@@ -1,0 +1,91 @@
+import sys::console; // for 'setForeground', 'resetColor' and 'clearScreen'
+
+// Adds an element in the tree
+function addTree(ref tree, elem, prn = null)
+{
+	if (tree == null)
+		tree = new {value = elem, parent = prn, left = null, right = null};
+	else if (elem <= tree.value)
+		addTree(tree.left, elem, tree);
+	else
+		addTree(tree.right, elem, tree);
+}
+
+// Computes the depth of the tree
+function treeDepth(tree)
+{
+	if (tree == null) return 0;
+	return 1 + max(treeDepth(tree.left), treeDepth(tree.right));
+}
+
+// Finds a node in the tree
+function findNode(tree, elem)
+{
+	if (tree == null) return null;
+	if (tree.value == elem) return tree;
+	return findNode(tree.left, elem) ?? findNode(tree.right, elem);
+}
+
+// Prints the tree
+function printTree(tree, bookmark = null)
+{
+	if (tree == null) return;
+	
+	printLeading(tree);
+	setForeground(tree == bookmark ? "Yellow" : "Red");
+	println(tree.value);
+	resetColor();
+	
+	printTree(tree.left, bookmark);
+	printTree(tree.right, bookmark);
+}
+
+/**
+* Prints the leading part of a row
+* according to the node's depth and position
+*/
+function printLeading(node)
+{
+	if (node.parent == null) return;
+	
+	var tmpNode = node.parent, leading = "";
+	while (tmpNode.parent != null)
+	{
+		var tmpParent = tmpNode.parent;
+		
+		if (tmpNode == tmpParent.left && tmpParent.right != null)
+			leading = "|   " + leading;
+		else
+			leading = "    " + leading;
+		
+		tmpNode = tmpParent;
+	}
+	
+	print(leading + "+---");
+}
+
+/********************** MAIN PROGRAM **********************/
+tree = null;
+for (i = 0; i < 20; i++)
+{
+    addTree(tree, floor(100 * rand()));
+}
+
+printTree(tree);
+println();
+
+println("tree depth: {0}", treeDepth(tree));
+println();
+
+value = (int) readln("value to find = ");
+found = findNode(tree, value);
+
+if (found != null)
+{
+	clear();
+	printTree(tree, found);
+}
+else
+	println("not found");
+
+readln();

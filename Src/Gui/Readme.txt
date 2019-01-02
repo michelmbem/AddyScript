@@ -1,0 +1,1 @@
+﻿To be able to load TestForm.cs in the Windows Forms designer, first move SciLexer.dll to the Windows directory.

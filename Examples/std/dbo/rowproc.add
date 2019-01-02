@@ -1,0 +1,17 @@
+function to_list(reader) {
+	var i, result = [];
+	for (i = 0; i < reader.FieldCount; ++i)
+		result.add(reader[i]);
+	return result;
+}
+
+function to_map(reader) {
+	var i, result = {=>};
+	for (i = 0; i < reader.FieldCount; ++i)
+		result[reader.GetName(i)] = reader[i];
+	return result;
+}
+
+function to_object(reader) {
+	return (object) to_map(reader);
+}

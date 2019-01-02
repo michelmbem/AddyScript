@@ -1,0 +1,29 @@
+function sum(v)
+{
+	var res = 0;
+	v.each(|item| => res += item);
+	return res;
+}
+
+t = [];
+n = (int) readln("how many items? ");
+
+if (n <= 0)
+	println("goodbye!");
+else
+{
+	for (i = 0; i < n; ++i)
+	{
+		print("item no. {0} = ", i + 1);
+		t.add((float) readln());
+	}
+	
+	s = sum(t);
+	println("you've entered: " + t.join(", "));
+	println("the sum of items is: " + s);
+	println("the minimum is: " + min(t));
+	println("the maximum is: " + max(t));
+	println("the averrage is: " + (s / n));
+}
+
+readln();

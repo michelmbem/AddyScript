@@ -1,0 +1,14 @@
+try {
+	daoType = System::Type::GetTypeFromProgID("Employee Data Access Object", "PC-MIKE");
+	dao = System::Activator::CreateInstance(daoType);
+	lst = dao.GetAll();
+	
+	println("{0,-5}{1,-15}{2,-15}", "ID", "First Name", "Last Name");
+	println("-" * 35);
+	foreach (obj in lst)
+		println("{0,-5}{1,-15}{2,-15}", obj.Id, obj.FirstName, obj.LastName);
+} catch (e) {
+	println(e.message);
+}
+
+readln();

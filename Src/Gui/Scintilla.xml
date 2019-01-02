@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScintillaNET>
+  <Language Name="default">
+    <Styles>
+      <Style Name="Default" FontName="Courier New" Size="11"/>
+    </Styles>
+  </Language>
+
+  <Language Name="addyscript">
+    <AutoComplete FillUpCharacters="" SingleLineAccept="True" IsCaseSensitive="False">
+      <List>
+        abs?3 abstract?0 acos?3 as?0 asin?3 atan?3 atan2?3 bool?1 break?0 case?0 catch?0 ceil?3 chr?3 class?0
+        closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
+        default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 fifo?3 final?0
+        finally?0 float?1 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1
+        is?4 lifo?3 list?1 log?3 log10?3 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2
+        min?3 MINDATE?2 MINFLOAT?2 MININT?2 NAN?2 new?4 NEWLINE?2 NINFINITY?2 now?3 null?2 object?1 operator?0
+        ord?3 pack?3 params?0 PI?2 PINFINITY?2 print?3 println?3 private?0 property?0 protected?0 public?0 queue?1
+        rad2deg?3 rand?3 randint?3 rational?1 read?5 readln?3 ref?0 resource?1 return?0 round?3 set?1 sign?3
+        sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1 super?0 switch?0 tan?3 tanh?3 this?5
+        throw?0 true?2 trunc?3 try?0 typeof?4 unpack?3 var?0 void?1 while?0 write?5
+      </List>
+    </AutoComplete>
+
+    <Indentation TabWidth="4" SmartIndentType="cpp" />
+
+    <Lexer LexerName="cpp" LineCommentPrefix="//" StreamCommentPrefix="/* " StreamCommentSuffix=" */" >
+      <Keywords List="0" Inherit="False">
+        abstract as bool break case catch class closure complex const constructor contains continue date decimal default
+        do else endswith event extern false final finally float for foreach function goto if import in int is list long
+        map matches new null object operator params private property protected public queue rational read ref resource
+        return set stack startswith static string super switch this throw true try typeof var void while write
+      </Keywords>
+      <Keywords List="1" Inherit="False">
+        abs acos asin atan atan2 ceil chr cos cosh deg2rad E eval exp fifo floor format I lifo log log10 log2 max
+        MAXDATE MAXFLOAT MAXINT min MINDATE MINFLOAT MININT NAN NINFINITY NEWLINE now ord pack PI PINFINITY print
+        println rad2deg rand randint readln round sign sin sinh sqrt tan tanh trunc unpack
+      </Keywords>
+    </Lexer>
+
+    <Styles>
+      <Style Name="COMMENT" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTBLOCK" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTDOC" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTDOCKEYWORD" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTDOCKEYWORDERROR" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTLINE" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTLINEBANG" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="COMMENTLINEDOC" ForeColor="Gray" Size="9" Italic="True" />
+      <Style Name="CHARACTER" ForeColor="Green" />
+      <Style Name="STRING" ForeColor="Green" />
+      <Style Name="STRINGEOL" ForeColor="Green" BackColor="Transparent" />
+      <Style Name="VERBATIM" ForeColor="Green" />
+      <Style Name="WORD" ForeColor="Blue" Bold="True" />
+      <Style Name="WORD2" ForeColor="Purple" />
+      <Style Name="OPERATOR" ForeColor="Navy" Size="10" Bold="True" />
+      <Style Name="BRACELIGHT" Size="11" />
+      <Style Name="PREPROCESSOR" ForeColor="Black" />
+    </Styles>
+
+    <Snippets>
+      <Snippet Shortcut="if" IsSurroundsWith="false">if ($expression$)
+  $end$</Snippet>
+      
+      <Snippet Shortcut="else" IsSurroundsWith="false">else
+  $end$</Snippet>
+      
+      <Snippet Shortcut="ifb" IsSurroundsWith="true">if ($expression$)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="elseb" IsSurroundsWith="true">else
+{
+    $end$$selected$
+}</Snippet>
+
+        <Snippet Shortcut="ifmain" IsSurroundsWith="true">if (__name == 'main')
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="for" IsSurroundsWith="True">for ($i$ = $0$; $i$ &lt; $n$; $i$++)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="foreach" IsSurroundsWith="True">foreach ($item$ in $list$)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="foreachkv" IsSurroundsWith="True">foreach ($key$ => $value$ in $list$)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="while" IsSurroundsWith="true">while ($expression$)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="do" IsSurroundsWith="true">do
+{
+    $end$$selected$
+} while ($expression$);</Snippet>
+      
+      <Snippet Shortcut="switch" IsSurroundsWith="false">switch ($switch_on$)
+{
+    $end$
+    default:
+        $selected$
+}</Snippet>
+      
+      <Snippet Shortcut="try" IsSurroundsWith="true">try
+{
+    $end$$selected$
+}
+catch (e)
+{
+    
+}</Snippet>
+      
+      <Snippet Shortcut="tryf" IsSurroundsWith="true">try
+{
+    $end$$selected$
+}
+finally
+{
+    
+}</Snippet>
+      
+      <Snippet Shortcut="function" IsSurroundsWith="true">function $fname$($args$)
+{
+    $end$$selected$
+}</Snippet>
+      
+      <Snippet Shortcut="class" IsSurroundsWith="true">class $cname$
+{
+    $end$$selected$
+}</Snippet>
+    </Snippets>
+  </Language>
+</ScintillaNET>

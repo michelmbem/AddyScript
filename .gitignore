@@ -1,0 +1,16 @@
+﻿################################################################################
+# Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
+################################################################################
+
+/Bin/Debug
+/Backups
+/Examples/my
+/Src/.vs/AddyScript/v15
+/Src/AddyScript/obj
+/Src/Gui/obj
+/Src/GuiUtilities/obj
+/Src/Interactive/obj
+/Src/Manual/hm
+/Src/Manual/AddyScript-original.chm
+/Src/Plotter/obj
+/Src/Test/obj

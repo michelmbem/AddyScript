@@ -1,0 +1,7 @@
+[Procedure(library="user32", name="MessageBox", returnType="Int32")]
+extern function msgbox([Parameter(type="IntPtr")] hWnd,
+					   [Parameter(type="String")] message,
+					   [Parameter(type="String")] title,
+					   [Parameter(type="Int32")] flags);
+
+msgbox(null, "Hello y'all!", "Win32 Greatings", 0x141);

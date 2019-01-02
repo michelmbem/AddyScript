@@ -1,0 +1,6 @@
+const FORMAT = '<hI15sf12p2xP';
+b = pack(FORMAT, -4, 5, "bonjour l'ami", 20, 'cmt vas-tu?', System::IntPtr::Zero);
+println('{0:x}', b);
+s = unpack(FORMAT, b);
+println(s);
+readln();

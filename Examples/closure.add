@@ -1,0 +1,51 @@
+class Toto
+{
+	private static m = 1;
+	private n = 10;
+	
+	public static function getClosureStatic()
+	{
+		return |x| => Toto::m += x;
+	}
+	
+	public function getClosure()
+	{
+		return |x| => this.n += x;
+	}
+}
+
+function getTotoClosure()
+{
+	var toto = new Toto();
+	return toto.getClosure();
+}
+
+function getClosure()
+{
+	var n = 5;
+	return |x| => n += x;
+}
+
+println('Toto::getClosureStatic');
+f = Toto::getClosureStatic();
+for (i = 0; i < 10; i += 2)
+	println(f(i));
+println();
+
+println('Toto::getClosure');
+g = new Toto().getClosure();
+for (i = 0; i < 10; i += 2)
+	println(g(i));
+println();
+
+println('getTotoClosure');
+h = getTotoClosure();
+for (i = 0; i < 10; i += 2)
+	println(h(i));
+println();
+
+println('getClosure');
+j = getClosure();
+for (i = 0; i < 10; i += 2)
+	println(j(i));
+readln();

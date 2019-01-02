@@ -1,0 +1,81 @@
+abstract class Geometry
+{
+	public abstract function perimeter();
+	public abstract function surface();
+}
+
+class Rectangle : Geometry
+{
+	public constructor (length, width)
+	{
+		this.length = length;
+		this.width = width;
+	}
+	
+	public property length { read; private write; }
+	public property width { read; private write; }
+	
+	public function perimeter()
+	{
+		return 2 * (this.length + this.width);
+	}
+	
+	public function surface()
+	{
+		return this.length * this.width;
+	}
+}
+
+class Square : Rectangle
+{
+	public constructor (side) : super(side, side)
+	{
+	}
+}
+
+class Circle : Geometry
+{
+	public constructor (radius)
+	{
+		this.radius = radius;
+	}
+	
+	public property radius { read; private write; }
+	
+	public function perimeter()
+	{
+		return 2 * PI * this.radius;
+	}
+	
+	public function surface()
+	{
+		return PI * this.radius ** 2;
+	}
+}
+
+geoms = list::create(3); 
+geoms[0] = new Rectangle(6, 4);
+geoms[1] = new Square(5);
+geoms[2] = new Circle(3);
+
+try
+{
+	geoms.add(new Geometry());
+	println('if you see this message, then something went wrong');
+}
+catch (e)
+{
+	println('Error: ' + e.message);
+	println();
+}
+
+foreach (geom in geoms)
+{
+	println('{0}:', geom.type.name);
+	println('----------');
+	println(' - perimeter = {0:0.##}', geom.perimeter());
+	println(' - surface = {0:0.##}', geom.surface());
+	println();
+}
+
+readln();

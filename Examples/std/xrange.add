@@ -1,0 +1,67 @@
+class Range
+{
+	private start;
+	private end;
+	private step;
+	private current;
+	
+	public constructor(start, end, step)
+	{
+		this.start = min(start, end);
+		this.end = max(start, end);
+		this.step = abs(step);
+	}
+	
+	public function moveFirst()
+	{
+		this.current = this.start;
+	}
+	
+	public function hasNext()
+	{
+		return this.current < this.end;
+	}
+	
+	public function moveNext()
+	{
+		var current = this.current;
+		this.current += this.step;
+		return current;
+	}
+	
+	/**
+	* This is a complementary method to make a range
+	* behave like any other collection.
+	*/
+	public function each(action) {
+		var item;
+		foreach (item in this)
+			action(item);
+		return this;
+	}
+	
+	public function toList() {
+		var res = [];
+		foreach (item in this)
+			res.add(item);
+		return res;
+	}
+	
+	public function toSet() {
+		var res = {};
+		foreach (item in this)
+			res.add(item);
+		return res;
+	}
+}
+
+function xrange(start, end = 0, step = 1)
+{
+	return new Range(start, end, step);
+}
+
+if (__name == 'main')
+{
+	xrange(10).each(|v| => print('{0} ', v));
+	readln();
+}

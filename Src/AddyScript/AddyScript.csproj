@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CCFE218B-2FBF-49FD-9D9B-875BD85E2645}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>AddyScript</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>AddyScript</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\Bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\..\Bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\Bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>..\..\Bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ast\Expressions\AnonymousCall.cs" />
+    <Compile Include="Ast\Expressions\ComplexInitializer.cs" />
+    <Compile Include="Ast\Expressions\Call.cs" />
+    <Compile Include="Ast\Expressions\TypeExpression.cs" />
+    <Compile Include="Ast\Expressions\Literal.cs" />
+    <Compile Include="Ast\Expressions\SetInitializer.cs" />
+    <Compile Include="Ast\Expressions\MapInitializer.cs" />
+    <Compile Include="Compilers\CodeGenerator.cs" />
+    <Compile Include="Compilers\Utility\IndentedTextWriter.cs" />
+    <Compile Include="Ast\Expressions\ExternalFunctionCall.cs" />
+    <Compile Include="Parsers\Keyword.cs" />
+    <Compile Include="Parsers\Lexer.cs" />
+    <Compile Include="Runtime\ClassEvent.cs" />
+    <Compile Include="Runtime\ClassMemberSet.cs" />
+    <Compile Include="Runtime\ClassProperty.cs" />
+    <Compile Include="Runtime\Dynamics\Boolean.cs" />
+    <Compile Include="Runtime\Dynamics\Complex.cs" />
+    <Compile Include="Runtime\Dynamics\Closure.cs" />
+    <Compile Include="Runtime\Dynamics\Rational.cs" />
+    <Compile Include="Runtime\Dynamics\Date.cs" />
+    <Compile Include="Runtime\Dynamics\Decimal.cs" />
+    <Compile Include="Runtime\Dynamics\Dynamic.cs" />
+    <Compile Include="Runtime\Dynamics\DynamicFactory.cs" />
+    <Compile Include="Runtime\Dynamics\Float.cs" />
+    <Compile Include="Runtime\Dynamics\Integer.cs" />
+    <Compile Include="Runtime\Dynamics\List.cs" />
+    <Compile Include="Runtime\Dynamics\Long.cs" />
+    <Compile Include="Runtime\Dynamics\Map.cs" />
+    <Compile Include="Runtime\Dynamics\Object.cs" />
+    <Compile Include="Runtime\Dynamics\Queue.cs" />
+    <Compile Include="Runtime\Dynamics\Resource.cs" />
+    <Compile Include="Runtime\Dynamics\Set.cs" />
+    <Compile Include="Runtime\Dynamics\Stack.cs" />
+    <Compile Include="Runtime\Dynamics\String.cs" />
+    <Compile Include="Runtime\Dynamics\DynamicBinder.cs" />
+    <Compile Include="Runtime\Dynamics\Undefined.cs" />
+    <Compile Include="Runtime\Dynamics\Void.cs" />
+    <Compile Include="Runtime\Frames\BlockFrame.cs" />
+    <Compile Include="Runtime\Frames\CallContext.cs" />
+    <Compile Include="Runtime\Frames\Frame.cs" />
+    <Compile Include="Runtime\Frames\IFrameItem.cs" />
+    <Compile Include="Runtime\Frames\FrameItemKind.cs" />
+    <Compile Include="Runtime\Frames\MethodFrame.cs" />
+    <Compile Include="Runtime\MemberKind.cs" />
+    <Compile Include="Runtime\Utilities\BinaryFormatter.cs" />
+    <Compile Include="Runtime\Utilities\NameTree.cs" />
+    <Compile Include="Runtime\Utilities\NameTreeNode.cs" />
+    <Compile Include="Runtime\NativeTypes\BigDecimal.cs" />
+    <Compile Include="Compilers\Utility\MissingReferenceAction.cs" />
+    <Compile Include="Ast\Expressions\QualifiedName.cs" />
+    <Compile Include="Runtime\Constant.cs" />
+    <Compile Include="Runtime\PropertyAccess.cs" />
+    <Compile Include="Runtime\Utilities\MathUtil.cs" />
+    <Compile Include="Runtime\NativeTypes\Rational32.cs" />
+    <Compile Include="Runtime\RuntimeServices.cs" />
+    <Compile Include="Runtime\StaticTypeMember.cs" />
+    <Compile Include="Ast\Statements\ConstantDecl.cs" />
+    <Compile Include="Ast\Statements\ExternalFunctionDecl.cs" />
+    <Compile Include="Ast\Statements\Label.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Utilities\PackFormat.cs" />
+    <Compile Include="Runtime\Utilities\Reflector.cs" />
+    <Compile Include="Runtime\Utilities\StringUtil.cs" />
+    <Compile Include="ScriptElement.cs" />
+    <Compile Include="ScriptLocation.cs" />
+    <Compile Include="Compilers\ICompiler.cs" />
+    <Compile Include="Compilers\Interpreter.cs" />
+    <Compile Include="Compilers\XmlGenerator.cs" />
+    <Compile Include="Ast\Expressions\BinaryOperator.cs" />
+    <Compile Include="Runtime\ClassID.cs" />
+    <Compile Include="Runtime\Modifier.cs" />
+    <Compile Include="Runtime\JumpCode.cs" />
+    <Compile Include="Runtime\Scope.cs" />
+    <Compile Include="Parsers\TokenID.cs" />
+    <Compile Include="Ast\Expressions\UnaryOperator.cs" />
+    <Compile Include="Runtime\RuntimeException.cs" />
+    <Compile Include="Parsers\ParseException.cs" />
+    <Compile Include="ScriptException.cs" />
+    <Compile Include="Ast\Expressions\ListInitializer.cs" />
+    <Compile Include="Ast\Expressions\ItemRef.cs" />
+    <Compile Include="Ast\Expressions\Assignment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Expressions\BinaryExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Expressions\MapItemInitializer.cs" />
+    <Compile Include="Ast\Expressions\ConstructorCall.cs" />
+    <Compile Include="Ast\Expressions\Conversion.cs" />
+    <Compile Include="Ast\Expressions\PropertyInitializer.cs" />
+    <Compile Include="Ast\Expressions\InlineFunction.cs" />
+    <Compile Include="Ast\Expressions\InnerFunctionCall.cs" />
+    <Compile Include="Ast\Expressions\MethodCall.cs" />
+    <Compile Include="Ast\Expressions\PropertyRef.cs" />
+    <Compile Include="Ast\Expressions\ParentMethodCall.cs" />
+    <Compile Include="Ast\Expressions\StaticMethodCall.cs" />
+    <Compile Include="Ast\Expressions\StaticPropertyRef.cs" />
+    <Compile Include="Ast\Expressions\ObjectInitializer.cs" />
+    <Compile Include="Ast\Expressions\TypeOfExpression.cs" />
+    <Compile Include="Ast\Expressions\VariableRef.cs" />
+    <Compile Include="Ast\Expressions\TernaryExpression.cs" />
+    <Compile Include="Ast\Expressions\ThisReference.cs" />
+    <Compile Include="Ast\Expressions\TypeVerification.cs" />
+    <Compile Include="Runtime\Class.cs" />
+    <Compile Include="Runtime\ClassField.cs" />
+    <Compile Include="Runtime\ClassMember.cs" />
+    <Compile Include="Runtime\ClassMethod.cs" />
+    <Compile Include="Runtime\Function.cs" />
+    <Compile Include="Runtime\InnerFunction.cs" />
+    <Compile Include="Runtime\Parameter.cs" />
+    <Compile Include="Parsers\BaseParser.cs" />
+    <Compile Include="Parsers\ExpressionParser.cs" />
+    <Compile Include="Parsers\Parser.cs" />
+    <Compile Include="Parsers\Token.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptContext.cs" />
+    <Compile Include="ScriptEngine.cs" />
+    <Compile Include="Runtime\Attribute.cs" />
+    <Compile Include="Ast\Statements\Block.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Expressions\Expression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Expressions\FunctionCall.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Expressions\UnaryExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Statements\Break.cs" />
+    <Compile Include="Ast\Statements\ClassDefinition.cs" />
+    <Compile Include="Ast\Statements\Continue.cs" />
+    <Compile Include="Ast\Statements\StatementWithAttributes.cs" />
+    <Compile Include="Runtime\AttributeProperty.cs" />
+    <Compile Include="Ast\Statements\Goto.cs" />
+    <Compile Include="Ast\Statements\Statement.cs" />
+    <Compile Include="Ast\Statements\ParentConstructorCall.cs" />
+    <Compile Include="Ast\Statements\Return.cs" />
+    <Compile Include="Ast\Statements\Throw.cs" />
+    <Compile Include="Ast\Statements\TryCatchFinally.cs" />
+    <Compile Include="Ast\Statements\ImportDirective.cs" />
+    <Compile Include="Ast\Statements\SwitchBlock.cs" />
+    <Compile Include="Ast\Statements\ForEachLoop.cs" />
+    <Compile Include="Ast\Statements\DoLoop.cs" />
+    <Compile Include="Ast\Statements\ForLoop.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Statements\FunctionDecl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Statements\IfThenElse.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Statements\VariableDecl.cs" />
+    <Compile Include="Ast\Program.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\AstNode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ast\Statements\CaseLabel.cs" />
+    <Compile Include="Ast\Statements\WhileLoop.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.fr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,16 @@
+l = ['orange', 'banana', 'lime', 'apple', 'beef', 'melon'];
+l1 = l;
+l2 = l.clone();
+
+println('before the removal of item 4');
+println('----------------------------');
+println('copy  : ' + l1);
+println('clone : ' + l2);
+println();
+
+l.removeAt(4);
+println('after the removal of item 4');
+println('---------------------------');
+println('copy  : ' + l1);
+println('clone : ' + l2);
+readln();
