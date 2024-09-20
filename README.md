@@ -125,12 +125,12 @@ The editor window uses the [Scintilla.NET](https://github.com/desjarlais/Scintil
 *	Ability to overload postfix unary operators in custom classes (ver. 0.9.9).
 *	Ability to invoke base type property or indexer in derived classes (ver. 0.9.9).
 *	Ability to invoke functions with explicitly named parameters in random order (ver. 0.9.9).
+*	Migration to dotnet 8.0 (ver. 0.9.9).
 consult the Changes history page of the help manual for more details.
 
 ## What's still to come?
 *	The ability to compile a script to a managed DLL or executable via Reflection.Emit; that's the real next step. This will enhance runtime performances as well as bringing other functionalities like the ability to subclass a .Net's type from a script.
 *	Redesign of the **import** directive syntax: it should look like a function call with a string argument.
-*	Migration to a recent version of the dotnet sdk and/or runtime.
 *	Migration of the GUI to [AvaloniaUI](https://avaloniaui.net/) for a better multiplatform support;
 *	Additional localized UI resources (It's up to you to do that).
 *	Maybe a variant number of strongly typed catch clause in the try-catch-finally statement.
