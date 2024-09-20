@@ -126,6 +126,7 @@ The editor window uses the [Scintilla.NET](https://github.com/desjarlais/Scintil
 *	Ability to invoke base type property or indexer in derived classes (ver. 0.9.9).
 *	Ability to invoke functions with explicitly named parameters in random order (ver. 0.9.9).
 *	Migration to dotnet 8.0 (ver. 0.9.9).
+
 consult the Changes history page of the help manual for more details.
 
 ## What's still to come?
