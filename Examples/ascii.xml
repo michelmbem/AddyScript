@@ -5,21 +5,25 @@
     <Arguments>
       <Literal Type="string" Value="Yellow" />
     </Arguments>
+    <NamedArgs />
   </FunctionCall>
   <FunctionCall FunctionName="println">
     <Arguments>
       <Literal Type="string" Value="******** THE ASCII CODE ********" />
     </Arguments>
+    <NamedArgs />
   </FunctionCall>
   <FunctionCall FunctionName="println">
     <Arguments>
       <Literal Type="string" Value="" />
     </Arguments>
+    <NamedArgs />
   </FunctionCall>
   <FunctionCall FunctionName="print">
     <Arguments>
       <Literal Type="string" Value="  " />
     </Arguments>
+    <NamedArgs />
   </FunctionCall>
   <ForLoop>
     <Initializers>
@@ -56,15 +60,18 @@
             <Literal Type="string" Value="{0:X} " />
             <VariableRef Name="i" />
           </Arguments>
+          <NamedArgs />
         </FunctionCall>
       </Block>
     </Action>
   </ForLoop>
   <FunctionCall FunctionName="println">
     <Arguments />
+    <NamedArgs />
   </FunctionCall>
   <FunctionCall FunctionName="resetColor">
     <Arguments />
+    <NamedArgs />
   </FunctionCall>
   <ForLoop>
     <Initializers>
@@ -100,15 +107,18 @@
           <Arguments>
             <Literal Type="string" Value="Yellow" />
           </Arguments>
+          <NamedArgs />
         </FunctionCall>
         <FunctionCall FunctionName="print">
           <Arguments>
             <Literal Type="string" Value="{0:X} " />
             <VariableRef Name="i" />
           </Arguments>
+          <NamedArgs />
         </FunctionCall>
         <FunctionCall FunctionName="resetColor">
           <Arguments />
+          <NamedArgs />
         </FunctionCall>
         <IfElse>
           <Condition>
@@ -185,8 +195,10 @@
                               </RightOperand>
                             </BinaryExpression>
                           </Arguments>
+                          <NamedArgs />
                         </FunctionCall>
                       </Arguments>
+                      <NamedArgs />
                     </FunctionCall>
                   </Block>
                 </Action>
@@ -196,11 +208,13 @@
         </IfElse>
         <FunctionCall FunctionName="println">
           <Arguments />
+          <NamedArgs />
         </FunctionCall>
       </Block>
     </Action>
   </ForLoop>
   <FunctionCall FunctionName="readln">
     <Arguments />
+    <NamedArgs />
   </FunctionCall>
 </Program>

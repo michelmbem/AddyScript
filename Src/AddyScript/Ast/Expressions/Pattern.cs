@@ -1,5 +1,4 @@
 using AddyScript.Ast.Statements;
-using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 
 
@@ -57,11 +56,9 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="ValuePattern"/>.
     /// </remarks>
-    /// <param name="val">The value this <see cref="Pattern"/> compares other values to in order to match them</param>
-    public class ValuePattern(DataItem val) : Pattern
+    /// <param name="value">The value this <see cref="Pattern"/> compares other values to in order to match them</param>
+    public class ValuePattern(DataItem value) : Pattern
     {
-        private readonly DataItem value = val;
-
         /// <summary>
         /// The value this <see cref="Pattern"/> compares other values to in order to match them.
         /// </summary>
@@ -80,17 +77,14 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="RangePattern"/>.
     /// </remarks>
-    /// <param name="lBound">
+    /// <param name="lowerBound">
     /// The lower bound of the range in which values must be for this <see cref="Pattern"/> to match them
     /// </param>
-    /// <param name="uBound">
+    /// <param name="upperBound">
     /// The upper bound of the range in which values must be for this <see cref="Pattern"/> to match them.
     /// </param>
-    public class RangePattern(DataItem lBound, DataItem uBound) : Pattern
+    public class RangePattern(DataItem lowerBound, DataItem upperBound) : Pattern
     {
-        private readonly DataItem lowerBound = lBound;
-        private readonly DataItem upperBound = uBound;
-
         /// <summary>
         /// The lower bound of the range in which values must be for this <see cref="Pattern"/> to match them.
         /// </summary>
@@ -125,11 +119,9 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="TypePattern"/>.
     /// </remarks>
-    /// <param name="tName">The name of the type values should be for this <see cref="Pattern"/> to match them</param>
-    public class TypePattern(string tName) : Pattern
+    /// <param name="typeName">The name of the type values should be for this <see cref="Pattern"/> to match them</param>
+    public class TypePattern(string typeName) : Pattern
     {
-        private readonly string typeName = tName;
-
         /// <summary>
         /// The name of the type values should be for this <see cref="Pattern"/> to match them.
         /// </summary>
@@ -149,12 +141,10 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="ObjectPattern"/>.
     /// </remarks>
-    /// <param name="tName">The name of the type values should be for this <see cref="Pattern"/> to match them</param>
-    /// <param name="ex">An object that will be compared property by property to any object to be matched</param>
-    public class ObjectPattern(string tName, DataItem ex) : TypePattern(tName)
+    /// <param name="typeName">The name of the type values should be for this <see cref="Pattern"/> to match them</param>
+    /// <param name="example">An object that will be compared property by property to any object to be matched</param>
+    public class ObjectPattern(string typeName, DataItem example) : TypePattern(typeName)
     {
-        private readonly DataItem example = ex;
-
         /// <summary>
         /// An object that will be compared property by property to any object to be matched.
         /// </summary>
@@ -185,15 +175,12 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="PredicatePattern"/>.
     /// </remarks>
-    /// <param name="paramName">
+    /// <param name="parameterName">
     /// The name of the parameter of the predicate that this <see cref="Pattern"/> invokes to match a value
     /// </param>
-    /// <param name="pred">The predicate that this <see cref="Pattern"/> invokes to match a value</param>
-    public class PredicatePattern(string paramName, Expression pred) : Pattern
+    /// <param name="predicate">The predicate that this <see cref="Pattern"/> invokes to match a value</param>
+    public class PredicatePattern(string parameterName, Expression predicate) : Pattern
     {
-        private readonly string parameterName = paramName;
-        private readonly Expression predicate = pred;
-
         /// <summary>
         /// The name of the parameter of the predicate that this <see cref="Pattern"/> invokes to match a value.<br/>
         /// It is basically an alias for the value that is being tested within the predicate's body.
@@ -208,8 +195,8 @@ namespace AddyScript.Ast.Expressions
         public override Expression GetMatchTest(Expression arg)
         {
             var parameter = new ParameterDecl(parameterName, false, false, null);
-            var inlineFn = new InlineFunction(new[] { parameter }, Block.Return(predicate));
-            return new AnonymousCall(inlineFn, new[] { arg }, null);
+            var inlineFn = new InlineFunction([parameter], Block.Return(predicate));
+            return new AnonymousCall(inlineFn, [arg], null);
         }
     }
 
@@ -221,11 +208,9 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="CompositePattern"/>.
     /// </remarks>
-    /// <param name="comps"></param>
-    public class CompositePattern(params Pattern[] comps) : Pattern
+    /// <param name="components"></param>
+    public class CompositePattern(params Pattern[] components) : Pattern
     {
-        private readonly Pattern[] components = comps;
-
         /// <summary>
         /// The children of this <see cref="CompositePattern"/>.
         /// </summary>

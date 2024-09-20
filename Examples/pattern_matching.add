@@ -98,5 +98,15 @@ l.each(|item| => {
 	println($'result with item: {res}');
 	println('-' * 110);
 });
+println();
+
+try {
+	randint(-7, 3) switch {
+		0..3 => println($'{__value} is OK!');
+		_ => throw 'I don\'t like negative values';
+	};
+} catch (e) {
+	println(e.name + ' : ' + e.message);
+}
 
 readln();

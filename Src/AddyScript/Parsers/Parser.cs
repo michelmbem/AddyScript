@@ -394,6 +394,14 @@ namespace AddyScript.Parsers
                 anoCall.CopyLocation(body);
                 return anoCall;
             }
+            
+            if (TryMatch(TokenID.KW_Throw))
+            {
+                Throw _throw = Throw();
+                var anoCall = new AnonymousCall(new InlineFunction([], new Block(_throw)), null, null);
+                anoCall.CopyLocation(_throw);
+                return anoCall;
+            }
 
             return base.MatchCaseExpression();
         }

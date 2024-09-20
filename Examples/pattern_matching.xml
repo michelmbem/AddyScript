@@ -75,7 +75,7 @@
         </Parameters>
         <Body>
           <Return>
-            <StringInterpolation Pattern="Employee {{name: {0}, age: {1}, salary: {2}, dateHired: {3: &quot;d&quot;}}}">
+            <StringInterpolation Pattern="Employee {{name: {0}, age: {1}, salary: {2}, dateHired: {3:d}}}">
               <Substitions>
                 <PropertyRef PropertyName="name" Optional="False">
                   <Owner>
@@ -151,7 +151,7 @@
         </Parameters>
         <Body>
           <Return>
-            <StringInterpolation Pattern="Developper {{name: {0}, age: {1}, salary: {2}, dateHired: {3: &quot;d&quot;}, languages: {4}}}">
+            <StringInterpolation Pattern="Developper {{name: {0}, age: {1}, salary: {2}, dateHired: {3:d}, languages: {4}}}">
               <Substitions>
                 <PropertyRef PropertyName="name" Optional="False">
                   <Owner>
@@ -196,7 +196,7 @@
   </ClassDefinition>
   <Assignment Operator="None">
     <LeftOperand>
-      <VariableRef Name="obj" />
+      <VariableRef Name="o" />
     </LeftOperand>
     <RightOperand>
       <ObjectInitializer>
@@ -225,13 +225,19 @@
     <RightOperand>
       <PatternMatching>
         <Expression>
-          <VariableRef Name="obj" />
+          <VariableRef Name="o" />
         </Expression>
         <MatchCases>
           <MatchCase>
             <NullPattern />
             <Expression>
               <Literal Type="string" Value="null" />
+            </Expression>
+          </MatchCase>
+          <MatchCase>
+            <ValuePattern Value="5" />
+            <Expression>
+              <Literal Type="string" Value="five" />
             </Expression>
           </MatchCase>
           <MatchCase>
@@ -250,21 +256,15 @@
               <Literal Type="string" Value="my object of size 18" />
             </Expression>
           </MatchCase>
-          <MatchCase>
-            <ValuePattern Value="5" />
-            <Expression>
-              <Literal Type="string" Value="five" />
-            </Expression>
-          </MatchCase>
         </MatchCases>
       </PatternMatching>
     </RightOperand>
   </Assignment>
   <FunctionCall FunctionName="println">
     <Arguments>
-      <StringInterpolation Pattern="obj = {0}">
+      <StringInterpolation Pattern="o is {0}">
         <Substitions>
-          <VariableRef Name="obj" />
+          <VariableRef Name="o" />
         </Substitions>
       </StringInterpolation>
     </Arguments>
@@ -272,7 +272,7 @@
   </FunctionCall>
   <FunctionCall FunctionName="println">
     <Arguments>
-      <StringInterpolation Pattern="result with obj: {0}">
+      <StringInterpolation Pattern="result with o: {0}">
         <Substitions>
           <VariableRef Name="res" />
         </Substitions>
@@ -297,7 +297,7 @@
           <MatchCase>
             <ValuePattern Value="3,14" />
             <Expression>
-              <Literal Type="string" Value="three dot fourteen" />
+              <Literal Type="string" Value="three-point-fourteen" />
             </Expression>
           </MatchCase>
           <MatchCase>
@@ -309,7 +309,7 @@
               <ValuePattern Value="9" />
             </CompositePattern>
             <Expression>
-              <Literal Type="string" Value="in the set {0, 1, 2..4, 5..8, 9}" />
+              <Literal Type="string" Value="in the set {0, 1, 2 to 4, 5 to 8, 9}" />
             </Expression>
           </MatchCase>
           <MatchCase>
@@ -420,6 +420,13 @@
     <Arguments />
     <NamedArgs />
   </FunctionCall>
+  <ConstantDecl>
+    <PropertyInitializer Name="number_regex">
+      <Value>
+        <Literal Type="string" Value="[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?" />
+      </Value>
+    </PropertyInitializer>
+  </ConstantDecl>
   <Assignment Operator="None">
     <LeftOperand>
       <VariableRef Name="res" />
@@ -445,14 +452,14 @@
                         <VariableRef Name="x" />
                       </LeftOperand>
                       <RightOperand>
-                        <Literal Type="string" Value="[+-]?\d+" />
+                        <VariableRef Name="number_regex" />
                       </RightOperand>
                     </BinaryExpression>
                   </LeftOperand>
                   <RightOperand>
                     <BinaryExpression Operator="GreaterThan">
                       <LeftOperand>
-                        <Conversion TypeName="int">
+                        <Conversion TypeName="decimal">
                           <Expression>
                             <VariableRef Name="x" />
                           </Expression>
@@ -467,7 +474,7 @@
               </Predicate>
             </PredicatePattern>
             <Expression>
-              <Literal Type="string" Value="it's a positive integer" />
+              <Literal Type="string" Value="it's a positive number" />
             </Expression>
           </MatchCase>
           <MatchCase>
@@ -478,19 +485,19 @@
                     <VariableRef Name="x" />
                   </LeftOperand>
                   <RightOperand>
-                    <Literal Type="string" Value="[+-]?\d+" />
+                    <VariableRef Name="number_regex" />
                   </RightOperand>
                 </BinaryExpression>
               </Predicate>
             </PredicatePattern>
             <Expression>
-              <Literal Type="string" Value="it's just an integer" />
+              <Literal Type="string" Value="it's just a number" />
             </Expression>
           </MatchCase>
           <MatchCase>
             <AlwaysPattern />
             <Expression>
-              <Literal Type="string" Value="it's not an integer" />
+              <Literal Type="string" Value="it's not a number" />
             </Expression>
           </MatchCase>
         </MatchCases>
@@ -572,12 +579,44 @@
         <PropertyInitializers>
           <PropertyInitializer Name="name">
             <Value>
+              <Literal Type="string" Value="Ahmadu Suleyman" />
+            </Value>
+          </PropertyInitializer>
+          <PropertyInitializer Name="salary">
+            <Value>
+              <Literal Type="int" Value="7000" />
+            </Value>
+          </PropertyInitializer>
+        </PropertyInitializers>
+      </AlteredCopy>
+    </Arguments>
+    <NamedArgs />
+  </MethodCall>
+  <MethodCall FunctionName="add" Optional="False">
+    <Target>
+      <VariableRef Name="l" />
+    </Target>
+    <Arguments>
+      <AlteredCopy>
+        <PropertyInitializers>
+          <PropertyInitializer Name="name">
+            <Value>
               <Literal Type="string" Value="Kim Ondo" />
             </Value>
           </PropertyInitializer>
           <PropertyInitializer Name="age">
             <Value>
-              <Literal Type="int" Value="28" />
+              <Literal Type="int" Value="36" />
+            </Value>
+          </PropertyInitializer>
+          <PropertyInitializer Name="languages">
+            <Value>
+              <ListInitializer>
+                <Items>
+                  <Literal Type="string" Value="Python" />
+                  <Literal Type="string" Value="TypeScript" />
+                </Items>
+              </ListInitializer>
             </Value>
           </PropertyInitializer>
         </PropertyInitializers>
@@ -662,11 +701,111 @@
             </Arguments>
             <NamedArgs />
           </FunctionCall>
+          <FunctionCall FunctionName="println">
+            <Arguments>
+              <BinaryExpression Operator="Times">
+                <LeftOperand>
+                  <Literal Type="string" Value="-" />
+                </LeftOperand>
+                <RightOperand>
+                  <Literal Type="int" Value="110" />
+                </RightOperand>
+              </BinaryExpression>
+            </Arguments>
+            <NamedArgs />
+          </FunctionCall>
         </Body>
       </InlineFunction>
     </Arguments>
     <NamedArgs />
   </MethodCall>
+  <FunctionCall FunctionName="println">
+    <Arguments />
+    <NamedArgs />
+  </FunctionCall>
+  <TryCatchFinally ExceptionName="e">
+    <TryBlock>
+      <PatternMatching>
+        <Expression>
+          <FunctionCall FunctionName="randint">
+            <Arguments>
+              <UnaryExpression Operator="Minus">
+                <Operand>
+                  <Literal Type="int" Value="7" />
+                </Operand>
+              </UnaryExpression>
+              <Literal Type="int" Value="3" />
+            </Arguments>
+            <NamedArgs />
+          </FunctionCall>
+        </Expression>
+        <MatchCases>
+          <MatchCase>
+            <RangePattern LowerBound="0" UpperBound="3" />
+            <Expression>
+              <FunctionCall FunctionName="println">
+                <Arguments>
+                  <StringInterpolation Pattern="{0} is OK!">
+                    <Substitions>
+                      <VariableRef Name="__value" />
+                    </Substitions>
+                  </StringInterpolation>
+                </Arguments>
+                <NamedArgs />
+              </FunctionCall>
+            </Expression>
+          </MatchCase>
+          <MatchCase>
+            <AlwaysPattern />
+            <Expression>
+              <AnonymousCall>
+                <Callee>
+                  <InlineFunction>
+                    <Parameters />
+                    <Body>
+                      <Throw>
+                        <Literal Type="string" Value="I don't like negative values" />
+                      </Throw>
+                    </Body>
+                  </InlineFunction>
+                </Callee>
+              </AnonymousCall>
+            </Expression>
+          </MatchCase>
+        </MatchCases>
+      </PatternMatching>
+    </TryBlock>
+    <CatchBlock>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <BinaryExpression Operator="Plus">
+            <LeftOperand>
+              <BinaryExpression Operator="Plus">
+                <LeftOperand>
+                  <PropertyRef PropertyName="name" Optional="False">
+                    <Owner>
+                      <VariableRef Name="e" />
+                    </Owner>
+                  </PropertyRef>
+                </LeftOperand>
+                <RightOperand>
+                  <Literal Type="string" Value=" : " />
+                </RightOperand>
+              </BinaryExpression>
+            </LeftOperand>
+            <RightOperand>
+              <PropertyRef PropertyName="message" Optional="False">
+                <Owner>
+                  <VariableRef Name="e" />
+                </Owner>
+              </PropertyRef>
+            </RightOperand>
+          </BinaryExpression>
+        </Arguments>
+        <NamedArgs />
+      </FunctionCall>
+    </CatchBlock>
+  </TryCatchFinally>
   <FunctionCall FunctionName="readln">
     <Arguments />
     <NamedArgs />

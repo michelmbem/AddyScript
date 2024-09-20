@@ -16,6 +16,7 @@ using AutocompleteMenuNS;
 using ScintillaNET;
 using ScintillaNET_FindReplaceDialog;
 using ScintillaPrinting;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 
 namespace AddyScript.Gui
@@ -24,8 +25,9 @@ namespace AddyScript.Gui
     {
         #region Constants
 
-        // Default window title
+        // Default window title and help link
         private const string TITLE_BASE = "AddyScript";
+        private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/docs";
 
         // Some key constants
         private const int VK_CAPITAL = 0x14;
@@ -825,7 +827,7 @@ namespace AddyScript.Gui
                 };
 
                 if (!string.IsNullOrEmpty(filePath))
-                    dialog.FileName = Path.ChangeExtension(Path.GetFileName(filePath), dialog.DefaultExt);
+                    dialog.FileName = Path.GetFileNameWithoutExtension(filePath) + dialog.DefaultExt;
 
                 using (dialog)
                 {
@@ -833,7 +835,7 @@ namespace AddyScript.Gui
 
                     var program = ScriptEngine.ParseString(scintilla.Text);
                     ScriptEngine.ExportXml(program, dialog.FileName);
-                    Process.Start(dialog.FileName);
+                    Process.Start(new ProcessStartInfo(dialog.FileName) { UseShellExecute = true });
                 }
             }
             catch (Exception ex)
@@ -970,19 +972,17 @@ namespace AddyScript.Gui
 
                 if (asis.ExitCode <= 0) return;
 
-                using (var logReader = File.OpenText(logPath))
-                {
-                    if (logReader.ReadLine() != scriptPath) return;
+                using var logReader = File.OpenText(logPath);
+                if (logReader.ReadLine() != scriptPath) return;
 
-                    string[] parts = logReader.ReadLine().Split(',');
-                    var start = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
-                    
-                    parts = logReader.ReadLine().Split(',');
-                    var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
-                    
-                    errorMessage = logReader.ReadLine();
-                    ReportError(new ScriptElement(start, end));
-                }
+                string[] parts = logReader.ReadLine().Split(',');
+                var start = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+
+                parts = logReader.ReadLine().Split(',');
+                var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+
+                errorMessage = logReader.ReadLine();
+                ReportError(new ScriptElement(start, end));
             }
             catch (Exception ex)
             {
@@ -1015,7 +1015,7 @@ namespace AddyScript.Gui
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Help.ShowHelp(this, "AddyScript.chm");
+            Process.Start(new ProcessStartInfo(HELP_LINK) { UseShellExecute = true });
         }
 
         private void aboutAddyScriptToolStripMenuItem_Click(object sender, EventArgs e)

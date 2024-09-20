@@ -1144,15 +1144,22 @@ namespace AddyScript.Translators
         {
             if (expression is AnonymousCall anoCall)
             {
-                bool wasFunctionBody = inFunctionBody;
-                bool wasBlockInline = isBlockInline;
+                Block block = ((InlineFunction)anoCall.Callee).Body;
 
-                inFunctionBody = isBlockInline = true;
-                ((InlineFunction)anoCall.Callee).Body.AcceptTranslator(this);
-                textWriter.WriteLine();
+                if (block.Statements.Length == 1 && block.Statements[0] is Throw _throw)
+                    _throw.AcceptTranslator(this);
+                else
+                {
+                    bool wasFunctionBody = inFunctionBody;
+                    bool wasBlockInline = isBlockInline;
 
-                inFunctionBody = wasFunctionBody;
-                isBlockInline = wasBlockInline;
+                    inFunctionBody = isBlockInline = true;
+                    block.AcceptTranslator(this);
+                    textWriter.WriteLine();
+
+                    inFunctionBody = wasFunctionBody;
+                    isBlockInline = wasBlockInline;
+                }
             }
             else
             {
@@ -1161,15 +1168,15 @@ namespace AddyScript.Translators
             }
         }
 
-        private void MayBeIndent(AstNode stmt)
+        private void MayBeIndent(Statement statement)
         {
-            if (stmt.GetType() == typeof(Block))
-                stmt.AcceptTranslator(this);
+            if (statement.GetType() == typeof(Block))
+                statement.AcceptTranslator(this);
             else
             {
                 ++textWriter.Indentation;
-                stmt.AcceptTranslator(this);
-                if (stmt is Expression) textWriter.WriteLine(';');
+                statement.AcceptTranslator(this);
+                if (statement is Expression) textWriter.WriteLine(';');
                 --textWriter.Indentation;
             }
         }

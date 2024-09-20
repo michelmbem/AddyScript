@@ -23,7 +23,7 @@ namespace AddyScript.Gui
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://" + lnkWebsite.Text);
+            Process.Start(new ProcessStartInfo($"https://{lnkWebsite.Text}") { UseShellExecute = true });
         }
 
         #region Assembly Attribute Accessors
