@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<AssemblyName>asgui</AssemblyName>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ApplicationIcon>AddyScript.ico</ApplicationIcon>
+		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>1701;1702;CA1416</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AddyScript\AddyScript.csproj" />
+		<ProjectReference Include="..\AddyScript.GuiUtilities\AddyScript.GuiUtilities.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoCompleteMenu-ScintillaNET" Version="2.1.1" />
+		<PackageReference Include="Scintilla5.NET" Version="5.6.1" />
+		<PackageReference Include="ScintillaNetPrinting.NET" Version="1.0.11" />
+		<PackageReference Include="ScintillaNET_FindReplaceDialog" Version="1.5.5" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="AddyScript.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="red_bullet.bmp" />
+	</ItemGroup>
+  
+	<ItemGroup>
+		<None Include="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\Clock.ico" />
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\Clock.png" />
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\DeleteHS.png" />
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToNextMessage.png" />
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToPreviousMessage.png" />
+		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\LineColorHS.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="AddyScript.jpg" />
+		<None Remove="AddyScript.png" />
+	</ItemGroup>
+
+</Project>

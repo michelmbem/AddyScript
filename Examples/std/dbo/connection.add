@@ -1,0 +1,58 @@
+import config;
+
+class DBOConnection
+{
+	private _connection;
+	private _transactions;
+	
+	public constructor (providerName, connectionString)
+	{
+		this._connection = DBOConfig::createConnection(providerName);
+		this._connection.ConnectionString = connectionString;
+		this._transactions = stack::of();
+	}
+	
+	public property inTransaction
+	{
+		read { return this._transactions.count > 0; }
+	}
+	
+	public property transaction
+	{
+		read { return this.inTransaction ? this._transactions.peek() : null; }
+	}
+	
+	public function open()
+	{
+		this._connection.Open();
+	}
+	
+	public function close()
+	{
+		this._connection.Close();
+		this._transactions.clear();
+	}
+	
+	public function createCommand(commandText, commandType = 'Text')
+	{
+		var command = this._connection.CreateCommand();
+		command.CommandText = commandText;
+		command.CommandType = commandType;
+		return command;
+	}
+	
+	public function beginTransaction()
+	{
+		this._transactions.push(this._connection.BeginTransaction());
+	}
+	
+	public function commit()
+	{
+		this._transactions.pop().Commit();
+	}
+	
+	public function rollback()
+	{
+		this._transactions.pop().Rollback();
+	}
+}

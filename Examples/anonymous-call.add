@@ -1,0 +1,26 @@
+/*
+	'Anonymous Call' is an addyscript's construct which allows to use the result of
+	a function as another function without having to store it in an intermediate
+	variable. The returned value must however be a closure. In this example, function
+	f returns a function that takes two arguments and returns the sum of those two
+	arguments divided by n (n being the argument of f). f is later invoked with a
+	randomly generated value (x) and its result is immediately called with two other
+	randomly generated values (y and z).
+	'Anonymous Call' also handles the case of closures stored in clollections.
+*/
+function f(n)
+{
+	return |a, b| => (a + b)/n;
+}
+
+x = randint(1, 11);
+y = randint(100);
+z = randint(100);
+t = (float)f(x)(y, z);
+println('x = {0}; y = {1}; z = {2}; f(x)(y, z) = {3}', x, y, z, t);
+
+l = [function(p, q) { return p/q**2; }];
+t = (float)l[0](20, 4);
+println('l[0](20, 4) = {0}', t);
+
+readln();

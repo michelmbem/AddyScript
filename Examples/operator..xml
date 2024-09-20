@@ -1,0 +1,1025 @@
+<?xml version="1.0"?>
+<Program>
+  <ClassDefinition ClassName="Number">
+    <Constructor>
+      <ClassMethodDecl Name="Number" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="value" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="value" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="value" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Fields />
+    <Properties />
+    <Methods>
+      <ClassMethodDecl Name="toString" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <MethodCall FunctionName="toString" Optional="False">
+              <Target>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </Target>
+              <Arguments>
+                <VariableRef Name="fmt" />
+              </Arguments>
+            </MethodCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_plus" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <SelfReference />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_minus" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <UnaryExpression Operator="Minus">
+                  <Operand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </Operand>
+                </UnaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_pre_inc" Scope="Public">
+        <Parameters />
+        <Body>
+          <UnaryExpression Operator="PreIncrement">
+            <Operand>
+              <PropertyRef PropertyName="value" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </Operand>
+          </UnaryExpression>
+          <Return>
+            <SelfReference />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_pre_dec" Scope="Public">
+        <Parameters />
+        <Body>
+          <UnaryExpression Operator="PreDecrement">
+            <Operand>
+              <PropertyRef PropertyName="value" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </Operand>
+          </UnaryExpression>
+          <Return>
+            <SelfReference />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_post_inc" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="n">
+              <Value>
+                <ConstructorCall ClassName="Number">
+                  <Arguments>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </Arguments>
+                </ConstructorCall>
+              </Value>
+            </PropertyInitializer>
+          </VariableDecl>
+          <UnaryExpression Operator="PreIncrement">
+            <Operand>
+              <SelfReference />
+            </Operand>
+          </UnaryExpression>
+          <Return>
+            <VariableRef Name="n" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_post_dec" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="n">
+              <Value>
+                <ConstructorCall ClassName="Number">
+                  <Arguments>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </Arguments>
+                </ConstructorCall>
+              </Value>
+            </PropertyInitializer>
+          </VariableDecl>
+          <UnaryExpression Operator="PreDecrement">
+            <Operand>
+              <SelfReference />
+            </Operand>
+          </UnaryExpression>
+          <Return>
+            <VariableRef Name="n" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_bw_not" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <UnaryExpression Operator="BitwiseNot">
+                  <Operand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </Operand>
+                </UnaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_add" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_sub" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Minus">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_mul" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Times">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_div" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Divide">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_mod" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Modulo">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_pow" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="n" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Power">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="n" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_and" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="And">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_or" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="Or">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_xor" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="ExclusiveOr">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <VariableRef Name="other" />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_shl" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="n" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="ShiftLeft">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="n" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_shr" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="n" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <BinaryExpression Operator="ShiftRight">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="value" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="n" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_eq" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Equal">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_neq" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="NotEqual">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_lt" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="LessThan">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_gt" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="GreaterThan">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_lte" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="LessThanOrEqual">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="__op_gte" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="other" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="GreaterThanOrEqual">
+              <LeftOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="value" Optional="False">
+                  <Owner>
+                    <VariableRef Name="other" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <IfElse>
+    <Condition>
+      <BinaryExpression Operator="Equal">
+        <LeftOperand>
+          <VariableRef Name="__name" />
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="string" Value="main" />
+        </RightOperand>
+      </BinaryExpression>
+    </Condition>
+    <PositiveAction>
+      <Block>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="n1" />
+          </LeftOperand>
+          <RightOperand>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <Literal Type="int" Value="10" />
+              </Arguments>
+            </ConstructorCall>
+          </RightOperand>
+        </Assignment>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="n2" />
+          </LeftOperand>
+          <RightOperand>
+            <ConstructorCall ClassName="Number">
+              <Arguments>
+                <UnaryExpression Operator="Minus">
+                  <Operand>
+                    <Literal Type="int" Value="5" />
+                  </Operand>
+                </UnaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 = {0}" />
+            <VariableRef Name="n1" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n2 = {0}" />
+            <VariableRef Name="n2" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="+n1 = {0}" />
+            <UnaryExpression Operator="Plus">
+              <Operand>
+                <VariableRef Name="n1" />
+              </Operand>
+            </UnaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="-n1 = {0}" />
+            <UnaryExpression Operator="Minus">
+              <Operand>
+                <VariableRef Name="n1" />
+              </Operand>
+            </UnaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="+n2 = {0}" />
+            <UnaryExpression Operator="Plus">
+              <Operand>
+                <VariableRef Name="n2" />
+              </Operand>
+            </UnaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="-n2 = {0}" />
+            <UnaryExpression Operator="Minus">
+              <Operand>
+                <VariableRef Name="n2" />
+              </Operand>
+            </UnaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1++ = {0}, n1 = {1}" />
+            <UnaryExpression Operator="PostIncrement">
+              <Operand>
+                <VariableRef Name="n1" />
+              </Operand>
+            </UnaryExpression>
+            <VariableRef Name="n1" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1-- = {0}, n1 = {1}" />
+            <UnaryExpression Operator="PostDecrement">
+              <Operand>
+                <VariableRef Name="n1" />
+              </Operand>
+            </UnaryExpression>
+            <VariableRef Name="n1" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="++n2 = {0}, n2 = {1}" />
+            <UnaryExpression Operator="PreIncrement">
+              <Operand>
+                <VariableRef Name="n2" />
+              </Operand>
+            </UnaryExpression>
+            <VariableRef Name="n2" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="--n2 = {0}, n2 = {1}" />
+            <UnaryExpression Operator="PreDecrement">
+              <Operand>
+                <VariableRef Name="n2" />
+              </Operand>
+            </UnaryExpression>
+            <VariableRef Name="n2" />
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="~n1 = {0}" />
+            <UnaryExpression Operator="BitwiseNot">
+              <Operand>
+                <VariableRef Name="n1" />
+              </Operand>
+            </UnaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 + n2 = {0}" />
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 - n2 = {0}" />
+            <BinaryExpression Operator="Minus">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 * n2 = {0}" />
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 / n2 = {0}" />
+            <BinaryExpression Operator="Divide">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 % n2 = {0}" />
+            <BinaryExpression Operator="Modulo">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 ** 3 = {0:###,###,##0}" />
+            <BinaryExpression Operator="Power">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <Literal Type="int" Value="3" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &amp; n2 = {0}" />
+            <BinaryExpression Operator="And">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 | n2 = {0}" />
+            <BinaryExpression Operator="Or">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 ^ n2 = {0}" />
+            <BinaryExpression Operator="ExclusiveOr">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &lt;&lt; 2 = {0}" />
+            <BinaryExpression Operator="ShiftLeft">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <Literal Type="int" Value="2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &gt;&gt; 2 = {0}" />
+            <BinaryExpression Operator="ShiftRight">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <Literal Type="int" Value="2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 == n2 = {0}" />
+            <BinaryExpression Operator="Equal">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 != n2 = {0}" />
+            <BinaryExpression Operator="NotEqual">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &lt; n2 = {0}" />
+            <BinaryExpression Operator="LessThan">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &gt; n2 = {0}" />
+            <BinaryExpression Operator="GreaterThan">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &lt;= n2 = {0}" />
+            <BinaryExpression Operator="LessThanOrEqual">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value="n1 &gt;= n2 = {0}" />
+            <BinaryExpression Operator="GreaterThanOrEqual">
+              <LeftOperand>
+                <VariableRef Name="n1" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n2" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="readln">
+          <Arguments />
+        </FunctionCall>
+      </Block>
+    </PositiveAction>
+  </IfElse>
+</Program>

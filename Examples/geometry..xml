@@ -1,0 +1,612 @@
+<?xml version="1.0"?>
+<Program>
+  <ClassDefinition ClassName="Geometry" Modifier="Abstract">
+    <Fields />
+    <Properties />
+    <Methods>
+      <ClassMethod Name="perimeter" Scope="Public" Modifier="Abstract">
+        <Parameters />
+      </ClassMethod>
+      <ClassMethod Name="surface" Scope="Public" Modifier="Abstract">
+        <Parameters />
+      </ClassMethod>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <ClassDefinition ClassName="Rectangle" SuperClassName="Geometry">
+    <Constructor>
+      <ClassMethod Name="Rectangle" Scope="Public">
+        <Parameters>
+          <Parameter Name="length" ByRef="False" VaArgs="False" />
+          <Parameter Name="width" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="length" Optional="False">
+                <Owner>
+                  <ThisReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="length" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="width" Optional="False">
+                <Owner>
+                  <ThisReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="width" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethod>
+    </Constructor>
+    <Fields />
+    <Properties>
+      <ClassProperty Name="length" Scope="Public" Access="ReadWrite" ReaderScope="Public" WriterScope="Private" />
+      <ClassProperty Name="width" Scope="Public" Access="ReadWrite" ReaderScope="Public" WriterScope="Private" />
+    </Properties>
+    <Methods>
+      <ClassMethod Name="perimeter" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <Literal Type="int" Value="2" />
+              </LeftOperand>
+              <RightOperand>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="length" Optional="False">
+                      <Owner>
+                        <ThisReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="width" Optional="False">
+                      <Owner>
+                        <ThisReference />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+      <ClassMethod Name="surface" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <PropertyRef PropertyName="length" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="width" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+      <ClassMethod Name="toString" Scope="Public">
+        <Parameters>
+          <Parameter Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="Rectangle { length: " />
+                <PropertyRef PropertyName="length" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=", width: " />
+                <PropertyRef PropertyName="width" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=" }" />
+              </Segments>
+            </FormatStringExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <ClassDefinition ClassName="Square" SuperClassName="Rectangle">
+    <Constructor>
+      <ClassMethod Name="Square" Scope="Public">
+        <Parameters>
+          <Parameter Name="side" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <ParentConstructorCall>
+            <Arguments>
+              <VariableRef Name="side" />
+              <VariableRef Name="side" />
+            </Arguments>
+          </ParentConstructorCall>
+        </Body>
+      </ClassMethod>
+    </Constructor>
+    <Fields />
+    <Properties />
+    <Methods>
+      <ClassMethod Name="toString" Scope="Public">
+        <Parameters>
+          <Parameter Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="Square { side: " />
+                <PropertyRef PropertyName="length" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=" }" />
+              </Segments>
+            </FormatStringExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <ClassDefinition ClassName="Ellipse" SuperClassName="Geometry">
+    <Constructor>
+      <ClassMethod Name="Ellipse" Scope="Public">
+        <Parameters>
+          <Parameter Name="a" ByRef="False" VaArgs="False" />
+          <Parameter Name="b" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="a" Optional="False">
+                <Owner>
+                  <ThisReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="a" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="b" Optional="False">
+                <Owner>
+                  <ThisReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="b" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethod>
+    </Constructor>
+    <Fields />
+    <Properties>
+      <ClassProperty Name="a" Scope="Public" Access="ReadWrite" ReaderScope="Public" WriterScope="Private" />
+      <ClassProperty Name="b" Scope="Public" Access="ReadWrite" ReaderScope="Public" WriterScope="Private" />
+    </Properties>
+    <Methods>
+      <ClassMethod Name="perimeter" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <BinaryExpression Operator="Times">
+                  <LeftOperand>
+                    <Literal Type="int" Value="2" />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="PI" />
+                  </RightOperand>
+                </BinaryExpression>
+              </LeftOperand>
+              <RightOperand>
+                <FunctionCall FunctionName="sqrt">
+                  <Arguments>
+                    <BinaryExpression Operator="Divide">
+                      <LeftOperand>
+                        <BinaryExpression Operator="Plus">
+                          <LeftOperand>
+                            <BinaryExpression Operator="Power">
+                              <LeftOperand>
+                                <PropertyRef PropertyName="a" Optional="False">
+                                  <Owner>
+                                    <ThisReference />
+                                  </Owner>
+                                </PropertyRef>
+                              </LeftOperand>
+                              <RightOperand>
+                                <Literal Type="int" Value="2" />
+                              </RightOperand>
+                            </BinaryExpression>
+                          </LeftOperand>
+                          <RightOperand>
+                            <BinaryExpression Operator="Power">
+                              <LeftOperand>
+                                <PropertyRef PropertyName="b" Optional="False">
+                                  <Owner>
+                                    <ThisReference />
+                                  </Owner>
+                                </PropertyRef>
+                              </LeftOperand>
+                              <RightOperand>
+                                <Literal Type="int" Value="2" />
+                              </RightOperand>
+                            </BinaryExpression>
+                          </RightOperand>
+                        </BinaryExpression>
+                      </LeftOperand>
+                      <RightOperand>
+                        <Literal Type="int" Value="2" />
+                      </RightOperand>
+                    </BinaryExpression>
+                  </Arguments>
+                </FunctionCall>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+      <ClassMethod Name="surface" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <BinaryExpression Operator="Times">
+                  <LeftOperand>
+                    <VariableRef Name="PI" />
+                  </LeftOperand>
+                  <RightOperand>
+                    <PropertyRef PropertyName="a" Optional="False">
+                      <Owner>
+                        <ThisReference />
+                      </Owner>
+                    </PropertyRef>
+                  </RightOperand>
+                </BinaryExpression>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="b" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+      <ClassMethod Name="toString" Scope="Public">
+        <Parameters>
+          <Parameter Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="Ellipse { semi-major-axis: " />
+                <PropertyRef PropertyName="a" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=", semi-minor-axis: " />
+                <PropertyRef PropertyName="b" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=" }" />
+              </Segments>
+            </FormatStringExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <ClassDefinition ClassName="Circle" SuperClassName="Ellipse">
+    <Constructor>
+      <ClassMethod Name="Circle" Scope="Public">
+        <Parameters>
+          <Parameter Name="radius" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <ParentConstructorCall>
+            <Arguments>
+              <VariableRef Name="radius" />
+              <VariableRef Name="radius" />
+            </Arguments>
+          </ParentConstructorCall>
+        </Body>
+      </ClassMethod>
+    </Constructor>
+    <Fields />
+    <Properties />
+    <Methods>
+      <ClassMethod Name="toString" Scope="Public">
+        <Parameters>
+          <Parameter Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="Circle { radius: " />
+                <PropertyRef PropertyName="a" Optional="False">
+                  <Owner>
+                    <ThisReference />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=" }" />
+              </Segments>
+            </FormatStringExpression>
+          </Return>
+        </Body>
+      </ClassMethod>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="geoms" />
+    </LeftOperand>
+    <RightOperand>
+      <BinaryExpression Operator="Times">
+        <LeftOperand>
+          <ListInitializer>
+            <Items>
+              <Literal Type="void" Value="" />
+            </Items>
+          </ListInitializer>
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="int" Value="5" />
+        </RightOperand>
+      </BinaryExpression>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <ItemRef>
+        <Owner>
+          <VariableRef Name="geoms" />
+        </Owner>
+        <Index>
+          <Literal Type="int" Value="0" />
+        </Index>
+      </ItemRef>
+    </LeftOperand>
+    <RightOperand>
+      <ConstructorCall ClassName="Rectangle">
+        <Arguments>
+          <Literal Type="int" Value="6" />
+          <Literal Type="int" Value="4" />
+        </Arguments>
+      </ConstructorCall>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <ItemRef>
+        <Owner>
+          <VariableRef Name="geoms" />
+        </Owner>
+        <Index>
+          <Literal Type="int" Value="1" />
+        </Index>
+      </ItemRef>
+    </LeftOperand>
+    <RightOperand>
+      <ConstructorCall ClassName="Square">
+        <Arguments>
+          <Literal Type="int" Value="5" />
+        </Arguments>
+      </ConstructorCall>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <ItemRef>
+        <Owner>
+          <VariableRef Name="geoms" />
+        </Owner>
+        <Index>
+          <Literal Type="int" Value="2" />
+        </Index>
+      </ItemRef>
+    </LeftOperand>
+    <RightOperand>
+      <ConstructorCall ClassName="Ellipse">
+        <Arguments>
+          <Literal Type="int" Value="5" />
+          <Literal Type="int" Value="4" />
+        </Arguments>
+      </ConstructorCall>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <ItemRef>
+        <Owner>
+          <VariableRef Name="geoms" />
+        </Owner>
+        <Index>
+          <Literal Type="int" Value="3" />
+        </Index>
+      </ItemRef>
+    </LeftOperand>
+    <RightOperand>
+      <ConstructorCall ClassName="Circle">
+        <Arguments>
+          <Literal Type="int" Value="3" />
+        </Arguments>
+      </ConstructorCall>
+    </RightOperand>
+  </Assignment>
+  <TryCatchFinally ExceptionName="e">
+    <TryBlock>
+      <MethodCall FunctionName="add" Optional="False">
+        <Target>
+          <VariableRef Name="geoms" />
+        </Target>
+        <Arguments>
+          <ConstructorCall ClassName="Geometry">
+            <Arguments />
+          </ConstructorCall>
+        </Arguments>
+      </MethodCall>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <Literal Type="string" Value="if you see this message, then something went wrong" />
+        </Arguments>
+      </FunctionCall>
+    </TryBlock>
+    <CatchBlock>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <BinaryExpression Operator="Plus">
+            <LeftOperand>
+              <BinaryExpression Operator="Plus">
+                <LeftOperand>
+                  <PropertyRef PropertyName="name" Optional="False">
+                    <Owner>
+                      <VariableRef Name="e" />
+                    </Owner>
+                  </PropertyRef>
+                </LeftOperand>
+                <RightOperand>
+                  <Literal Type="string" Value=" : " />
+                </RightOperand>
+              </BinaryExpression>
+            </LeftOperand>
+            <RightOperand>
+              <PropertyRef PropertyName="message" Optional="False">
+                <Owner>
+                  <VariableRef Name="e" />
+                </Owner>
+              </PropertyRef>
+            </RightOperand>
+          </BinaryExpression>
+        </Arguments>
+      </FunctionCall>
+      <FunctionCall FunctionName="println">
+        <Arguments />
+      </FunctionCall>
+    </CatchBlock>
+  </TryCatchFinally>
+  <ForEachLoop ValueName="geom">
+    <Enumerated>
+      <VariableRef Name="geoms" />
+    </Enumerated>
+    <Action>
+      <Block>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Assignment Operator="None">
+              <LeftOperand>
+                <VariableRef Name="title" />
+              </LeftOperand>
+              <RightOperand>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Assignment Operator="IfEmpty">
+                      <LeftOperand>
+                        <VariableRef Name="geom" />
+                      </LeftOperand>
+                      <RightOperand>
+                        <Literal Type="string" Value="null" />
+                      </RightOperand>
+                    </Assignment>
+                  </LeftOperand>
+                  <RightOperand>
+                    <Literal Type="string" Value=":" />
+                  </RightOperand>
+                </BinaryExpression>
+              </RightOperand>
+            </Assignment>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Times">
+              <LeftOperand>
+                <Literal Type="string" Value="-" />
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="length" Optional="False">
+                  <Owner>
+                    <VariableRef Name="title" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value=" - perimeter = {0:0.##}" />
+            <MethodCall FunctionName="perimeter" Optional="True">
+              <Target>
+                <VariableRef Name="geom" />
+              </Target>
+              <Arguments />
+            </MethodCall>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Literal Type="string" Value=" - surface = {0:0.##}" />
+            <MethodCall FunctionName="surface" Optional="True">
+              <Target>
+                <VariableRef Name="geom" />
+              </Target>
+              <Arguments />
+            </MethodCall>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments />
+        </FunctionCall>
+      </Block>
+    </Action>
+  </ForEachLoop>
+  <FunctionCall FunctionName="readln">
+    <Arguments />
+  </FunctionCall>
+</Program>

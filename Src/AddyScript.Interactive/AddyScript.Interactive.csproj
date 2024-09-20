@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<AssemblyName>asis</AssemblyName>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AddyScript\AddyScript.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Data.Odbc" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+	<!-- UNCOMMENT ACCORDING TO YOUR NEEDS!
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.5.1" />
+		<PackageReference Include="MySql.Data" Version="9.0.0" />
+		<PackageReference Include="Npgsql" Version="8.0.4" />
+		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+	-->
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+	</ItemGroup>
+
+</Project>

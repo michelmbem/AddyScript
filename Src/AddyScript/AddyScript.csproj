@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+	</ItemGroup>
+
+</Project>

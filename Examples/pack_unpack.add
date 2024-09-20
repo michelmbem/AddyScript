@@ -1,0 +1,6 @@
+const FORMAT = '<hI15sf12p2xP'; // little-endian: signed short, unsigned int, 15 chars string, float, 12 chars array, 2 pad bytes, pointer to void
+b = pack(FORMAT, -4, 5, "bonjour l'ami", 20, 'cmt vas-tu?', System::IntPtr::Zero);
+println('{0:x}', b);
+s = unpack(FORMAT, b);
+println(s);
+readln();

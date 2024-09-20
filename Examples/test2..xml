@@ -1,0 +1,468 @@
+<?xml version="1.0"?>
+<Program>
+  <ImportDirective ModuleName="std::util" />
+  <ClassDefinition ClassName="A" Modifier="Abstract">
+    <Constructor>
+      <ClassMethodDecl Name="A" Scope="Protected">
+        <Parameters />
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_list" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <FunctionCall FunctionName="randlst">
+                <Arguments>
+                  <FunctionCall FunctionName="randint">
+                    <Arguments>
+                      <Literal Type="int" Value="10" />
+                      <Literal Type="int" Value="50" />
+                    </Arguments>
+                    <NamedArgs />
+                  </FunctionCall>
+                  <Literal Type="int" Value="100" />
+                </Arguments>
+                <NamedArgs />
+              </FunctionCall>
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Indexer>
+      <ClassPropertyDecl Name="[item]" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <ItemRef Optional="False">
+                <Owner>
+                  <PropertyRef PropertyName="_list" Optional="False">
+                    <Owner>
+                      <SelfReference />
+                    </Owner>
+                  </PropertyRef>
+                </Owner>
+                <Index>
+                  <VariableRef Name="__key" />
+                </Index>
+              </ItemRef>
+            </Return>
+          </Body>
+        </Reader>
+        <Writer Scope="Public">
+          <Body>
+            <Return>
+              <Assignment Operator="None">
+                <LeftOperand>
+                  <ItemRef Optional="False">
+                    <Owner>
+                      <PropertyRef PropertyName="_list" Optional="False">
+                        <Owner>
+                          <SelfReference />
+                        </Owner>
+                      </PropertyRef>
+                    </Owner>
+                    <Index>
+                      <VariableRef Name="__key" />
+                    </Index>
+                  </ItemRef>
+                </LeftOperand>
+                <RightOperand>
+                  <VariableRef Name="__value" />
+                </RightOperand>
+              </Assignment>
+            </Return>
+          </Body>
+        </Writer>
+      </ClassPropertyDecl>
+    </Indexer>
+    <Fields />
+    <Properties>
+      <ClassPropertyDecl Name="count" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <PropertyRef PropertyName="count" Optional="False">
+                <Owner>
+                  <PropertyRef PropertyName="_list" Optional="False">
+                    <Owner>
+                      <SelfReference />
+                    </Owner>
+                  </PropertyRef>
+                </Owner>
+              </PropertyRef>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Properties>
+    <Methods>
+      <ClassMethodDecl Name="first" Scope="Protected">
+        <Parameters />
+        <Body>
+          <Return>
+            <ItemRef Optional="False">
+              <Owner>
+                <PropertyRef PropertyName="_list" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </Owner>
+              <Index>
+                <Literal Type="int" Value="0" />
+              </Index>
+            </ItemRef>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <ClassDefinition ClassName="B" SuperClassName="A">
+    <Constructor>
+      <ClassMethodDecl Name="B" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="separator" ByRef="False" VaArgs="False" DefaultValue=", " />
+          <ParameterDecl Name="prefix" ByRef="False" VaArgs="False" DefaultValue="[" />
+          <ParameterDecl Name="suffix" ByRef="False" VaArgs="False" DefaultValue="]" />
+        </Parameters>
+        <Body>
+          <ParentConstructorCall>
+            <Arguments />
+            <NamedArgs />
+          </ParentConstructorCall>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="separator" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="separator" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="prefix" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="prefix" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="suffix" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="suffix" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Indexer>
+      <ClassPropertyDecl Name="[item]" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <ParentIndexerRef>
+                <Index>
+                  <VariableRef Name="__key" />
+                </Index>
+              </ParentIndexerRef>
+            </Return>
+          </Body>
+        </Reader>
+        <Writer Scope="Public">
+          <Body>
+            <Return>
+              <Assignment Operator="None">
+                <LeftOperand>
+                  <ParentIndexerRef>
+                    <Index>
+                      <VariableRef Name="__key" />
+                    </Index>
+                  </ParentIndexerRef>
+                </LeftOperand>
+                <RightOperand>
+                  <Conversion TypeName="int">
+                    <Expression>
+                      <VariableRef Name="__value" />
+                    </Expression>
+                  </Conversion>
+                </RightOperand>
+              </Assignment>
+            </Return>
+          </Body>
+        </Writer>
+      </ClassPropertyDecl>
+    </Indexer>
+    <Fields />
+    <Properties>
+      <ClassPropertyDecl Name="count" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <ParentPropertyRef PropertyName="count" />
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Properties>
+    <Methods>
+      <ClassMethodDecl Name="getFirst" Scope="Public">
+        <Parameters />
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <VariableRef Name="first" />
+            </LeftOperand>
+            <RightOperand>
+              <ParentPropertyRef PropertyName="first" />
+            </RightOperand>
+          </Assignment>
+          <FunctionCall FunctionName="println">
+            <Arguments>
+              <BinaryExpression Operator="Plus">
+                <LeftOperand>
+                  <Literal Type="string" Value="first item from B: " />
+                </LeftOperand>
+                <RightOperand>
+                  <FunctionCall FunctionName="first">
+                    <Arguments />
+                    <NamedArgs />
+                  </FunctionCall>
+                </RightOperand>
+              </BinaryExpression>
+            </Arguments>
+            <NamedArgs />
+          </FunctionCall>
+          <Return>
+            <VariableRef Name="first" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="toString" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="fmt" ByRef="False" VaArgs="False" DefaultValue="" />
+        </Parameters>
+        <Body>
+          <Return>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <PropertyRef PropertyName="prefix" Optional="False">
+                      <Owner>
+                        <SelfReference />
+                      </Owner>
+                    </PropertyRef>
+                  </LeftOperand>
+                  <RightOperand>
+                    <MethodCall FunctionName="join" Optional="False">
+                      <Target>
+                        <PropertyRef PropertyName="_list" Optional="False">
+                          <Owner>
+                            <SelfReference />
+                          </Owner>
+                        </PropertyRef>
+                      </Target>
+                      <Arguments>
+                        <PropertyRef PropertyName="separator" Optional="False">
+                          <Owner>
+                            <SelfReference />
+                          </Owner>
+                        </PropertyRef>
+                      </Arguments>
+                    </MethodCall>
+                  </RightOperand>
+                </BinaryExpression>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="suffix" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="b" />
+    </LeftOperand>
+    <RightOperand>
+      <ConstructorCall ClassName="B">
+        <Arguments />
+        <NamedArgs>
+          <Arg Name="prefix">
+            <Literal Type="string" Value="{" />
+          </Arg>
+          <Arg Name="suffix">
+            <Literal Type="string" Value="}" />
+          </Arg>
+        </NamedArgs>
+      </ConstructorCall>
+    </RightOperand>
+  </Assignment>
+  <FunctionCall FunctionName="println">
+    <Arguments>
+      <FormatStringExpression>
+        <Segments>
+          <Literal Type="string" Value="b = " />
+          <VariableRef Name="b" />
+        </Segments>
+      </FormatStringExpression>
+    </Arguments>
+    <NamedArgs />
+  </FunctionCall>
+  <FunctionCall FunctionName="println">
+    <Arguments>
+      <FormatStringExpression>
+        <Segments>
+          <Literal Type="string" Value="b.count = " />
+          <PropertyRef PropertyName="count" Optional="False">
+            <Owner>
+              <VariableRef Name="b" />
+            </Owner>
+          </PropertyRef>
+        </Segments>
+      </FormatStringExpression>
+    </Arguments>
+    <NamedArgs />
+  </FunctionCall>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="mid" />
+    </LeftOperand>
+    <RightOperand>
+      <Conversion TypeName="int">
+        <Expression>
+          <BinaryExpression Operator="Divide">
+            <LeftOperand>
+              <PropertyRef PropertyName="count" Optional="False">
+                <Owner>
+                  <VariableRef Name="b" />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <Literal Type="int" Value="2" />
+            </RightOperand>
+          </BinaryExpression>
+        </Expression>
+      </Conversion>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <ItemRef Optional="False">
+        <Owner>
+          <VariableRef Name="b" />
+        </Owner>
+        <Index>
+          <VariableRef Name="mid" />
+        </Index>
+      </ItemRef>
+    </LeftOperand>
+    <RightOperand>
+      <BinaryExpression Operator="Times">
+        <LeftOperand>
+          <Literal Type="int" Value="10" />
+        </LeftOperand>
+        <RightOperand>
+          <VariableRef Name="PI" />
+        </RightOperand>
+      </BinaryExpression>
+    </RightOperand>
+  </Assignment>
+  <FunctionCall FunctionName="println">
+    <Arguments>
+      <FormatStringExpression>
+        <Segments>
+          <Literal Type="string" Value="b[" />
+          <VariableRef Name="mid" />
+          <Literal Type="string" Value="] = " />
+          <ItemRef Optional="False">
+            <Owner>
+              <VariableRef Name="b" />
+            </Owner>
+            <Index>
+              <VariableRef Name="mid" />
+            </Index>
+          </ItemRef>
+        </Segments>
+      </FormatStringExpression>
+    </Arguments>
+    <NamedArgs />
+  </FunctionCall>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="firstGetter" />
+    </LeftOperand>
+    <RightOperand>
+      <MethodCall FunctionName="getFirst" Optional="False">
+        <Target>
+          <VariableRef Name="b" />
+        </Target>
+        <Arguments />
+      </MethodCall>
+    </RightOperand>
+  </Assignment>
+  <TryCatchFinally ExceptionName="e">
+    <TryBlock>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <BinaryExpression Operator="Plus">
+            <LeftOperand>
+              <Literal Type="string" Value="first item from global scope: " />
+            </LeftOperand>
+            <RightOperand>
+              <FunctionCall FunctionName="firstGetter">
+                <Arguments />
+                <NamedArgs />
+              </FunctionCall>
+            </RightOperand>
+          </BinaryExpression>
+        </Arguments>
+        <NamedArgs />
+      </FunctionCall>
+    </TryBlock>
+    <CatchBlock>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <PropertyRef PropertyName="message" Optional="False">
+            <Owner>
+              <VariableRef Name="e" />
+            </Owner>
+          </PropertyRef>
+        </Arguments>
+        <NamedArgs />
+      </FunctionCall>
+    </CatchBlock>
+  </TryCatchFinally>
+  <FunctionCall FunctionName="readln">
+    <Arguments />
+    <NamedArgs />
+  </FunctionCall>
+</Program>

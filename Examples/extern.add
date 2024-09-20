@@ -1,0 +1,10 @@
+[LibImport("user32", returnType="Int32")]
+extern function MessageBox(
+	[Type("IntPtr")] hWnd,
+	[Type("String")] message,
+	[Type("Char[]")] title,
+	[Type("Int32")]  flags);
+
+ans = MessageBox(null, "Hello y'all!", "Win32 Greatings", 0x141);
+println($"user's choice: {ans}");
+readln();

@@ -1,0 +1,27 @@
+import System::Collections::Generic;
+import reflection;	// for underline
+
+l = new LinkedList{1};
+for (i = 1; i < 1000; i *= 2)
+	l.AddLast(i);
+
+underline('LinkedList{1}:');
+foreach(item in l)
+	print($'[{item}]->');
+println('END');
+println();
+
+d = new SortedDictionary{2};
+names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
+names.each(|name| => d[name] = randint(18, 40));
+
+underline('SortedDictionary{2}:');
+foreach(key => value in d)
+	println($"{key}\t: {value}");
+println();
+
+underline('System::Tuple{3}:');
+t = new System::Tuple{3}('Jason Donovan', 32, `2010-03-15`);
+println($"{t.Item1} is {t.Item2} years old, he works for us since {t.Item3:d}.");
+
+readln();

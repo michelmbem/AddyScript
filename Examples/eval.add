@@ -1,0 +1,21 @@
+try
+{
+    func = readln('f(x) = ');
+	start = (float) readln('x starts from: ');
+	end = (float) readln('x ends to: ');
+	step = (float) readln('x grows by: ');
+	
+	for (x = start; x <= end; x += step)
+	{
+		y = eval(func);
+		println('f({0}) = {1}', x, y);
+	}
+}
+catch (e)
+{
+    println(e.name + ' : ' + e.message);
+}
+finally
+{
+	readln('Press [Enter] to exit!');
+}

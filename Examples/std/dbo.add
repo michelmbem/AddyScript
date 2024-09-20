@@ -1,0 +1,524 @@
+import dbo::command;
+
+class DBO
+{
+	private connection;
+	
+	public constructor (providerName, connectionString)
+	{
+		this.connection = new DBOConnection(providerName!, connectionString!);
+		this.connection.open();
+	}
+	
+	public function query(commandText, fetch = null)
+	{
+		var command, reader, result;
+		
+		fetch ??= fetch_index_list;
+		
+		try {
+			command = this.connection.createCommand(commandText!);
+			command.Transaction = this.connection.transaction;
+			reader = command.ExecuteReader();
+			result = fetch(reader);
+		}
+		catch (ex) {
+			throw ex;
+		}
+		finally {
+			try {
+				reader.Close();
+			}
+			catch (ex1) {
+			}
+		}
+		
+		return result;
+	}
+	
+	public function queryScalar(commandText)
+	{
+		var command, result;
+		
+		try {
+			command = this.connection.createCommand(commandText!);
+			command.Transaction = this.connection.transaction;
+			result = command.ExecuteScalar();
+		}
+		catch (ex) {
+			throw ex;
+		}
+		
+		return result;
+	}
+	
+	public function find(table, field, condition)
+	{
+		var sb = new System::Text::StringBuilder();
+		sb.Append("SELECT ").Append(field!).Append(" FROM ").Append(table!).Append(" WHERE ").Append(condition!);
+		return this.queryScalar(sb.ToString());
+	}
+	
+	public function exec(commandText)
+	{
+		var command, result;
+		
+		try {
+			command = this.connection.createCommand(commandText!);
+			command.Transaction = this.connection.transaction;
+			result = command.ExecuteNonQuery();
+		}
+		catch (ex) {
+			throw ex;
+		}
+		
+		return result;
+	}
+	
+	public function eachRow(commandText, action, processor = null)
+	{
+		var command, iterator, row;
+		
+		action!; // Require action to be non-empty
+		processor ??= to_object;
+		
+		try {
+			command = this.connection.createCommand(commandText!);
+			command.Transaction = this.connection.transaction;
+			iterator = new DBOIterator(command, processor);
+			foreach (row in iterator) action(row);
+		}
+		catch (ex) {
+			throw ex;
+		}
+		finally {
+			try {
+				iterator.dispose();
+			}
+			catch (ex1) {
+			}
+		}
+	}
+	
+	public function fill(dataSet, tableName, commandText, createCmdBldr = false)
+	{
+		var command, adapter;
+		
+		try {
+			command = this.connection.createCommand(commandText!);
+			command.Transaction = this.connection.transaction;
+			adapter = DBOConfig::createDataAdapter(command);
+			adapter.Fill(dataSet!, tableName!);
+			if (createCmdBldr)
+				DBOConfig::createCommandBuilder(adapter);
+		}
+		catch (ex) {
+			throw ex;
+		}
+		
+		return adapter;
+	}
+	
+	public function getDataSet(tableName, commandText)
+	{
+		var dataSet = new System::Data::DataSet(tableName!);
+		this.fill(dataSet, tableName, commandText!).Dispose();
+		return dataSet;
+	}
+	
+	public function prepare(commandText, commandType = 'Text')
+	{
+		return new DBOCommand(this.connection, commandText!, commandType);
+	}
+	
+	public function execMany(commandText, parameters, values)
+	{
+		var cmd = this.prepare(commandText!).addParams(parameters);
+		values.each(|v| => cmd.setAllParams(v).exec()); // Note! values has to be a list of lists
+	}
+	
+	public function beginTransaction()
+	{
+		this.connection.beginTransaction();
+	}
+	
+	public function commit()
+	{
+		this.connection.commit();
+	}
+	
+	public function rollback()
+	{
+		this.connection.rollback();
+	}
+	
+	public function commitAll()
+	{
+		while (this.connection.inTransaction)
+			this.connection.commit();
+	}
+	
+	public function rollbackAll()
+	{
+		while (this.connection.inTransaction)
+			this.connection.rollback();
+	}
+	
+	public function reconnect()
+	{
+		this.connection.close();
+		this.connection.open();
+	}
+	
+	public function dispose()
+	{
+		this.connection.close();
+	}
+}
+
+/*****************************************************************************************************************************************/
+
+if (__name === 'main')
+{
+	names = [['John Doe'], ['Ben Harper'], ['Mike Johnson'], ['Ed Simmons'], ['Jim Fortey']];
+	
+	function readint(prompt, min, max, $default) {
+		ans = readln(prompt);
+		try {
+			val = (int) ans;
+			if (min <= val && val <= max)
+				return val;
+			return $default;
+		}
+		catch (ex) {
+			return $default;
+		}
+	}
+	
+	function access_test() {
+		const DB_PATH = "../../../Examples/data/nwind.mdb";
+		const OLEDB_CONNECTION_STRING = 'Provider=MicroSoft.Ace.OleDb.12.0;Data Source=' + DB_PATH;
+		const ODBC_CONNECTION_STRING = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + DB_PATH;
+		
+		driver = readint('Which driver to use? (0: OLE DB, 1: ODBC) ', 0, 1, 0);
+		println('Testing MS Access with connection string: {0}', driver == 0 ? OLEDB_CONNECTION_STRING : ODBC_CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = driver == 0 ? new DBO('oledb', OLEDB_CONNECTION_STRING) : new DBO('odbc', ODBC_CONNECTION_STRING);
+			dbo.exec("create table test (id counter, name text(50) not null, primary key (id))");
+			dbo.execMany("insert into test (name) values (?)", [new { name = 'name', dbType = 'String', size = 12 }], names);
+			cmd = dbo.prepare('delete from test where id = ?').addParam(new { name = 'id', dbType = 'Int32' });
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println($'{t.id} : {t.name}'));
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			cmd = dbo.prepare('select * from test');
+			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			println();
+			println('10 first customers in the database:');
+			println('-' * 35);
+			ds = dbo.getDataSet("Customers", "select top 10 * from customers");
+			foreach (row in ds.Tables[0].Rows)
+				println($"{row['CustomerID']} {row['CompanyName']}");
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try  {
+				if (driver != 0) dbo.reconnect(); // only needed when ODBC driver is used
+				dbo.exec('drop table test');
+			}
+			catch (ex1) {
+			}
+			finally {
+				try {
+					dbo.dispose();
+				}
+				catch (ex2) {
+				}
+			}
+		}
+	}
+
+	function mssql_test() {
+		const CONNECTION_STRING = 'Data Source=(local);Initial Catalog=Northwind;Integrated Security=yes;TrustServerCertificate=yes';
+		
+		println('Testing MS SQL Server with connection string: ' + CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = new DBO('mssql', CONNECTION_STRING);
+			dbo.exec("create table test (id int not null identity(1, 1), name varchar(50) not null, primary key (id))");
+			dbo.execMany("insert into test values (@name)", [new { name = 'name', dbType = 'String', size = 12 }], names);
+			cmd = dbo.prepare('delete from test where id = @id').addParam(new { name = 'id', dbType = 'Int32' });
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println('{0} : {1}', t.id, t.name));
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			cmd = dbo.prepare('select * from test');
+			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			println();
+			println('10 first products in the database:');
+			println('-' * 34);
+			ds = dbo.getDataSet("Products", "select top 10 * from products");
+			foreach (row in ds.Tables[0].Rows)
+				println('{0} {1}', row['ProductID'], row['ProductName']);
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try  {
+				dbo.exec('drop table test');
+			}
+			catch (ex1) {
+			}
+			finally {
+				try {
+					dbo.dispose();
+				}
+				catch (ex2) {
+				}
+			}
+		}
+	}
+
+	function oracle_test() {
+		const CONNECTION_STRING = 'Data Source=localhost:1521/free;User Id=hr;Password=oracle';
+		
+		println('Testing Oracle with connection string: ' + CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = new DBO('oracle', CONNECTION_STRING);
+			dbo.exec("create table test (id number(10) not null, name varchar2(50) not null, primary key (id))");
+			dbo.exec("create sequence test_seq nocache nocycle");
+			dbo.execMany("insert into test values (test_seq.nextval, :name)", ['name'], names);
+			cmd = dbo.prepare('delete from test where id = :id').addParam(new { name = 'id', dbType = 'Int32' }); // the colon (:) is mandatory as parameter indicator with Oracle
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println('{0} : {1}', t.ID, t.NAME)); // column names are set to upper case with Oracle
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			cmd = dbo.prepare('test', 'TableDirect');
+			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			println();
+			println('10 employees extracted from the database:');
+			println('-' * 41);
+			ds = dbo.prepare("select * from (select e.*, rownum rn from employees e) where rn between :offset and :offset + 9")
+					.addParam(new { name = 'offset', value = randint(1, 99) })
+					.getDataSet("Employees"); // rownum is a pseudo-column used for pagination
+			foreach (row in ds.Tables[0].Rows)
+				println('{0} {1} {2}', row['EMPLOYEE_ID'], row['FIRST_NAME'], row['LAST_NAME']);
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try  {
+				dbo.exec('drop table test');
+				dbo.exec('drop sequence test_seq');
+			}
+			catch (ex1) {
+			}
+			finally {
+				try {
+					dbo.dispose();
+				}
+				catch (ex2) {
+				}
+			}
+		}
+	}
+
+	function mysql_test() {
+		const CONNECTION_STRING = 'Server=localhost;Port=3307;User=root;Password=;Database=sakila'; // The 'Database' or 'Initial Catalog' setting is mandatory with MySQL
+		
+		println('Testing MySQL with connection string: ' + CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = new DBO('mysql', CONNECTION_STRING);
+			dbo.exec("create table test (id int not null auto_increment, name varchar(50) not null, primary key (id))");
+			dbo.execMany("insert into test (name) values (@name)", ['name'], names);
+			cmd = dbo.prepare('delete from test where id = @id').addParam(new { name = 'id', dbType = 'Int32' }); // Could have used :id as well
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println('{0} : {1}', t.id, t.name));
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			cmd = dbo.prepare('select * from test'); // 'TableDirect' not supported!
+			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			println();
+			println('10 first actors in the database:');
+			println('-' * 32);
+			ds = dbo.getDataSet("Actors", "select * from actor limit 10");
+			foreach (row in ds.Tables[0].Rows)
+				println('{0,2} {1} {2}', row['actor_id'], row['first_name'], row['last_name']);
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try  {
+				dbo.exec('drop table test');
+			}
+			catch (ex1) {
+			}
+			finally {
+				try {
+					dbo.dispose();
+				}
+				catch (ex2) {
+				}
+			}
+		}
+	}
+
+	function postgres_test() {
+		const CONNECTION_STRING = 'Server=localhost;User=pagila_user;Password=pagilanator;Database=pagila'; // pagila is a port of MySQL's sakila to PostgreSQL
+		
+		println('Testing PostgreSQL with connection string: ' + CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = new DBO('pgsql', CONNECTION_STRING);
+			dbo.exec("create table test (id serial not null, name character varying(50) not null, primary key (id))");
+			dbo.execMany("insert into test (name) values (:name)", ['name'], names);
+			cmd = dbo.prepare('delete from test where id = :id').addParam(new { name = 'id', dbType = 'Int32' }); // as with Oracle, the colon (:) is mandatory for parameter placeholders
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println('{0} : {1}', t.id, t.name));
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			cmd = dbo.prepare('test', 'TableDirect');
+			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			println();
+			println('10 films extracted from the database:');
+			println('-' * 37);
+			ds = dbo.prepare('select film_id, title, release_year from film limit 10 offset :offset')
+					.addParam({'name' => 'offset', 'value' => randint(992)})
+					.getDataSet("Films");
+			foreach (row in ds.Tables[0].Rows)
+				println('{0} {1} ({2})', row['film_id'], row['title'], row['release_year']);
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try  {
+				dbo.exec('drop table test');
+			}
+			catch (ex1) {
+			}
+			finally {
+				try {
+					dbo.dispose();
+				}
+				catch (ex2) {
+				}
+			}
+		}
+	}
+
+	function sqlite_test() {
+		const CONNECTION_STRING = 'Data Source=:memory:;User Id=sa';
+		
+		println('Testing SQLite with connection string: ' + CONNECTION_STRING);
+		println();
+		
+		try {
+			dbo = new DBO('sqlite', CONNECTION_STRING);
+			dbo.exec("create table test (id integer not null, name varchar not null, primary key (id))");
+			dbo.execMany("insert into test (name) values (@name)", ['name'], names);
+			cmd = dbo.prepare('delete from test where id = @id').addParam(new { name = 'id', dbType = 'Int32' });
+			dbo.beginTransaction();
+			cmd.setParam('id', 3).exec();
+			println('whithin transaction:');
+			dbo.eachRow('select * from test', |t| => println('{0} : {1}', t.id, t.name));
+			dbo.rollback();
+			println();
+			println('after rolling back transaction:');
+			dbo.prepare('select * from test').eachRow(|t| => println('{0} : {1}', t), to_list);
+			println();
+			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
+			// importing data from the mysql's world database:
+			dbo1 = new DBO('mysql', 'Server=localhost;Port=3307;User=root;Password=;Database=world'); // connection to mysql database
+			dbo.exec('create table country (code char primary key, name varchar, continent varchar)');
+			dbo.execMany('insert into country values(:code, :name, :continent)', ['code', 'name', 'continent'], dbo1.query('select code, name, continent from country'));
+			dbo1.dispose();
+			// end of importation
+			println();
+			println('10 first countries in the database:');
+			println('-' * 35);
+			ds = dbo.getDataSet("Countries", "select * from country limit 10");
+			foreach (row in ds.Tables[0].Rows)
+				println('{0,-5}{1,-22}{2}', row['code'], row['name'], row['continent']);
+			ds.Dispose();
+		}
+		catch (ex) {
+			println(ex.name + ' : ' + ex.message);
+		}
+		finally {
+			try {
+				dbo.dispose();
+			}
+			catch (ex2) {
+			}
+		}
+	}
+	
+	function menu() {
+		println('Please choose a DBMS to test (1: MS Access, 2: MS SQL Server, 3: Oracle, 4: MySQL, 5: PostgreSQL, 6: SQLite, 0: Quit)');
+		return readint('Your choice? ', 0, 6, -1);
+	}
+
+	var dbo, choice;
+
+	do {
+		choice = menu();
+		System::Console::Clear();
+		
+		choice switch {
+			0 => null;
+			1 => access_test();
+			2 => mssql_test();
+			3 => oracle_test();
+			4 => mysql_test();
+			5 => postgres_test();
+			6 => sqlite_test();
+			_ => println('invalid choice');
+		};
+		
+		println();
+	} while (choice != 0);
+}

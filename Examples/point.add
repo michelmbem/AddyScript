@@ -1,0 +1,84 @@
+class Point
+{
+	public static final MAXCOUNT = 2;
+	private static _count = 0;
+	private _x;
+	private _y;
+	
+	public constructor(x, y)
+	{
+		if (Point::count >= Point::MAXCOUNT)
+			throw new Exception("TooMuchPoints",
+								"The maximum count of points is reached!");
+
+		this._x = x;
+		this._y = y;
+		++Point::_count; // ++this._count also works
+	}
+	
+	public static property count => Point::_count;
+	public property x => this._x;	
+	public property y => this._y;
+	
+	/**
+	* This will automatically generate 3 methods in the Point class:
+	* - add_moved(handler): adds a closure to the set of handlers of the 'moved' event.
+	* - remove_moved(handler): removes a closure from the set of handlers of 'moved'.
+	* - trigger_moved(sender): triggers the 'moved' event with the given argument.
+	*/
+	public event moved(sender);
+	
+	public function move(x, y)
+	{
+		this._x = x;
+		this._y = y;
+		this.trigger_moved(this);
+	}
+}
+
+class Point3D : Point
+{
+	private _z;
+	
+	public constructor(x, y, z) : super(x, y)
+	{
+		this._z = z;
+	}
+	
+	public property z => this._z;
+	
+	public function move(x, y)
+	{
+		throw 'Please use move3D for a Point3D';
+	}
+	
+	public function move3D(x, y, z)
+	{
+		this._z = z;
+		super::move(x, y); // the position of this call is essential to ensure that the 'moved' event will be triggered after all fields have been updated
+	}
+}
+
+if (__name == 'main')
+{
+	p = new Point(10, -5);
+	println($"p is at ({p.x}, {p.y})");
+	p.add_moved(|s| => println($"p has moved to ({s.x}, {s.y})"));
+	p.move(-7, 1);
+	
+	p3 = new Point3D(3, 6, -9);
+	println(p3 is Point ? "p3 is a point" : "p3 is not a point");
+	println($"p3 is at ({p3.x}, {p3.y}, {p3.z})");
+	p3.add_moved(|s| => println($"p3 has moved to ({s.x}, {s.y}, {s.z})"));
+	p3.move3D(4, -2, 8);
+	
+	println($"point count = {Point::count}");
+	
+	try {
+		p = new Point(0, 0);
+	} catch (e) {
+		println($"{e.name}: {e.message}");
+	} finally {
+		readln();
+	}
+}

@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<Program>
+  <FunctionDecl Name="sum">
+    <Parameters>
+      <Parameter Name="v" ByRef="False" VaArgs="False" />
+    </Parameters>
+    <Body>
+      <Return>
+        <MethodCall FunctionName="aggregate" Optional="False">
+          <Target>
+            <VariableRef Name="v" />
+          </Target>
+          <Arguments>
+            <Literal Type="int" Value="0" />
+            <InlineFunction>
+              <Parameters>
+                <Parameter Name="acc" ByRef="False" VaArgs="False" />
+                <Parameter Name="val" ByRef="False" VaArgs="False" />
+              </Parameters>
+              <Body>
+                <Return>
+                  <BinaryExpression Operator="Plus">
+                    <LeftOperand>
+                      <VariableRef Name="acc" />
+                    </LeftOperand>
+                    <RightOperand>
+                      <VariableRef Name="val" />
+                    </RightOperand>
+                  </BinaryExpression>
+                </Return>
+              </Body>
+            </InlineFunction>
+          </Arguments>
+        </MethodCall>
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="t" />
+    </LeftOperand>
+    <RightOperand>
+      <ListInitializer>
+        <Items />
+      </ListInitializer>
+    </RightOperand>
+  </Assignment>
+  <Assignment Operator="None">
+    <LeftOperand>
+      <VariableRef Name="n" />
+    </LeftOperand>
+    <RightOperand>
+      <Conversion TypeName="int">
+        <Expression>
+          <FunctionCall FunctionName="readln">
+            <Arguments>
+              <Literal Type="string" Value="how many items? " />
+            </Arguments>
+          </FunctionCall>
+        </Expression>
+      </Conversion>
+    </RightOperand>
+  </Assignment>
+  <IfElse>
+    <Condition>
+      <BinaryExpression Operator="LessThanOrEqual">
+        <LeftOperand>
+          <VariableRef Name="n" />
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="int" Value="0" />
+        </RightOperand>
+      </BinaryExpression>
+    </Condition>
+    <PositiveAction>
+      <FunctionCall FunctionName="println">
+        <Arguments>
+          <Literal Type="string" Value="goodbye!" />
+        </Arguments>
+      </FunctionCall>
+    </PositiveAction>
+    <NegativeAction>
+      <Block>
+        <ForLoop>
+          <Initializers>
+            <Assignment Operator="None">
+              <LeftOperand>
+                <VariableRef Name="i" />
+              </LeftOperand>
+              <RightOperand>
+                <Literal Type="int" Value="0" />
+              </RightOperand>
+            </Assignment>
+          </Initializers>
+          <Guard>
+            <BinaryExpression Operator="LessThan">
+              <LeftOperand>
+                <VariableRef Name="i" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="n" />
+              </RightOperand>
+            </BinaryExpression>
+          </Guard>
+          <Updaters>
+            <UnaryExpression Operator="PreIncrement">
+              <Operand>
+                <VariableRef Name="i" />
+              </Operand>
+            </UnaryExpression>
+          </Updaters>
+          <Action>
+            <Block>
+              <FunctionCall FunctionName="print">
+                <Arguments>
+                  <Literal Type="string" Value="item no. {0} = " />
+                  <BinaryExpression Operator="Plus">
+                    <LeftOperand>
+                      <VariableRef Name="i" />
+                    </LeftOperand>
+                    <RightOperand>
+                      <Literal Type="int" Value="1" />
+                    </RightOperand>
+                  </BinaryExpression>
+                </Arguments>
+              </FunctionCall>
+              <MethodCall FunctionName="add" Optional="False">
+                <Target>
+                  <VariableRef Name="t" />
+                </Target>
+                <Arguments>
+                  <Conversion TypeName="float">
+                    <Expression>
+                      <FunctionCall FunctionName="readln">
+                        <Arguments />
+                      </FunctionCall>
+                    </Expression>
+                  </Conversion>
+                </Arguments>
+              </MethodCall>
+            </Block>
+          </Action>
+        </ForLoop>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="s" />
+          </LeftOperand>
+          <RightOperand>
+            <FunctionCall FunctionName="sum">
+              <Arguments>
+                <VariableRef Name="t" />
+              </Arguments>
+            </FunctionCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <Literal Type="string" Value="you've entered: " />
+              </LeftOperand>
+              <RightOperand>
+                <MethodCall FunctionName="join" Optional="False">
+                  <Target>
+                    <VariableRef Name="t" />
+                  </Target>
+                  <Arguments>
+                    <Literal Type="string" Value=", " />
+                  </Arguments>
+                </MethodCall>
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <Literal Type="string" Value="the sum of items is: " />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="s" />
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <Literal Type="string" Value="the minimum is: " />
+              </LeftOperand>
+              <RightOperand>
+                <FunctionCall FunctionName="min">
+                  <Arguments>
+                    <VariableRef Name="t" />
+                  </Arguments>
+                </FunctionCall>
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <Literal Type="string" Value="the maximum is: " />
+              </LeftOperand>
+              <RightOperand>
+                <FunctionCall FunctionName="max">
+                  <Arguments>
+                    <VariableRef Name="t" />
+                  </Arguments>
+                </FunctionCall>
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <BinaryExpression Operator="Plus">
+              <LeftOperand>
+                <Literal Type="string" Value="the averrage is: " />
+              </LeftOperand>
+              <RightOperand>
+                <BinaryExpression Operator="Divide">
+                  <LeftOperand>
+                    <VariableRef Name="s" />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="n" />
+                  </RightOperand>
+                </BinaryExpression>
+              </RightOperand>
+            </BinaryExpression>
+          </Arguments>
+        </FunctionCall>
+      </Block>
+    </NegativeAction>
+  </IfElse>
+  <FunctionCall FunctionName="readln">
+    <Arguments />
+  </FunctionCall>
+</Program>

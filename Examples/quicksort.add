@@ -1,0 +1,56 @@
+import std::util; // for 'swap' and 'randlst'
+import sys::environment; // for 'getTickCount'
+
+function quicksort(t, left, right)
+{
+	if (left < right)
+	{
+		var pivot = partition(t, left, right);
+		quicksort(t, left, pivot - 1);
+		quicksort(t, pivot + 1, right);
+	}
+}
+
+function partition(t, left, right)
+{
+	var pivot = t[left], l = left + 1, r = right;
+	
+	while (l < r)
+	{
+		while(l < r && t[l] <= pivot) l++;
+		while(l < r && t[r] >= pivot) r--;
+		if(l < r) swap(t[l], t[r]);
+	}
+	
+	if (t[l] > pivot) l--;
+	t[left] = t[l];
+	t[l] = pivot;
+	
+	return l;
+}
+
+if (__name == 'main')
+{
+	n = (int) readln("how many items? ");
+	prec = (int) readln("precision? ");
+    println();
+	
+	println("generating values...");
+    println();
+    
+	t = randlst(n, n, rounding: prec); // generates a list of n floating-point values comprised between 0 and n and rounded to prec
+	println("generated list : " + t);
+    println();
+	
+	println("sorting...");
+	startTime = getTickCount();
+	quicksort(t, 0, n - 1);
+	duration = getTickCount() - startTime;
+    println();
+	
+	println("sorted list : " + t);
+    println();
+    
+	println("total runtime : " + duration);
+	readln();
+}

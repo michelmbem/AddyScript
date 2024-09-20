@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<AssemblyName>asplot</AssemblyName>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ApplicationIcon>Plotter.ico</ApplicationIcon>
+		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>1701;1702;CA1416</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AddyScript\AddyScript.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Plotter.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="Plotter.jpg" />
+	</ItemGroup>
+  
+	<ItemGroup>
+		<None Include="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+</Project>

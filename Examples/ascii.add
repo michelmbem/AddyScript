@@ -1,0 +1,33 @@
+import sys::console;
+
+setForeground('Yellow');
+println('******** THE ASCII CODE ********');
+println('');
+
+print('  ');
+for (i = 0; i < 16; i++)
+{
+	print('{0:X} ', i);
+}
+
+println();
+resetColor();
+
+for (i = 0; i < 16; i++)
+{
+	setForeground('Yellow');
+	print('{0:X} ', i);
+	resetColor();
+    
+    if (!({0, 1, 8, 9} contains i))
+    {
+        for (j = 0; j < 16; j++)
+        {
+            print('{0} ', chr(16 * i + j));
+        }
+    }
+	
+	println();
+}
+
+readln();

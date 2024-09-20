@@ -1,0 +1,188 @@
+/**
+* The Number class overloads all overloadable operators except
+* those that are typically reserved to strings and collections:
+* ('startswith', 'endswith', 'contains' and 'matches')
+*/
+class Number
+{
+    // It's not necessary to declare fields in general!
+	// But explicitly declaring them is useful for access control and introspection.
+	// private value;
+	
+	public constructor (value)
+	{
+		this.value = value;
+	}
+	
+	public function toString(fmt = '')
+	{
+		return this.value.toString(fmt);
+	}
+	
+	public operator +()
+	{
+		return this;
+	}
+	
+	public operator -()
+	{
+		return new Number(-this.value);
+	}
+	
+    // The prefix version of ++ has no argument
+	public operator ++()
+	{
+        ++this.value;
+		return this;
+	}
+	
+	// The prefix version of -- has no argument
+	public operator --()
+	{
+        --this.value;
+		return this;
+	}
+	
+    // The postfix version of ++ has one unused argument
+	public operator ++(other)
+	{
+		var n = new Number(this.value);
+        ++this;
+		return n;
+	}
+	
+	// The postfix version of -- has one unused argument
+	public operator --(other)
+	{
+		var n = new Number(this.value);
+        --this;
+		return n;
+	}
+	
+	public operator ~()
+	{
+		return new Number(~this.value);
+	}
+	
+	// The difference between the unary and the binary versions of + is the presence or absence of the 'other' parameter
+	public operator +(other)
+	{
+		return new Number(this.value + other.value);
+	}
+	
+	// The difference between the unary and the binary versions of - is the presence or absence of the 'other' parameter
+	public operator -(other)
+	{
+		return new Number(this.value - other.value);
+	}
+	
+	public operator *(other)
+	{
+		return new Number(this.value * other.value);
+	}
+	
+	public operator /(other)
+	{
+		return new Number(this.value / other.value);
+	}
+	
+	public operator %(other)
+	{
+		return new Number(this.value % other.value);
+	}
+	
+	public operator **(n)
+	{
+		return new Number(this.value ** n);
+	}
+	
+	public operator &(other)
+	{
+		return new Number(this.value & other.value);
+	}
+	
+	public operator |(other)
+	{
+		return new Number(this.value | other.value);
+	}
+	
+	public operator ^(other)
+	{
+		return new Number(this.value ^ other.value);
+	}
+	
+	public operator <<(n)
+	{
+		return new Number(this.value << n);
+	}
+	
+	public operator >>(n)
+	{
+		return new Number(this.value >> n);
+	}
+	
+	public operator ==(other)
+	{
+		return this.value == other.value;
+	}
+	
+	public operator !=(other)
+	{
+		return this.value != other.value;
+	}
+	
+	public operator <(other)
+	{
+		return this.value < other.value;
+	}
+	
+	public operator >(other)
+	{
+		return this.value > other.value;
+	}
+	
+	public operator <=(other)
+	{
+		return this.value <= other.value;
+	}
+	
+	public operator >=(other)
+	{
+		return this.value >= other.value;
+	}
+}
+
+if (__name == 'main')
+{
+	n1 = new Number(10);
+	n2 = new Number(-5);
+	println('n1 = {0}', n1);
+	println('n2 = {0}', n2);
+	println('+n1 = {0}', +n1);
+	println('-n1 = {0}', -n1);
+	println('+n2 = {0}', +n2);
+	println('-n2 = {0}', -n2);
+	println('n1++ = {0}, n1 = {1}', n1++, n1);
+	println('n1-- = {0}, n1 = {1}', n1--, n1);
+	println('++n2 = {0}, n2 = {1}', ++n2, n2);
+	println('--n2 = {0}, n2 = {1}', --n2, n2);
+	println('~n1 = {0}', ~n1);
+	println('n1 + n2 = {0}', n1 + n2);
+	println('n1 - n2 = {0}', n1 - n2);
+	println('n1 * n2 = {0}', n1 * n2);
+	println('n1 / n2 = {0}', n1 / n2);
+	println('n1 % n2 = {0}', n1 % n2);
+	println('n1 ** 3 = {0:###,###,##0}', n1 ** 3);
+	println('n1 & n2 = {0}', n1 & n2);
+	println('n1 | n2 = {0}', n1 | n2);
+	println('n1 ^ n2 = {0}', n1 ^ n2);
+	println('n1 << 2 = {0}', n1 << 2);
+	println('n1 >> 2 = {0}', n1 >> 2);
+	println('n1 == n2 = {0}', n1 == n2);
+	println('n1 != n2 = {0}', n1 != n2);
+	println('n1 < n2 = {0}', n1 < n2);
+	println('n1 > n2 = {0}', n1 > n2);
+	println('n1 <= n2 = {0}', n1 <= n2);
+	println('n1 >= n2 = {0}', n1 >= n2);
+	readln();
+}

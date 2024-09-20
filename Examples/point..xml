@@ -1,0 +1,519 @@
+<?xml version="1.0"?>
+<Program>
+  <ClassDefinition ClassName="Point">
+    <Constructor>
+      <ClassMethodDecl Name="Point" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="x" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="y" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <IfElse>
+            <Condition>
+              <BinaryExpression Operator="GreaterThanOrEqual">
+                <LeftOperand>
+                  <StaticPropertyRef Name="Point::count" />
+                </LeftOperand>
+                <RightOperand>
+                  <StaticPropertyRef Name="Point::MAXCOUNT" />
+                </RightOperand>
+              </BinaryExpression>
+            </Condition>
+            <PositiveAction>
+              <Throw>
+                <Literal Type="string" Value="The maximum count of points is reached!" />
+              </Throw>
+            </PositiveAction>
+          </IfElse>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_x" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="x" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_y" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="y" />
+            </RightOperand>
+          </Assignment>
+          <UnaryExpression Operator="PreIncrement">
+            <Operand>
+              <StaticPropertyRef Name="Point::_count" />
+            </Operand>
+          </UnaryExpression>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Fields>
+      <ClassFieldDecl Name="MAXCOUNT" Scope="Public" Modifier="StaticFinal">
+        <Initializer>
+          <Literal Type="int" Value="2" />
+        </Initializer>
+      </ClassFieldDecl>
+      <ClassFieldDecl Name="_count" Scope="Private" Modifier="Static">
+        <Initializer>
+          <Literal Type="int" Value="0" />
+        </Initializer>
+      </ClassFieldDecl>
+      <ClassFieldDecl Name="_x" Scope="Private" />
+      <ClassFieldDecl Name="_y" Scope="Private" />
+    </Fields>
+    <Properties>
+      <ClassPropertyDecl Name="count" Scope="Public" Modifier="Static">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <StaticPropertyRef Name="Point::_count" />
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+      <ClassPropertyDecl Name="x" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <PropertyRef PropertyName="_x" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+      <ClassPropertyDecl Name="y" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <PropertyRef PropertyName="_y" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Properties>
+    <Methods>
+      <ClassMethodDecl Name="move" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="x" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="y" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_x" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="x" />
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_y" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="y" />
+            </RightOperand>
+          </Assignment>
+          <MethodCall FunctionName="trigger_moved" Optional="False">
+            <Target>
+              <SelfReference />
+            </Target>
+            <Arguments>
+              <SelfReference />
+            </Arguments>
+          </MethodCall>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events>
+      <ClassEventDecl Name="moved" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="sender" ByRef="False" VaArgs="False" />
+        </Parameters>
+      </ClassEventDecl>
+    </Events>
+  </ClassDefinition>
+  <ClassDefinition ClassName="Point3D" SuperClassName="Point">
+    <Constructor>
+      <ClassMethodDecl Name="Point3D" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="x" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="y" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="z" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <ParentConstructorCall>
+            <Arguments>
+              <VariableRef Name="x" />
+              <VariableRef Name="y" />
+            </Arguments>
+          </ParentConstructorCall>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_z" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="z" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Fields>
+      <ClassFieldDecl Name="_z" Scope="Private" />
+    </Fields>
+    <Properties>
+      <ClassPropertyDecl Name="z" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <PropertyRef PropertyName="_z" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Properties>
+    <Methods>
+      <ClassMethodDecl Name="move" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="x" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="y" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Throw>
+            <Literal Type="string" Value="Please use move3D for a Point3D" />
+          </Throw>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="move3D" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="x" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="y" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="z" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="_z" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="z" />
+            </RightOperand>
+          </Assignment>
+          <ParentMethodCall FunctionName="move">
+            <Arguments>
+              <VariableRef Name="x" />
+              <VariableRef Name="y" />
+            </Arguments>
+          </ParentMethodCall>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <IfElse>
+    <Condition>
+      <BinaryExpression Operator="Equal">
+        <LeftOperand>
+          <VariableRef Name="__name" />
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="string" Value="main" />
+        </RightOperand>
+      </BinaryExpression>
+    </Condition>
+    <PositiveAction>
+      <Block>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="p" />
+          </LeftOperand>
+          <RightOperand>
+            <ConstructorCall ClassName="Point">
+              <Arguments>
+                <Literal Type="int" Value="10" />
+                <UnaryExpression Operator="Minus">
+                  <Operand>
+                    <Literal Type="int" Value="5" />
+                  </Operand>
+                </UnaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="p is at (" />
+                <PropertyRef PropertyName="x" Optional="False">
+                  <Owner>
+                    <VariableRef Name="p" />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=", " />
+                <PropertyRef PropertyName="y" Optional="False">
+                  <Owner>
+                    <VariableRef Name="p" />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=")" />
+              </Segments>
+            </FormatStringExpression>
+          </Arguments>
+        </FunctionCall>
+        <MethodCall FunctionName="add_moved" Optional="False">
+          <Target>
+            <VariableRef Name="p" />
+          </Target>
+          <Arguments>
+            <InlineFunction>
+              <Parameters>
+                <ParameterDecl Name="s" ByRef="False" VaArgs="False" />
+              </Parameters>
+              <Body>
+                <Return>
+                  <FunctionCall FunctionName="println">
+                    <Arguments>
+                      <FormatStringExpression>
+                        <Segments>
+                          <Literal Type="string" Value="p has moved to (" />
+                          <PropertyRef PropertyName="x" Optional="False">
+                            <Owner>
+                              <VariableRef Name="s" />
+                            </Owner>
+                          </PropertyRef>
+                          <Literal Type="string" Value=", " />
+                          <PropertyRef PropertyName="y" Optional="False">
+                            <Owner>
+                              <VariableRef Name="s" />
+                            </Owner>
+                          </PropertyRef>
+                          <Literal Type="string" Value=")" />
+                        </Segments>
+                      </FormatStringExpression>
+                    </Arguments>
+                  </FunctionCall>
+                </Return>
+              </Body>
+            </InlineFunction>
+          </Arguments>
+        </MethodCall>
+        <MethodCall FunctionName="move" Optional="False">
+          <Target>
+            <VariableRef Name="p" />
+          </Target>
+          <Arguments>
+            <UnaryExpression Operator="Minus">
+              <Operand>
+                <Literal Type="int" Value="7" />
+              </Operand>
+            </UnaryExpression>
+            <Literal Type="int" Value="1" />
+          </Arguments>
+        </MethodCall>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="p3" />
+          </LeftOperand>
+          <RightOperand>
+            <ConstructorCall ClassName="Point3D">
+              <Arguments>
+                <Literal Type="int" Value="3" />
+                <Literal Type="int" Value="6" />
+                <UnaryExpression Operator="Minus">
+                  <Operand>
+                    <Literal Type="int" Value="9" />
+                  </Operand>
+                </UnaryExpression>
+              </Arguments>
+            </ConstructorCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <TernaryExpression>
+              <Test>
+                <TypeVerification TypeName="Point">
+                  <Expression>
+                    <VariableRef Name="p3" />
+                  </Expression>
+                </TypeVerification>
+              </Test>
+              <TruePart>
+                <Literal Type="string" Value="p3 is a point" />
+              </TruePart>
+              <FalsePart>
+                <Literal Type="string" Value="p3 is not a point" />
+              </FalsePart>
+            </TernaryExpression>
+          </Arguments>
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="p3 is at (" />
+                <PropertyRef PropertyName="x" Optional="False">
+                  <Owner>
+                    <VariableRef Name="p3" />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=", " />
+                <PropertyRef PropertyName="y" Optional="False">
+                  <Owner>
+                    <VariableRef Name="p3" />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=", " />
+                <PropertyRef PropertyName="z" Optional="False">
+                  <Owner>
+                    <VariableRef Name="p3" />
+                  </Owner>
+                </PropertyRef>
+                <Literal Type="string" Value=")" />
+              </Segments>
+            </FormatStringExpression>
+          </Arguments>
+        </FunctionCall>
+        <MethodCall FunctionName="add_moved" Optional="False">
+          <Target>
+            <VariableRef Name="p3" />
+          </Target>
+          <Arguments>
+            <InlineFunction>
+              <Parameters>
+                <ParameterDecl Name="s" ByRef="False" VaArgs="False" />
+              </Parameters>
+              <Body>
+                <Return>
+                  <FunctionCall FunctionName="println">
+                    <Arguments>
+                      <FormatStringExpression>
+                        <Segments>
+                          <Literal Type="string" Value="p3 has moved to (" />
+                          <PropertyRef PropertyName="x" Optional="False">
+                            <Owner>
+                              <VariableRef Name="s" />
+                            </Owner>
+                          </PropertyRef>
+                          <Literal Type="string" Value=", " />
+                          <PropertyRef PropertyName="y" Optional="False">
+                            <Owner>
+                              <VariableRef Name="s" />
+                            </Owner>
+                          </PropertyRef>
+                          <Literal Type="string" Value=", " />
+                          <PropertyRef PropertyName="z" Optional="False">
+                            <Owner>
+                              <VariableRef Name="s" />
+                            </Owner>
+                          </PropertyRef>
+                          <Literal Type="string" Value=")" />
+                        </Segments>
+                      </FormatStringExpression>
+                    </Arguments>
+                  </FunctionCall>
+                </Return>
+              </Body>
+            </InlineFunction>
+          </Arguments>
+        </MethodCall>
+        <MethodCall FunctionName="move3D" Optional="False">
+          <Target>
+            <VariableRef Name="p3" />
+          </Target>
+          <Arguments>
+            <Literal Type="int" Value="4" />
+            <UnaryExpression Operator="Minus">
+              <Operand>
+                <Literal Type="int" Value="2" />
+              </Operand>
+            </UnaryExpression>
+            <Literal Type="int" Value="8" />
+          </Arguments>
+        </MethodCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <FormatStringExpression>
+              <Segments>
+                <Literal Type="string" Value="point count = " />
+                <StaticPropertyRef Name="Point::count" />
+              </Segments>
+            </FormatStringExpression>
+          </Arguments>
+        </FunctionCall>
+        <TryCatchFinally ExceptionName="e">
+          <TryBlock>
+            <Assignment Operator="None">
+              <LeftOperand>
+                <VariableRef Name="p" />
+              </LeftOperand>
+              <RightOperand>
+                <ConstructorCall ClassName="Point">
+                  <Arguments>
+                    <Literal Type="int" Value="0" />
+                    <Literal Type="int" Value="0" />
+                  </Arguments>
+                </ConstructorCall>
+              </RightOperand>
+            </Assignment>
+          </TryBlock>
+          <CatchBlock>
+            <FunctionCall FunctionName="println">
+              <Arguments>
+                <PropertyRef PropertyName="message" Optional="False">
+                  <Owner>
+                    <VariableRef Name="e" />
+                  </Owner>
+                </PropertyRef>
+              </Arguments>
+            </FunctionCall>
+          </CatchBlock>
+          <FinallyBlock>
+            <FunctionCall FunctionName="readln">
+              <Arguments />
+            </FunctionCall>
+          </FinallyBlock>
+        </TryCatchFinally>
+      </Block>
+    </PositiveAction>
+  </IfElse>
+</Program>

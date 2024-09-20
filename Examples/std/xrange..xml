@@ -1,0 +1,516 @@
+<?xml version="1.0"?>
+<Program>
+  <ClassDefinition ClassName="Range">
+    <Constructor>
+      <ClassMethodDecl Name="Range" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="start" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="end" ByRef="False" VaArgs="False" />
+          <ParameterDecl Name="step" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <IfElse>
+            <Condition>
+              <BinaryExpression Operator="LessThanOrEqual">
+                <LeftOperand>
+                  <VariableRef Name="step" />
+                </LeftOperand>
+                <RightOperand>
+                  <Literal Type="int" Value="0" />
+                </RightOperand>
+              </BinaryExpression>
+            </Condition>
+            <PositiveAction>
+              <Throw>
+                <Literal Type="string" Value="step has to be positive" />
+              </Throw>
+            </PositiveAction>
+          </IfElse>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="start" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <FunctionCall FunctionName="min">
+                <Arguments>
+                  <VariableRef Name="start" />
+                  <VariableRef Name="end" />
+                </Arguments>
+                <NamedArgs />
+              </FunctionCall>
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="end" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <FunctionCall FunctionName="max">
+                <Arguments>
+                  <VariableRef Name="start" />
+                  <VariableRef Name="end" />
+                </Arguments>
+                <NamedArgs />
+              </FunctionCall>
+            </RightOperand>
+          </Assignment>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="step" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="step" />
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+    </Constructor>
+    <Indexer>
+      <ClassPropertyDecl Name="[item]" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <IfElse>
+              <Condition>
+                <BinaryExpression Operator="OrElse">
+                  <LeftOperand>
+                    <BinaryExpression Operator="LessThan">
+                      <LeftOperand>
+                        <VariableRef Name="__key" />
+                      </LeftOperand>
+                      <RightOperand>
+                        <Literal Type="int" Value="0" />
+                      </RightOperand>
+                    </BinaryExpression>
+                  </LeftOperand>
+                  <RightOperand>
+                    <BinaryExpression Operator="GreaterThanOrEqual">
+                      <LeftOperand>
+                        <VariableRef Name="__key" />
+                      </LeftOperand>
+                      <RightOperand>
+                        <PropertyRef PropertyName="count" Optional="False">
+                          <Owner>
+                            <SelfReference />
+                          </Owner>
+                        </PropertyRef>
+                      </RightOperand>
+                    </BinaryExpression>
+                  </RightOperand>
+                </BinaryExpression>
+              </Condition>
+              <PositiveAction>
+                <Throw>
+                  <Literal Type="string" Value="index out of range" />
+                </Throw>
+              </PositiveAction>
+            </IfElse>
+            <Return>
+              <BinaryExpression Operator="Plus">
+                <LeftOperand>
+                  <PropertyRef PropertyName="start" Optional="False">
+                    <Owner>
+                      <SelfReference />
+                    </Owner>
+                  </PropertyRef>
+                </LeftOperand>
+                <RightOperand>
+                  <BinaryExpression Operator="Times">
+                    <LeftOperand>
+                      <PropertyRef PropertyName="step" Optional="False">
+                        <Owner>
+                          <SelfReference />
+                        </Owner>
+                      </PropertyRef>
+                    </LeftOperand>
+                    <RightOperand>
+                      <VariableRef Name="__key" />
+                    </RightOperand>
+                  </BinaryExpression>
+                </RightOperand>
+              </BinaryExpression>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Indexer>
+    <Fields>
+      <ClassFieldDecl Name="start" Scope="Private" />
+      <ClassFieldDecl Name="end" Scope="Private" />
+      <ClassFieldDecl Name="step" Scope="Private" />
+      <ClassFieldDecl Name="current" Scope="Private" />
+    </Fields>
+    <Properties>
+      <ClassPropertyDecl Name="count" Scope="Public">
+        <Reader Scope="Public">
+          <Body>
+            <Return>
+              <Conversion TypeName="int">
+                <Expression>
+                  <BinaryExpression Operator="Divide">
+                    <LeftOperand>
+                      <BinaryExpression Operator="Minus">
+                        <LeftOperand>
+                          <PropertyRef PropertyName="end" Optional="False">
+                            <Owner>
+                              <SelfReference />
+                            </Owner>
+                          </PropertyRef>
+                        </LeftOperand>
+                        <RightOperand>
+                          <PropertyRef PropertyName="start" Optional="False">
+                            <Owner>
+                              <SelfReference />
+                            </Owner>
+                          </PropertyRef>
+                        </RightOperand>
+                      </BinaryExpression>
+                    </LeftOperand>
+                    <RightOperand>
+                      <PropertyRef PropertyName="step" Optional="False">
+                        <Owner>
+                          <SelfReference />
+                        </Owner>
+                      </PropertyRef>
+                    </RightOperand>
+                  </BinaryExpression>
+                </Expression>
+              </Conversion>
+            </Return>
+          </Body>
+        </Reader>
+      </ClassPropertyDecl>
+    </Properties>
+    <Methods>
+      <ClassMethodDecl Name="moveFirst" Scope="Public">
+        <Parameters />
+        <Body>
+          <Assignment Operator="None">
+            <LeftOperand>
+              <PropertyRef PropertyName="current" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <PropertyRef PropertyName="start" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </RightOperand>
+          </Assignment>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="hasNext" Scope="Public">
+        <Parameters />
+        <Body>
+          <Return>
+            <BinaryExpression Operator="LessThan">
+              <LeftOperand>
+                <PropertyRef PropertyName="current" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="end" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="moveNext" Scope="Public">
+        <Parameters />
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="current">
+              <Value>
+                <PropertyRef PropertyName="current" Optional="False">
+                  <Owner>
+                    <SelfReference />
+                  </Owner>
+                </PropertyRef>
+              </Value>
+            </PropertyInitializer>
+          </VariableDecl>
+          <Assignment Operator="Plus">
+            <LeftOperand>
+              <PropertyRef PropertyName="current" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </LeftOperand>
+            <RightOperand>
+              <PropertyRef PropertyName="step" Optional="False">
+                <Owner>
+                  <SelfReference />
+                </Owner>
+              </PropertyRef>
+            </RightOperand>
+          </Assignment>
+          <Return>
+            <VariableRef Name="current" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="each" Scope="Public">
+        <Parameters>
+          <ParameterDecl Name="action" ByRef="False" VaArgs="False" />
+        </Parameters>
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="item" />
+          </VariableDecl>
+          <ForEachLoop ValueName="item">
+            <Enumerated>
+              <SelfReference />
+            </Enumerated>
+            <Action>
+              <FunctionCall FunctionName="action">
+                <Arguments>
+                  <VariableRef Name="item" />
+                </Arguments>
+                <NamedArgs />
+              </FunctionCall>
+            </Action>
+          </ForEachLoop>
+          <Return>
+            <SelfReference />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="toList" Scope="Public">
+        <Parameters />
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="item" />
+            <PropertyInitializer Name="res">
+              <Value>
+                <ListInitializer>
+                  <Items />
+                </ListInitializer>
+              </Value>
+            </PropertyInitializer>
+          </VariableDecl>
+          <ForEachLoop ValueName="item">
+            <Enumerated>
+              <SelfReference />
+            </Enumerated>
+            <Action>
+              <MethodCall FunctionName="add" Optional="False">
+                <Target>
+                  <VariableRef Name="res" />
+                </Target>
+                <Arguments>
+                  <VariableRef Name="item" />
+                </Arguments>
+              </MethodCall>
+            </Action>
+          </ForEachLoop>
+          <Return>
+            <VariableRef Name="res" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+      <ClassMethodDecl Name="toSet" Scope="Public">
+        <Parameters />
+        <Body>
+          <VariableDecl>
+            <PropertyInitializer Name="item" />
+            <PropertyInitializer Name="res">
+              <Value>
+                <SetInitializer>
+                  <Items />
+                </SetInitializer>
+              </Value>
+            </PropertyInitializer>
+          </VariableDecl>
+          <ForEachLoop ValueName="item">
+            <Enumerated>
+              <SelfReference />
+            </Enumerated>
+            <Action>
+              <MethodCall FunctionName="add" Optional="False">
+                <Target>
+                  <VariableRef Name="res" />
+                </Target>
+                <Arguments>
+                  <VariableRef Name="item" />
+                </Arguments>
+              </MethodCall>
+            </Action>
+          </ForEachLoop>
+          <Return>
+            <VariableRef Name="res" />
+          </Return>
+        </Body>
+      </ClassMethodDecl>
+    </Methods>
+    <Events />
+  </ClassDefinition>
+  <FunctionDecl Name="xrange">
+    <Parameters>
+      <ParameterDecl Name="start" ByRef="False" VaArgs="False" />
+      <ParameterDecl Name="end" ByRef="False" VaArgs="False" DefaultValue="0" />
+      <ParameterDecl Name="step" ByRef="False" VaArgs="False" DefaultValue="1" />
+    </Parameters>
+    <Body>
+      <Return>
+        <ConstructorCall ClassName="Range">
+          <Arguments>
+            <VariableRef Name="start" />
+            <VariableRef Name="end" />
+            <VariableRef Name="step" />
+          </Arguments>
+          <NamedArgs />
+        </ConstructorCall>
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <IfElse>
+    <Condition>
+      <BinaryExpression Operator="Equal">
+        <LeftOperand>
+          <VariableRef Name="__name" />
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="string" Value="main" />
+        </RightOperand>
+      </BinaryExpression>
+    </Condition>
+    <PositiveAction>
+      <Block>
+        <VariableDecl>
+          <PropertyInitializer Name="r">
+            <Value>
+              <FunctionCall FunctionName="xrange">
+                <Arguments>
+                  <Literal Type="int" Value="10" />
+                </Arguments>
+                <NamedArgs>
+                  <Arg Name="step">
+                    <Literal Type="int" Value="2" />
+                  </Arg>
+                </NamedArgs>
+              </FunctionCall>
+            </Value>
+          </PropertyInitializer>
+        </VariableDecl>
+        <ForLoop>
+          <Initializers>
+            <Assignment Operator="None">
+              <LeftOperand>
+                <VariableRef Name="i" />
+              </LeftOperand>
+              <RightOperand>
+                <Literal Type="int" Value="0" />
+              </RightOperand>
+            </Assignment>
+          </Initializers>
+          <Guard>
+            <BinaryExpression Operator="LessThan">
+              <LeftOperand>
+                <VariableRef Name="i" />
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="count" Optional="False">
+                  <Owner>
+                    <VariableRef Name="r" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </Guard>
+          <Updaters>
+            <UnaryExpression Operator="PreIncrement">
+              <Operand>
+                <VariableRef Name="i" />
+              </Operand>
+            </UnaryExpression>
+          </Updaters>
+          <Action>
+            <FunctionCall FunctionName="print">
+              <Arguments>
+                <FormatStringExpression>
+                  <Segments>
+                    <ItemRef Optional="False">
+                      <Owner>
+                        <VariableRef Name="r" />
+                      </Owner>
+                      <Index>
+                        <VariableRef Name="i" />
+                      </Index>
+                    </ItemRef>
+                    <Literal Type="string" Value=" " />
+                  </Segments>
+                </FormatStringExpression>
+              </Arguments>
+              <NamedArgs />
+            </FunctionCall>
+          </Action>
+        </ForLoop>
+        <FunctionCall FunctionName="println">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+        <MethodCall FunctionName="each" Optional="False">
+          <Target>
+            <VariableRef Name="r" />
+          </Target>
+          <Arguments>
+            <InlineFunction>
+              <Parameters>
+                <ParameterDecl Name="v" ByRef="False" VaArgs="False" />
+              </Parameters>
+              <Body>
+                <Return>
+                  <FunctionCall FunctionName="print">
+                    <Arguments>
+                      <Literal Type="string" Value="{0} " />
+                      <BinaryExpression Operator="Plus">
+                        <LeftOperand>
+                          <VariableRef Name="v" />
+                        </LeftOperand>
+                        <RightOperand>
+                          <Literal Type="int" Value="1" />
+                        </RightOperand>
+                      </BinaryExpression>
+                    </Arguments>
+                    <NamedArgs />
+                  </FunctionCall>
+                </Return>
+              </Body>
+            </InlineFunction>
+          </Arguments>
+        </MethodCall>
+        <FunctionCall FunctionName="println">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="readln">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+      </Block>
+    </PositiveAction>
+  </IfElse>
+</Program>

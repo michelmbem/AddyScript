@@ -1,0 +1,193 @@
+import connection;
+import fetch;
+import iterator;
+
+class DBOCommand
+{
+	private connection;
+	private command;
+	private prepared;
+	
+	public constructor(connection, commandText, commandType)
+	{
+		this.connection = connection;
+		this.command = connection.createCommand(commandText, commandType);
+		this.prepared = false;
+	}
+	
+	public function addParam(parameter)
+	{
+		var dbParam = this.command.CreateParameter();
+		this.command.Parameters.Add(dbParam);
+		
+		if (parameter is string) {
+			dbParam.ParameterName = parameter;
+		}
+		else { // Assuming parameter is an object or a map with at least a 'name' property or key
+			parameter = (object) parameter;
+			dbParam.ParameterName = parameter.name;
+			if (!(parameter.dbType is void))
+				dbParam.DbType = parameter.dbType;
+			if (!(parameter.size is void))
+				dbParam.Size = parameter.size;
+			if (!(parameter.precision is void))
+				dbParam.Precision = parameter.precision;
+			if (!(parameter.scale is void))
+				dbParam.Scale = parameter.scale;
+			if (!(parameter.value is void))
+				dbParam.Value = parameter.value;
+		}
+		
+		return this;
+	}
+	
+	public function addParams(params parameters)
+	{
+		parameters.each(|p| => this.addParam(p));
+		return this;
+	}
+	
+	public function setParam(index, value)
+	{
+		this.command.Parameters[index].Value = value;
+		return this;
+	}
+	
+	public function setParams(parameters)
+	{
+		parameters.each(|name, value| => this.setParam(name, value)); //Note: parameters has to be a map
+		return this;
+	}
+	
+	public function setAllParams(params values)
+	{
+		var k = 0, parameter;
+		foreach (parameter in this.command.Parameters) {
+			switch (parameter.Direction) {
+				case 'Input':
+				case 'InputOutput':
+					parameter.Value = values[k++];
+					break;
+			}
+		}
+		return this;
+	}
+	
+	public function query(fetch = null)
+	{
+		var reader, result;
+		
+		if (fetch === null)
+			fetch = fetch_index_list;
+		
+		try {
+			this.command.Transaction = this.connection.transaction;
+			this.ensurePrepared();
+			reader = this.command.ExecuteReader();
+			result = fetch(reader);	
+		}
+		catch (ex) {
+			throw ex;
+		}
+		finally {
+			try {
+				reader.Close();
+			}
+			catch (ex1) {
+			}
+		}
+		
+		return result;
+	}
+	
+	public function queryScalar()
+	{
+		var result;
+		
+		try {
+			this.command.Transaction = this.connection.transaction;
+			this.ensurePrepared();
+			result = this.command.ExecuteScalar();
+		}
+		catch (ex) {
+			throw ex;
+		}
+		
+		return result;
+	}
+	
+	public function exec()
+	{
+		var result;
+		
+		try {
+			this.command.Transaction = this.connection.transaction;
+			this.ensurePrepared();
+			result = this.command.ExecuteNonQuery();
+		}
+		catch (ex) {
+			throw ex;println(ex.name + ' : ' + ex.message);
+		}
+		
+		return result;
+	}
+	
+	public function eachRow(action, processor = null)
+	{
+		var iterator, row;
+		
+		if (processor === null)
+			processor = to_object;
+		
+		try {
+			this.command.Transaction = this.connection.transaction;
+			this.ensurePrepared();
+			iterator = new DBOIterator(this.command, processor);
+			foreach (row in iterator) action(row);
+		}
+		catch (ex) {
+			throw ex;
+		}
+		finally {
+			try {
+				iterator.dispose();
+			}
+			catch (ex1) {
+			}
+		}
+	}
+	
+	public function fill(dataSet, tableName, createCmdBldr = false)
+	{
+		var adapter;
+		
+		try {
+			this.command.Transaction = this.connection.transaction;
+			this.ensurePrepared();
+			adapter = DBOConfig::createDataAdapter(this.command);
+			adapter.Fill(dataSet, tableName);
+			if (createCmdBldr)
+				DBOConfig::createCommandBuilder(adapter);
+		}
+		catch (ex) {
+			throw ex;
+		}
+		
+		return adapter;
+	}
+	
+	public function getDataSet(tableName)
+	{
+		var dataSet = new System::Data::DataSet(tableName);
+		this.fill(dataSet, tableName).Dispose();
+		return dataSet;
+	}
+	
+	protected function ensurePrepared()
+	{
+		if (!this.prepared) {
+			this.command.Prepare();
+			this.prepared = true;
+		}
+	}
+}

@@ -1,0 +1,32 @@
+class DBOIterator
+{
+	private command;
+	private processor;
+	private reader;
+	
+	public constructor(command, processor)
+	{
+		this.command = command;
+		this.processor = processor;
+	}
+	
+	public function moveFirst()
+	{
+		this.reader = this.command.ExecuteReader();
+	}
+	
+	public function hasNext()
+	{
+		return this.reader.Read();
+	}
+	
+	public function moveNext()
+	{
+		return this.processor(this.reader);
+	}
+	
+	public function dispose()
+	{
+		this.reader.Close();
+	}
+}

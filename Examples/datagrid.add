@@ -1,0 +1,198 @@
+import std::dbo;
+import System::Windows::Forms;
+
+const PROVIDER = "oledb";
+const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../../Examples/data/nwind.mdb";
+//const PROVIDER = "mssql";
+//const CONNECTION_STRING = "Data Source=(local);Initial Catalog=Northwind;Integrated Security=Yes";
+
+function createColumn($property, header = null, type = "text", width = 100, readonly = false)
+{
+	var column;
+	
+	switch (type)
+	{
+		case "text":
+			column = new DataGridViewTextBoxColumn();
+			break;
+		case "check":
+			column = new DataGridViewCheckBoxColumn();
+			break;
+		case "combo":
+			column = new DataGridViewComboBoxColumn();
+			break;
+		case "image":
+			column = new DataGridViewImageColumn();
+			break;
+		default:
+			throw "Invalid column type : " + type;
+	}
+	
+	column.DataPropertyName = $property;
+	column.HeaderText = header ?? $property;
+	column.Width = width;
+	column.ReadOnly = readonly;
+	
+	return column;
+}
+
+function createColumns(grid, ds)
+{
+	col0 = createColumn("ProductID", "Product ID", width: 75, readonly: true);
+	col0.Frozen = true;
+	
+	col1 = createColumn("ProductName", "Product Name", width: 180);
+	
+	col2 = createColumn("SupplierID", "Supplier", "combo", 200);
+	col2.DataSource = ds.Tables["Suppliers"];
+	col2.ValueMember = "SupplierID";
+	col2.DisplayMember = "CompanyName";
+	col2.DisplayStyle = "Nothing";
+	
+	col3 = createColumn("CategoryID", "Category", "combo", 150);
+	col3.DataSource = ds.Tables["Categories"];
+	col3.ValueMember = "CategoryID";
+	col3.DisplayMember = "CategoryName";
+	col3.DisplayStyle = "Nothing";
+	
+	col4 = createColumn("QuantityPerUnit", "Quantity Per Unit", width: 120);
+	
+	col5 = createColumn("UnitPrice", "Unit Price");
+	col5.DefaultCellStyle.Format = "c";
+	
+	col6 = createColumn("UnitsInStock", "Units In Stock", readonly: true);
+	
+	col7 = createColumn("UnitsOnOrder", "Units On Order", readonly: true);
+	
+	col8 = createColumn("ReorderLevel", "Reorder Level");
+	
+	col9 = createColumn("Discontinued", type: "check", width: 75, readonly: true);
+	
+	grid.AutoGenerateColumns = false;
+	grid.Columns.AddRange([col0, col1, col2, col3, col4, col5, col6, col7, col8, col9]);
+}
+
+function formLoad(sender, args)
+{
+	try
+	{
+		println('provider: {0}. connection string: {1}', PROVIDER, CONNECTION_STRING);
+		println('connecting to the database...');
+		dbo = new DBO(PROVIDER, CONNECTION_STRING);
+		println('loading data...');
+		da = dbo.fill(ds, "Products", "SELECT * FROM Products", true /* will generate a command builder for the returned data adapter */);
+		dbo.fill(ds, "Suppliers", "SELECT SupplierID, CompanyName FROM Suppliers").Dispose();
+		dbo.fill(ds, "Categories", "SELECT CategoryID, CategoryName FROM Categories").Dispose();
+		println('presenting data...');
+		createColumns(g, ds);
+		g.DataSource = ds.Tables["Products"];
+		println('ready');
+	}
+	catch (ex)
+	{
+		MessageBox::Show(ex.message, "Error", "OK", "Error");
+		sender.Close();
+	}
+}
+
+function formClosing(sender, args)
+{
+	if (ds.HasChanges())
+	{
+		ans = MessageBox::Show(
+				"Save the changes made to data before exit?",
+				"Possible change loss",
+				"YesNoCancel",
+				"Question");
+		
+		switch (ans)
+		{
+			case "Yes":
+				da.Update(ds, "Products");
+				break;
+			case "Cancel":
+				args.Cancel = true;
+				return;
+		}
+	}
+	
+	dbo.dispose();
+	da.Dispose();
+	ds.Dispose();
+}
+
+function reload(sender, args)
+{
+	try
+	{
+		ds.Tables["Products"].Clear();
+		da.Fill(ds, "Products");
+	}
+	catch (ex)
+	{
+		MessageBox::Show(ex.message, "Error", "OK", "Error");
+	}
+}
+
+function update(sender, args)
+{
+	try
+	{
+		da.Update(ds, "Products");
+		ds.AcceptChanges();
+		
+		MessageBox::Show("Successfully updated", f.Text, "OK", "Information");
+	}
+	catch (ex)
+	{
+		MessageBox::Show(ex.message, "Error", "OK", "Error");
+	}
+}
+
+/*************************************** MAIN PROGRAM ********************************************/
+
+Application::EnableVisualStyles();
+
+dbo = da = null;
+ds = new System::Data::DataSet("Northwind");
+	
+f = new Form
+		{
+			Text = "Northwind Products",
+			StartPosition = "CenterScreen",
+			Size = new { Width = 800, Height = 600 }
+		};
+f.add_Load(formLoad);
+f.add_FormClosing(formClosing);
+
+b1 = new Button
+		 {
+			 Text = "Reload",
+			 Location = new { X = 4, Y = 4 },
+			 Size = new { Width = 80, Height = 24 }
+		 };
+b1.add_Click(reload);
+
+b2 = new Button
+		 {
+			 Text = "Save",
+			 Location = new { X = 88, Y = 4},
+			 Size = new { Width = 80, Height = 24}
+		 };
+b2.add_Click(update);
+
+p = new Panel
+		{
+			Dock = "Top",
+			Height = 32
+		};
+p.Controls.AddRange([b2, b1]);
+
+g = new DataGridView
+		{
+			Dock = "Fill"
+		};
+
+f.Controls.AddRange([g, p]);
+f.ShowDialog();
+f.Dispose();

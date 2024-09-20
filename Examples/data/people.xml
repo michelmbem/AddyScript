@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<people>
+  <person name="Morgan">
+    <surname>Joe</surname>
+    <age>28</age>
+    <sex>Male</sex>
+    <job>Dentist</job>
+  </person>
+  <person name="David">
+    <surname>William</surname>
+    <age>25</age>
+    <sex>Male</sex>
+    <job>Carpenter</job>
+  </person>
+  <person name="Largo">
+    <surname>Mary</surname>
+    <age>30</age>
+    <sex>Female</sex>
+    <job>Actress</job>
+  </person>
+  <person name="Hussein">
+    <surname>Myriam</surname>
+    <age>24</age>
+    <sex>Female</sex>
+    <job>Teacher</job>
+  </person>
+  <person name="Spencer">
+    <surname>Phil</surname>
+    <age>25</age>
+    <sex>Male</sex>
+    <job>Policeman</job>
+  </person>
+</people>

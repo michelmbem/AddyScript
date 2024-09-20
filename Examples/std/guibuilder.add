@@ -1,0 +1,696 @@
+/******************************************************** ControlBuilder **************************************************/
+
+abstract class ControlBuilder {
+	protected _control;
+	
+	public property control {
+		read { return this._control; }
+	}
+	
+	public function name(value) {
+		this._control.Name = value;
+		return this;
+	}
+	
+	public function text(value) {
+		this._control.Text = value;
+		return this;
+	}
+	
+	public function tag(value) {
+		this._control.Tag = value;
+		return this;
+	}
+	
+	public function tabIndex(value) {
+		this._control.TabIndex = value;
+		return this;
+	}
+	
+	public function tabStop(value) {
+		this._control.TabStop = value;
+		return this;
+	}
+	
+	public function visible(value) {
+		this._control.Visible = value;
+		return this;
+	}
+	
+	public function enabled(value) {
+		this._control.Enabled = value;
+		return this;
+	}
+	
+	public function autoSize(value) {
+		this._control.AutoSize = value;
+		return this;
+	}
+	
+	public function allowDrop(value) {
+		this._control.AllowDrop = value;
+		return this;
+	}
+	
+	public function left(value) {
+		this._control.Left = value;
+		return this;
+	}
+	
+	public function top(value) {
+		this._control.Top = value;
+		return this;
+	}
+	
+	public function location(x, y) {
+		this._control.Location = new System::Drawing::Point(x, y);
+		return this;
+	}
+	
+	public function width(value) {
+		this._control.Width = value;
+		return this;
+	}
+	
+	public function height(value) {
+		this._control.Height = value;
+		return this;
+	}
+	
+	public function size(width, height) {
+		this._control.Size = new System::Drawing::Size(width, height);
+		return this;
+	}
+	
+	public function clientSize(width, height) {
+		this._control.ClientSize = new System::Drawing::Size(width, height);
+		return this;
+	}
+	
+	public function minimumSize(width, height) {
+		this._control.MinimumSize = new System::Drawing::Size(width, height);
+		return this;
+	}
+	
+	public function maximumSize(width, height) {
+		this._control.MaximumSize = new System::Drawing::Size(width, height);
+		return this;
+	}
+	
+	public function bounds(x, y, width, height) {
+		this._control.Bounds = new System::Drawing::Rectangle(x, y, width, height);
+		return this;
+	}
+	
+	public function autoScrollOffset(x, y) {
+		this._control.AutoScrollOffset = new System::Drawing::Point(x, y);
+		return this;
+	}
+	
+	public function font(family, size, style) {
+		this._control.Font = new System::Drawing::Font(family, size, style);
+		return this;
+	}
+	
+	public function foreColor(a, r, g, b) {
+		this._control.ForeColor = System::Drawing::Color::FromArgb(a, r, g, b);
+		return this;
+	}
+	
+	public function backColor(a, r, g, b) {
+		this._control.BackColor = System::Drawing::Color::FromArgb(a, r, g, b);
+		return this;
+	}
+	
+	public function backgroundImage(path) {
+		this._control.BackgroundImage = System::Drawing::Image::FromFile(path);
+		return this;
+	}
+	
+	public function backgroundImageLayout(value) {
+		this._control.BackgroundImageLayout = value;
+		return this;
+	}
+	
+	public function anchor(value) {
+		this._control.Anchor = value;
+		return this;
+	}
+	
+	public function dock(value) {
+		this._control.Dock = value;
+		return this;
+	}
+	
+	public function padding(left, top, right, bottom) {
+		this._control.Padding = new System::Drawing::Padding(left, top, right, bottom);
+		return this;
+	}
+	
+	public function paddingAll(all) {
+		return this.padding(all, all, all, all);
+	}
+	
+	public function margin(left, top, right, bottom) {
+		this._control.Margin = new System::Drawing::Padding(left, top, right, bottom);
+		return this;
+	}
+	
+	public function marginAll(all) {
+		return this.margin(all, all, all, all);
+	}
+	
+	public function addClick(handler) {
+		this._control.add_Click(handler);
+		return this;
+	}
+	
+	public function addDoubleClick(handler) {
+		this._control.add_DoubleClick(handler);
+		return this;
+	}
+	
+	public function addMouseDown(handler) {
+		this._control.add_MouseDown(handler);
+		return this;
+	}
+	
+	public function addMouseUp(handler) {
+		this._control.add_MouseUp(handler);
+		return this;
+	}
+	
+	public function addMouseClick(handler) {
+		this._control.add_MouseClick(handler);
+		return this;
+	}
+	
+	public function addMouseDoubleClick(handler) {
+		this._control.add_MouseDoubleClick(handler);
+		return this;
+	}
+	
+	public function addMouseEnter(handler) {
+		this._control.add_MouseEnter(handler);
+		return this;
+	}
+	
+	public function addMouseHover(handler) {
+		this._control.add_MouseHover(handler);
+		return this;
+	}
+	
+	public function addMouseLeave(handler) {
+		this._control.add_MouseLeave(handler);
+		return this;
+	}
+	
+	public function addMouseMove(handler) {
+		this._control.add_MouseMove(handler);
+		return this;
+	}
+	
+	public function addMouseWheel(handler) {
+		this._control.add_MouseWheel(handler);
+		return this;
+	}
+	
+	public function addKeyDown(handler) {
+		this._control.add_KeyDown(handler);
+		return this;
+	}
+	
+	public function addKeyPress(handler) {
+		this._control.add_KeyPress(handler);
+		return this;
+	}
+	
+	public function addKeyUp(handler) {
+		this._control.add_KeyUp(handler);
+		return this;
+	}
+	
+	public function addEnter(handler) {
+		this._control.add_Enter(handler);
+		return this;
+	}
+	
+	public function addGotFocus(handler) {
+		this._control.add_GotFocus(handler);
+		return this;
+	}
+	
+	public function addLostFocus(handler) {
+		this._control.add_LostFocus(handler);
+		return this;
+	}
+	
+	public function addLeave(handler) {
+		this._control.add_Leave(handler);
+		return this;
+	}
+	
+	public function addMove(handler) {
+		this._control.add_Move(handler);
+		return this;
+	}
+	
+	public function addResize(handler) {
+		this._control.add_Resize(handler);
+		return this;
+	}
+	
+	public function addLayout(handler) {
+		this._control.add_Layout(handler);
+		return this;
+	}
+	
+	public function addInvalidated(handler) {
+		this._control.add_Invalidated(handler);
+		return this;
+	}
+	
+	public function addPaint(handler) {
+		this._control.add_Paint(handler);
+		return this;
+	}
+	
+	public function addValidating(handler) {
+		this._control.add_Validating(handler);
+		return this;
+	}
+	
+	public function addValidated(handler) {
+		this._control.add_Validated(handler);
+		return this;
+	}
+	
+	public function addQueryContinueDrag(handler) {
+		this._control.add_QueryContinueDrag(handler);
+		return this;
+	}
+	
+	public function addDragEnter(handler) {
+		this._control.add_DragEnter(handler);
+		return this;
+	}
+	
+	public function addDragOver(handler) {
+		this._control.add_DragOver(handler);
+		return this;
+	}
+	
+	public function addDragDrop(handler) {
+		this._control.add_DragDrop(handler);
+		return this;
+	}
+	
+	public function addDragLeave(handler) {
+		this._control.add_DragLeave(handler);
+		return this;
+	}
+}
+
+/********************************************************* LabelBuilder ***************************************************/
+
+class LabelBuilder : ControlBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::Label();
+	}
+	
+	public function autoEllipsis(value) {
+		this._control.AutoEllipsis = value;
+		return this;
+	}
+	
+	public function textAlign(value) {
+		this._control.TextAlign = value;
+		return this;
+	}
+	
+	public function flatStyle(value) {
+		this._control.FlatStyle = value;
+		return this;
+	}
+	
+	public function borderStyle(value) {
+		this._control.BorderStyle = value;
+		return this;
+	}
+	
+	public function image(path) {
+		this._control.Image = System::Drawing::Image::FromFile(path);
+		return this;
+	}
+	
+	public function imageAlign(value) {
+		this._control.ImageAlign = value;
+		return this;
+	}
+	
+	public function useMnemonic(value) {
+		this._control.UseMnemonic = value;
+		return this;
+	}
+	
+	public function useCompatibleTextRendering(value) {
+		this._control.UseCompatibleTextRendering = value;
+		return this;
+	}
+}
+
+/********************************************************* ButtonBuilder ***************************************************/
+
+class ButtonBuilder : LabelBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::Button();
+	}
+	
+	public function flatAppearance(value) {
+		this._control.FlatAppearance = value;
+		return this;
+	}
+	
+	public function textImageRelation(value) {
+		this._control.TextImageRelation = value;
+		return this;
+	}
+	
+	public function useVisualStyleBackColor(value) {
+		this._control.UseVisualStyleBackColor = value;
+		return this;
+	}
+}
+
+/********************************************************* CheckBoxBuilder *************************************************/
+
+class CheckBoxBuilder : ButtonBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::CheckBox();
+	}
+	
+	public function appearance(value) {
+		this._control.Appearance = value;
+		return this;
+	}
+	
+	public function autoCheck(value) {
+		this._control.AutoCheck = value;
+		return this;
+	}
+	
+	public function checked(value) {
+		this._control.Checked = value;
+		return this;
+	}
+	
+	public function checkState(value) {
+		this._control.CheckState = value;
+		return this;
+	}
+	
+	public function threeState(value) {
+		this._control.ThreeState = value;
+		return this;
+	}
+	
+	public function checkAlign(value) {
+		this._control.CheckAlign = value;
+		return this;
+	}
+}
+
+/******************************************************* RadioButtonBuilder *************************************************/
+
+class RadioButtonBuilder : CheckBoxBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::RadioButton();
+	}
+}
+
+/********************************************************* TextBoxBuilder **************************************************/
+
+class TextBoxBuilder : ControlBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::TextBox();
+	}
+	
+	public function textAlign(value) {
+		this._control.TextAlign = value;
+		return this;
+	}
+	
+	public function borderStyle(value) {
+		this._control.BorderStyle = value;
+		return this;
+	}
+	
+	public function readOnly(value) {
+		this._control.ReadOnly = value;
+		return this;
+	}
+	
+	public function multiline(value) {
+		this._control.Multiline = value;
+		return this;
+	}
+	
+	public function acceptsReturn(value) {
+		this._control.AcceptsReturn = value;
+		return this;
+	}
+	
+	public function acceptsTab(value) {
+		this._control.AcceptsTab = value;
+		return this;
+	}
+	
+	public function scrollBars(value) {
+		this._control.ScrollBars = value;
+		return this;
+	}
+	
+	public function wordWrap(value) {
+		this._control.WordWrap = value;
+		return this;
+	}
+	
+	public function passwordChar(value) {
+		this._control.PasswordChar = value;
+		return this;
+	}
+	
+	public function useSystemPasswordChar(value) {
+		this._control.UseSystemPasswordChar = value;
+		return this;
+	}
+	
+	public function maxLength(value) {
+		this._control.MaxLength = value;
+		return this;
+	}
+	
+	public function lines(value) {
+		this._control.Lines = value;
+		return this;
+	}
+}
+
+/********************************************************* ContainerBuilder ************************************************/
+
+abstract class ContainerBuilder : ControlBuilder {
+	protected function child(childBuilder, delegate) {
+		this._control.Controls.Add(childBuilder.control);
+		if (delegate !== null) delegate(childBuilder);
+		return this;
+	}
+	
+	public function label(delegate = null) {
+		return this.child(new LabelBuilder(), delegate);
+	}
+	
+	public function button(delegate = null) {
+		return this.child(new ButtonBuilder(), delegate);
+	}
+	
+	public function checkBox(delegate = null) {
+		return this.child(new CheckBoxBuilder(), delegate);
+	}
+	
+	public function radioButton(delegate = null) {
+		return this.child(new RadioButtonBuilder(), delegate);
+	}
+	
+	public function textBox(delegate = null) {
+		return this.child(new TextBoxBuilder(), delegate);
+	}
+}
+
+/********************************************************* PanelBuilder ************************************************/
+
+class PanelBuilder : ContainerBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::Panel();
+	}
+	
+	public function borderStyle(value) {
+		this._control.BorderStyle = value;
+		return this;
+	}
+}
+
+/********************************************************* GroupBoxBuilder ************************************************/
+
+class GroupBoxBuilder : PanelBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::GroupBox();
+	}
+	
+	public function flatStyle(value) {
+		this._control.FlatStyle = value;
+		return this;
+	}
+}
+
+/*********************************************************** FormBuilder **************************************************/
+
+class FormBuilder : ContainerBuilder {
+	public constructor () {
+		this._control = new System::Windows::Forms::Form();
+	}
+	
+	public function icon(path) {
+		this._control.Icon = new System::Drawing::Icon(path);
+		return this;
+	}
+	
+	public function formBorderStyle(value) {
+		this._control.FormBorderStyle = value;
+		return this;
+	}
+	
+	public function startPosition(value) {
+		this._control.StartPosition = value;
+		return this;
+	}
+	
+	public function minimizeBox(value) {
+		this._control.MinimizeBox = value;
+		return this;
+	}
+	
+	public function maximizeBox(value) {
+		this._control.MaximizeBox = value;
+		return this;
+	}
+	
+	public function showIcon(value) {
+		this._control.ShowIcon = value;
+		return this;
+	}
+	
+	public function showInTaskbar(value) {
+		this._control.ShowInTaskbar = value;
+		return this;
+	}
+	
+	public function sizeGripStyle(value) {
+		this._control.SizeGripStyle = value;
+		return this;
+	}
+	
+	public function topMost(value) {
+		this._control.TopMost = value;
+		return this;
+	}
+	
+	public function transparencyKey(a, r, g, b) {
+		this._control.TransparencyKey = System::Drawing::Color::FromArgb(a, r, g, b);
+		return this;
+	}
+	
+	public function windowState(value) {
+		this._control.WindowState = value;
+		return this;
+	}
+}
+
+/*********************************************************** UTILITY ******************************************************/
+
+static class Toolkit {
+    public static function enableTheming() {
+        System::Windows::Forms::Application::EnableVisualStyles();
+    }
+    
+	public static function msgInfo(msg, title = "Information") {
+		return System::Windows::Forms::MessageBox::Show(msg, title, "OK", "Information");
+	}
+	
+	public static function msgWarning(msg, title = "Warning") {
+		return System::Windows::Forms::MessageBox::Show(msg, title, "OK", "Warning");
+	}
+	
+	public static function msgError(msg, title = "Error") {
+		return System::Windows::Forms::MessageBox::Show(msg, title, "OK", "Error");
+	}
+	
+	public static function msgOption(msg, title = "Select an option", buttons = "OKCancel") {
+		return System::Windows::Forms::MessageBox::Show(msg, title, buttons, "Question");
+	}
+	
+	public static function getOpenFileName() {
+		var dlg = new System::Windows::Forms::OpenFileDialog();
+		if (dlg.ShowDialog() == "OK") return dlg.FileName;
+		return null;
+	}
+	
+	public static function getSaveFileName() {
+		var dlg = new System::Windows::Forms::SaveFileDialog();
+		if (dlg.ShowDialog() == "OK") return dlg.FileName;
+		return null;
+	}
+	
+	public static function getFolderName() {
+		var dlg = new System::Windows::Forms::FolderBrowserDialog();
+		if (dlg.ShowDialog() == "OK") return dlg.SelectedPath;
+		return null;
+	}
+	
+	public static function getColor() {
+		var dlg = new System::Windows::Forms::ColorDialog();
+		if (dlg.ShowDialog() == "OK") return dlg.Color;
+		return System::Drawing::Color::Empty;
+	}
+	
+	public static function getFont() {
+		var dlg = new System::Windows::Forms::FontDialog();
+		if (dlg.ShowDialog() == "OK")
+			return new { font = dlg.Font, color = dlg.Color };
+		return null;
+	}
+}
+
+/******************************************************** INITIALIZATION ***************************************************/
+
+__context.AddReference("System");
+__context.AddReference("System.Drawing");
+__context.AddReference("System.Windows.Forms");
+
+/********************************************************** DEMO ***********************************************************/
+if (__name == "main") {
+    Toolkit::enableTheming();
+    
+	f = new FormBuilder().size(350, 200)
+						.startPosition('CenterScreen')
+						.formBorderStyle('FixedSingle')
+						.minimizeBox(false)
+						.maximizeBox(false)
+						.text('Sample GUI Builder Application')
+						.icon('../../../Examples/data/person.ico')
+						.label(function (self) { self.text('Type a message:').location(25, 25).autoSize(true); })
+						.textBox(function (self) { self.text('Hello Africa!').location(25, 45).size(300, 20); })
+						.button(function (self) { self.text('Show the message').location(25, 75).size(150, 25).addClick(function (sender, e) { Toolkit::msgInfo(sender.Parent.Controls[1].Text); }); })
+						.control;
+	f.ShowDialog();
+	f.Dispose();
+}

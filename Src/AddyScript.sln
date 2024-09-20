@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript", "AddyScript\AddyScript.csproj", "{A114CFE7-08D1-46CC-8131-22111E4DA0D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Gui", "AddyScript.Gui\AddyScript.Gui.csproj", "{EF288506-5299-4C7F-BA12-649509DB83BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Interactive", "AddyScript.Interactive\AddyScript.Interactive.csproj", "{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.GuiUtilities", "AddyScript.GuiUtilities\AddyScript.GuiUtilities.csproj", "{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Plotter", "AddyScript.Plotter\AddyScript.Plotter.csproj", "{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Tests", "AddyScript.Tests\AddyScript.Tests.csproj", "{0A24A20E-8751-417A-B77C-B71DB21F609A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF288506-5299-4C7F-BA12-649509DB83BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF288506-5299-4C7F-BA12-649509DB83BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF288506-5299-4C7F-BA12-649509DB83BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF288506-5299-4C7F-BA12-649509DB83BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

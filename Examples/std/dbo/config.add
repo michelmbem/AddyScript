@@ -1,0 +1,64 @@
+import System::Activator;
+import System::Data::Common::DbProviderFactories;
+
+static class DBOConfig
+{
+	public static final providers = {
+		'odbc' => new {
+			assemblyName = 'System.Data.Odbc',
+			connectionType = 'System.Data.Odbc.OdbcConnection'
+		},
+		'oledb' => new {
+			assemblyName = 'System.Data.OleDb',
+			connectionType = 'System.Data.OleDb.OleDbConnection'
+		},
+		'mssql' => new {
+			assemblyName = 'Microsoft.Data.SqlClient',
+			connectionType = 'Microsoft.Data.SqlClient.SqlConnection'
+		},
+		'oracle' => new {
+			assemblyName = 'Oracle.ManagedDataAccess',
+			connectionType = 'Oracle.ManagedDataAccess.Client.OracleConnection'
+		},
+		'mysql' => new {
+			assemblyName = 'MySql.Data',
+			connectionType = 'MySql.Data.MySqlClient.MySqlConnection'
+		},
+		'pgsql' => new {
+			assemblyName = 'Npgsql',
+			connectionType = 'Npgsql.NpgsqlConnection'
+		},
+		'sqlite' => new {
+			assemblyName = 'System.Data.SQLite',
+			connectionType = 'System.Data.SQLite.SQLiteConnection'
+		}
+	};
+
+	public static function createConnection(providerName) {
+		if (DBOConfig::providers.containsKey(providerName)) {
+			var provider = DBOConfig::providers[providerName];			
+			var assembly = __context.LoadAssembly(provider.assemblyName);
+			if (assembly === null) throw 'Could not load assembly ' + provider.assemblyName;
+			var type = assembly.GetType(provider.connectionType);
+			if (type === null) throw 'Could not find type ' + provider.connectionType + ' in assembly ' + assembly.FullName;
+			return Activator::CreateInstance(type);
+		}
+		else {
+			var factory = DbProviderFactories::GetFactory(providerName);
+			if (factory === null) throw 'Could not find configuration for provider ' + providerName;
+			return factory.CreateConnection();
+		}
+	}
+
+	public static function createDataAdapter(selectCommand) {
+		var cmdType = selectCommand.GetType();
+		var daType = cmdType.Assembly.GetType(cmdType.FullName.replace('Command', 'DataAdapter'));
+		return Activator::CreateInstance(daType, [selectCommand]);
+	}
+
+	public static function createCommandBuilder(dataAdapter) {
+		var daType = dataAdapter.GetType();
+		var cbType = daType.Assembly.GetType(daType.FullName.replace('DataAdapter', 'CommandBuilder'));
+		return Activator::CreateInstance(cbType, [dataAdapter]);
+	}
+}

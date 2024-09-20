@@ -1,0 +1,116 @@
+abstract class Geometry
+{
+	public abstract function perimeter();
+	
+	public abstract function surface();
+	
+}
+
+class Rectangle : Geometry
+{
+	public constructor(length, width)
+	{
+		this.length = length;
+		this.width = width;
+	}
+	
+	public property length { read; private write; }
+	
+	public property width { read; private write; }
+	
+	public function perimeter()
+	{
+		return 2 * (this.length + this.width);
+	}
+	
+	public function surface()
+	{
+		return this.length * this.width;
+	}
+	
+	public function toString(fmt = '')
+	{
+		return $'Rectangle {{ length: {this.length}, width: {this.width} }}';
+	}
+	
+}
+
+class Square : Rectangle
+{
+	public constructor(side) : super(side, side)
+	{
+	}
+	
+	public function toString(fmt = '')
+	{
+		return $'Square {{ side: {this.length} }}';
+	}
+	
+}
+
+class Ellipse : Geometry
+{
+	public constructor(a, b)
+	{
+		this.a = a;
+		this.b = b;
+	}
+	
+	public property a { read; private write; }
+	
+	public property b { read; private write; }
+	
+	public function perimeter()
+	{
+		return 2 * PI * sqrt((this.a ** 2 + this.b ** 2) / 2);
+	}
+	
+	public function surface()
+	{
+		return PI * this.a * this.b;
+	}
+	
+	public function toString(fmt = '')
+	{
+		return $'Ellipse {{ semi-major-axis: {this.a}, semi-minor-axis: {this.b} }}';
+	}
+	
+}
+
+class Circle : Ellipse
+{
+	public constructor(radius) : super(radius, radius)
+	{
+	}
+	
+	public function toString(fmt = '')
+	{
+		return $'Circle {{ radius: {this.a} }}';
+	}
+	
+}
+
+geoms = [null] * 5;
+geoms[0] = new Rectangle(6, 4);
+geoms[1] = new Square(5);
+geoms[2] = new Ellipse(5, 4);
+geoms[3] = new Circle(3);
+try
+{
+	geoms.add(new Geometry());
+	println('if you see this message, then something went wrong');
+}
+catch (e)
+{
+	println(e.name + ' : ' + e.message);
+	println();
+}
+foreach (geom in geoms)
+{
+	println(title = (geom ?? 'null') + ':');
+	println('-' * title.length);
+	println(' - perimeter = {0:0.##}', geom?.perimeter());
+	println(' - surface = {0:0.##}', geom?.surface());
+	println();
+}
+readln();

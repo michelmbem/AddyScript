@@ -1,0 +1,66 @@
+import System::Console;
+
+function read()
+{
+	return Console::Read();
+}
+
+function readKey(echo = true)
+{
+	return Console::ReadKey(echo);
+}
+
+function keyAvail()
+{
+	return Console::KeyAvailable;
+}
+
+function getForeground()
+{
+	return Console::ForegroundColor;
+}
+
+function setForeground(value)
+{
+	Console::ForegroundColor = value;
+}
+
+function getBackground()
+{
+	return Console::BackgroundColor;
+}
+
+function setBackground(value)
+{
+	Console::BackgroundColor = value;
+}
+
+function resetColor()
+{
+	Console::ResetColor();
+}
+
+function clear()
+{
+	Console::Clear();
+}
+
+function cursorX()
+{
+	return Console::CursorLeft;
+}
+
+function cursorY()
+{
+	return Console::CursorTop;
+}
+
+function moveTo(left, top)
+{
+	Console::SetCursorPosition(left, top);
+}
+
+function beep()
+{
+	Console::Beep();
+}

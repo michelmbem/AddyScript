@@ -1,0 +1,29 @@
+function sum(vector)
+{
+	total = 0;
+	foreach (item in vector) total += item;
+	return total;
+}
+
+t = [];
+n = (int)readln("how many items? ");
+
+if (n <= 0)
+	println("goodbye!");
+else
+{
+	for (i = 0; i < n; ++i)
+	{
+		print($"item no. {i + 1} = ");
+		t.add((float)readln());
+	}
+	
+	s = sum(t); // s = t.aggregate(0, |a, v| => a + v);
+	println("you've entered: " + t.join(", "));
+	println("the sum of items is: " + s);
+	println("the minimum is: " + min(t));
+	println("the maximum is: " + max(t));
+	println("the averrage is: " + (s / n));
+}
+
+readln();

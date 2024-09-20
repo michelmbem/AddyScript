@@ -1,0 +1,24 @@
+adoCon = new ADODB::Connection();
+adoCon.ConnectionString = @"Provider=SQLOLEDB;Data Source=localhost;Initial Catalog=Northwind;Integrated Security=SSPI";
+adoCon.Open();
+
+adoRs = new ADODB::Recordset();
+adoRs.Open("SELECT * FROM Employees", adoCon);
+
+println("ID  ToC   Last Name   First Name  Job Title");
+println("-" * 60);
+
+while (!adoRs.EOF)
+{
+	println("{0,-4}{1,-6}{2,-12}{3,-12}{4}",
+			adoRs.Fields["EmployeeID"].Value,
+			adoRs.Fields["TitleOfCourtesy"].Value,
+			adoRs.Fields["LastName"].Value,
+			adoRs.Fields["FirstName"].Value,
+			adoRs.Fields["Title"].Value);
+	adoRs.MoveNext();
+}
+
+adoRs.Close();
+adoCon.Close();
+readln();

@@ -1,0 +1,57 @@
+import rowproc;
+
+function fetch_index(reader)
+{
+	var result = null;
+	if (reader.Read())
+		result = to_list(reader);
+	return result;
+}
+
+function fetch_assoc(reader)
+{
+	var result = null;
+	if (reader.Read())
+		result = to_map(reader);
+	return result;
+}
+
+function fetch_object(reader)
+{
+	var result = null;
+	if (reader.Read())
+		result = to_object(reader);
+	return (object) result;
+}
+
+function fetch_index_list(reader)
+{
+	var result = [];
+	while (reader.Read())
+		result.add(to_list(reader));
+	return result;
+}
+
+function fetch_assoc_list(reader)
+{
+	var result = [];
+	while (reader.Read())
+		result.add(to_map(reader));
+	return result;
+}
+
+function fetch_object_list(reader)
+{
+	var result = [];
+	while (reader.Read())
+		result.add(to_object(reader));
+	return result;
+}
+
+function fetch_list(reader)
+{
+	var result = [];
+	while (reader.Read())
+		result.add(reader[0]);
+	return result;
+}

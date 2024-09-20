@@ -1,0 +1,67 @@
+import std::util;
+
+abstract class A
+{
+	protected constructor()
+	{
+		this._list = randlst(randint(10, 30), 100);
+	}
+	
+	public property []
+	{
+		read => this._list[__key];
+		write => this._list[__key] = __value;
+	}
+	
+	public property count => this._list.count;
+	
+	protected function first() => this._list[0];
+}
+
+class B : A
+{
+	public constructor(separator = ', ', prefix = '[', suffix = ']')
+		: super()
+	{
+		this.separator = separator;
+		this.prefix = prefix;
+		this.suffix = suffix;
+	}
+	
+	public property []
+	{
+		read => super[__key];
+		write => super[__key] = (int)__value;
+	}
+	
+	public property count => super::count;
+	
+	public function getFirst()
+	{
+		first = super::first;
+		println('first item from B: ' + first());
+		return first;
+	}
+	
+	public function toString(fmt = '') =>
+		this.prefix + this._list.join(this.separator) + this.suffix;
+}
+
+b = new B(prefix: '{', suffix: '}');
+println($'b = {b}');
+println($'b.count = {b.count}');
+mid = (int)(b.count / 2);
+b[mid] = 10 * PI;
+println($'b[{mid}] = {b[mid]}');
+firstGetter = b.getFirst();
+
+try
+{
+	println('first item from global scope: ' + firstGetter());
+}
+catch (e)
+{
+	println(e.message);
+}
+
+readln();

@@ -1,0 +1,34 @@
+import sys::environment;
+
+t = {
+		null,
+		true,
+		12,
+		9_876_543_210,
+		0.5,
+		-9_876_543_210.123_456_789d,
+		(2, -1),
+		`1975-3-18`,
+		"Hello world!",
+		['a', 'b', 'c'],
+		{'name' => 'spencer', 'age' => 21},
+		{8, 6, 7},
+		queue::of(3, 0, 5),
+		stack::of(9, 7),
+		new {name = "John Doe"},
+		getOSVersion(),
+		now
+	};
+
+println('{0, -42} | {1}', 'Value', 'Type');
+println('-' * 43 + '+' + '-' * 24);
+
+foreach (item in t) {
+	print('{0, -42} | {1}', item, item.type.name);
+	if (item is resource)
+		println(' ({0})', item.GetType().FullName);
+	else
+		println();
+}
+
+readln();

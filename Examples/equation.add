@@ -1,0 +1,52 @@
+function equation(a, b, c)
+{
+	if (a == 0)
+	{
+		if (b == 0)
+		{
+			if (c == 0)
+				println('any number is a solution');
+			else
+				println('no solution');
+		}
+		else
+		{
+			x = -c / b;
+			println('unique solution: {0}', x);
+		}
+	}
+	else
+	{
+		delta = b ** 2 - 4 * a * c;
+		
+		if (delta >= 0)
+		{
+			x1 = (-b - sqrt(delta)) / (2 * a);
+			x2 = (-b + sqrt(delta)) / (2 * a);
+			println('a couple of solutions: {0}, {1}', x1, x2);
+		}
+		else
+		{
+			r = -b / (2 * a);
+			i = sqrt(-delta) / (2 * a);
+			x1 = (r, i);
+			x2 = (r, -i);
+			println('complex conjugate solutions: {0}, {1}', x1, x2);
+		}
+	}
+}
+
+var ans;
+do
+{
+    println('solving a*x**2 + b*x + c:');
+	a = (float) readln('a = ');
+	b = (float) readln('b = ');
+	c = (float) readln('c = ');
+	
+	equation(a, b, c);
+	
+	do
+		ans = readln('continue? (y/n) ').toLower();
+	while (ans != 'y' & ans != 'n');
+} while (ans == 'y');

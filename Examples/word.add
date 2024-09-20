@@ -1,0 +1,25 @@
+/*****************************************************************************************************************************
+*           Borrowed to Md. Marufuzzaman, author of a series of articles on PowerShell scripting at codeproject.com          *
+******************************************************************************************************************************/
+
+objWord = new Word::Application();
+objWord.Visible = true;
+
+objDocument = objWord.Documents.Add();
+
+objParaHeader = objDocument.Paragraphs.Add();
+objParaHeader.Range.Style = "Titre 1"; // english: "Heading 1";
+objParaHeader.Range.Text = "AddyScript In Action";
+objParaHeader.Range.InsertParagraphAfter();
+
+objParaText = objDocument.Paragraphs.Add();
+objParaText.Range.Text = @"I will not say I have failed 1000 times.
+I will say that I have discovered 1000 ways that can cause failure.
+Thomas Edison.";
+objParaText.Range.InsertParagraphAfter();
+
+filename = System::IO::Path::Combine(System::Environment::GetFolderPath('DesktopDirectory'), "WordExample.doc");
+objDocument.SaveAs(filename);
+objDocument.Close();
+
+objWord.Quit();

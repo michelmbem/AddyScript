@@ -1,0 +1,87 @@
+class Range
+{
+	private start;
+	private end;
+	private step;
+	private current;
+	
+	public constructor(start, end, step)
+	{
+		if (step <= 0) throw 'step has to be positive';
+		
+		this.start = min(start, end);
+		this.end = max(start, end);
+		this.step = step;
+	}
+	
+	public property count
+	{
+		read => (int)((this.end - this.start) / this.step);
+	}
+	
+	public property []
+	{
+		read
+		{
+			if (__key < 0 || __key >= this.count)
+				throw 'index out of range';
+				
+			return this.start + this.step * __key;
+		}
+	}
+	
+	public function moveFirst()
+	{
+		this.current = this.start;
+	}
+	
+	public function hasNext() => this.current < this.end;
+	
+	public function moveNext()
+	{
+		var current = this.current;
+		this.current += this.step;
+		return current;
+	}
+	
+	/**
+	* This is a complementary method to make a range
+	* behave like any other collection.
+	*/
+	public function each(action) {
+		var item;
+		foreach (item in this) action(item);
+		return this;
+	}
+	
+	public function toList() {
+		var item, res = [];
+		foreach (item in this) res.add(item);
+		return res;
+	}
+	
+	public function toSet() {
+		var item, res = {};
+		foreach (item in this) res.add(item);
+		return res;
+	}
+}
+
+function xrange(start, end = 0, step = 1)
+{
+	return new Range(start, end, step);
+}
+
+if (__name == 'main')
+{
+	var r = xrange(10, step: 2);
+	
+	for (i = 0; i < r.count; ++i)
+		print($'{r[i]} ');
+	println();
+	
+	r.each(|v| => print('{0} ', v + 1));
+	println();
+	
+	readln();
+}
