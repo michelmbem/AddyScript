@@ -11,7 +11,7 @@
 		<GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ApplicationIcon>AddyScript.ico</ApplicationIcon>
-		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+		<OutputPath>..\..\bin\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup>

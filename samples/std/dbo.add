@@ -509,14 +509,14 @@ if (__name === 'main')
 		System::Console::Clear();
 		
 		choice switch {
-			0 => null;
-			1 => access_test();
-			2 => mssql_test();
-			3 => oracle_test();
-			4 => mysql_test();
-			5 => postgres_test();
-			6 => sqlite_test();
-			_ => println('invalid choice');
+			0 => null,
+			1 => access_test(),
+			2 => mssql_test(),
+			3 => oracle_test(),
+			4 => mysql_test(),
+			5 => postgres_test(),
+			6 => sqlite_test(),
+			_ => println('invalid choice')
 		};
 		
 		println();

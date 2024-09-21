@@ -397,9 +397,13 @@ namespace AddyScript.Parsers
             
             if (TryMatch(TokenID.KW_Throw))
             {
-                Throw _throw = Throw();
-                var anoCall = new AnonymousCall(new InlineFunction([], new Block(_throw)), null, null);
-                anoCall.CopyLocation(_throw);
+                Token first = token;
+                Consume(1);
+
+                Expression thrown = RequiredExpression();
+
+                var anoCall = new AnonymousCall(new InlineFunction([], new Block(new Throw(thrown))), null, null);
+                anoCall.SetLocation(first.Start, thrown.End);
                 return anoCall;
             }
 

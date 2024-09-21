@@ -1,8 +1,9 @@
 ![Banner](AddyScript.jpg)
 # Welcome to AddyScript
-AddyScript is a lightweight scripting engine for the .Net platform. It can be used to add scripting capabilities to applications that target that platform or simply as a learning tool for children.
 
-AddyScript has a straightforward C-like (JavaScript-like or PHP-like if you prefer so) syntax with dynamic typing and consistent OOP features. You can discover that syntax by consulting the sample scripts provided with the source-code. 
+AddyScript is a lightweight scripting engine for the .Net platform. It can be used to add scripting features to applications that target that platform or simply as a learning tool for young people.
+
+AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you prefer) with dynamic typing and consistent OOP features. You can learn about this syntax by looking at the sample scripts provided with the source code.
 
 # What's next?
 * Introduction

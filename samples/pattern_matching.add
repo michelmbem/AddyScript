@@ -36,32 +36,32 @@ class Developper : Employee
 
 o = new {name = 'my object', size = 18, color = 'blue'};
 res = o switch {
-	null => 'null';
-	5 => 'five';
-	{height = 150, color = 'blue'} => 'a blue and 150 tall object';
-	{name = 'my object', size = 18} => 'my object of size 18';
+	null => 'null',
+	5 => 'five',
+	{height = 150, color = 'blue'} => 'a blue and 150 tall object',
+	{name = 'my object', size = 18} => 'my object of size 18'
 };
 println($'o is {o}');
 println($'result with o: {res}');
 println();
 
 res = PI switch {
-	3.14 => 'three-point-fourteen';
-	0, 1, 2..4, 5..8, 9 => 'in the set {0, 1, 2 to 4, 5 to 8, 9}';
-	float => 'a floatting-point number';
+	3.14 => 'three-point-fourteen',
+	0, 1, 2..4, 5..8, 9 => 'in the set {0, 1, 2 to 4, 5 to 8, 9}',
+	float => 'a floatting-point number'
 };
 println($'result with PI: {res}');
 println();
 
 res = ((int)readln('type a number: ')) switch {
-	..-1 => 'negative';
-	0..4 => 'from 0 to 4';
+	..-1 => 'negative',
+	0..4 => 'from 0 to 4',
 	5..9 => {
 		print('yeah i know, ');
 		println('it\'s between 5 and 9!');
 		return __value;
-	}
-	10.. => '10 and above';
+	},
+	10.. => '10 and above'
 };
 println($'result: {res}');
 println();
@@ -69,9 +69,9 @@ println();
 const number_regex = @'[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?';
 
 res = readln('type some text: ') switch {
-	x: x matches number_regex && ((decimal)x) > 0 => 'it\'s a positive number';
-	x: x matches number_regex => 'it\'s just a number';
-	_ => 'it\'s not a number';
+	x: x matches number_regex && ((decimal)x) > 0 => 'it\'s a positive number',
+	x: x matches number_regex => 'it\'s just a number',
+	_ => 'it\'s not a number'
 };
 println($'result: {res}');
 println();
@@ -89,10 +89,10 @@ l.add(l[2] with { name = 'Kim Ondo', age = 36, languages = ['Python', 'TypeScrip
 
 l.each(|item| => {
 	res = item switch {
-		null => 'this item is null';
+		null => 'this item is null',
 		Employee {age = 44, dateHired = `2010-01-14`} =>
-			$'{item.name} is 44 years old, he/she was hired on 2010-01-14 and earns ${item.salary}/month';
-		_ => 'neither null nor a 44 years old employee hired on 2010-01-14';
+			$'{item.name} is 44 years old, he/she was hired on 2010-01-14 and earns ${item.salary}/month',
+		_ => 'neither null nor a 44 years old employee hired on 2010-01-14'
 	};
 	println($'item = {item}');
 	println($'result with item: {res}');
@@ -102,8 +102,8 @@ println();
 
 try {
 	randint(-7, 3) switch {
-		0..3 => println($'{__value} is OK!');
-		_ => throw 'I don\'t like negative values';
+		0..3 => println($'{__value} is OK!'),
+		_ => throw 'I don\'t like negative values'
 	};
 } catch (e) {
 	println(e.name + ' : ' + e.message);

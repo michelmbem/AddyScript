@@ -39,6 +39,7 @@ static class DBOConfig
 			var provider = DBOConfig::providers[providerName];			
 			var assembly = __context.LoadAssembly(provider.assemblyName);
 			if (assembly === null) throw 'Could not load assembly ' + provider.assemblyName;
+			__context.AddReference(assembly);
 			var type = assembly.GetType(provider.connectionType);
 			if (type === null) throw 'Could not find type ' + provider.connectionType + ' in assembly ' + assembly.FullName;
 			return Activator::CreateInstance(type);

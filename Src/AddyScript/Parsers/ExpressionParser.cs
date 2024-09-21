@@ -19,15 +19,12 @@ namespace AddyScript.Parsers
     /// <summary>
     /// A parser for expressions only.
     /// </summary>
-    public class ExpressionParser : BasicParser
+    /// <remarks>
+    /// Initializes a new instance of the parser
+    /// </remarks>
+    /// <param name="lexer">The bound lexer</param>
+    public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
-        /// <summary>
-        /// Initializes a new instance of the parser
-        /// </summary>
-        /// <param name="lexer">The bound lexer</param>
-        public ExpressionParser(Lexer lexer) : base(lexer)
-        {
-        }
 
         /// <summary>
         /// Recognizes a non-null expression.
@@ -313,9 +310,13 @@ namespace AddyScript.Parsers
         }
 
         /// <summary>
-        /// Recognizes composite expressions like those with a couple of brackets or a dot.
+        /// Recognizes composite expressions like those with a couple of brackets, a dot or one of the
+        /// <b>switch</b> and <b>with</b> operators.
         /// </summary>
-        /// <returns>An <see cref="ItemRef"/>, a <see cref="PropertyRef"/> or a <see cref="MethodCall"/></returns>
+        /// <returns>
+        /// An <see cref="ItemRef"/>, a <see cref="SliceRef"/>, a <see cref="PropertyRef"/>, a <see cref="MethodCall"/>,
+        /// a <see cref="PatternMatching"/> or an <see cref="AlteredCopy"/>
+        /// </returns>
         protected Expression Composite()
         {
             Expression expr = Atom();
@@ -336,11 +337,33 @@ namespace AddyScript.Parsers
                             bool optional = token.TokenID == TokenID.QuestionBracket;
                             Consume(1);
 
-                            var index = RequiredExpression();
+                            Expression lBound = null, uBound = null;
+                            bool isSlice = false;
+
+                            if (TryMatch(TokenID.DoubleDot))
+                            {
+                                Consume(1);
+                                uBound = Expression();
+                                isSlice = true;
+                            }
+                            else
+                            {
+                                lBound = RequiredExpression();
+
+                                if (TryMatch(TokenID.DoubleDot))
+                                {
+                                    Consume(1);
+                                    uBound = Expression();
+                                    isSlice = true;
+                                }
+                            }
+
                             bookmark = Match(TokenID.RightBracket);
 
                             Expression owner = expr;
-                            expr = new ItemRef(owner, index) { Optional = optional };
+                            expr = isSlice
+                                 ? new SliceRef(owner, lBound, uBound) { Optional = optional }
+                                 : new ItemRef(owner, lBound) { Optional = optional };
                             expr.SetLocation(owner.Start, bookmark.End);
                         }
                         break;
@@ -382,7 +405,7 @@ namespace AddyScript.Parsers
                         {
                             Consume(1);
                             Match(TokenID.LeftBrace);
-                            MatchCase[] cases = Asterisk(MatchCase);
+                            MatchCase[] cases = List(MatchCase, false, null);
                             Token last = Match(TokenID.RightBrace);
 
                             Expression expr2match = expr;
@@ -420,51 +443,30 @@ namespace AddyScript.Parsers
         {
             SkipComments();
 
-            switch (token.TokenID)
+            return token.TokenID switch
             {
-                case TokenID.LT_Null:
-                    return Literal(null);
-                case TokenID.LT_Boolean:
-                    return Literal(Boolean.FromBool((bool)token.Value));
-                case TokenID.LT_Integer:
-                    return Literal(new Integer((int)token.Value));
-                case TokenID.LT_Long:
-                    return Literal(new Long((BigInteger)token.Value));
-                case TokenID.LT_Float:
-                    return Literal(new Float((double)token.Value));
-                case TokenID.LT_Decimal:
-                    return Literal(new Decimal((BigDecimal)token.Value));
-                case TokenID.LT_Date:
-                    return Literal(new Date((DateTime)token.Value));
-                case TokenID.LT_String:
-                    return Literal(new String((string)token.Value));
-                case TokenID.KW_This:
-                    return SelfReference();
-                case TokenID.KW_Super:
-                    return AtomStartingWithSuper();
-                case TokenID.KW_New:
-                    return AtomStartingWithNew();
-                case TokenID.KW_TypeOf:
-                    return AtomStartingWithTypeOf();
-                case TokenID.TypeName:
-                    return AtomStartingWithTypeName();
-                case TokenID.Identifier:
-                    return AtomStartingWithId();
-                case TokenID.LeftParenthesis:
-                    return AtomStartingWithLParen();
-                case TokenID.LeftBrace:
-                    return AtomStartingWithLBrace();
-                case TokenID.LeftBracket:
-                    return ListInitializer();
-                case TokenID.VerticalBar:
-                    return Lambda();
-                case TokenID.KW_Function:
-                    return InlineFunction();
-                case TokenID.MutableString:
-                    return StringInterpolation();
-                default:
-                    return null;
-            }
+                TokenID.LT_Null => Literal(null),
+                TokenID.LT_Boolean => Literal(Boolean.FromBool((bool)token.Value)),
+                TokenID.LT_Integer => Literal(new Integer((int)token.Value)),
+                TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
+                TokenID.LT_Float => Literal(new Float((double)token.Value)),
+                TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
+                TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
+                TokenID.LT_String => Literal(new String((string)token.Value)),
+                TokenID.KW_This => SelfReference(),
+                TokenID.KW_Super => AtomStartingWithSuper(),
+                TokenID.KW_New => AtomStartingWithNew(),
+                TokenID.KW_TypeOf => AtomStartingWithTypeOf(),
+                TokenID.TypeName => AtomStartingWithTypeName(),
+                TokenID.Identifier => AtomStartingWithId(),
+                TokenID.LeftParenthesis => AtomStartingWithLParen(),
+                TokenID.LeftBrace => AtomStartingWithLBrace(),
+                TokenID.LeftBracket => ListInitializer(),
+                TokenID.VerticalBar => Lambda(),
+                TokenID.KW_Function => InlineFunction(),
+                TokenID.MutableString => StringInterpolation(),
+                _ => null,
+            };
         }
 
         /// <summary>
@@ -1081,7 +1083,7 @@ namespace AddyScript.Parsers
                 Pattern pattern = null;
                 bool negative = false;
 
-                switch (first.TokenID)
+                switch (token.TokenID)
                 {
                     case TokenID.LT_Null:
                         pattern = new NullPattern();
@@ -1094,7 +1096,8 @@ namespace AddyScript.Parsers
                     case TokenID.LT_Decimal:
                     case TokenID.LT_Date:
                     case TokenID.LT_String:
-                        DataItem lBound = DataItemFactory.CreateDataItem(first.Value);
+                        TokenID lBoundID = token.TokenID;
+                        DataItem lBound = DataItemFactory.CreateDataItem(token.Value);
                         if (negative) lBound = lBound.UnaryOperation(UnaryOperator.Minus);
                         Consume(1);
 
@@ -1111,7 +1114,7 @@ namespace AddyScript.Parsers
                             else
                                 negative = false;
 
-                            if (TryMatch(first.TokenID))
+                            if (TryMatch(lBoundID))
                             {
                                 last = token;
                                 DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
@@ -1145,7 +1148,7 @@ namespace AddyScript.Parsers
                         }
                         break;
                     case TokenID.TypeName:
-                        string typeName = first.ToString();
+                        string typeName = token.ToString();
                         Consume(1);
 
                         if (typeName == AlwaysPattern.Symbol)
@@ -1159,7 +1162,7 @@ namespace AddyScript.Parsers
                     case TokenID.Identifier:
                         if (LookAhead(TokenID.Colon, out pos))
                         {
-                            string parameterName = first.ToString();
+                            string parameterName = token.ToString();
                             Consume(pos);
                             Expression predicate = RequiredExpression();
                             pattern = new PredicatePattern(parameterName, predicate);
@@ -1173,7 +1176,7 @@ namespace AddyScript.Parsers
                         break;
                     case TokenID.Plus:
                     case TokenID.Minus:
-                        if (!LookAhead(t => t.IsNumeric, out pos)) throw new ParseException(FileName, first);
+                        if (!LookAhead(t => t.IsNumeric, out pos)) throw new ParseException(FileName, token);
 
                         negative = first.TokenID == TokenID.Minus;
                         Consume(pos - 1);
@@ -1183,7 +1186,7 @@ namespace AddyScript.Parsers
                         if (patterns.Count > 0)
                             Consume(1);
                         else
-                            throw new ParseException(FileName, first);
+                            throw new ParseException(FileName, token);
                         break;
                     default:
                         loop = false;
@@ -1200,8 +1203,8 @@ namespace AddyScript.Parsers
             if (patterns.Count <= 0) return null;
             if (patterns.Count == 1) return patterns[0];
 
-            var composite = new CompositePattern(patterns.ToArray());
-            composite.SetLocation(patterns[0].Start, patterns[patterns.Count - 1].End);
+            var composite = new CompositePattern([.. patterns]);
+            composite.SetLocation(patterns[0].Start, patterns[^1].End);
             return composite;
         }
 
@@ -1246,11 +1249,7 @@ namespace AddyScript.Parsers
         /// </remarks>
         protected virtual Expression MatchCaseExpression()
         {
-            Expression expr = RequiredExpression();
-            Token last = Match(TokenID.SemiColon);
-            expr.SetLocation(expr.Start, last.End);
-
-            return expr;
+            return RequiredExpression();
         }
     }
 }

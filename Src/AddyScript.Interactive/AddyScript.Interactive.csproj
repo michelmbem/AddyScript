@@ -6,7 +6,7 @@
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+		<OutputPath>..\..\bin\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
@@ -35,6 +35,10 @@
 
 	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
 		<PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
 	</ItemGroup>
 
 </Project>

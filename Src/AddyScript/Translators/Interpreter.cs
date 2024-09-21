@@ -42,7 +42,6 @@ namespace AddyScript.Translators
         #region Fields
 
         private readonly HashSet<string> importedModules = [];
-        private readonly HashSet<Assembly> loadedAssemblies = [];
         private readonly NameTree nameCache = new();
         private readonly Dictionary<Class, DataItem> typeInfoCache = [];
         private Stack<MethodFrame> frames = new();
@@ -887,6 +886,63 @@ namespace AddyScript.Translators
             catch (Exception ex)
             {
                 throw new RuntimeException(fileName, itemRef, ex);
+            }
+        }
+
+        public void TranslateSliceRef(SliceRef sliceRef)
+        {
+            try
+            {
+                int lBound = 0, uBound = 0;
+
+                if (sliceRef.LowerBound != null)
+                {
+                    sliceRef.LowerBound.AcceptTranslator(this);
+                    lBound = returnedValue.AsInt32;
+                }
+
+                if (sliceRef.UpperBound != null)
+                {
+                    sliceRef.UpperBound.AcceptTranslator(this);
+                    uBound = returnedValue.AsInt32;
+                }
+
+                sliceRef.Owner.AcceptTranslator(this);
+
+                switch (returnedValue.Class.ClassID)
+                {
+                    case ClassID.Void:
+                        if (!sliceRef.Optional) goto default;
+                        returnedValue = Void.Value;
+                        break;
+                    case ClassID.String:
+                        {
+                            string str = returnedValue.ToString();
+                            while (lBound < 0) lBound += str.Length;
+                            while (uBound <= 0) uBound += str.Length;
+                            returnedValue = new String(str[lBound..uBound]);
+                        }
+                        break;
+                    case ClassID.List:
+                        {
+                            List<DataItem> lst = returnedValue.AsList;
+                            while (lBound < 0) lBound += lst.Count;
+                            while (uBound <= 0) uBound += lst.Count;
+                            returnedValue = new List(lst[lBound..uBound]);
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException(fileName, sliceRef,
+                            string.Format(Resources.SlicingNotSupported, returnedValue.Class.Name));
+                }
+            }
+            catch (ScriptException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new RuntimeException(fileName, sliceRef, ex);
             }
         }
 
@@ -2553,36 +2609,6 @@ namespace AddyScript.Translators
         }
 
         /// <summary>
-        /// Ensures that all the <see cref="ScriptContext.References"/> are added to the <see cref="loadedAssemblies"/> collection.
-        /// </summary>
-        private void LoadReferencedAssemblies()
-        {
-            if (loadedAssemblies.Count > 0) return;
-
-            foreach (Assembly assembly in InitialContext.References)
-                LoadRecursively(assembly);
-        }
-
-        /// <summary>
-        /// Recursively adds an <see cref="Assembly"/> and its dependencies to the <see cref="loadedAssemblies"/> collection.
-        /// </summary>
-        private void LoadRecursively(Assembly assembly)
-        {
-            if (loadedAssemblies.Contains(assembly)) return;
-
-            loadedAssemblies.Add(assembly);
-
-            foreach (AssemblyName dependency in assembly.GetReferencedAssemblies())
-                try
-                {
-                    LoadRecursively(Assembly.Load(dependency));
-                }
-                catch
-                {
-                }
-        }
-
-        /// <summary>
         /// Invokes a dotnet type's method from the script.
         /// </summary>
         /// <param name="type">The <see cref="Type"/> that holds the method</param>
@@ -2628,7 +2654,7 @@ namespace AddyScript.Translators
                 result = matchedMethod.Invoke(target, nativeArgValues);
 
                 for (int i = 0; i < arguments.Length; ++i)
-                    if (parameters[i].IsOut)
+                    if (parameters[i].IsOut || parameters[i].ParameterType.IsArray)
                         try
                         {
                             Assign(arguments[i], DataItemFactory.CreateDataItem(nativeArgValues[i]));
@@ -2648,9 +2674,7 @@ namespace AddyScript.Translators
         /// <returns>A <see cref="Type"/></returns>
         private Type GetTypeByName(string typeName)
         {
-            LoadReferencedAssemblies();
-
-            foreach (Assembly assembly in loadedAssemblies)
+            foreach (Assembly assembly in InitialContext.References)
             {
                 Type type = assembly.GetType(typeName);
                 if (type == null) continue;
@@ -2815,9 +2839,7 @@ namespace AddyScript.Translators
             string prefix = dottedName + ".";
             var types = new List<Type>();
 
-            LoadReferencedAssemblies();
-
-            foreach (Assembly assembly in loadedAssemblies)
+            foreach (Assembly assembly in InitialContext.References)
                 foreach (Type type in assembly.GetExportedTypes())
                 {
                     if (type.FullName == dottedName)
@@ -2877,9 +2899,7 @@ namespace AddyScript.Translators
                 }
             }
 
-            LoadReferencedAssemblies();
-
-            foreach (Assembly assembly in loadedAssemblies)
+            foreach (Assembly assembly in InitialContext.References)
                 for (int k = name.Length; k > 0; --k)
                 {
                     Type type = assembly.GetType(name.Subname(0, k).ToDottedName(true));

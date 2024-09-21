@@ -8,8 +8,7 @@ class Point
 	public constructor(x, y)
 	{
 		if (Point::count >= Point::MAXCOUNT)
-			throw new Exception("TooMuchPoints",
-								"The maximum count of points is reached!");
+			throw new Exception("TooManyPoints", "The maximum count of points is reached!");
 
 		this._x = x;
 		this._y = y;

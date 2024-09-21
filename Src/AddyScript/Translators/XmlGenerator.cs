@@ -352,6 +352,36 @@ namespace AddyScript.Translators
             currentElement = previousElement;
         }
 
+        public void TranslateSliceRef(SliceRef sliceRef)
+        {
+            XmlElement tmpElement = document.CreateElement("SliceRef");
+            tmpElement.SetAttribute("Optional", sliceRef.Optional.ToString());
+            currentElement.AppendChild(tmpElement);
+
+            XmlElement previousElement = currentElement;
+
+            currentElement = document.CreateElement("Owner");
+            tmpElement.AppendChild(currentElement);
+            sliceRef.Owner.AcceptTranslator(this);
+
+            if (sliceRef.LowerBound != null)
+            {
+                currentElement = document.CreateElement("LowerBound");
+                tmpElement.AppendChild(currentElement);
+                sliceRef.LowerBound.AcceptTranslator(this);
+            }
+            sliceRef.Owner.AcceptTranslator(this);
+
+            if (sliceRef.UpperBound != null)
+            {
+                currentElement = document.CreateElement("UpperBound");
+                tmpElement.AppendChild(currentElement);
+                sliceRef.UpperBound.AcceptTranslator(this);
+            }
+
+            currentElement = previousElement;
+        }
+
         public void TranslatePropertyRef(PropertyRef propRef)
         {
             XmlElement tmpElement = document.CreateElement("PropertyRef");

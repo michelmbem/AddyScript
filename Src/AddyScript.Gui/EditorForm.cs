@@ -27,7 +27,7 @@ namespace AddyScript.Gui
 
         // Default window title and help link
         private const string TITLE_BASE = "AddyScript";
-        private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/docs";
+        private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/index.md";
 
         // Some key constants
         private const int VK_CAPITAL = 0x14;

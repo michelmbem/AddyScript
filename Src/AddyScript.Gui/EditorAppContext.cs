@@ -85,7 +85,7 @@ namespace AddyScript.Gui
             }
 
             if (directories.Count <= 0)
-                directories.Add(Path.GetFullPath(@"..\..\..\Examples"));
+                directories.Add(Path.GetFullPath(@"..\..\..\samples"));
 
             if (assemblies.Count <= 0)
                 assemblies.AddRange(["System.Data.OleDb", "Microsoft.Data.SqlClient", "System.Windows.Forms"]);
@@ -102,7 +102,7 @@ namespace AddyScript.Gui
                         
                         string dirname = args[index + 1];
                         if (!Directory.Exists(dirname))
-                            throw new ApplicationException("Directory '" + dirname + "' does not exist");
+                            throw new ArgumentException("Directory '" + dirname + "' does not exist");
                         
                         if (!directories.Contains(dirname)) directories.Add(dirname);
                         break;

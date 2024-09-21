@@ -1275,5 +1275,16 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("ValueShouldNotBeEmpty", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The value should not be empty.
+        /// </summary>
+        internal static string SlicingNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("SlicingNotSupported", resourceCulture);
+            }
+        }
     }
 }

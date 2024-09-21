@@ -341,6 +341,16 @@ namespace AddyScript.Translators
             textWriter.Write(']');
         }
 
+        public void TranslateSliceRef(SliceRef sliceRef)
+        {
+            MayBeParenthesize(sliceRef.Owner);
+            textWriter.Write('[');
+            sliceRef.LowerBound?.AcceptTranslator(this);
+            textWriter.Write("..");
+            sliceRef.UpperBound?.AcceptTranslator(this);
+            textWriter.Write(']');
+        }
+
         public void TranslatePropertyRef(PropertyRef propertyRef)
         {
             MayBeParenthesize(propertyRef.Owner);
@@ -676,9 +686,19 @@ namespace AddyScript.Translators
             textWriter.WriteLine(" switch {");
             ++textWriter.Indentation;
 
-            foreach (MatchCase matchCase in patMatch.MatchCases)
-                DumpMatchCase(matchCase);
+            bool firstCase = true;
 
+            foreach (MatchCase matchCase in patMatch.MatchCases)
+            {
+                if (firstCase)
+                    firstCase = false;
+                else
+                    textWriter.WriteLine(',');
+
+                DumpMatchCase(matchCase);
+            }
+
+            textWriter.WriteLine();
             --textWriter.Indentation;
             textWriter.Write('}');
         }
@@ -1147,7 +1167,10 @@ namespace AddyScript.Translators
                 Block block = ((InlineFunction)anoCall.Callee).Body;
 
                 if (block.Statements.Length == 1 && block.Statements[0] is Throw _throw)
-                    _throw.AcceptTranslator(this);
+                {
+                    textWriter.Write("throw ");
+                    _throw.Expression.AcceptTranslator(this);
+                }
                 else
                 {
                     bool wasFunctionBody = inFunctionBody;
@@ -1155,17 +1178,13 @@ namespace AddyScript.Translators
 
                     inFunctionBody = isBlockInline = true;
                     block.AcceptTranslator(this);
-                    textWriter.WriteLine();
 
                     inFunctionBody = wasFunctionBody;
                     isBlockInline = wasBlockInline;
                 }
             }
             else
-            {
                 expression.AcceptTranslator(this);
-                textWriter.WriteLine(';');
-            }
         }
 
         private void MayBeIndent(Statement statement)

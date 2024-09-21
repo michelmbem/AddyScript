@@ -29,8 +29,8 @@ namespace AddyScript.Interactive
             {
                 var titleAttribute = GetAssemblyAttribute<AssemblyTitleAttribute>();
                 return titleAttribute != null
-                    ? titleAttribute.Title
-                    : Path.GetFileNameWithoutExtension(ExecutingAssembly.Location);
+                     ? titleAttribute.Title
+                     : Path.GetFileNameWithoutExtension(ExecutingAssembly.Location);
             }
         }
 

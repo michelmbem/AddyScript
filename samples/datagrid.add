@@ -190,7 +190,8 @@ p.Controls.AddRange([b2, b1]);
 
 g = new DataGridView
 		{
-			Dock = "Fill"
+			Dock = "Fill",
+			BorderStyle = "None"
 		};
 
 f.Controls.AddRange([g, p]);

@@ -1,20 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-
-namespace AddyScript.Interactive
+﻿namespace AddyScript.Interactive
 {
     public class OptionSet
     {
+        private readonly ScriptContext context = new();
+
         public OptionSet(string[] args)
         {
-            string option = null, input = null, log = null;
-            List<string> directories = [];
-            List<Assembly> assemblies = [];
             ExecutionMode mode = ExecutionMode.Default;
-            Assembly assembly;
+            string option = null, input = null, log = null;
 
-            args = [.. args, "-r", "System.Diagnostics", "-r", "System.Console"];
+            context.AddReference(typeof(System.Diagnostics.Process).Assembly);
+            context.AddReference(typeof(System.Console).Assembly);
 
             foreach (string arg in args)
             {
@@ -52,11 +48,10 @@ namespace AddyScript.Interactive
                                 input = arg;
                                 break;
                             case "-d":
-                                directories.Add(arg);
+                                context.AddImportPath(arg);
                                 break;
                             case "-r":
-                                assembly = ScriptContext.LoadAssembly(arg);
-                                if (assembly != null) assemblies.Add(assembly);
+                                context.AddReference(arg);
                                 break;
                             case "-l":
                                 log = arg;
@@ -74,28 +69,15 @@ namespace AddyScript.Interactive
             ExecutionMode = mode;
             Input = input;
             Log = log;
-            Directories = [.. directories];
-            Assemblies = [.. assemblies];
         }
 
         public ExecutionMode ExecutionMode { get; private set; }
-
-        public string[] Directories { get; private set; }
-
-        public Assembly[] Assemblies { get; private set; }
 
         public string Input { get; private set; }
 
         public string Log { get; private set; }
 
-        public ScriptContext GetScriptContext()
-        {
-            return new ScriptContext
-                       {
-                           ImportPaths = Directories,
-                           References = Assemblies
-                       };
-        }
+        public ScriptContext Context => context;
 
         private static void CheckOption(string option)
         {

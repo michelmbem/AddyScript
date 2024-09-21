@@ -22,12 +22,10 @@ namespace AddyScript.Interactive
         static void Main(string[] args)
         {
             OptionSet options = null;
-            ScriptContext context = null;
 
             try
             {
                 options = new OptionSet(args);
-                context = options.GetScriptContext();
             }
             catch (InvalidOptionException ex)
             {
@@ -35,19 +33,19 @@ namespace AddyScript.Interactive
                 Environment.Exit(1);
             }
 
-            InnerFunction.Globals.Add(SourceFunction(context));
+            InnerFunction.Globals.Add(SourceFunction(options.Context));
             InnerFunction.Globals.Add(ExitFunction());
 
             switch (options.ExecutionMode)
             {
                 case ExecutionMode.Evaluate:
-                    Evaluate(options.Input, options.Log, context);
+                    Evaluate(options.Input, options.Log, options.Context);
                     break;
                 case ExecutionMode.RunFile:
-                    RunFile(options.Input, options.Log, context);
+                    RunFile(options.Input, options.Log, options.Context);
                     break;
                 default:
-                    RunInteractive(context);
+                    RunInteractive(options.Context);
                     break;
             }
         }

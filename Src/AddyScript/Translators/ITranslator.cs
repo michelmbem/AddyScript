@@ -28,6 +28,7 @@ namespace AddyScript.Translators
         void TranslateInlineFunction(InlineFunction inlineFn);
         void TranslateVariableRef(VariableRef varRef);
         void TranslateItemRef(ItemRef itemRef);
+        void TranslateSliceRef(SliceRef sliceRef);
         void TranslatePropertyRef(PropertyRef propertyRef);
         void TranslateStaticPropertyRef(StaticPropertyRef staticRef);
         void TranslateSelfReference(SelfReference selfRef);

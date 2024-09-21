@@ -6,7 +6,7 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWindowsForms>true</UseWindowsForms>
-		<OutputPath>..\..\Bin\$(Configuration)\</OutputPath>
+		<OutputPath>..\..\bin\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 	
 	<ItemGroup>
