@@ -2933,7 +2933,14 @@ namespace AddyScript.Translators
             if (nameCache.Contains(newName)) return;
 
             if (type.IsGenericType && !type.IsConstructedGenericType)
-                type = type.MakeGenericType(type.GetGenericArguments().Select(t => typeof(DataItem)).ToArray());
+                try
+                {
+                    type = type.MakeGenericType(type.GetGenericArguments().Select(t => typeof(DataItem)).ToArray());
+                }
+                catch
+                {
+                    return;
+                }
 
             nameCache.Add(newName, type);
 
