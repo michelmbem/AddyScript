@@ -70,19 +70,19 @@ MAX_ITEMS = 100;
 
 |Constant|Value|Description|
 |:-:|-|-|
-|MININT|-2147483648|The minimum value for the **int** type.|
-|MAXINT|+2147483647|The maximum value for the **int** type.|
-|MINFLOAT|-1,79769313486232E+308|The minimum value for the **float** type.|
-|MAXFLOAT|+1,79769313486232E+308|The maximum value for the **float** type.|
-|PI|3,14159265358979|A numeric value used in geometry.|
-|E|2,71828182845905|Exponential one.|
-|EPSILON|4,94065645841247E-324 on my developer's machine|A value that varies from machine to machine and indicates which precision to use in arithmetic operations on floating-point numbers.|
+|MININT|-2,147,483,648|The minimum value for the **int** type.|
+|MAXINT|+2,147,483,647|The maximum value for the **int** type.|
+|MINFLOAT|-1.79,769,313,486,232E+308|The minimum value for the **float** type.|
+|MAXFLOAT|+1.79,769,313,486,232E+308|The maximum value for the **float** type.|
+|PI|3.14,159,265,358,979|A numeric value used in geometry.|
+|E|2.71,828,182,845,905|Exponential one.|
+|EPSILON|4.94,065,645,841,247E-324 on my developer's machine|A value that varies from machine to machine and indicates which precision to use in arithmetic operations on floating-point numbers.|
 |NINFINITY|(None)|A symbolic representation of the negative infinity.|
 |PINFINITY|(None)|A symbolic representation of the positive infinity.|
 |NAN|(None)|A value indicating that a floating-point number is in an invalid state.|
 |I|Well, **i** itself|The imaginary one complex number.|
-|MINDATE|01/01/0001 00:00:00|The minimum value for the **date** type.|
-|MAXDATE|31/12/9999 23:59:59|The maximum value for the **date** type.|
+|MINDATE|0001-01-01 00:00:00|The minimum value for the **date** type.|
+|MAXDATE|9999-12-31 23:59:59|The maximum value for the **date** type.|
 |NEWLINE|"\r\n" on Windows, "\n" on Unix based systems|The sequence of characters used to mark the end of a line by the underlying platform.|
 
 ### Data types
