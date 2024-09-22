@@ -95,7 +95,7 @@ The date class supports the following operators:
 In addition to those operators, the **date** class exposes the following members:
 
 |Member|Nature|Description|
-|:-:|-|-|
+|-|-|-|
 |`date of(params int[] values)`|static method|A static factory method for creating dates.<br>Accepts 3, 4, 6 or 7 arguments (all of the **int** type).<br>The arguments are interpreted like this:<ul><li>3 arguments: year, month, day.</li><li>4 arguments: hour, minute, second, millisecond.</li><li>6 arguments: year, month, day, hour, minute, second.</li><li>7 arguments: year, month, day, hour, minute, second, millisecond.</li></ul>|
 |`date $date { read; }`|property|Extracts the "date" component (in the strict sense of the term) of a date object.|
 |`date time { read; }`|property|Extracts the "time" component of a date object.|

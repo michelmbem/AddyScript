@@ -68,8 +68,8 @@ MAX_ITEMS = 100;
 
 #### The following constants are predefined in AddyScript:
 
- Description|Constant|Value|
-|-|-|-|
+|Constant|Value|Description|
+|:-:|-|-|
 |MININT|-2147483648|The minimum value for the **int** type.|
 |MAXINT|+2147483647|The maximum value for the **int** type.|
 |MINFLOAT|-1,79769313486232E+308|The minimum value for the **float** type.|
@@ -90,7 +90,7 @@ MAX_ITEMS = 100;
 Even if you don't have to explicitly define the type of your variables in AddyScript, they still have a type. In fact, AddyScript recognizes a set of 27 predefined data types. In addition to that, you can create your own classes and add them to the set of existing data types. Below are listed the AddyScript's built-in types and their meaning:
 
 |Type|Description|.Net equivalent|
-|-|-|-|
+|:-:|-|-|
 |void|The type of null or anything that's undefined|System.Void|
 |bool|A boolean: **true** or **false**|System.Boolean|
 |int|A 32-bits signed integer: ranging from -2147483648 to 2147483647. Operations on this type may produce a result of the **long** type as soon as an overflow occurs. Dividing two **int**s produces a result of the **rational** type when the dividend is not divisible by the divisor.|System.Int32|
