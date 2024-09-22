@@ -66,9 +66,9 @@ var context = new ScriptContext();
 
 foreach (var value in inputValues)
 {
-context.Bindings["x"] = value;
-double result = ScriptEngine.Evaluate(formula, context).AsDouble;
-Console.WriteLine(result);
+	context.Bindings["x"] = value;
+	double result = ScriptEngine.Evaluate(formula, context).AsDouble;
+	Console.WriteLine(result);
 }
 ```
 
