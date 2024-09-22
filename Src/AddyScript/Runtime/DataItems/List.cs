@@ -27,15 +27,9 @@ namespace AddyScript.Runtime.DataItems
             list = new List<DataItem>(initialContent);
         }
 
-        public override Class Class
-        {
-            get { return Class.List; }
-        }
+        public override Class Class => Class.List;
 
-        public override List<DataItem> AsList
-        {
-            get { return list; }
-        }
+        public override List<DataItem> AsList => list;
 
         public override HashSet<DataItem> AsHashSet
         {
@@ -52,14 +46,11 @@ namespace AddyScript.Runtime.DataItems
             get { return new Stack<DataItem>(list); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return list; }
-        }
+        public override object AsNativeObject => list;
 
         public override object Clone()
         {
-            var cloneList = list.ConvertAll(x => (DataItem) x.Clone());
+            var cloneList = list.ConvertAll(x => (DataItem)x.Clone());
             return new List(cloneList);
         }
 
@@ -74,8 +65,7 @@ namespace AddyScript.Runtime.DataItems
                 trimEnd = true;
             }
 
-            if (trimEnd)
-                sb.Remove(sb.Length - 2, 2);
+            if (trimEnd) sb.Remove(sb.Length - 2, 2);
 
             return sb.Append(']').ToString();
         }

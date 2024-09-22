@@ -24,10 +24,7 @@ namespace AddyScript.Runtime.DataItems
             stack = new Stack<DataItem>(initialContent);
         }
 
-        public override Class Class
-        {
-            get { return Class.Stack; }
-        }
+        public override Class Class => Class.Stack;
 
         public override List<DataItem> AsList
         {
@@ -44,22 +41,16 @@ namespace AddyScript.Runtime.DataItems
             get { return new Queue<DataItem>(stack); }
         }
 
-        public override Stack<DataItem> AsStack
-        {
-            get { return stack; }
-        }
+        public override Stack<DataItem> AsStack => stack;
 
-        public override object AsNativeObject
-        {
-            get { return stack; }
-        }
+        public override object AsNativeObject => stack;
 
         public override object Clone()
         {
             var content = stack.ToArray();
 
             for (int i = 0; i < content.Length; ++i)
-                content[i] = (DataItem) content[i].Clone();
+                content[i] = (DataItem)content[i].Clone();
 
             return new Stack(content);
         }

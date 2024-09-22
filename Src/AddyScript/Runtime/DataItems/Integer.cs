@@ -12,30 +12,18 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Integer(int value) : DataItem
     {
-        public Integer Opposite
-        {
-            get { return new Integer(-value); }
-        }
+        public Integer Opposite => new(-value);
 
-        public Integer Complement
-        {
-            get { return new Integer(~value); }
-        }
+        public Integer Complement => new(~value);
 
-        public override Class Class
-        {
-            get { return Class.Integer; }
-        }
+        public override Class Class => Class.Integer;
 
         public override bool AsBoolean
         {
             get { return value != 0; }
         }
 
-        public override int AsInt32
-        {
-            get { return value; }
-        }
+        public override int AsInt32 => value;
 
         public override BigInteger AsBigInteger
         {
@@ -47,10 +35,7 @@ namespace AddyScript.Runtime.DataItems
             get { return new Rational32(value); }
         }
 
-        public override double AsDouble
-        {
-            get { return value; }
-        }
+        public override double AsDouble => value;
 
         public override BigDecimal AsBigDecimal
         {
@@ -62,10 +47,7 @@ namespace AddyScript.Runtime.DataItems
             get { return new Complex64(value, 0); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {
@@ -77,10 +59,7 @@ namespace AddyScript.Runtime.DataItems
             return value == other.AsInt32;
         }
 
-        public override int GetHashCode()
-        {
-            return value;
-        }
+        public override int GetHashCode() => value;
 
         protected override int UnsafeCompareTo(DataItem other)
         {

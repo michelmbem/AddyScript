@@ -8,20 +8,11 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Date(DateTime value) : DataItem
     {
-        public override Class Class
-        {
-            get { return Class.Date; }
-        }
+        public override Class Class => Class.Date;
 
-        public override DateTime AsDateTime
-        {
-            get { return value; }
-        }
+        public override DateTime AsDateTime => value;
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override object Clone()
         {

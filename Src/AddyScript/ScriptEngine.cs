@@ -57,7 +57,11 @@ namespace AddyScript
             DataItem result = null;
             string fullCommand = (commandPrefix + Environment.NewLine + command).Trim();
 
-            RuntimeServices.Interpreter = interpreter; // Never forget to do this!
+            /**
+             * Notes: never forget to assign a value to RuntimeServices.Interpreter before running a script!
+             * Some features depend on the fact of globally having access to the currently running interpreter.
+             */
+            RuntimeServices.Interpreter = interpreter;
             
             try
             {
@@ -103,9 +107,11 @@ namespace AddyScript
         /// <returns>The value returned by the function itself</returns>
         public DataItem Invoke(string functionName, params object[] args)
         {
+            // Important: define the currently running interpreter!
+            RuntimeServices.Interpreter = interpreter;
+
             var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
             var call = new FunctionCall(functionName, literals);
-            RuntimeServices.Interpreter = interpreter;
             call.AcceptTranslator(interpreter);
 
             return interpreter.ReturnedValue;
@@ -122,8 +128,10 @@ namespace AddyScript
         /// </remarks>
         public T GetDelegate<T>(string functionName) where T : Delegate
         {
-            var varRef = new VariableRef(functionName);
+            // Important: define the currently running interpreter!
             RuntimeServices.Interpreter = interpreter;
+            
+            var varRef = new VariableRef(functionName);
             varRef.AcceptTranslator(interpreter);
 
             return (T)interpreter.ReturnedValue.AsFunction.ToDelegate(typeof(T));

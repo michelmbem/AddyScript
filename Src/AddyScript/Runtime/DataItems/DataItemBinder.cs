@@ -171,16 +171,16 @@ namespace AddyScript.Runtime.DataItems
         #region Mismatch Method
 
         /// <summary>
-        /// Determines the degree of incompatibility between an AddyScript's variable and a native type.
+        /// Determines the degree of incompatibility between an AddyScript variable and a native type.
         /// </summary>
-        /// <param name="v">An AddyScript's variable</param>
+        /// <param name="v">An AddyScript variable</param>
         /// <param name="t">A native CLR <see cref="Type"/></param>
         /// <returns>
         /// <ul>
         /// <li>0: full compatibility</li>
         /// <li>1: <paramref name="v"/> can be converted to <paramref name="t"/> without loss</li>
         /// <li>2: <paramref name="v"/> can be converted to <paramref name="t"/> with possible loss</li>
-        /// <li>3: <paramref name="t"/> is the <see cref="String"/> type</li>
+        /// <li>3: <paramref name="t"/> is the <see cref="string"/> type</li>
         /// <li>4: No possible conversion between both types</li>
         /// </ul>
         /// </returns>
@@ -192,16 +192,16 @@ namespace AddyScript.Runtime.DataItems
         }
 
         /// <summary>
-        /// Determines the degree of incompatibility between an AddyScript's type and a native type.
+        /// Determines the degree of incompatibility between an AddyScript type and a native type.
         /// </summary>
-        /// <param name="c">An AddyScript's <see cref="Class"/></param>
+        /// <param name="c">An AddyScript <see cref="Class"/></param>
         /// <param name="t">A native CLR <see cref="Type"/></param>
         /// <returns>
         /// <ul>
         /// <li>0: full compatibility</li>
         /// <li>1: <paramref name="c"/> can be converted to <paramref name="t"/> without loss</li>
         /// <li>2: <paramref name="c"/> can be converted to <paramref name="t"/> with possible loss</li>
-        /// <li>3: <paramref name="t"/> is the <see cref="String"/> type</li>
+        /// <li>3: <paramref name="t"/> is the <see cref="string"/> type</li>
         /// <li>4: No possible conversion between both types</li>
         /// </ul>
         /// </returns>
@@ -336,7 +336,7 @@ namespace AddyScript.Runtime.DataItems
         /// <li>0: full compatibility</li>
         /// <li>1: <paramref name="t1"/> can be converted to <paramref name="t2"/> without loss</li>
         /// <li>2: <paramref name="t1"/> can be converted to <paramref name="t2"/> with possible loss</li>
-        /// <li>3: <paramref name="t2"/> is the <see cref="String"/> type</li>
+        /// <li>3: <paramref name="t2"/> is the <see cref="string"/> type</li>
         /// <li>4: No possible conversion between both types</li>
         /// </ul>
         /// </returns>

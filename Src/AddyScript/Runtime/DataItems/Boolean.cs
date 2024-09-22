@@ -26,20 +26,11 @@ namespace AddyScript.Runtime.DataItems
             this.value = value;
         }
 
-        public Boolean Negation
-        {
-            get { return FromBool(!value); }
-        }
+        public Boolean Negation => FromBool(!value);
 
-        public override Class Class
-        {
-            get { return Class.Boolean; }
-        }
+        public override Class Class => Class.Boolean;
 
-        public override bool AsBoolean
-        {
-            get { return value; }
-        }
+        public override bool AsBoolean => value;
 
         public override int AsInt32
         {
@@ -66,10 +57,7 @@ namespace AddyScript.Runtime.DataItems
             get { return value ? BigDecimal.One : BigDecimal.Zero; }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

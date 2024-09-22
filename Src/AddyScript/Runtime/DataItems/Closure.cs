@@ -7,20 +7,11 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Closure(Function function) : DataItem
     {
-        public override Class Class
-        {
-            get { return Class.Closure; }
-        }
+        public override Class Class => Class.Closure;
 
-        public override object  AsNativeObject
-        {
-            get { return function; }
-        }
+        public override object AsNativeObject => function;
 
-        public override Function AsFunction
-        {
-            get { return function; }
-        }
+        public override Function AsFunction => function;
 
         protected override bool UnsafeEquals(DataItem other)
         {

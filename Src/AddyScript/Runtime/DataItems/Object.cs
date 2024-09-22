@@ -30,17 +30,14 @@ namespace AddyScript.Runtime.DataItems
             {
                 var dict = new Dictionary<DataItem, DataItem>();
 
-                foreach (KeyValuePair<string, DataItem> pair in fields)
+                foreach (var pair in fields)
                     dict.Add(new String(pair.Key), pair.Value);
 
                 return dict;
             }
         }
 
-        public override Dictionary<string, DataItem> AsDynamicObject
-        {
-            get { return fields; }
-        }
+        public override Dictionary<string, DataItem> AsDynamicObject => fields;
 
         public override object AsNativeObject
         {
@@ -53,23 +50,23 @@ namespace AddyScript.Runtime.DataItems
             sb.AppendFormat("<{0} {{", Class.Name);
 
             bool trimEnd = false;
-            foreach (KeyValuePair<string, DataItem> pair in fields)
+
+            foreach (var pair in fields)
             {
                 ClassField field = klass.GetField(pair.Key);
-                if (field != null && field.Scope != Scope.Public) continue;
+                if (!(field == null || field.Scope == Scope.Public)) continue;
                 sb.AppendFormat("{0} = {1}, ", pair.Key, pair.Value);
                 trimEnd = true;
             }
 
-            if (trimEnd)
-                sb.Remove(sb.Length - 2, 2);
+            if (trimEnd) sb.Remove(sb.Length - 2, 2);
 
             return sb.Append("}>").ToString();
         }
 
         public override object ConvertTo(Type targetType)
         {
-            if (targetType != typeof(DataItem) && targetType != typeof(object))
+            if (!(targetType == typeof(DataItem) || targetType == typeof(object)))
             {
                 const BindingFlags flags = BindingFlags.Public | BindingFlags.Static |
                                            BindingFlags.Instance | BindingFlags.SetField |
@@ -77,8 +74,9 @@ namespace AddyScript.Runtime.DataItems
 
                 var binder = new DataItemBinder();
                 object instance = Activator.CreateInstance(targetType);
-                foreach (KeyValuePair<string, DataItem> pair in fields)
-                    targetType.InvokeMember(pair.Key, flags, binder, instance, new[] { pair.Value });
+
+                foreach (var pair in fields)
+                    targetType.InvokeMember(pair.Key, flags, binder, instance, [pair.Value]);
 
                 return instance;
             }

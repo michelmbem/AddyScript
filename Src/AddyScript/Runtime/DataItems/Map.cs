@@ -27,15 +27,9 @@ namespace AddyScript.Runtime.DataItems
             dict = new Dictionary<DataItem, DataItem>(initialContent);
         }
 
-        public override Class Class
-        {
-            get { return Class.Map; }
-        }
+        public override Class Class => Class.Map;
 
-        public override Dictionary<DataItem, DataItem> AsDictionary
-        {
-            get { return dict; }
-        }
+        public override Dictionary<DataItem, DataItem> AsDictionary => dict;
 
         public override Dictionary<string, DataItem> AsDynamicObject
         {
@@ -43,7 +37,7 @@ namespace AddyScript.Runtime.DataItems
             {
                 var obj = new Dictionary<string, DataItem>();
 
-                foreach (KeyValuePair<DataItem, DataItem> pair in dict)
+                foreach (var pair in dict)
                     obj.Add(pair.Key.ToString(), pair.Value);
 
                 return obj;
@@ -59,8 +53,8 @@ namespace AddyScript.Runtime.DataItems
         {
             var cloneDict = new Dictionary<DataItem, DataItem>();
 
-            foreach (KeyValuePair<DataItem, DataItem> pair in dict)
-                cloneDict.Add((DataItem) pair.Key.Clone(), (DataItem) pair.Key.Clone());
+            foreach (var pair in dict)
+                cloneDict.Add((DataItem)pair.Key.Clone(), (DataItem)pair.Key.Clone());
 
             return new Map(cloneDict);
         }
@@ -73,19 +67,18 @@ namespace AddyScript.Runtime.DataItems
             {
                 bool trimEnd = false;
 
-                foreach (KeyValuePair<DataItem, DataItem> pair in dict)
+                foreach (var pair in dict)
                 {
                     sb.Append(pair.Key).Append(" => ").Append(pair.Value).Append(", ");
                     trimEnd = true;
                 }
 
-                if (trimEnd)
-                    sb.Remove(sb.Length - 2, 2);
+                if (trimEnd) sb.Remove(sb.Length - 2, 2);
             }
             else
                 sb.Append("=>");
 
-            return sb.Append("}").ToString();
+            return sb.Append('}').ToString();
         }
 
         protected override bool UnsafeEquals(DataItem other)
@@ -93,10 +86,9 @@ namespace AddyScript.Runtime.DataItems
             var otherDict = other.AsDictionary;
             if (dict.Count != otherDict.Count) return false;
 
-            foreach (DataItem key in dict.Keys)
-                if (!(otherDict.ContainsKey(key) &&
-                    dict[key].Equals(otherDict[key])))
-                    return false;
+            foreach (var pair in dict)
+                if (!(otherDict.TryGetValue(pair.Key, out DataItem otherValue) &&
+                    pair.Value.Equals(otherValue))) return false;
 
             return true;
         }
@@ -118,8 +110,10 @@ namespace AddyScript.Runtime.DataItems
                 case BinaryOperator.Plus:
                     {
                         var result = new Dictionary<DataItem, DataItem>(dict);
+
                         foreach (var pair in operand.AsDictionary)
                             result.Add(pair.Key, pair.Value);
+
                         return new Map(result);
                     }
                 default:

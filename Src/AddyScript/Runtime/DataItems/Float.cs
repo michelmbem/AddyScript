@@ -12,15 +12,9 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Float(double value) : DataItem
     {
-        public Float Opposite
-        {
-            get { return new Float(-value); }
-        }
+        public Float Opposite => new(-value);
 
-        public override Class Class
-        {
-            get { return Class.Float; }
-        }
+        public override Class Class => Class.Float;
 
         public override bool AsBoolean
         {
@@ -42,10 +36,7 @@ namespace AddyScript.Runtime.DataItems
             get { return new Rational32((int) value); }
         }
 
-        public override double AsDouble
-        {
-            get { return value; }
-        }
+        public override double AsDouble => value;
 
         public override BigDecimal AsBigDecimal
         {
@@ -57,10 +48,7 @@ namespace AddyScript.Runtime.DataItems
             get { return new Complex64(value, 0); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

@@ -19,7 +19,7 @@ using Void = AddyScript.Runtime.DataItems.Void;
 namespace AddyScript.Parsers
 {
     /// <summary>
-    /// The AddyScript's full-featured parser.
+    /// The AddyScript full-featured parser.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of the parser.

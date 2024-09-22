@@ -15,7 +15,7 @@ using AddyScript.Runtime.OOP;
 namespace AddyScript.Runtime.DataItems
 {
     /// <summary>
-    /// The base class of all AddyScript's builtin data types.
+    /// The base class of all AddyScript builtin data types.
     /// </summary>
     public abstract class DataItem
         : IFrameItem, ICloneable, IFormattable, IEquatable<DataItem>,

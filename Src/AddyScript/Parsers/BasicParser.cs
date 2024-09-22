@@ -12,7 +12,7 @@ using AddyScript.Runtime.OOP;
 namespace AddyScript.Parsers
 {
     /// <summary>
-    /// The base class of all AddyScript's parsers.<br/>
+    /// The base class of all AddyScript parsers.<br/>
     /// A collection of utility methods for derived classes.
     /// </summary>
     public abstract class BasicParser

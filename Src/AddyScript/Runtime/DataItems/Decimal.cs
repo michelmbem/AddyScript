@@ -11,10 +11,7 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Decimal(BigDecimal value) : DataItem
     {
-        public Decimal Opposite
-        {
-            get { return new Decimal(-value); }
-        }
+        public Decimal Opposite => new(-value);
 
         public override Class Class
         {
@@ -28,38 +25,32 @@ namespace AddyScript.Runtime.DataItems
 
         public override int AsInt32
         {
-            get { return (int) value; }
+            get { return (int)value; }
         }
 
         public override BigInteger AsBigInteger
         {
-            get { return (BigInteger) value; }
+            get { return (BigInteger)value; }
         }
 
         public override Rational32 AsRational32
         {
-            get { return new Rational32((int) value); }
+            get { return new Rational32((int)value); }
         }
 
         public override double AsDouble
         {
-            get { return (double) value; }
+            get { return (double)value; }
         }
 
-        public override BigDecimal AsBigDecimal
-        {
-            get { return value; }
-        }
+        public override BigDecimal AsBigDecimal => value;
 
         public override Complex64 AsComplex64
         {
-            get { return new Complex64((double) value, 0); }
+            get { return new Complex64((double)value, 0); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

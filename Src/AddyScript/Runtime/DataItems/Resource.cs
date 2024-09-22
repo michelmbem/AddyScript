@@ -13,20 +13,11 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Resource(object handle) : DataItem
     {
-        public Type NativeType
-        {
-            get { return handle.GetType(); }
-        }
+        public Type NativeType => handle.GetType();
 
-        public override Class Class
-        {
-            get { return Class.Resource; }
-        }
+        public override Class Class => Class.Resource;
 
-        public override object AsNativeObject
-        {
-            get { return handle; }
-        }
+        public override object AsNativeObject => handle;
 
         public override object Clone()
         {
@@ -93,8 +84,8 @@ namespace AddyScript.Runtime.DataItems
             const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
 
             object obj = NativeType.IsCOMObject
-                       ? NativeType.InvokeMember("Item", flags, null, handle, new[] { index.AsNativeObject })
-                       : NativeType.InvokeMember("get_Item", flags, new DataItemBinder(), handle, new[] { index });
+                       ? NativeType.InvokeMember("Item", flags, null, handle, [index.AsNativeObject])
+                       : NativeType.InvokeMember("get_Item", flags, new DataItemBinder(), handle, [index]);
 
             return DataItemFactory.CreateDataItem(obj);
         }
@@ -104,9 +95,9 @@ namespace AddyScript.Runtime.DataItems
             const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
 
             if (NativeType.IsCOMObject)
-                NativeType.InvokeMember("Item", flags, null, handle, new[] { index.AsNativeObject, value.AsNativeObject });
+                NativeType.InvokeMember("Item", flags, null, handle, [index.AsNativeObject, value.AsNativeObject]);
             else
-                NativeType.InvokeMember("set_Item", flags, new DataItemBinder(), handle, new[] { index, value });
+                NativeType.InvokeMember("set_Item", flags, new DataItemBinder(), handle, [index, value]);
         }
 
         public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
@@ -121,6 +112,7 @@ namespace AddyScript.Runtime.DataItems
             else if (handle is IEnumerable enumerable)
             {
                 int index = 0;
+
                 foreach (object item in enumerable)
                     yield return new KeyValuePair<DataItem, DataItem>(
                         new Integer(index++),

@@ -70,11 +70,13 @@ namespace AddyScript.Runtime.DataItems
                 case "X":
                     {
                         var sb = new StringBuilder();
+
                         foreach (char c in value)
                             if (32 <= c && c < 127)
                                 sb.Append(c);
                             else
                                 sb.AppendFormat("\\x{0:x2}", (int)c);
+
                         return sb.ToString();
                     }
                 default:

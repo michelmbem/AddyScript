@@ -11,7 +11,7 @@ using AddyScript.Runtime.NativeTypes;
 namespace AddyScript.Parsers
 {
     /// <summary>
-    /// AddyScript's lexer.
+    /// AddyScript lexer.
     /// </summary>
     public class Lexer
     {

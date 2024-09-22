@@ -44,10 +44,7 @@ namespace AddyScript.Runtime.DataItems
             get { return Simplify(value.Inverse()); }
         }
 
-        public override Class Class
-        {
-            get { return Class.Rational; }
-        }
+        public override Class Class => Class.Rational;
 
         public override bool AsBoolean
         {
@@ -56,12 +53,12 @@ namespace AddyScript.Runtime.DataItems
 
         public override int AsInt32
         {
-            get { return (int) value; }
+            get { return (int)value; }
         }
 
         public override BigInteger AsBigInteger
         {
-            get { return new BigInteger((int) value); }
+            get { return new BigInteger((int)value); }
         }
 
         public override Rational32 AsRational32
@@ -71,23 +68,20 @@ namespace AddyScript.Runtime.DataItems
 
         public override double AsDouble
         {
-            get { return (double) value; }
+            get { return (double)value; }
         }
 
         public override BigDecimal AsBigDecimal
         {
-            get { return new BigDecimal((decimal) value); }
+            get { return new BigDecimal((decimal)value); }
         }
 
         public override Complex64 AsComplex64
         {
-            get { return new Complex64((double) value, 0); }
+            get { return new Complex64((double)value, 0); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

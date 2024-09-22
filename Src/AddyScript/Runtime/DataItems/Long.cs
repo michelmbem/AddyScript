@@ -11,20 +11,11 @@ namespace AddyScript.Runtime.DataItems
 {
     public sealed class Long(BigInteger value) : DataItem
     {
-        public Long Opposite
-        {
-            get { return new Long(-value); }
-        }
+        public Long Opposite => new(-value);
 
-        public Long Complement
-        {
-            get { return new Long(~value); }
-        }
+        public Long Complement => new(~value);
 
-        public override Class Class
-        {
-            get { return Class.Long; }
-        }
+        public override Class Class => Class.Long;
 
         public override bool AsBoolean
         {
@@ -36,10 +27,7 @@ namespace AddyScript.Runtime.DataItems
             get { return (int) value; }
         }
 
-        public override BigInteger AsBigInteger
-        {
-            get { return value; }
-        }
+        public override BigInteger AsBigInteger => value;
 
         public override Rational32 AsRational32
         {
@@ -61,10 +49,7 @@ namespace AddyScript.Runtime.DataItems
             get { return new Complex64((double) value, 0); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

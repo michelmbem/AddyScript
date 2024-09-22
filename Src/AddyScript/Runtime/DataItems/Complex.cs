@@ -26,35 +26,23 @@ namespace AddyScript.Runtime.DataItems
             value = new Complex64(realPart, 0);
         }
 
-        public Complex Opposite
-        {
-            get { return new Complex(-value); }
-        }
+        public Complex Opposite => new(-value);
 
         public Complex Conjugate
         {
             get { return new Complex(Complex64.Conjugate(value)); }
         }
 
-        public override Class Class
-        {
-            get { return Class.Complex; }
-        }
+        public override Class Class => Class.Complex;
 
         public override bool AsBoolean
         {
             get { return value != Complex64.Zero; }
         }
 
-        public override Complex64 AsComplex64
-        {
-            get { return value; }
-        }
+        public override Complex64 AsComplex64 => value;
 
-        public override object AsNativeObject
-        {
-            get { return value; }
-        }
+        public override object AsNativeObject => value;
 
         public override string ToString(string format, IFormatProvider formatProvider)
         {

@@ -24,10 +24,7 @@ namespace AddyScript.Runtime.DataItems
             queue = new Queue<DataItem>(initialContent);
         }
 
-        public override Class Class
-        {
-            get { return Class.Queue; }
-        }
+        public override Class Class => Class.Queue;
 
         public override List<DataItem> AsList
         {
@@ -39,20 +36,14 @@ namespace AddyScript.Runtime.DataItems
             get { return new HashSet<DataItem>(queue); }
         }
 
-        public override Queue<DataItem> AsQueue
-        {
-            get { return queue; }
-        }
+        public override Queue<DataItem> AsQueue => queue;
 
         public override Stack<DataItem> AsStack
         {
             get { return new Stack<DataItem>(queue); }
         }
 
-        public override object AsNativeObject
-        {
-            get { return queue; }
-        }
+        public override object AsNativeObject => queue;
 
         public override object Clone()
         {
