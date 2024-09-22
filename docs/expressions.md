@@ -70,8 +70,8 @@ MAX_ITEMS = 100;
 
 |Constant|Value|Description|
 |:-:|-|-|
-|MININT|-2,147,483,648|The minimum value for the **int** type.|
-|MAXINT|+2,147,483,647|The maximum value for the **int** type.|
+|MININT|-2.147,483,648|The minimum value for the **int** type.|
+|MAXINT|+2.147,483,647|The maximum value for the **int** type.|
 |MINFLOAT|-1.79,769,313,486,232E+308|The minimum value for the **float** type.|
 |MAXFLOAT|+1.79,769,313,486,232E+308|The maximum value for the **float** type.|
 |PI|3.14,159,265,358,979|A numeric value used in geometry.|
