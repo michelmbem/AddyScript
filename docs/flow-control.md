@@ -146,10 +146,10 @@ Example 2:
 o = new {name = 'my object', size = 18, color = 'blue'};
 
 res = o switch {
-	null => 'absolutely null',
-	float => 'i\'m floating',
-	Exception {message = 'something went wrong'} => __value.message,
-	{name = 'my object', size = 18} => 'my object of size 18'
+    null => 'absolutely null',
+    float => 'i\'m floating',
+    Exception {message = 'something went wrong'} => __value.message,
+    {name = 'my object', size = 18} => 'my object of size 18'
 };
 
 println($'o is {o}');

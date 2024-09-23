@@ -16,8 +16,8 @@ names = [];
 
 for (i = 0; i < n; i++)
 {
-	print('Name number {0}: ', i + 1);
-	names.add(readln());
+    print('Name number {0}: ', i + 1);
+    names.add(readln());
 }
 
 println('You entered the following names: ' + names);
@@ -29,30 +29,30 @@ someName = readln('Type a name: ');
 
 if (names contains someName)
 {
-	i = names.indexOf(someName);
-	println('{0} was found in the list at position {1}', someName, i);
-	names.removeAt(i);
-	println('After removal of ' + someName + ': ' + names);
+    i = names.indexOf(someName);
+    println('{0} was found in the list at position {1}', someName, i);
+    names.removeAt(i);
+    println('After removal of ' + someName + ': ' + names);
 }
 else
 {
-	i = (int) readln('Enter a position in the list: ');
-	
-	if (i < names.count)
-	{
-		names.insert(i, someName);
-		println('After insertion of {0} at position {1}: {2}', someName, i, names);
-	}
-	else
-		println('Out of list boundaries!');
+    i = (int) readln('Enter a position in the list: ');
+    
+    if (i < names.count)
+    {
+        names.insert(i, someName);
+        println('After insertion of {0} at position {1}: {2}', someName, i, names);
+    }
+    else
+        println('Out of list boundaries!');
 }
 
 someName = readln('Type another name: ');
 
 if (names.remove(someName))
-	println('After removal of ' + someName + ': ' + names);
+    println('After removal of ' + someName + ': ' + names);
 else
-	println('Not found!');
+    println('Not found!');
 
 names.clear();
 println('After clearing the list: ' + names);
@@ -109,43 +109,43 @@ tom['hire date'] = `2004-05-18`;
 tom['salary'] = 3600D;
 
 foreach (prop => value in tom)
-	println('{0} : {1}', prop, value);
+    println('{0} : {1}', prop, value);
 
 someProperty = readln('Type the name of a property: ');
 
 if (tom.containsKey(someProperty))
-	println('Property ' + someProperty + ' is already defined for tom!');
+    println('Property ' + someProperty + ' is already defined for tom!');
 else
 {
-	tom[someProperty] = readln('Enter a value for ' + someProperty + ': ');
-	println('After adding that property:');
-	foreach (prop in tom.keys)
-		println('{0} : {1}', prop, tom[prop]);
+    tom[someProperty] = readln('Enter a value for ' + someProperty + ': ');
+    println('After adding that property:');
+    foreach (prop in tom.keys)
+        println('{0} : {1}', prop, tom[prop]);
 }
 
 someProperty = readln('Type the name of another property: ');
 
 if (tom.remove(someProperty))
 {
-	println('After removal of ' + someProperty + ':');
-	foreach (value in tom)
-		println('{0} : {1}', __key, value);
+    println('After removal of ' + someProperty + ':');
+    foreach (value in tom)
+        println('{0} : {1}', __key, value);
 }
 else
-	println('Property ' + someProperty + ' is not defined for tom!');
+    println('Property ' + someProperty + ' is not defined for tom!');
 
 someValue = readln('Type any value: ');
 
 if (tom.containsValue(someValue))
 {
-	println(someValue + ' is the value of ' + tom.frequencyOf(someValue) + ' properties of tom');
-	print('Those are :');
-	foreach (prop in tom.keysOf(someValue))
-		print(prop);
-	println();
+    println(someValue + ' is the value of ' + tom.frequencyOf(someValue) + ' properties of tom');
+    print('Those are :');
+    foreach (prop in tom.keysOf(someValue))
+        print(prop);
+    println();
 }
 else
-	println('No property of tom has value ' + someValue);
+    println('No property of tom has value ' + someValue);
 ```
 
 #### Map API

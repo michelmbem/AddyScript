@@ -1,0 +1,207 @@
+# User-defined functions
+
+In addition to the predefined functions, users have the ability to define their own functions in AddyScript and use them. The following sections describe how to do this.
+
+### Creating a function
+
+To create a function in AddyScript, simply use the following syntax:
+
+```
+function functionName (comma_separated_list_of_parameters)
+{
+    // function's logic goes here
+    // returning a value is optional and can be done like this:
+    return 10;
+}
+```
+
+Example:
+
+```Cpp
+function sayHello()
+{
+    println("Hello to anyone!");
+}
+
+function sayHelloTo(name)
+{
+    println("Hello " + name);
+    return readln("How do you do? ");
+}
+
+// Now we can call those 2 functions like this:
+
+sayHello();
+
+name = readln("What's your name? ");
+ans = sayHelloTo(name);
+
+if (ans != "fine")
+    println("What's the matter?");
+```
+
+When the body of a function is reduced to a **return** statement or a simple expression, the entire function can be formulated with this shorter syntax:
+
+```
+function functionName (comma_separated_list_of_parameters) => expression;
+```
+
+Example:
+
+```Cpp
+function addTwo(a, b) => a + b;
+
+n = (float)readln('first number: ');
+m = (float)readln('second number: ');
+res = addTwo(n, m);
+println($'the result is: {res}');
+```
+
+### Invoking functions
+
+As in most languages, a function invocation in AddyScript consists of its name followed by a comma-separated list of arguments in parentheses. In AddyScript, however, arguments can be either positional or named.
+
+A positional argument is any expression that appears at a particular position in an argument list. It is automatically mapped at runtime to the parameter that appears at the same position in the function header.
+
+A named argument is one that consists of a name (i.e., an identifier) ​​followed by a colon (:) and then an expression. It is mapped to the parameter that has the same name in the function header. Named arguments are particularly useful when you are calling a function that has optional parameters and you do not want to provide values ​​for some of the ones that come first in the function header.
+
+Positional arguments must always come first in an argument list. Once a named argument is encountered by the parser, it expects all subsequent arguments to be named as well.
+
+Example:
+
+```Cpp
+function concat(values, separator = ', ', prefix = '{', suffix = '}')
+	=> prefix + values.join(separator) + suffix;
+
+// A list to concatenate:
+l = [8, 3, 4, 9, 2, 4, 6, 0, 7];
+
+// Calling concat with default values for separator, prefix and suffix:
+s1 = concat(l);
+println('s1 = ' + s1);
+
+// Calling concat with explicit values for separator, prefix and suffix:
+// All arguments are positional
+s2 = concat(l, '-', '[', ']');
+println('s2 = ' + s2);
+
+// Calling concat with an explicit value for separator and default values for prefix and suffix:
+// All arguments are positional
+s3 = concat(l, '; ');
+println('s3 = ' + s3);
+
+// Calling concat with explicit values for prefix and suffix:
+// The prefix and suffix arguments are named
+s4 = concat(l, prefix: '(', suffix: ')');
+println('s4 = ' + s4);
+
+// Calling concat with explicit values for separator, prefix and suffix:
+// All arguments are named and given in random order
+s5 = concat(suffix: '[', separator: ':', values: l, prefix: ']');
+println('s5 = ' + s5);
+```
+
+### Manage how parameters are passed to a function
+
+A parameter can be passed to a function by value, by reference, or as a variable-length list of values. By default, parameters are passed by value. To indicate that a parameter is passed by reference, simply prefix it with the **ref** keyword. Similarly, prefixing a parameter with the **params** keyword indicates that it represents a variable-length list of values. Note that a variable-length list of values ​​must always be the last in a parameter list. Thus, a function cannot have multiple variable-length lists of values ​​in its header.
+
+When a parameter is passed by value to a function, it can be assigned a default value. This makes the parameter optional (i.e., it does not need to be provided with a value when calling the function). Once you add an optional parameter to a parameter list, the only types of parameters that can follow are other optional parameters and a variable-length list of values.
+
+### Closures
+
+A closure is a function used as a variable. Closures are typically used to pass functions as parameters to other functions (customizing their behavior) or to return a function as the result of another function. They appear in two forms in AddyScript: function references and inline function declarations. A function reference is like a reference to a variable (a simple identifier in the code) while an inline function declaration is an anonymous function definition that appears where an expression was expected. Both techniques are illustrated in the example below:
+
+Example:
+
+```Cpp
+// Repeats an action on each item of a list; parameter 'action' is a closure
+function repeat(l, action)
+{
+    foreach (item in l)
+        action(item);
+}
+
+// A list for testing purpose
+myList = [2, 5, 7, 8, 3, 0, 1, 6, 9, 4];
+// Invoke repeat with a reference to the builtin 'println' function
+repeat(myList, println);
+
+// Declare a function inline and store it in a variable called myFunc
+myFunc = function (n)
+         {
+             println('{0} x 2 = {1}', n, 2 * n);
+         };
+
+// Invoke repeat with myFunc
+repeat(myList, myFunc);
+// Something more compact
+repeat(myList, function (x)
+               {
+                   println(x % 2 == 0 ? 'even' : 'odd');
+               });
+```
+
+#### Remarks:
+
+1. When the body of an anonymous function is reduced to a return statement or a simple expression, the entire function can be formulated like this: `|parameters| => expression`. In this form, we call it a **lambda expression**. For example, we could invoke the "repeat" function from the previous example like this: `repeat(myList, |n| => println('{0} x 2 = {1}', n, 2*n));`. A lambda expression can also have a real function body delimited by curly braces and optionally ending with a **return** statement.
+
+2. If the parameter list of a lambda expression is empty, put a space between the vertical bars. This prevents parsers from confusing them with an or-else operator (\|\|).
+
+#### External functions
+AddyScript allows a script to invoke a function declared in a native library (such as a DLL or a shared object). To do this, the target function must first be declared as an external function in the script using this syntax:
+
+`[LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
+extern function functionName(list_of_parameters_with_type_attribute);`
+
+Where "nativeLibraryName" is the name of the native library that contains the definition of the function we want to import, "importedFunctionName" is the name of the function we want to import, and "someDotNetType" is the name of the return type of the function. functionName is the name we want to give to the function in our code. If functionName is equal to "importedFunctionName", then the procName field of the LibImport attribute can be omitted. If the function does not return anything, then returnType can also be omitted.
+
+Each parameter in the formal parameter list must be decorated with a Type attribute indicating what type the parameter is. If the Type attribute is omitted, the System.Object type will be used by default. In fact, when it comes to P/Invoke, AddyScript is less dynamically typed than usual. Unqualified type names will be prefixed with "System.", and will therefore be searched in the _System.Private.CorLib_ assembly.
+
+The following example shows how to invoke the Win32 MessageBox function from a script:
+
+```Cpp
+[LibImport("user32", procName = "MessageBox", returnType = "Int32")]
+extern function msgbox(
+        [Type("IntPtr")] hWnd,
+        [Type("String")] message,
+        [Type("String")] title,
+        [Type("Int32")] flags);
+
+msgbox(null, "Hello funny people!", "AddyScript", 0);
+```
+
+### Re-using code: the import directive
+
+AddyScript obviously allows the user to define a function once and reuse it multiple times later. To do this, simply save the target functions in a script and import that script from another. You typically import a script using the **import** directive. Its syntax is as follows:
+
+`import script_name_without_extension;`
+
+AddyScript assumes that imported scripts have the extension _.add_. The imported script will first be searched in the same directory as the script from which it is imported. If it is not found in that directory, AddyScript will continue searching in each of the directories that are listed in the _ImportPaths_ property of the _ScriptContext_ instance with which the current _ScriptEngine_ object was initialized. An error occurs if the search is unsuccessful. To indicate that the script to be imported would be in a subdirectory, use the double-colon operator (::) as a path separator in the script name.
+
+Example:
+
+Suppose that you have the following file structure:
+
+![tree](tree.jpg)
+
+To import _funcs.add_ from _main.add_, simply add the following line of code to _main.add_:
+
+`import funcs;`
+
+To import _moreFuncs.add_ from _main.add_, simply add the following line of code to _main.add_:
+
+`import lib::moreFuncs;`
+
+Supposing that the full path to _scripts_ figures in the _ImportPaths_ property of the current _ScriptContext_, we can import _math.add_ from _main.add_ by simply adding the following line of code to _main.add_:
+
+`import math;`
+
+And finally, _scripts_ being in the _ImportPaths_, we can import _core.add_ from _main.add_ by simply adding the following line of code to _main.add_:
+
+`import graph::core;`
+
+#### Remarks:
+
+The import directive can be used to import any symbol defined in a script. These include constants, variables, functions and classes.
+
+[Home](README.md) | [Previous](innerfunc.md) | [Next](classes.md)

@@ -21,7 +21,7 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
     * [Collections and objects](col-obj.md)
     * Functions
         * [Inner functions](innerfunc.md)
-        * [User-defined functions](usefunc.md)
+        * [User-defined functions](userfunc.md)
     * Object oriented programming
         * [Classes](classes.md)
         * [Inheritance and polymorphism](inheritance.md)

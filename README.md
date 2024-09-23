@@ -60,15 +60,15 @@ Import AddyScript and any other namespaces in the AddyScript.dll assembly depend
 I'm assuming the formula to be evaluated is stored in a string called strFormula and expects a parameter named x; successive values of the x parameter are stored in a collection named inputValues.
 Add a code snippet like this:
 
-```Cpp
+```CSharp
 var formula = ScriptEngine.ParseExpression(strFormula);
 var context = new ScriptContext();
 
 foreach (var value in inputValues)
 {
-	context.Bindings["x"] = value;
-	double result = ScriptEngine.Evaluate(formula, context).AsDouble;
-	Console.WriteLine(result);
+    context.Bindings["x"] = value;
+    double result = ScriptEngine.Evaluate(formula, context).AsDouble;
+    Console.WriteLine(result);
 }
 ```
 
@@ -77,7 +77,7 @@ Add a reference to AddyScript.dll to your project.
 Import AddyScript and any other namespaces from the AddyScript.dll assembly.
 The rest is as follows:
 
-```Cpp
+```CSharp
 delegate double DummyDelegate(double x);
 
 var context = new ScriptContext();
