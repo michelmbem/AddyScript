@@ -16,24 +16,24 @@ done = false;
 
 try
 {
-	y = eval(f);
-	println($'f({x}) = {y}');
-	done = true;
+    y = eval(f);
+    println($'f({x}) = {y}');
+    done = true;
 }
 catch (e)
 {
-	println(e.name + ' : ' + e.message);
-	goto retry;
+    println(e.name + ' : ' + e.message);
+    goto retry;
 }
 finally
 {
-	if (done)
-	{
-		println('done!');
-		readln();
-	}
-	else
-		println('type another expression');
+    if (done)
+    {
+        println('done!');
+        readln();
+    }
+    else
+        println('type another expression');
 }
 ```
 
@@ -77,23 +77,23 @@ const EMPTY_BLOCK = '\0' * BLOCK_SIZE;
 
 try (input = File::OpenRead(@"E:\Videos\TV Series\Breaking Bad\Saison 1\01x01.avi"))
 {
-	try (output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'BBS1E01.avi')))
-	{
-		var block = EMPTY_BLOCK, m = 0, n;
-		
-		while (true) {
-			n = input.Read(block, 0, BLOCK_SIZE);
-			if (n <= 0) break;
-			output.Write(block, 0, n);
-			m += n;
-			println($'{m} bytes written');
-		}
-	}
+    try (output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'BBS1E01.avi')))
+    {
+        var block = EMPTY_BLOCK, m = 0, n;
+        
+        while (true) {
+            n = input.Read(block, 0, BLOCK_SIZE);
+            if (n <= 0) break;
+            output.Write(block, 0, n);
+            m += n;
+            println($'{m} bytes written');
+        }
+    }
 }
 catch (e)
 {
-	println('Error (' + e.name + ') : ' + e.message);
-	readln();
+    println('Error (' + e.name + ') : ' + e.message);
+    readln();
 }
 ```
 
