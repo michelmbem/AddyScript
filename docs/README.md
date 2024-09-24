@@ -28,10 +28,10 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
         * [Introspection](introspection.md)
         * [Interacting with .Net and the host platform](interop.md)
     * [Exceptions handling](exceptions.md)
-    * [AddyScript's grammar](grammar.md)
+    * [AddyScript grammar](grammar.md)
 * Extending AddyScript
     * [Extending the API](extapi.md)
-    * [Extending the language's syntax](extlang.md)
+    * [Extending the language syntax](extlang.md)
     * [Improving the scripting engine](improve.md)
 * [Licensing](license.md)
 * [About the author](aboutauth.md)

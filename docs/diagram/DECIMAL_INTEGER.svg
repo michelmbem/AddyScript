@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="195" height="97">
+   <defs>
+      <style type="text/css">
+    @namespace "http://www.w3.org/2000/svg";
+    .line                 {fill: none; stroke: #332900; stroke-width: 1;}
+    .bold-line            {stroke: #141000; shape-rendering: crispEdges; stroke-width: 2;}
+    .thin-line            {stroke: #1F1800; shape-rendering: crispEdges}
+    .filled               {fill: #332900; stroke: none;}
+    text.terminal         {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #141000;
+                            font-weight: bold;
+                          }
+    text.nonterminal      {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #1A1400;
+                            font-weight: normal;
+                          }
+    text.regexp           {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #1F1800;
+                            font-weight: normal;
+                          }
+    rect, circle, polygon {fill: #332900; stroke: #332900;}
+    rect.terminal         {fill: #FFDB4D; stroke: #332900; stroke-width: 1;}
+    rect.nonterminal      {fill: #FFEC9E; stroke: #332900; stroke-width: 1;}
+    rect.text             {fill: none; stroke: none;}
+    polygon.regexp        {fill: #FFF4C7; stroke: #332900; stroke-width: 1;}
+  </style>
+   </defs>
+   <polygon points="9 77 1 73 1 81"/>
+   <polygon points="17 77 9 73 9 81"/>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#DIGIT"
+      xlink:title="DIGIT">
+      <rect x="71" y="63" width="56" height="32"/>
+      <rect x="69" y="61" width="56" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="79" y="81">DIGIT</text>
+   </a>
+   <rect x="71" y="19" width="28" height="32" rx="10"/>
+   <rect x="69"
+         y="17"
+         width="28"
+         height="32"
+         class="terminal"
+         rx="10"/>
+   <text class="terminal" x="79" y="37">_</text>
+   <path class="line"
+         d="m17 77 h2 m40 0 h10 m56 0 h10 m-96 0 l20 0 m-1 0 q-9 0 -9 -10 l0 -24 q0 -10 10 -10 m76 44 l20 0 m-20 0 q10 0 10 -10 l0 -24 q0 -10 -10 -10 m-76 0 h10 m28 0 h10 m0 0 h28 m-116 44 l20 0 m-1 0 q-9 0 -9 -10 l0 -56 q0 -10 10 -10 m116 76 l20 0 m-20 0 q10 0 10 -10 l0 -56 q0 -10 -10 -10 m-116 0 h10 m0 0 h106 m23 76 h-3"/>
+   <polygon points="185 77 193 73 193 81"/>
+   <polygon points="185 77 177 73 177 81"/>
+</svg>

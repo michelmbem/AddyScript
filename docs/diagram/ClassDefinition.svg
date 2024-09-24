@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="963" height="103">
+   <defs>
+      <style type="text/css">
+    @namespace "http://www.w3.org/2000/svg";
+    .line                 {fill: none; stroke: #332900; stroke-width: 1;}
+    .bold-line            {stroke: #141000; shape-rendering: crispEdges; stroke-width: 2;}
+    .thin-line            {stroke: #1F1800; shape-rendering: crispEdges}
+    .filled               {fill: #332900; stroke: none;}
+    text.terminal         {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #141000;
+                            font-weight: bold;
+                          }
+    text.nonterminal      {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #1A1400;
+                            font-weight: normal;
+                          }
+    text.regexp           {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #1F1800;
+                            font-weight: normal;
+                          }
+    rect, circle, polygon {fill: #332900; stroke: #332900;}
+    rect.terminal         {fill: #FFDB4D; stroke: #332900; stroke-width: 1;}
+    rect.nonterminal      {fill: #FFEC9E; stroke: #332900; stroke-width: 1;}
+    rect.text             {fill: none; stroke: none;}
+    polygon.regexp        {fill: #FFF4C7; stroke: #332900; stroke-width: 1;}
+  </style>
+   </defs>
+   <polygon points="9 51 1 47 1 55"/>
+   <polygon points="17 51 9 47 9 55"/>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#Attributes"
+      xlink:title="Attributes">
+      <rect x="51" y="69" width="82" height="32"/>
+      <rect x="49" y="67" width="82" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="87">Attributes</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#MODIFIER"
+      xlink:title="MODIFIER">
+      <rect x="193" y="69" width="82" height="32"/>
+      <rect x="191" y="67" width="82" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="201" y="87">MODIFIER</text>
+   </a>
+   <rect x="315" y="37" width="52" height="32" rx="10"/>
+   <rect x="313"
+         y="35"
+         width="52"
+         height="32"
+         class="terminal"
+         rx="10"/>
+   <text class="terminal" x="323" y="55">class</text>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#IDENTIFIER"
+      xlink:title="IDENTIFIER">
+      <rect x="387" y="37" width="92" height="32"/>
+      <rect x="385" y="35" width="92" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="395" y="55">IDENTIFIER</text>
+   </a>
+   <rect x="519" y="69" width="24" height="32" rx="10"/>
+   <rect x="517"
+         y="67"
+         width="24"
+         height="32"
+         class="terminal"
+         rx="10"/>
+   <text class="terminal" x="527" y="87">:</text>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#IDENTIFIER"
+      xlink:title="IDENTIFIER">
+      <rect x="563" y="69" width="92" height="32"/>
+      <rect x="561" y="67" width="92" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="571" y="87">IDENTIFIER</text>
+   </a>
+   <rect x="695" y="37" width="28" height="32" rx="10"/>
+   <rect x="693"
+         y="35"
+         width="28"
+         height="32"
+         class="terminal"
+         rx="10"/>
+   <text class="terminal" x="703" y="55">{</text>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#ClassMember"
+      xlink:title="ClassMember">
+      <rect x="763" y="3" width="104" height="32"/>
+      <rect x="761" y="1" width="104" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="771" y="21">ClassMember</text>
+   </a>
+   <rect x="907" y="37" width="28" height="32" rx="10"/>
+   <rect x="905"
+         y="35"
+         width="28"
+         height="32"
+         class="terminal"
+         rx="10"/>
+   <text class="terminal" x="915" y="55">}</text>
+   <path class="line"
+         d="m17 51 h2 m20 0 h10 m0 0 h92 m-122 0 h20 m102 0 h20 m-142 0 q10 0 10 10 m122 0 q0 -10 10 -10 m-132 10 v12 m122 0 v-12 m-122 12 q0 10 10 10 m102 0 q10 0 10 -10 m-112 10 h10 m82 0 h10 m40 -32 h10 m0 0 h92 m-122 0 h20 m102 0 h20 m-142 0 q10 0 10 10 m122 0 q0 -10 10 -10 m-132 10 v12 m122 0 v-12 m-122 12 q0 10 10 10 m102 0 q10 0 10 -10 m-112 10 h10 m82 0 h10 m20 -32 h10 m52 0 h10 m0 0 h10 m92 0 h10 m20 0 h10 m0 0 h146 m-176 0 h20 m156 0 h20 m-196 0 q10 0 10 10 m176 0 q0 -10 10 -10 m-186 10 v12 m176 0 v-12 m-176 12 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m24 0 h10 m0 0 h10 m92 0 h10 m20 -32 h10 m28 0 h10 m20 0 h10 m0 0 h114 m-144 0 l20 0 m-1 0 q-9 0 -9 -10 l0 -14 q0 -10 10 -10 m124 34 l20 0 m-20 0 q10 0 10 -10 l0 -14 q0 -10 -10 -10 m-124 0 h10 m104 0 h10 m20 34 h10 m28 0 h10 m3 0 h-3"/>
+   <polygon points="953 51 961 47 961 55"/>
+   <polygon points="953 51 945 47 945 55"/>
+</svg>
