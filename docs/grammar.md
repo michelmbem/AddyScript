@@ -2,31 +2,24 @@
 
 The following railroad diagrams summarize the syntax of the AddyScript language. They were generated with the help of a tool called [_Railroad Diagram Generator_](https://rr.red-dove.com/ui). Thanks to the authors!
 
-Note that in the AddyScript grammar, the axiom is a symbol called _Program_ ; it represents an entire script. Here are the syntax rules:
-
-<style>
-    img {
-        background-color: #FFE;
-        padding: 8px;
-    }
-</style>
-
-## Non-terminal symbols
+### Axiom
 
 **Program:**
 
 ![Program](diagram/Program.svg)
 
 ```
-Program  ::= StatementSeries
+Program  ::= StatementWithLabel*
 ```
 
-**StatementSeries:**
+### Non-terminal symbols
 
-![StatementSeries](diagram/StatementSeries.svg)
+**StatementWithLabel:**
+
+![StatementWithLabel](diagram/StatementWithLabel.svg)
 
 ```
-StatementSeries ::= ( Label* Statement )*
+StatementWithLabel ::= Label* Statement
 ```
 
 **Label:**
@@ -42,27 +35,26 @@ Label ::= IDENTIFIER ':'
 ![Statement](diagram/Statement.svg)
 
 ```
-Statement
-         ::= ImportDirective
-           | ClassDefinition
-           | FunctionDecl
-           | ExternalFunctionDecl
-           | ConstantDecl
-           | VariableDecl
-           | Block
-           | IfElse
-           | SwitchBlock
-           | ForLoop
-           | ForEachLoop
-           | WhileLoop
-           | DoLoop
-           | Continue
-           | Break
-           | Goto
-           | Return
-           | Throw
-           | TryCatchFinally
-           | Expression ';'
+Statement ::= ImportDirective
+            | ClassDefinition
+            | FunctionDecl
+            | ExternalFunctionDecl
+            | ConstantDecl
+            | VariableDecl
+            | Block
+            | IfElse
+            | SwitchBlock
+            | ForLoop
+            | ForEachLoop
+            | WhileLoop
+            | DoLoop
+            | Continue
+            | Break
+            | Goto
+            | Return
+            | Throw
+            | TryCatchFinally
+            | Expression ';'
 ```
 
 **ImportDirective:**
@@ -102,15 +94,15 @@ Attributes ::= '[' Attribute ( ',' Attribute )* ']'
 ![Attribute](diagram/Attribute.svg)
 
 ```
-Attribute ::= IDENTIFIER ( '(' ( Expression | ( Expression ',' )? PropertyInitializers )? ')' )?
+Attribute ::= IDENTIFIER ( '(' ( Expression | ( Expression ',' )? PropertyInitializerList )? ')' )?
 ```
 
-**PropertyInitializers:**
+**PropertyInitializerList:**
 
-![PropertyInitializers](diagram/PropertyInitializers.svg)
+![PropertyInitializerList](diagram/PropertyInitializerList.svg)
 
 ```
-PropertyInitializers ::= PropertyInitializer ( ',' PropertyInitializer )*
+PropertyInitializerList ::= PropertyInitializer ( ',' PropertyInitializer )*
 ```
 
 **PropertyInitializer:**
@@ -134,10 +126,9 @@ ClassMember ::= MemberPrefix? MemberSpec
 ![MemberPrefix](diagram/MemberPrefix.svg)
 
 ```
-MemberPrefix
-         ::= SCOPE ( MODIFIER Attributes? | Attributes MODIFIER? )?
-           | MODIFIER ( SCOPE Attributes? | Attributes SCOPE? )?
-           | Attributes ( SCOPE MODIFIER? | MODIFIER SCOPE? )?
+MemberPrefix ::= SCOPE ( MODIFIER Attributes? | Attributes MODIFIER? )?
+               | MODIFIER ( SCOPE Attributes? | Attributes SCOPE? )?
+               | Attributes ( SCOPE MODIFIER? | MODIFIER SCOPE? )?
 ```
 
 **MemberSpec:**
@@ -145,12 +136,12 @@ MemberPrefix
 ![MemberSpec](diagram/MemberSpec.svg)
 
 ```
-MemberSpec
-         ::= ConstructorSpec
-           | FieldSpec
-           | PropertySpec
-           | MethodSpec
-           | EventSpec
+MemberSpec ::= ConstructorSpec
+             | FieldSpec
+             | PropertySpec
+             | MethodSpec
+             | OperatorSpec
+             | EventSpec
 ```
 
 **ConstructorSpec:**
@@ -159,98 +150,6 @@ MemberSpec
 
 ```
 ConstructorSpec ::= 'constructor' ParameterList Block
-```
-
-**FieldSpec:**
-
-![FieldSpec](diagram/FieldSpec.svg)
-
-```
-FieldSpec ::= IDENTIFIER ( '=' Expression )? ';'
-```
-
-**PropertySpec:**
-
-![PropertySpec](diagram/PropertySpec.svg)
-
-```
-PropertySpec ::= 'property' PropertyName ( ExpandedPropertySpec | AutoPropertySpec )
-```
-
-**PropertyName:**
-
-![PropertyName](diagram/PropertyName.svg)
-
-```
-PropertyName ::= IDENTIFIER | '[]'
-```
-<sub>**Remark**: the property is an indexer when its name is a pair of brackets</sub>
-
-**ExpandedPropertySpec:**
-
-![ExpandedPropertySpec](diagram/ExpandedPropertySpec.svg)
-
-```
-ExpandedPropertySpec
-         ::= '=>' Expression ';'
-           | '{' ( SCOPE? ( 'read' | 'write' ) FunctionBody )+ '}'
-```
-<sub>**Remark**: each accessor can only be defined once</sub>
-
-**FunctionBody:**
-
-![FunctionBody](diagram/FunctionBody.svg)
-
-```
-FunctionBody
-         ::= '=>' Expression ';'
-           | Block
-```
-
-**AutoPropertySpec:**
-
-![AutoPropertySpec](diagram/AutoPropertySpec.svg)
-
-```
-AutoPropertySpec
-         ::= '{' ( SCOPE? ( 'read' | 'write' ) ';' )+ '}'
-           | ';'
-```
-<sub>**Remark**: each accessor can only be declared once</sub>
-
-**MethodSpec:**
-
-![MethodSpec](diagram/MethodSpec.svg)
-
-```
-MethodSpec
-         ::= AbstractMethodSpec
-           | StandardMethodSpec
-           | OperatorSpec
-```
-
-**AbstractMethodSpec:**
-
-![AbstractMethodSpec](diagram/AbstractMethodSpec.svg)
-
-```
-AbstractMethodSpec ::= 'function' IDENTIFIER ParameterList ';'
-```
-
-**StandardMethodSpec:**
-
-![StandardMethodSpec](diagram/StandardMethodSpec.svg)
-
-```
-StandardMethodSpec ::= 'function' IDENTIFIER ParameterList FunctionBody
-```
-
-**OperatorSpec:**
-
-![OperatorSpec](diagram/OperatorSpec.svg)
-
-```
-OperatorSpec ::= 'operator' OverloadableOperator ParameterList FunctionBody
 ```
 
 **ParameterList:**
@@ -277,36 +176,91 @@ Parameter ::= ParameterPrefix IDENTIFIER | IDENTIFIER ( '=' Literal )?
 ParameterPrefix ::= 'ref' | 'params'
 ```
 
+**Literal:**
+
+![Literal](diagram/Literal.svg)
+
+```
+Literal  ::= 'null'
+           | BOOLEAN
+           | INTEGER
+           | BIG_INTEGER
+           | FLOAT
+           | BIG_DECIMAL
+           | DATE
+           | STRING
+```
+
+**FieldSpec:**
+
+![FieldSpec](diagram/FieldSpec.svg)
+
+```
+FieldSpec ::= IDENTIFIER ( '=' Expression )? ';'
+```
+
+**PropertySpec:**
+
+![PropertySpec](diagram/PropertySpec.svg)
+
+```
+PropertySpec ::= 'property' ( IDENTIFIER | '[]' ) ( ( '=>' Expression )? ';' | '{' SCOPE? ( 'read' ( MethodBody SCOPE? 'write' )? | 'write' ( MethodBody SCOPE? 'read' )? ) MethodBody '}' )
+```
+<sub>**Remarks**: if the first accessor defined has an empty body, it should be the same for the other accessor if it's defined. Both accessors cannot have custom a scope. An accessor scope shoulb always be more restrictive than the scope of the property itself</sub>
+
+**MethodBody:**
+
+![MethodBody](diagram/MethodBody.svg)
+
+```
+MethodBody ::= ( '=>' Expression )? ';' | Block
+```
+
+**MethodSpec:**
+
+![MethodSpec](diagram/MethodSpec.svg)
+
+```
+MethodSpec ::= 'function' IDENTIFIER ParameterList MethodBody
+```
+
+**OperatorSpec:**
+
+![OperatorSpec](diagram/OperatorSpec.svg)
+
+```
+OperatorSpec ::= 'operator' OverloadableOperator ParameterList MethodBody
+```
+
 **OverloadableOperator:**
 
 ![OverloadableOperator](diagram/OverloadableOperator.svg)
 
 ```
-OverloadableOperator
-         ::= '+'
-           | '-'
-           | '++'
-           | '--'
-           | '~'
-           | '*'
-           | '/'
-           | '%'
-           | '**'
-           | '&'
-           | '|'
-           | '^'
-           | '<<'
-           | '>>'
-           | '=='
-           | '!='
-           | '<'
-           | '>'
-           | '<='
-           | '>='
-           | 'startswith'
-           | 'endswith'
-           | 'contains'
-           | 'matches'
+OverloadableOperator ::= '+'
+                       | '-'
+                       | '++'
+                       | '--'
+                       | '~'
+                       | '*'
+                       | '/'
+                       | '%'
+                       | '**'
+                       | '&'
+                       | '|'
+                       | '^'
+                       | '<<'
+                       | '>>'
+                       | '=='
+                       | '!='
+                       | '<'
+                       | '>'
+                       | '<='
+                       | '>='
+                       | 'startswith'
+                       | 'endswith'
+                       | 'contains'
+                       | 'matches'
 ```
 
 **EventSpec:**
@@ -325,6 +279,14 @@ EventSpec ::= 'event' ParameterList ';'
 FunctionDecl ::= Attributes? 'function' IDENTIFIER ParameterList FunctionBody
 ```
 
+**FunctionBody:**
+
+![FunctionBody](diagram/FunctionBody.svg)
+
+```
+FunctionBody ::= '=>' Expression ';' | Block
+```
+
 **ExternalFunctionDecl:**
 
 ![ExternalFunctionDecl](diagram/ExternalFunctionDecl.svg)
@@ -338,7 +300,7 @@ ExternalFunctionDecl ::= Attributes? 'extern' 'function' IDENTIFIER ParameterLis
 ![ConstantDecl](diagram/ConstantDecl.svg)
 
 ```
-ConstantDecl ::= 'const' PropertyInitializers ';'
+ConstantDecl ::= 'const' PropertyInitializerList ';'
 ```
 
 **VariableDecl:**
@@ -346,7 +308,7 @@ ConstantDecl ::= 'const' PropertyInitializers ';'
 ![VariableDecl](diagram/VariableDecl.svg)
 
 ```
-VariableDecl ::= 'var' PropertyInitializers ';'
+VariableDecl ::= 'var' PropertyInitializerList ';'
 ```
 
 **Block:**
@@ -354,7 +316,7 @@ VariableDecl ::= 'var' PropertyInitializers ';'
 ![Block](diagram/Block.svg)
 
 ```
-Block ::= '{' StatementSeries '}'
+Block ::= '{' StatementWithLabel* '}'
 ```
 
 **IfElse:**
@@ -370,7 +332,7 @@ IfElse ::= 'if' '(' Expression ')' Statement ( 'else' Statement )?
 ![SwitchBlock](diagram/SwitchBlock.svg)
 
 ```
-SwitchBlock ::= 'switch' '(' Expression ')' '{' ( CaseLabel StatementSeries )+ '}'
+SwitchBlock ::= 'switch' '(' Expression ')' '{' ( CaseLabel ':' StatementWithLabel* )* ( 'default' ':' StatementWithLabel* )? '}'
 ```
 
 **CaseLabel:**
@@ -378,7 +340,7 @@ SwitchBlock ::= 'switch' '(' Expression ')' '{' ( CaseLabel StatementSeries )+ '
 ![CaseLabel](diagram/CaseLabel.svg)
 
 ```
-CaseLabel ::= ( 'case' ( BOOLEAN | INTEGER | STRING ) | 'default' ) ':'
+CaseLabel ::= 'case' ( BOOLEAN | INTEGER | STRING )
 ```
 
 **ForLoop:**
@@ -490,20 +452,19 @@ Assignment ::= TernaryExpression ( AssignmentOperator Assignment )*
 ![AssignmentOperator](diagram/AssignmentOperator.svg)
 
 ```
-AssignmentOperator
-         ::= '='
-           | '+='
-           | '-='
-           | '*='
-           | '/='
-           | '%='
-           | '**='
-           | '&='
-           | '|='
-           | '^='
-           | '<<='
-           | '>>='
-           | '??='
+AssignmentOperator ::= '='
+                     | '+='
+                     | '-='
+                     | '*='
+                     | '/='
+                     | '%='
+                     | '**='
+                     | '&='
+                     | '|='
+                     | '^='
+                     | '<<='
+                     | '>>='
+                     | '??='
 ```
 
 **TernaryExpression:**
@@ -521,20 +482,18 @@ TernaryExpression ::= Condition ( '?' Expression ':' Expression )?
 ```
 Condition ::= Relation ( LogicalOperator Relation )*
 ```
-<sub>**Remark**: associativity to the left</sub>
 
 **LogicalOperator:**
 
 ![LogicalOperator](diagram/LogicalOperator.svg)
 
 ```
-LogicalOperator
-         ::= '&'
-           | '&&'
-           | '|'
-           | '||'
-           | '^'
-           | '??'
+LogicalOperator ::= '&'
+                  | '&&'
+                  | '|'
+                  | '||'
+                  | '^'
+                  | '??'
 ```
 
 **Relation:**
@@ -550,19 +509,18 @@ Relation ::= Term ( RelationalOperator Term | 'is' ( TYPE_NAME | IDENTIFIER ) )?
 ![RelationalOperator](diagram/RelationalOperator.svg)
 
 ```
-RelationalOperator
-         ::= '=='
-           | '!='
-           | '<'
-           | '>'
-           | '<='
-           | '>='
-           | '==='
-           | '!=='
-           | 'startswith'
-           | 'endswith'
-           | 'contains'
-           | 'matches'
+RelationalOperator ::= '=='
+                     | '!='
+                     | '<'
+                     | '>'
+                     | '<='
+                     | '>='
+                     | '==='
+                     | '!=='
+                     | 'startswith'
+                     | 'endswith'
+                     | 'contains'
+                     | 'matches'
 ```
 
 **Term:**
@@ -572,7 +530,6 @@ RelationalOperator
 ```
 Term ::= Factor ( ( '+' | '-' ) Factor )*
 ```
-<sub>**Remark**: associativity to the left</sub>
 
 **Factor:**
 
@@ -581,7 +538,6 @@ Term ::= Factor ( ( '+' | '-' ) Factor )*
 ```
 Factor ::= Exponentiation ( ( '*' | '/' | '%' | '<<' | '>>' ) Exponentiation )*
 ```
-<sub>**Remark**: associativity to the left</sub>
 
 **Exponentiation:**
 
@@ -612,7 +568,7 @@ PrefixUnaryExpression ::= ( '+' | '-' | '~' | '!' | '++' | '--' )* Composite
 ![Composite](diagram/Composite.svg)
 
 ```
-Composite ::= Atom ( '[' ( Expression | Expression? '..' Expression? ) ']' | '.' IDENTIFIER ArgumentList? | ArgumentList | ( 'switch' '{' MatchCases | 'with' '{' PropertyInitializers ) '}' )*
+Composite ::= Atom ( '[' ( Expression | Expression? '..' Expression? ) ']' | '.' IDENTIFIER ArgumentList? | ArgumentList | ( 'switch' '{' MatchCaseList | 'with' '{' PropertyInitializerList ) '}' )*
 ```
 
 **ArgumentList:**
@@ -639,12 +595,12 @@ NamedArgList ::= NamedArg ( ',' NamedArg )*
 NamedArg ::= IDENTIFIER ':' Expression
 ```
 
-**MatchCases:**
+**MatchCaseList:**
 
-![MatchCases](diagram/MatchCases.svg)
+![MatchCaseList](diagram/MatchCaseList.svg)
 
 ```
-MatchCases ::= MatchCase ( ',' MatchCase )*
+MatchCaseList ::= MatchCase ( ',' MatchCase )*
 ```
 
 **MatchCase:**
@@ -660,14 +616,14 @@ MatchCase ::= Pattern '=>' MatchCaseExpression
 ![Pattern](diagram/Pattern.svg)
 
 ```
-Pattern  ::= '_'
-           | 'null'
-           | TYPE_NAME ObjectPattern?
-           | ObjectPattern
-           | ValuePattern
-           | RangePattern
-           | PredicatePattern
-           | CompositePattern
+Pattern ::= '_'
+          | 'null'
+          | TYPE_NAME ObjectPattern?
+          | ObjectPattern
+          | ValuePattern
+          | RangePattern
+          | PredicatePattern
+          | CompositePattern
 ```
 
 **ObjectPattern:**
@@ -691,9 +647,7 @@ ValuePattern ::= ( '+' | '-' )? ( BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_
 ![RangePattern](diagram/RangePattern.svg)
 
 ```
-RangePattern
-         ::= ValuePattern '..' ValuePattern?
-           | '..' ValuePattern
+RangePattern ::= ValuePattern '..' ValuePattern? | '..' ValuePattern
 ```
 
 **PredicatePattern:**
@@ -725,33 +679,18 @@ MatchCaseExpression ::= Block | 'throw'? Expression
 ![Atom](diagram/Atom.svg)
 
 ```
-Atom     ::= Literal
-           | 'this'
-           | AtomStartingWithSuper
-           | AtomStartingWithTypeOf
-           | AtomStartingWithTypeName
-           | AtomStartingWithId
-           | AtomStartingWithNew
-           | AtomStartingWithLParen
-           | AtomStartingWithLBrace
-           | ListInitializer
-           | Lambda
-           | InlineFunction
-```
-
-**Literal:**
-
-![Literal](diagram/Literal.svg)
-
-```
-Literal  ::= 'null'
-           | BOOLEAN
-           | INTEGER
-           | BIG_INTEGER
-           | FLOAT
-           | BIG_DECIMAL
-           | DATE
-           | STRING
+Atom ::= Literal
+       | 'this'
+       | AtomStartingWithSuper
+       | AtomStartingWithTypeOf
+       | AtomStartingWithTypeName
+       | AtomStartingWithId
+       | AtomStartingWithNew
+       | AtomStartingWithLParen
+       | AtomStartingWithLBrace
+       | ListInitializer
+       | Lambda
+       | InlineFunction
 ```
 
 **AtomStartingWithSuper:**
@@ -799,7 +738,7 @@ AtomStartingWithNew ::= ObjectInitializer | ConstructorCall
 ![ObjectInitializer](diagram/ObjectInitializer.svg)
 
 ```
-ObjectInitializer ::= 'new' '{' PropertyInitializers? '}'
+ObjectInitializer ::= 'new' '{' PropertyInitializerList? '}'
 ```
 
 **ConstructorCall:**
@@ -807,7 +746,7 @@ ObjectInitializer ::= 'new' '{' PropertyInitializers? '}'
 ![ConstructorCall](diagram/ConstructorCall.svg)
 
 ```
-ConstructorCall ::= 'new' QualifiedName ArgumentList? ( '{' PropertyInitializers? '}' )?
+ConstructorCall ::= 'new' QualifiedName ArgumentList? ( '{' PropertyInitializerList? '}' )?
 ```
 
 **AtomStartingWithLParen:**
@@ -815,10 +754,7 @@ ConstructorCall ::= 'new' QualifiedName ArgumentList? ( '{' PropertyInitializers
 ![AtomStartingWithLParen](diagram/AtomStartingWithLParen.svg)
 
 ```
-AtomStartingWithLParen
-         ::= Conversion
-           | ComplexInitializer
-           | ParenthesizedExpression
+AtomStartingWithLParen ::= Conversion | ComplexInitializer | ParenthesizedExpression
 ```
 
 **Conversion:**
@@ -866,15 +802,15 @@ SetInitializer ::= '{' ExpressionList? '}'
 ![MapInitializer](diagram/MapInitializer.svg)
 
 ```
-MapInitializer ::= '{' ( MapItemInitializers | '=>' ) '}'
+MapInitializer ::= '{' ( MapItemInitializerList | '=>' ) '}'
 ```
 
-**MapItemInitializers:**
+**MapItemInitializerList:**
 
-![MapItemInitializers](diagram/MapItemInitializers.svg)
+![MapItemInitializerList](diagram/MapItemInitializerList.svg)
 
 ```
-MapItemInitializers ::= MapItemInitializer ( ',' MapItemInitializer )*
+MapItemInitializerList ::= MapItemInitializer ( ',' MapItemInitializer )*
 ```
 
 **MapItemInitializer:**
@@ -898,7 +834,7 @@ ListInitializer ::= '[' ExpressionList? ']'
 ![Lambda](diagram/Lambda.svg)
 
 ```
-Lambda ::= '|' ( Parameter ( ',' Parameter )* )? '|' '=>' FunctionBody
+Lambda ::= '|' ( Parameter ( ',' Parameter )* )? '|' '=>' ( Expression ';' | Block )
 ```
 
 **InlineFunction:**
@@ -909,14 +845,14 @@ Lambda ::= '|' ( Parameter ( ',' Parameter )* )? '|' '=>' FunctionBody
 InlineFunction ::= 'function' ParameterList Block
 ```
 
-## Terminal symbols
+### Terminal symbols
 
 **LETTER:**
 
 ![LETTER](diagram/LETTER.svg)
 
 ```
-LETTER   ::= 'A' - 'Z' | 'a' - 'z'
+LETTER ::= 'A' - 'Z' | 'a' - 'z'
 ```
 
 **LETTER_EXTENDED:**
@@ -924,12 +860,11 @@ LETTER   ::= 'A' - 'Z' | 'a' - 'z'
 ![LETTER_EXTENDED](diagram/LETTER_EXTENDED.svg)
 
 ```
-LETTER_EXTENDED
-         ::= LETTER
-           | '_'
-           | '\xc0' - '\xd6'
-           | '\xd8' - '\xf6'
-           | '\xf8' - '\xff'
+LETTER_EXTENDED ::= LETTER
+                  | '_'
+                  | '\xc0' - '\xd6'
+                  | '\xd8' - '\xf6'
+                  | '\xf8' - '\xff'
 ```
 
 **DIGIT:**
@@ -945,7 +880,9 @@ DIGIT ::= '0' - '9'
 ![HEXDIGIT](diagram/HEXDIGIT.svg)
 
 ```
-HEXDIGIT ::= DIGIT | 'A' - 'F' | 'a' - 'f'
+HEXDIGIT ::= DIGIT
+           | 'A' - 'F'
+           | 'a' - 'f'
 ```
 
 **IDENTIFIER:**
@@ -977,15 +914,14 @@ SPECIAL_IDENTIFIER ::= '$' ( LETTER_EXTENDED | DIGIT | ESCAPE_SEQ )+
 ![ESCAPE_SEQ](diagram/ESCAPE_SEQ.svg)
 
 ```
-ESCAPE_SEQ
-         ::= '\a'
-           | '\b'
-           | '\f'
-           | '\n'
-           | '\r'
-           | '\t'
-           | '\v'
-           | ( '\x' | '\u' HEXDIGIT HEXDIGIT ) HEXDIGIT HEXDIGIT
+ESCAPE_SEQ ::= '\a'
+             | '\b'
+             | '\f'
+             | '\n'
+             | '\r'
+             | '\t'
+             | '\v'
+             | ( '\x' | '\u' HEXDIGIT HEXDIGIT ) HEXDIGIT HEXDIGIT
 ```
 
 **BOOLEAN:**
@@ -993,7 +929,7 @@ ESCAPE_SEQ
 ![BOOLEAN](diagram/BOOLEAN.svg)
 
 ```
-BOOLEAN  ::= 'true' | 'false'
+BOOLEAN ::= 'true' | 'false'
 ```
 
 **INTEGER:**
@@ -1001,7 +937,7 @@ BOOLEAN  ::= 'true' | 'false'
 ![INTEGER](diagram/INTEGER.svg)
 
 ```
-INTEGER  ::= DECIMAL_INTEGER | HEX_INTEGER
+INTEGER ::= DECIMAL_INTEGER | HEX_INTEGER
 ```
 
 **DECIMAL_INTEGER:**
@@ -1017,7 +953,7 @@ DECIMAL_INTEGER ::= ( DIGIT ( '_' DIGIT )* )+
 ![HEX_INTEGER](diagram/HEX_INTEGER.svg)
 
 ```
-HEX_INTEGER ::= ( '0x' | '0X' ) HEXDIGIT+
+HEX_INTEGER ::= '0' [Xx] HEXDIGIT+
 ```
 
 **BIG_INTEGER:**
@@ -1025,7 +961,15 @@ HEX_INTEGER ::= ( '0x' | '0X' ) HEXDIGIT+
 ![BIG_INTEGER](diagram/BIG_INTEGER.svg)
 
 ```
-BIG_INTEGER ::= INTEGER ( 'l' | 'L' )
+BIG_INTEGER ::= INTEGER [Ll]
+```
+
+**REAL:**
+
+![REAL](diagram/REAL.svg)
+
+```
+REAL ::= ( DECIMAL_INTEGER? '.' )? DECIMAL_INTEGER ( ( 'e' | 'E' ) ( '+' | '-' )? DECIMAL_INTEGER )?
 ```
 
 **FLOAT:**
@@ -1033,7 +977,7 @@ BIG_INTEGER ::= INTEGER ( 'l' | 'L' )
 ![FLOAT](diagram/FLOAT.svg)
 
 ```
-FLOAT ::= DECIMAL_INTEGER ( '.' DECIMAL_INTEGER )? ( ( 'e' | 'E' ) ( '+' | '-' )? DECIMAL_INTEGER )? ( 'f' | 'F' )?
+FLOAT ::= REAL [Ff]?
 ```
 
 **BIG_DECIMAL:**
@@ -1041,7 +985,7 @@ FLOAT ::= DECIMAL_INTEGER ( '.' DECIMAL_INTEGER )? ( ( 'e' | 'E' ) ( '+' | '-' )
 ![BIG_DECIMAL](diagram/BIG_DECIMAL.svg)
 
 ```
-BIG_DECIMAL ::= DECIMAL_INTEGER ( '.' DECIMAL_INTEGER )? ( ( 'e' | 'E' ) ( '+' | '-' )? DECIMAL_INTEGER )? ( 'd' | 'D' )
+BIG_DECIMAL ::= REAL [Dd]
 ```
 
 **DATE:**
@@ -1081,25 +1025,24 @@ DOUBLE_QUOTED ::= '"' ( [^"] | ESCAPE_SEQ )* '"'
 ![TYPE_NAME](diagram/TYPE_NAME.svg)
 
 ```
-TYPE_NAME
-         ::= 'void'
-           | 'bool'
-           | 'int'
-           | 'long'
-           | 'rational'
-           | 'float'
-           | 'decimal'
-           | 'complex'
-           | 'date'
-           | 'string'
-           | 'list'
-           | 'map'
-           | 'set'
-           | 'queue'
-           | 'stack'
-           | 'object'
-           | 'resource'
-           | 'closure'
+TYPE_NAME ::= 'void'
+            | 'bool'
+            | 'int'
+            | 'long'
+            | 'rational'
+            | 'float'
+            | 'decimal'
+            | 'complex'
+            | 'date'
+            | 'string'
+            | 'list'
+            | 'map'
+            | 'set'
+            | 'queue'
+            | 'stack'
+            | 'object'
+            | 'resource'
+            | 'closure'
 ```
 
 **MODIFIER:**
@@ -1112,14 +1055,14 @@ MODIFIER ::= 'final'
            | 'abstract'
 ```
 
-**SCOPE:**
+**SCOPE**
 
 ![SCOPE](diagram/SCOPE.svg)
 
 ```
-SCOPE    ::= 'private'
-           | 'protected'
-           | 'public'
+SCOPE ::= 'private'
+        | 'protected'
+        | 'public'
 ```
 
 [Home](README.md) | [Previous](exceptions.md) | [Next](extapi.md)

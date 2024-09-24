@@ -124,7 +124,7 @@ namespace AddyScript.Runtime.DataItems
         {
             return _operator switch
             {
-                BinaryOperator.Plus => new String(value + operand),
+                BinaryOperator.Plus => new String(value + RuntimeServices.ToString(operand)),
                 BinaryOperator.Times => new String(StringUtil.Repeat(value, operand.AsInt32)),
                 BinaryOperator.LessThan => Boolean.FromBool(string.Compare(value, operand.ToString()) < 0),
                 BinaryOperator.LessThanOrEqual => Boolean.FromBool(string.Compare(value, operand.ToString()) <= 0),
