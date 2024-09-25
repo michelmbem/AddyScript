@@ -195,4 +195,7 @@
   <data name="XmlFileFilter" xml:space="preserve">
     <value>Xml file (*.xml)|*.xml|All files (*.*)|*.*</value>
   </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>The {0} type does not have support for slice extraction</value>
+  </data>
 </root>

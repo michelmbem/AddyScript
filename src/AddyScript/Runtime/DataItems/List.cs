@@ -61,7 +61,9 @@ namespace AddyScript.Runtime.DataItems
 
             foreach (DataItem item in list)
             {
-                sb.Append(item).Append(", ");
+                sb.Append(item.ToString(format, formatProvider))
+                  .Append(", ");
+
                 trimEnd = true;
             }
 

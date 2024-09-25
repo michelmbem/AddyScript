@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 
@@ -8,6 +9,7 @@ using AddyScript.Properties;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.Utilities;
 using AddyScript.Runtime.OOP;
+
 
 namespace AddyScript.Runtime.DataItems
 {
@@ -19,27 +21,55 @@ namespace AddyScript.Runtime.DataItems
         {
             get
             {
-                if (string.Compare(value, Resources.FALSE, true) == 0)
+                if (string.Compare(value, "false", true) == 0 ||
+                    string.Compare(value, Resources.FALSE, true) == 0)
                     return false;
-                if (string.Compare(value, Resources.TRUE, true) == 0)
+
+                if (string.Compare(value, "true", true) == 0 ||
+                    string.Compare(value, Resources.TRUE, true) == 0)
                     return true;
+
                 return bool.Parse(value);
             }
         }
 
         public override int AsInt32
         {
-            get { return int.Parse(value); }
+            get
+            {
+
+                if (!(int.TryParse(value, CultureInfo.InvariantCulture, out int result) ||
+                    int.TryParse(value, CultureInfo.CurrentUICulture, out result)))
+                    throw new FormatException();
+
+                return result;
+            }
         }
 
         public override BigInteger AsBigInteger
         {
-            get { return BigInteger.Parse(value); }
+            get
+            {
+
+                if (!(BigInteger.TryParse(value, CultureInfo.InvariantCulture, out BigInteger result) ||
+                    BigInteger.TryParse(value, CultureInfo.CurrentUICulture, out result)))
+                    throw new FormatException();
+
+                return result;
+            }
         }
 
         public override double AsDouble
         {
-            get { return double.Parse(value); }
+            get
+            {
+
+                if (!(double.TryParse(value, CultureInfo.InvariantCulture, out double result) ||
+                    double.TryParse(value, CultureInfo.CurrentUICulture, out result)))
+                    throw new FormatException();
+
+                return result;
+            }
         }
 
         public override BigDecimal AsBigDecimal
@@ -49,7 +79,15 @@ namespace AddyScript.Runtime.DataItems
 
         public override DateTime AsDateTime
         {
-            get { return DateTime.Parse(value); }
+            get
+            {
+
+                if (!(DateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result) ||
+                    DateTime.TryParse(value, CultureInfo.CurrentUICulture, out result)))
+                    throw new FormatException();
+
+                return result;
+            }
         }
 
         public override object AsNativeObject

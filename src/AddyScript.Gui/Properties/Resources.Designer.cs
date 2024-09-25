@@ -277,6 +277,15 @@ namespace AddyScript.Gui.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The {0} type does not have support for slice extraction.
+        /// </summary>
+        internal static string SlicingNotSupported {
+            get {
+                return ResourceManager.GetString("SlicingNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à {0} characters.
         /// </summary>
         internal static string TextLength {

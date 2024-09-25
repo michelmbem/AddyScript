@@ -520,4 +520,7 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="InvalidOperandForWith" xml:space="preserve">
     <value>L'operande de gauche de 'with' doit être un objet</value>
   </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>Le type {0} ne prends pas en charge l'extraction de tranches</value>
+  </data>
 </root>

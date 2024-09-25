@@ -55,7 +55,7 @@ namespace AddyScript.Runtime.DataItems
             {
                 ClassField field = klass.GetField(pair.Key);
                 if (!(field == null || field.Scope == Scope.Public)) continue;
-                sb.AppendFormat("{0} = {1}, ", pair.Key, pair.Value);
+                sb.AppendFormat("{0} = {1}, ", pair.Key, pair.Value.ToString(format, formatProvider));
                 trimEnd = true;
             }
 

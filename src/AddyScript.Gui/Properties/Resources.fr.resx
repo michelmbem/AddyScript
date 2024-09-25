@@ -186,4 +186,7 @@
   <data name="XmlFileFilter" xml:space="preserve">
     <value>Fichier Xml (*.xml)|*.xml|Tous les fichiers (*.*)|*.*</value>
   </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>Le type {0} ne prend pas en charge l'extration de tranches</value>
+  </data>
 </root>

@@ -520,4 +520,7 @@ It requires some initialization to support the expected operation.</value>
   <data name="InvalidOperandForWith" xml:space="preserve">
     <value>The left operand of 'with' should be an object</value>
   </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>The {0} type does not have support for slice extraction</value>
+  </data>
 </root>

@@ -126,7 +126,4 @@
   <data name="Function2Required" xml:space="preserve">
     <value>Type the second function's code here</value>
   </data>
-  <data name="SlicingNotSupported" xml:space="preserve">
-    <value>The {0} doesn't have support for slices</value>
-  </data>
 </root>

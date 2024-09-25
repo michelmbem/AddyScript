@@ -69,7 +69,11 @@ namespace AddyScript.Runtime.DataItems
 
                 foreach (var pair in dict)
                 {
-                    sb.Append(pair.Key).Append(" => ").Append(pair.Value).Append(", ");
+                    sb.Append(pair.Key.ToString(format, formatProvider))
+                      .Append(" => ")
+                      .Append(pair.Value.ToString(format, formatProvider))
+                      .Append(", ");
+
                     trimEnd = true;
                 }
 

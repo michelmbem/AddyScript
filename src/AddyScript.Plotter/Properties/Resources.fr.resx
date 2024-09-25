@@ -126,7 +126,4 @@
   <data name="Function2Required" xml:space="preserve">
     <value>Saisir le code de la seconde fonction ici</value>
   </data>
-  <data name="SlicingNotSupported" xml:space="preserve">
-    <value>Le type {0} ne supporte pas l'extraction de tranches</value>
-  </data>
 </root>
