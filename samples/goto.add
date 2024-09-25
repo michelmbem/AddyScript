@@ -1,21 +1,26 @@
-for(;;)
+for (; ; )
 {
-	switch (readln("what's my name? "))
+	switch (readln('what\'s my name? '))
 	{
-		case "michel":
-			println("you're right!");
+		case 'michel':
+			println('you\'re right!');
 			readln();
 			return;
 			one:
-			println("you're wrong!");
+			println('you\'re wrong!');
 			break;
-		case "mike":
-			println("sometimes people call me like that");
+		case 'mike':
+			println('sometimes people call me like that');
 			goto two;
+		case 'jordan':
+			println('that\'s one of my sons');
+			goto default;
+		case 'daniel':
+			println('nope, nope, nope');
+			goto case 'jordan';
 		default:
 			goto one;
-	}
-}
+	}}
 two:
-println("so you're right!");
+println('so you\'re right!');
 readln();

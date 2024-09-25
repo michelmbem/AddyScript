@@ -34,10 +34,10 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Ast.Program"/></returns>
         public Program Program()
         {
-            Statement[] statements = Asterisk(Statement);
-            var labels = CurrentFunction.CurrentBlock.ConvertLabels(statements);
+            Statement[] statements = Asterisk(StatementWithLabels);
             Match(TokenID.EndOfFile);
 
+            var labels = CurrentFunction.CurrentBlock.ConvertLabels(statements);
             var program = new Program(FileName, statements) {Labels = labels};
             if (statements.Length > 0)
                 program.SetLocation(statements[0].Start, statements[^1].End);
@@ -46,95 +46,87 @@ namespace AddyScript.Parsers
         }
 
         /// <summary>
+        /// Recognizes a statement eventually prededed by labels.
+        /// </summary>
+        /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
+        protected Statement StatementWithLabels()
+        {
+            while (TryMatch(TokenID.Identifier) && LookAhead(TokenID.Colon, out int k))
+            {
+                var label = new ParseTimeLabel(token.ToString(), token.Start, Ll(k).End);
+                CurrentFunction.CurrentBlock.Labels.Add(label);
+                Consume(k);
+            }
+
+            return Statement();
+        }
+
+        /// <summary>
         /// Recognizes a statement.
         /// </summary>
         /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
         protected Statement Statement()
         {
-            while (true)
-            {
-                SkipComments();
+            // Skip empty statements
+            while (TryMatch(TokenID.SemiColon))
+                Consume(1);
 
-                switch (token.TokenID)
-                {
-                    case TokenID.KW_Import:
-                        return Import();
-                    case TokenID.Modifier:
-                    case TokenID.KW_Class:
-                        return Class();
-                    case TokenID.KW_Function:
-                        return Function();
-                    case TokenID.KW_Extern:
-                        return ExternalFunction();
-                    case TokenID.LeftBracket:
-                        return StatementWithAttributes();
-                    case TokenID.KW_Const:
-                        return ConstantDecl();
-                    case TokenID.KW_Var:
-                        return VariableDecl();
-                    case TokenID.LeftBrace:
-                        return Block();
-                    case TokenID.KW_If:
-                        return IfElse();
-                    case TokenID.KW_Switch:
-                        return SwitchBlock();
-                    case TokenID.KW_For:
-                        return ForLoop();
-                    case TokenID.KW_ForEach:
-                        return ForEachLoop();
-                    case TokenID.KW_While:
-                        return WhileLoop();
-                    case TokenID.KW_Do:
-                        return DoLoop();
-                    case TokenID.KW_Continue:
-                        return Continue();
-                    case TokenID.KW_Break:
-                        return Break();
-                    case TokenID.KW_Goto:
-                        return Goto();
-                    case TokenID.KW_Return:
-                        return Return();
-                    case TokenID.KW_Throw:
-                        return Throw();
-                    case TokenID.KW_Try:
-                        return TryCatchFinally();
-                    case TokenID.Identifier:
-                        if (GotLabel()) break;
-                        goto case TokenID.LT_Null;
-                    case TokenID.LT_Null:
-                    case TokenID.LT_Boolean:
-                    case TokenID.LT_Integer:
-                    case TokenID.LT_Long:
-                    case TokenID.LT_Float:
-                    case TokenID.LT_Decimal:
-                    case TokenID.LT_Date:
-                    case TokenID.LT_String:
-                    case TokenID.Plus:
-                    case TokenID.DoublePlus:
-                    case TokenID.Minus:
-                    case TokenID.DoubleMinus:
-                    case TokenID.Exclamation:
-                    case TokenID.Tilda:
-                    case TokenID.LeftParenthesis:
-                    case TokenID.VerticalBar:
-                    case TokenID.KW_New:
-                    case TokenID.KW_This:
-                    case TokenID.KW_Super:
-                    case TokenID.KW_TypeOf:
-                    case TokenID.TypeName:
-                    case TokenID.MutableString:
+
+            switch (token.TokenID)
+            {
+                case TokenID.LeftBracket:
+                    return StatementWithAttributes();
+                case TokenID.KW_Import:
+                    return Import();
+                case TokenID.Modifier:
+                case TokenID.KW_Class:
+                    return Class();
+                case TokenID.KW_Function:
+                    return Function();
+                case TokenID.KW_Extern:
+                    return ExternalFunction();
+                case TokenID.KW_Const:
+                    return ConstantDecl();
+                case TokenID.KW_Var:
+                    return VariableDecl();
+                case TokenID.LeftBrace:
+                    return Block();
+                case TokenID.KW_If:
+                    return IfElse();
+                case TokenID.KW_Switch:
+                    return SwitchBlock();
+                case TokenID.KW_For:
+                    return ForLoop();
+                case TokenID.KW_ForEach:
+                    return ForEachLoop();
+                case TokenID.KW_While:
+                    return WhileLoop();
+                case TokenID.KW_Do:
+                    return DoLoop();
+                case TokenID.KW_Continue:
+                    return Continue();
+                case TokenID.KW_Break:
+                    return Break();
+                case TokenID.KW_Goto:
+                    return Goto();
+                case TokenID.KW_Return:
+                    return Return();
+                case TokenID.KW_Throw:
+                    return Throw();
+                case TokenID.KW_Try:
+                    return TryCatchFinally();
+                default:
+                    {
                         Expression expr = Expression();
-                        Token last = Match(TokenID.SemiColon);
-                        expr.SetLocation(expr.Start, last.End);
+                        
+                        if (expr != null)
+                        {
+                            Token last = Match(TokenID.SemiColon);
+                            expr.SetLocation(expr.Start, last.End);
+                        }
+
                         return expr;
-                    case TokenID.SemiColon:
-                        var empty = new Statement();
-                        empty.CopyLocation(token);
-                        Consume(1);
-                        return empty;
-                    default:
-                        return null;
-                }
+                    }
             }
         }
 
@@ -144,7 +136,7 @@ namespace AddyScript.Parsers
         /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
         public Statement RequiredStatement()
         {
-            return Required(Statement, string.Format(Resources.UnexpectedToken, token));
+            return Required(StatementWithLabels, string.Format(Resources.UnexpectedToken, token));
         }
 
         /// <summary>
@@ -212,7 +204,7 @@ namespace AddyScript.Parsers
             }
 
             Token maybeFirst = Match(TokenID.KW_Class);
-            first = first ?? maybeFirst;
+            first ??= maybeFirst;
             string className = Match(TokenID.Identifier).ToString();
 
             string superClassName = null;
@@ -304,8 +296,8 @@ namespace AddyScript.Parsers
                 }
             }
 
-            Token last = Match(TokenID.RightBrace);
             PopClass();
+            Token last = Match(TokenID.RightBrace);
 
             var classDef = new ClassDefinition(className, superClassName, classModifier, constructor, indexer,
                                                [.. classFields], [.. classProperties], [.. classMethods], [.. classEvents]);
@@ -487,7 +479,7 @@ namespace AddyScript.Parsers
             Token first = Match(TokenID.LeftBrace);
             
             CurrentFunction.PushBlock();
-            Statement[] stmts = Asterisk(Statement);
+            Statement[] stmts = Asterisk(StatementWithLabels);
             var labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
             CurrentFunction.PopBlock();
 
@@ -529,7 +521,7 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Ast.Statements.SwitchBlock"/></returns>
         protected SwitchBlock SwitchBlock()
         {
-            Token first = Match(TokenID.KW_Switch), last = first;
+            Token first = Match(TokenID.KW_Switch);
             Match(TokenID.LeftParenthesis);
             var expr = RequiredExpression();
             Match(TokenID.RightParenthesis);
@@ -537,63 +529,48 @@ namespace AddyScript.Parsers
 
             var cases = new List<CaseLabel>();
             var stmtList = new List<Statement>();
-            Statement[] stmts = null;
-            Dictionary<string, Label> labels = null;
-            int address = 0;
-            int defCase = int.MaxValue;
-            bool loop = true;
+            int address = 0, defCase = int.MaxValue;
+            Dictionary<string, Label> labels;
+            Statement[] stmts;
 
             CurrentFunction.PushBlock();
             ++CurrentFunction.SwitchBlocks;
 
-            do
+            while (TryMatch(TokenID.KW_Case))
             {
-                SkipComments();
+                CaseLabel caseLabel = CaseLabel(address);
 
-                switch (token.TokenID)
-                {
-                    case TokenID.KW_Case:
-                        {
-                            if (defCase < int.MaxValue)
-                                throw new ParseException(FileName, token, Resources.NoCaseAfterDefault);
+                if (cases.Contains(caseLabel))
+                    throw new ScriptException(FileName, caseLabel, Resources.DuplicatedCaseLabel);
 
-                            CaseLabel caseLabel = CaseLabel(address);
-                            if (cases.Contains(caseLabel))
-                                throw new ScriptException(FileName, caseLabel, Resources.DuplicatedCaseLabel);
+                cases.Add(caseLabel);
+                stmtList.AddRange(stmts = Asterisk(StatementWithLabels));
+                address += stmts.Length;
+            }
 
-                            cases.Add(caseLabel);
-                        }
-                        break;
-                    case TokenID.KW_Default:
-                        if (defCase < int.MaxValue)
-                            throw new ParseException(FileName, token, Resources.DuplicatedCaseLabel);
+            if (TryMatch(TokenID.KW_Default))
+            {
+                Consume(1);
+                Match(TokenID.Colon);
+                defCase = address;
+                stmtList.AddRange(Asterisk(StatementWithLabels));
+            }
 
-                        Consume(1);
-                        Match(TokenID.Colon);
-                        defCase = address;
-                        break;
-                    case TokenID.RightBrace:
-                        last = token;
-                        Consume(1);
-                        stmts = stmtList.ToArray();
-                        labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
-                        CurrentFunction.PopBlock();
-                        loop = false;
-                        break;
-                    case TokenID.Identifier:
-                        if (GotLabel()) break;
-                        goto default;
-                    default:
-                        stmtList.Add(Required(Statement, Resources.StatementRequired));
-                        ++address;
-                        break;
-                }
-            } while (loop);
+            Token last = Match(TokenID.RightBrace);
+            stmts = [.. stmtList];
+            labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
 
             --CurrentFunction.SwitchBlocks;
+            CurrentFunction.PopBlock();
 
             if (cases.Count == 0 && defCase == int.MaxValue)
                 throw new ParseException(FileName, first, Resources.CaseLabelRequired);
+            
+            foreach (CaseLabel caseLabel in cases)
+                labels.Add(caseLabel.GetLabelName(), caseLabel);
+
+            if (defCase < int.MaxValue)
+                labels.Add(Ast.Statements.CaseLabel.GetDefaultLabelName(), new Label(defCase));
 
             var switchBlock = new SwitchBlock(expr, [.. cases], defCase, stmts) { Labels = labels };
             switchBlock.SetLocation(first.Start, last.End);
@@ -745,12 +722,36 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Ast.Statements.Goto"/></returns>
         protected Goto Goto()
         {
+            string labelName;
+            bool jumpToCaseLabel = false;
+
             Token first = Match(TokenID.KW_Goto);
-            string labelName = Match(TokenID.Identifier).ToString();
+
+            if (TryMatch(TokenID.Identifier))
+                labelName = Match(TokenID.Identifier).ToString();
+            else if (TryMatch(TokenID.KW_Case))
+            {
+                Consume(1);
+                Token valueToken = MatchAny(TokenID.LT_Boolean, TokenID.LT_Integer, TokenID.LT_String);
+                DataItem value = DataItemFactory.CreateDataItem(valueToken.Value);
+                labelName = Ast.Statements.CaseLabel.GetLabelName(value);
+                jumpToCaseLabel= true;
+            }
+            else
+            {
+                Match(TokenID.KW_Default);
+                labelName = Ast.Statements.CaseLabel.GetDefaultLabelName();
+                jumpToCaseLabel = true;
+            }
+
             Token last = Match(TokenID.SemiColon);
 
             var _goto = new Goto(labelName);
             _goto.SetLocation(first.Start, last.End);
+
+            if (jumpToCaseLabel && CurrentFunction.SwitchBlocks <= 0)
+                throw new ScriptException(FileName, _goto, Resources.JumpToCaseLabelOutOfSwitchBlock);
+
             return _goto;
         }
 
@@ -1514,49 +1515,22 @@ namespace AddyScript.Parsers
         protected CaseLabel CaseLabel(int address)
         {
             Token first = Match(TokenID.KW_Case);
-            DataItem value;
-
             SkipComments();
 
-            switch (token.TokenID)
+            DataItem value = token.TokenID switch
             {
-                case TokenID.LT_Boolean:
-                    value = Boolean.FromBool((bool)token.Value);
-                    break;
-                case TokenID.LT_Integer:
-                    value = new Integer((int)token.Value);
-                    break;
-                case TokenID.LT_String:
-                    value = new String((string)token.Value);
-                    break;
-                default:
-                    throw new ParseException(FileName, token, Resources.OnlyBoolIntOrString);
-            }
+                TokenID.LT_Boolean => Boolean.FromBool((bool)token.Value),
+                TokenID.LT_Integer => new Integer((int)token.Value),
+                TokenID.LT_String => new String((string)token.Value),
+                _ => throw new ParseException(FileName, token, Resources.OnlyBoolIntOrString),
+            };
 
             Consume(1);
             Token last = Match(TokenID.Colon);
 
-            var caze = new CaseLabel(address, value);
-            caze.SetLocation(first.Start, last.End);
-            return caze;
-        }
-
-        /// <summary>
-        /// Recognize a label.
-        /// </summary>
-        /// <returns><b>true</b> if a label is encountered; <b>false</b> otherwise</returns>
-        protected bool GotLabel()
-        {
-            if (LookAhead(TokenID.Colon, out int k))
-            {
-                var label = new ParseTimeLabel(token.ToString(), token.Start, Ll(k).End);
-                CurrentFunction.CurrentBlock.Labels.Add(label);
-                Consume(k);
-
-                return true;
-            }
-
-            return false;
+            var caseLabel = new CaseLabel(address, value);
+            caseLabel.SetLocation(first.Start, last.End);
+            return caseLabel;
         }
 
         /// <summary>

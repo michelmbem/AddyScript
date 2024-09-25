@@ -282,8 +282,8 @@
   <data name="NameConflict" xml:space="preserve">
     <value>The name {0} is already in use</value>
   </data>
-  <data name="NoCaseAfterDefault" xml:space="preserve">
-    <value>No case label is allowed after the default</value>
+  <data name="JumpToCaseLabelOutOfSwitchBlock" xml:space="preserve">
+    <value>The script is trying to jump to a case label out of a switch block</value>
   </data>
   <data name="NoMatchingIndexer" xml:space="preserve">
     <value>No matching indexer found in {0}</value>

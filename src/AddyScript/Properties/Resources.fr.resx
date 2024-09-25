@@ -282,8 +282,8 @@
   <data name="NameConflict" xml:space="preserve">
     <value>Le nom {0} sert déjà à identifier un autre objet</value>
   </data>
-  <data name="NoCaseAfterDefault" xml:space="preserve">
-    <value>Aucune étiquette 'case' ne peut apparaître après l'étiquette 'default'</value>
+  <data name="JumpToCaseLabelOutOfSwitchBlock" xml:space="preserve">
+    <value>Le script essaie de faire un saut vers une étiquette de cas en dehors d'un bloc switch</value>
   </data>
   <data name="NoMatchingIndexer" xml:space="preserve">
     <value>Impossible de trouver l'indexeur correspondant dans {0}</value>

@@ -9,17 +9,17 @@ The following railroad diagrams summarize the syntax of the AddyScript language.
 ![Program](diagram/Program.svg)
 
 ```
-Program  ::= StatementWithLabel*
+Program  ::= StatementWithLabels*
 ```
 
 ### Non-terminal symbols
 
-**StatementWithLabel:**
+**StatementWithLabels:**
 
-![StatementWithLabel](diagram/StatementWithLabel.svg)
+![StatementWithLabels](diagram/StatementWithLabels.svg)
 
 ```
-StatementWithLabel ::= Label* Statement
+StatementWithLabels ::= Label* Statement
 ```
 
 **Label:**
@@ -316,7 +316,7 @@ VariableDecl ::= 'var' PropertyInitializerList ';'
 ![Block](diagram/Block.svg)
 
 ```
-Block ::= '{' StatementWithLabel* '}'
+Block ::= '{' StatementWithLabels* '}'
 ```
 
 **IfElse:**
@@ -332,7 +332,7 @@ IfElse ::= 'if' '(' Expression ')' Statement ( 'else' Statement )?
 ![SwitchBlock](diagram/SwitchBlock.svg)
 
 ```
-SwitchBlock ::= 'switch' '(' Expression ')' '{' ( CaseLabel ':' StatementWithLabel* )* ( 'default' ':' StatementWithLabel* )? '}'
+SwitchBlock ::= 'switch' '(' Expression ')' '{' ( CaseLabel ':' StatementWithLabels* )* ( 'default' ':' StatementWithLabels* )? '}'
 ```
 
 **CaseLabel:**
@@ -404,7 +404,7 @@ Break ::= 'break' ';'
 ![Goto](diagram/Goto.svg)
 
 ```
-Goto ::= 'goto' IDENTIFIER ';'
+Goto ::= 'goto' ( IDENTIFIER | 'case' ( BOOLEAN | INTEGER | STRING ) | 'default' ) ';'
 ```
 
 **Return:**
@@ -618,12 +618,23 @@ MatchCase ::= Pattern '=>' MatchCaseExpression
 ```
 Pattern ::= '_'
           | 'null'
+          | ValuePattern ( '..' ValuePattern? )?
+          | '..' ValuePattern
           | TYPE_NAME ObjectPattern?
           | ObjectPattern
-          | ValuePattern
-          | RangePattern
-          | PredicatePattern
+          | IDENTIFIER ':' Expression
           | CompositePattern
+```
+
+**ValuePattern:**
+
+![ValuePattern](diagram/ValuePattern.svg)
+
+```
+ValuePattern ::= [+-]? ( INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL )
+               | BOOLEAN
+               | DATE
+               | STRING
 ```
 
 **ObjectPattern:**
@@ -632,30 +643,6 @@ Pattern ::= '_'
 
 ```
 ObjectPattern ::= '{' IDENTIFIER '=' ValuePattern ( ',' IDENTIFIER '=' ValuePattern )* '}'
-```
-
-**ValuePattern:**
-
-![ValuePattern](diagram/ValuePattern.svg)
-
-```
-ValuePattern ::= ( '+' | '-' )? ( BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | DATE | STRING )
-```
-
-**RangePattern:**
-
-![RangePattern](diagram/RangePattern.svg)
-
-```
-RangePattern ::= ValuePattern '..' ValuePattern? | '..' ValuePattern
-```
-
-**PredicatePattern:**
-
-![PredicatePattern](diagram/PredicatePattern.svg)
-
-```
-PredicatePattern ::= IDENTIFIER ':' Expression
 ```
 
 **CompositePattern:**

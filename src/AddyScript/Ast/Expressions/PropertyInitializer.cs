@@ -30,8 +30,7 @@ namespace AddyScript.Ast.Expressions
 
         public override bool Equals(object obj)
         {
-            if (!(obj is PropertyInitializer)) return false;
-            return Name == ((PropertyInitializer) obj).Name;
+            return obj is PropertyInitializer pi && Name == pi.Name;
         }
 
         #endregion

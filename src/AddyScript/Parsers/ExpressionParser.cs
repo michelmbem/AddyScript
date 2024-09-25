@@ -152,18 +152,14 @@ namespace AddyScript.Parsers
                 case TokenID.KW_Is:
                     Consume(1);
 
-                    string typeName;
-                    if (TryMatchAny(TokenID.TypeName, TokenID.Identifier))
-                    {
-                        typeName = token.ToString();
-                        Consume(1);
-                    }
-                    else
+                    if (!TryMatchAny(TokenID.TypeName, TokenID.Identifier))
                         throw new ParseException(FileName, token, Resources.TypeNameExpected);
 
-                    Expression saved = expr;
-                    expr = new TypeVerification(saved, typeName);
-                    expr.SetLocation(saved.Start, token.End);
+                    string typeName = token.ToString();
+                    Consume(1);
+                    Expression _checked = expr;
+                    expr = new TypeVerification(_checked, typeName);
+                    expr.SetLocation(_checked.Start, token.End);
                     break;
             }
 
@@ -572,6 +568,7 @@ namespace AddyScript.Parsers
                     {
                         QualifiedName className = QualifiedName(ref first, ref last);
                         Tuple<Expression[], Dictionary<string, Expression>> args;
+                        PropertyInitializer[] fields = null;
 
                         if (token.TokenID == TokenID.LeftParenthesis)
                         {
@@ -585,15 +582,11 @@ namespace AddyScript.Parsers
                         if (TryMatch(TokenID.LeftBrace))
                         {
                             Consume(1);
-                            PropertyInitializer[] fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
+                            fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
                             last = Match(TokenID.RightBrace);
-                            expr = new ConstructorCall(className, args.Item1, args.Item2, fields);
                         }
-                        else
-                        {
-                            if (last == null) throw new ParseException(FileName, token);
-                            expr = new ConstructorCall(className, args.Item1, args.Item2);
-                        }
+
+                        expr = new ConstructorCall(className, args.Item1, args.Item2, fields);
                     }
                     break;
                 default:
@@ -1178,7 +1171,7 @@ namespace AddyScript.Parsers
                     case TokenID.Minus:
                         if (!LookAhead(t => t.IsNumeric, out pos)) throw new ParseException(FileName, token);
 
-                        negative = first.TokenID == TokenID.Minus;
+                        negative = token.TokenID == TokenID.Minus;
                         Consume(pos - 1);
 
                         goto case TokenID.LT_Boolean;
@@ -1215,7 +1208,8 @@ namespace AddyScript.Parsers
         protected DataItem MatchCaseObjectPattern(ref Token last)
         {
             var fieldBag = new Dictionary<string, DataItem>();
-            bool loop = true;
+            bool negative = false, loop = true;
+            Token fieldValueToken;
 
             Match(TokenID.LeftBrace);
 
@@ -1223,10 +1217,21 @@ namespace AddyScript.Parsers
             {
                 string fieldName = Match(TokenID.Identifier).ToString();
                 Match(TokenID.Equal);
-                Token fieldValue = MatchAny(TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
-                                            TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
+
+                if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out int pos))
+                {
+                    negative = token.TokenID == TokenID.Minus;
+                    Consume(pos - 1);
+                    fieldValueToken = token;
+                    Consume(1);
+                }
+                else
+                    fieldValueToken = MatchAny(TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
+                                               TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
                 
-                fieldBag.Add(fieldName, DataItemFactory.CreateDataItem(fieldValue.Value));
+                DataItem fieldValue = DataItemFactory.CreateDataItem(fieldValueToken.Value);
+                if (negative) fieldValue = fieldValue.UnaryOperation(UnaryOperator.Minus);
+                fieldBag.Add(fieldName, fieldValue);
 
                 if (TryMatch(TokenID.Comma))
                     Consume(1);

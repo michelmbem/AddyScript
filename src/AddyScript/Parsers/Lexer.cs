@@ -155,17 +155,19 @@ namespace AddyScript.Parsers
         private Token Number()
         {
             /* Tries to match the following pattern:
-             * ([0-9](_[0-9])*)+(\.([0-9](_[0-9])*)+)?([Ee]?[+-]?([0-9](_[0-9])*)+)?[LlFfDd]?
+             * ([0-9](_?[0-9])*)+(\.([0-9](_?[0-9])*)+)?([Ee]?[+-]?([0-9](_?[0-9])*)+)?[LlFfDd]?
              * Whenever the sequence starts with a dot, it's prepended a literal zero.
              */
-            var sb = new StringBuilder();
-            bool isFloat = false, zero = true;
+            var nbrBldr = new StringBuilder();
+            CultureInfo ci = CultureInfo.InvariantCulture;
+            bool isReal = false, prependZero = true;
             char ch = Ll(1);
 
+            // Integral part: ([0-9](_?[0-9])*)+
             while (char.IsDigit(ch))
             {
-                zero = false;
-                sb.Append(ch);
+                prependZero = false;
+                nbrBldr.Append(ch);
                 Consume(1);
                 ch = Ll(1);
                 if (ch == '_' && char.IsDigit(Ll(2)))
@@ -175,17 +177,18 @@ namespace AddyScript.Parsers
                 }
             }
 
+            // Decimal part: (\.([0-9](_?[0-9])*)+)?
             if (ch == '.' && char.IsDigit(Ll(2)))
             {
-                isFloat = true;
-                if (zero) sb.Append('0');
-                sb.Append(ch).Append(Ll(2));
+                isReal = true;
+                if (prependZero) nbrBldr.Append('0');
+                nbrBldr.Append(ch).Append(Ll(2));
                 Consume(2);
                 ch = Ll(1);
 
                 while (char.IsDigit(ch))
                 {
-                    sb.Append(ch);
+                    nbrBldr.Append(ch);
                     Consume(1);
                     ch = Ll(1);
                     if (ch == '_' && char.IsDigit(Ll(2)))
@@ -196,17 +199,18 @@ namespace AddyScript.Parsers
                 }
             }
 
+            // Exponent part: ([Ee]?[+-]?([0-9](_?[0-9])*)+)?
             if (ch == 'e' || ch == 'E')
             {
                 bool error = true;
-                isFloat = true;
-                sb.Append(ch);
+                isReal = true;
+                nbrBldr.Append(ch);
                 Consume(1);
                 ch = Ll(1);
 
                 if (ch == '+' || ch == '-')
                 {
-                    sb.Append(ch);
+                    nbrBldr.Append(ch);
                     Consume(1);
                     ch = Ll(1);
                 }
@@ -214,7 +218,7 @@ namespace AddyScript.Parsers
                 while (char.IsDigit(ch))
                 {
                     error = false;
-                    sb.Append(ch);
+                    nbrBldr.Append(ch);
                     Consume(1);
                     ch = Ll(1);
                     if (ch == '_' && char.IsDigit(Ll(2)))
@@ -224,34 +228,34 @@ namespace AddyScript.Parsers
                     }
                 }
 
-                if (error) return Token(TokenID.Unknown, sb.ToString(), false);
+                if (error) return Token(TokenID.Unknown, nbrBldr.ToString(), false);
             }
 
-            if (isFloat)
-            {
-                double aDouble;
+            // Suffix part: [LlFfDd]?
+            string nbrStr = nbrBldr.ToString();
+
+            if (isReal)
                 return Ll(1) switch
                 {
-                    'f' or 'F' => double.TryParse(sb.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out aDouble)
+                    'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                                 ? Token(TokenID.LT_Float, aDouble, true)
-                                : Token(TokenID.LT_Float, double.MaxValue, true),
-                    'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(sb.ToString()), true),
-                    _ => double.TryParse(sb.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out aDouble)
+                                : Token(TokenID.Unknown, nbrStr, true),
+                    'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
+                    _ => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                        ? Token(TokenID.LT_Float, aDouble, false)
-                       : Token(TokenID.Unknown, sb.ToString(), false),
+                       : Token(TokenID.Unknown, nbrStr, false),
                 };
-            }
 
             return Ll(1) switch
             {
-                'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(sb.ToString()), true),
-                'f' or 'F' => double.TryParse(sb.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double aDouble)
+                'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(nbrStr), true),
+                'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                             ? Token(TokenID.LT_Float, aDouble, true)
-                            : Token(TokenID.LT_Float, double.MaxValue, true),
-                'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(sb.ToString()), true),
-                _ => int.TryParse(sb.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int anInt)
+                            : Token(TokenID.Unknown, nbrStr, true),
+                'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
+                _ => int.TryParse(nbrStr, NumberStyles.Integer, ci, out int anInt)
                    ? Token(TokenID.LT_Integer, anInt, false)
-                   : Token(TokenID.LT_Long, BigInteger.Parse(sb.ToString()), false),
+                   : Token(TokenID.LT_Long, BigInteger.Parse(nbrStr), false),
             };
         }
 
@@ -264,7 +268,7 @@ namespace AddyScript.Parsers
             char wrapper = Ll(1);
             Consume(1);
 
-            var sb = new StringBuilder();
+            var strBldr = new StringBuilder();
             bool loop = true;
             char ch;
 
@@ -273,20 +277,20 @@ namespace AddyScript.Parsers
                 ch = Ll(1);
 
                 if (ch == '\r' || ch == '\n' || ch == EOF)
-                    return Token(TokenID.Unknown, wrapper + sb.ToString(), false);
+                    return Token(TokenID.Unknown, wrapper + strBldr.ToString(), false);
 
                 if (ch == wrapper)
                     loop = false;
                 else if (ch == '\\')
-                    sb.Append(Escape());
+                    strBldr.Append(Escape());
                 else
                 {
-                    sb.Append(ch);
+                    strBldr.Append(ch);
                     Consume(1);
                 }
             }
 
-            return Token(TokenID.LT_String, sb.ToString(), true);
+            return Token(TokenID.LT_String, strBldr.ToString(), true);
         }
 
         /// <summary>
@@ -348,7 +352,7 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="string"/></returns>
         private string EscapeHex(int max)
         {
-            var sb = new StringBuilder();
+            var escBldr = new StringBuilder();
             bool ok = true;
             char ch;
 
@@ -358,7 +362,7 @@ namespace AddyScript.Parsers
                 ch = Ll(i + 2);
 
                 if (('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))
-                    sb.Append(ch);
+                    escBldr.Append(ch);
                 else
                     ok = false;
             }
@@ -367,9 +371,9 @@ namespace AddyScript.Parsers
 
             if (ok)
             {
-                int value = int.Parse(sb.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                int value = int.Parse(escBldr.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 Consume(max + 1);
-                result = ((char) value).ToString();
+                result = ((char)value).ToString();
             }
             else
             {
@@ -386,8 +390,8 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Token"/> representing an identifier or a keyword</returns>
         private Token Identifier()
         {
-            var sb = new StringBuilder();
-            sb.Append(Ll(1));
+            var idBldr = new StringBuilder();
+            idBldr.Append(Ll(1));
             Consume(1);
 
             bool loop = true;
@@ -399,24 +403,24 @@ namespace AddyScript.Parsers
 
                 if (IsLegalIdChar(ch))
                 {
-                    sb.Append(ch);
+                    idBldr.Append(ch);
                     Consume(1);
                 }
                 else if (ch == '\\')
-                    sb.Append(Escape());
+                    idBldr.Append(Escape());
                 else
                     loop = false;
             }
 
-            string text = sb.ToString();
+            string word = idBldr.ToString();
 
-            if (Keyword.IsDefined(text))
+            if (Keyword.IsDefined(word))
             {
-                Keyword kw = Keyword.Get(text);
+                Keyword kw = Keyword.Get(word);
                 return Token(kw.TokenID, kw.Value, false);
             }
             
-            return Token(TokenID.Identifier, text, false);
+            return Token(TokenID.Identifier, word, false);
         }
 
         /// <summary>
@@ -665,7 +669,7 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Token"/> representing a line-end comment</returns>
         private Token LineComment()
         {
-            var sb = new StringBuilder();
+            var cmntBldr = new StringBuilder();
             bool loop = true;
 
             while (loop)
@@ -681,12 +685,12 @@ namespace AddyScript.Parsers
                         loop = false;
                         break;
                     default:
-                        sb.Append(ch);
+                        cmntBldr.Append(ch);
                         break;
                 }
             }
 
-            return Token(TokenID.LineComment, sb.ToString(), false);
+            return Token(TokenID.LineComment, cmntBldr.ToString(), false);
         }
 
         /// <summary>
@@ -695,7 +699,7 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="Token"/> representing a block comment</returns>
         private Token BlockComment()
         {
-            var sb = new StringBuilder();
+            var cmntBldr = new StringBuilder();
             bool loop = true;
 
             while (loop)
@@ -715,15 +719,15 @@ namespace AddyScript.Parsers
                             loop = false;
                         }
                         else
-                            sb.Append(ch);
+                            cmntBldr.Append(ch);
                         break;
                     default:
-                        sb.Append(ch);
+                        cmntBldr.Append(ch);
                         break;
                 }
             }
 
-            return Token(TokenID.BlockComment, sb.ToString(), true);
+            return Token(TokenID.BlockComment, cmntBldr.ToString(), true);
         }
 
         /// <summary>
@@ -828,7 +832,8 @@ namespace AddyScript.Parsers
         {
             Consume(1);
 
-            var sb = new StringBuilder();
+            var hexNbrBldr = new StringBuilder();
+            CultureInfo ci = CultureInfo.InvariantCulture;
             bool loop = true;
             char ch;
             
@@ -838,19 +843,21 @@ namespace AddyScript.Parsers
 
                 if (('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))
                 {
-                    sb.Append(ch);
+                    hexNbrBldr.Append(ch);
                     Consume(1);
                 }
                 else
                     loop = false;
             }
 
+            string hexNumStr = hexNbrBldr.ToString();
+
             return Ll(1) switch
             {
-                'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(sb.ToString(), NumberStyles.HexNumber, CultureInfo.CurrentUICulture), true),
-                _ => int.TryParse(sb.ToString(), NumberStyles.HexNumber, CultureInfo.CurrentUICulture, out int anInt)
+                'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), true),
+                _ => int.TryParse(hexNumStr, NumberStyles.HexNumber, ci, out int anInt)
                    ? Token(TokenID.LT_Integer, anInt, false)
-                   : Token(TokenID.LT_Long, BigInteger.Parse(sb.ToString(), NumberStyles.HexNumber, CultureInfo.CurrentUICulture), false),
+                   : Token(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), false),
             };
         }
 

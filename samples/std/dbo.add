@@ -196,7 +196,7 @@ if (__name === 'main')
 	}
 	
 	function access_test() {
-		const DB_PATH = "../../../Examples/data/nwind.mdb";
+		const DB_PATH = "../../../samples/data/nwind.mdb";
 		const OLEDB_CONNECTION_STRING = 'Provider=MicroSoft.Ace.OleDb.12.0;Data Source=' + DB_PATH;
 		const ODBC_CONNECTION_STRING = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + DB_PATH;
 		

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Xml;
 
 using AddyScript.Ast;
@@ -34,8 +35,10 @@ namespace AddyScript.Translators
             currentElement = document.CreateElement("Program");
             document.InsertAfter(currentElement, declaration);
 
-            foreach (AstNode astNode in program.Statements)
-                astNode.AcceptTranslator(this);
+            ProcessLabels(currentElement, program.Labels);
+
+            foreach (Statement statement in program.Statements)
+                statement.AcceptTranslator(this);
         }
 
         public void TranslateImportDirective(ImportDirective import)
@@ -153,6 +156,8 @@ namespace AddyScript.Translators
             currentElement = document.CreateElement(blockElementName ?? "Block");
             previousElement.AppendChild(currentElement);
             blockElementName = null;
+
+            ProcessLabels(currentElement, block.Labels);
 
             foreach (Statement statement in block.Statements)
             {
@@ -609,6 +614,8 @@ namespace AddyScript.Translators
                     ProcessSwitchCase(casesElement, _case);
             }
 
+            ProcessLabels(currentElement, switchBlock.Labels);
+
             currentElement = document.CreateElement("Statements");
             tmpElement.AppendChild(currentElement);
             foreach (Statement statement in switchBlock.Statements)
@@ -937,6 +944,21 @@ namespace AddyScript.Translators
             initializer.Value.AcceptTranslator(this);
 
             currentElement = previousElement;
+        }
+
+        private void ProcessLabels(XmlElement parent, Dictionary<string, Label> labels)
+        {
+            XmlElement labelsElement = document.CreateElement("Labels");
+            parent.AppendChild(parent);
+
+            foreach (var pair in labels)
+            {
+                if (pair.Key.StartsWith('@')) continue;
+
+                XmlElement labelElement = document.CreateElement(pair.Key);
+                labelElement.SetAttribute("Address", pair.Value.Address.ToString());
+                labelsElement.AppendChild(labelElement);
+            }
         }
 
         private void ProcessSwitchCase(XmlElement parent, CaseLabel switchCase)

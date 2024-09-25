@@ -1,6 +1,6 @@
-Program ::= StatementWithLabel*
+Program ::= StatementWithLabels*
 
-StatementWithLabel ::= Label* Statement
+StatementWithLabels ::= Label* Statement
 
 Label ::= IDENTIFIER ':'
 
@@ -60,11 +60,11 @@ ConstantDecl ::= 'const' PropertyInitializerList ';'
 
 VariableDecl ::= 'var' PropertyInitializerList ';'
 
-Block ::= '{' StatementWithLabel* '}'
+Block ::= '{' StatementWithLabels* '}'
 
 IfElse ::= 'if' '(' Expression ')' Statement ('else' Statement)?
 
-SwitchBlock ::= 'switch' '(' Expression ')' '{' (CaseLabel ':' StatementWithLabel*)* ('default' ':' StatementWithLabel*)? '}'
+SwitchBlock ::= 'switch' '(' Expression ')' '{' (CaseLabel ':' StatementWithLabels*)* ('default' ':' StatementWithLabels*)? '}'
 
 CaseLabel ::= 'case' (BOOLEAN | INTEGER | STRING)
 
@@ -82,7 +82,7 @@ Continue ::= 'continue' ';'
 
 Break ::= 'break' ';'
 
-Goto ::= 'goto' IDENTIFIER ';'
+Goto ::= 'goto' (IDENTIFIER | ('case' (BOOLEAN | INTEGER | STRING)) | 'default') ';'
 
 Return ::= 'return' Expression? ';'
 
@@ -128,15 +128,11 @@ MatchCaseList ::= MatchCase (',' MatchCase)*
 
 MatchCase ::= Pattern '=>' MatchCaseExpression
 
-Pattern ::= '_' | 'null' | (TYPE_NAME ObjectPattern?) | ObjectPattern | ValuePattern | RangePattern | PredicatePattern | CompositePattern
+Pattern ::= '_' | 'null' | (ValuePattern ('..' ValuePattern?)?) | ('..' ValuePattern) | (TYPE_NAME ObjectPattern?) | ObjectPattern | (IDENTIFIER ':' Expression) | CompositePattern
+
+ValuePattern ::= ([+-]? (INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL)) | BOOLEAN | DATE | STRING
 
 ObjectPattern ::= '{' IDENTIFIER '=' ValuePattern (',' IDENTIFIER '=' ValuePattern)* '}'
-
-ValuePattern ::= ('+' | '-')? (BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | DATE | STRING)
-
-RangePattern ::= (ValuePattern '..' ValuePattern?) | ('..' ValuePattern)
-
-PredicatePattern ::= IDENTIFIER ':' Expression
 
 CompositePattern ::= Pattern (',' Pattern)+
 

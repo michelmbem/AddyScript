@@ -505,7 +505,8 @@ namespace AddyScript.Translators
 
                 foreach (var pair in switchBlock.Labels)
                 {
-                    if (pair.Value.Address != counter) continue;
+                    if (pair.Key.StartsWith('@') || pair.Value.Address != counter)
+                        continue;
 
                     ++textWriter.Indentation;
                     textWriter.WriteLine("{0}:", SafeName(pair.Key));
@@ -597,7 +598,14 @@ namespace AddyScript.Translators
 
         public void TranslateGoto(Goto _goto)
         {
-            textWriter.WriteLine("goto {0};", SafeName(_goto.LabelName));
+            textWriter.Write("goto ");
+
+            if (_goto.LabelName.StartsWith('@'))
+                textWriter.Write(_goto.LabelName[1..]);
+            else
+                textWriter.Write(SafeName(_goto.LabelName));
+
+            textWriter.WriteLine(';');
         }
 
         public void TranslateReturn(Return _return)

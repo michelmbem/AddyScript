@@ -686,7 +686,7 @@ if (__name == "main") {
 						.minimizeBox(false)
 						.maximizeBox(false)
 						.text('Sample GUI Builder Application')
-						.icon('../../../Examples/data/person.ico')
+						.icon('../../../samples/data/person.ico')
 						.label(function (self) { self.text('Type a message:').location(25, 25).autoSize(true); })
 						.textBox(function (self) { self.text('Hello Africa!').location(25, 45).size(300, 20); })
 						.button(function (self) { self.text('Show the message').location(25, 75).size(150, 25).addClick(function (sender, e) { Toolkit::msgInfo(sender.Parent.Controls[1].Text); }); })

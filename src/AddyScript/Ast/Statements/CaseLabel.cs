@@ -1,4 +1,5 @@
 using AddyScript.Runtime.DataItems;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Ast.Statements
@@ -18,6 +19,29 @@ namespace AddyScript.Ast.Statements
         /// The value that follows the <b>case</b> keyword in the script.
         /// </summary>
         public DataItem Value { get; private set; } = value;
+
+        /// <summary>
+        /// Gets the implicit name of a <see cref="CaseLabel"/> given its <see cref="Value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Value"/> of a <see cref="CaseLabel"/></param>
+        /// <returns>A <see cref="string"/></returns>
+        public static string GetLabelName(DataItem value) => "@case " + value.Class.ClassID switch
+        {
+            Runtime.OOP.ClassID.String => "'" + CodeGenerator.EscapedString(value.ToString(), false) + "'",
+            _ => value.ToString(),
+        };
+
+        /// <summary>
+        /// Gets the implicit name of the default <see cref="CaseLabel"/>.
+        /// </summary>
+        /// <returns>A <see cref="string"/></returns>
+        public static string GetDefaultLabelName() => "@default";
+
+        /// <summary>
+        /// Gets the implicit name of this <see cref="CaseLabel"/>.
+        /// </summary>
+        /// <returns>A <see cref="string"/></returns>
+        public string GetLabelName() => GetLabelName(Value);
 
         #region Overrides
 
