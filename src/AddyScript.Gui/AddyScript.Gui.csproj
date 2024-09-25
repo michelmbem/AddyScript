@@ -35,18 +35,37 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="AddyScript.ico" />
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="red_bullet.bmp" />
-	</ItemGroup>
-  
-	<ItemGroup>
-		<None Include="Properties\Settings.settings">
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<None Update="Properties\Settings.settings">
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="AddyScript.ico" />
+		<EmbeddedResource Include="red_bullet.bmp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="AddyScript.jpg" />
+		<None Remove="AddyScript.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,11 +75,6 @@
 		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToNextMessage.png" />
 		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToPreviousMessage.png" />
 		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\LineColorHS.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Remove="AddyScript.jpg" />
-		<None Remove="AddyScript.png" />
 	</ItemGroup>
 
 </Project>

@@ -120,15 +120,6 @@
   <data name="AccessDenied" xml:space="preserve">
     <value>Cannot access to {0} from {1}</value>
   </data>
-  <data name="AccessDenied3" xml:space="preserve">
-    <value>Cannot access to {0} from {1}</value>
-  </data>
-  <data name="AccessDenied2" xml:space="preserve">
-    <value>Cannot access to {0} from {1}</value>
-  </data>
-  <data name="AccessDenied1" xml:space="preserve">
-    <value>Cannot access to {0} from {1}</value>
-  </data>
   <data name="CannotAlterConstant" xml:space="preserve">
     <value>Cannot alter a constant object</value>
   </data>
@@ -493,11 +484,8 @@ It requires some initialization to support the expected operation.</value>
   <data name="ValueShouldNotBeEmpty" xml:space="preserve">
     <value>The value should not be empty</value>
   </data>
-  <data name="DuplicateRBraceInFormatString" xml:space="preserve">
-    <value>'}' should be escaped by duplication in format strings</value>
-  </data>
-  <data name="DuplicateRBraceInFormtString" xml:space="preserve">
-    <value />
+  <data name="DuplicateRBraceInInterpolatedString" xml:space="preserve">
+    <value>'}' should be escaped by duplication in interpolated strings</value>
   </data>
   <data name="SingleIndexer" xml:space="preserve">
     <value>An indexer is already defined for this class</value>

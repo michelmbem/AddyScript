@@ -2223,7 +2223,7 @@ namespace AddyScript.Runtime
             var parameters = new List<Parameter>(Parameters);
             parameters.RemoveAt(0);
 
-            return new Function(parameters.ToArray(), Block.Return(new InnerFunctionCall(this, arguments)));
+            return new Function([.. parameters], Block.Return(new InnerFunctionCall(this, arguments)));
         }
 
         /// <summary>

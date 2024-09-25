@@ -147,7 +147,7 @@ o = new {name = 'my object', size = 18, color = 'blue'};
 
 res = o switch {
     null => 'absolutely null',
-    float => 'i\'m floating',
+    float => "i'm floating",
     Exception {message = 'something went wrong'} => __value.message,
     {name = 'my object', size = 18} => 'my object of size 18'
 };
@@ -169,7 +169,7 @@ The above examples showcase the different kinds of patterns. They are explained 
 |predicate pattern|an identifier followed by a colon ( : ) and then a logical expression; **e.g.**: `x: 20 <= x && x < 30`|This type of pattern is a function with a single parameter; the initial identifier is the name you want to give to the parameter; it will contain the value of the expression that is compared to the pattern; the expression that follows the colon is the body of the function; The pattern matches expressions for which its function returns **true**|
 |composite pattern|multiple elementary patterns separated by commas ( , ); **e.g.**:`13, 14..17, 18`|Tries to match the expression with one of its components|
 
-**Note**: On the left side of the arrow, the value of the expression that is compared can be referenced as **__value**.
+**Note**: On the right side of the arrow, the value of the expression that is compared can be referenced as **__value**. **e.g.**: in `=> __value.message` we are returning the message of the matched Exception if any.
 
 ### Loops
 
@@ -285,7 +285,7 @@ Jumps allow execution to resume from a location other than the next instruction.
 |-|-|-|
 |continue|`continue;`|Skips to the next iteration of a loop before the end of the current iteration|
 |break|`break;`|Exits a loop before the last iteration is reached.<br>Exits a switch block before the last statement is reached.|
-|goto|`goto label;`|Unconditionnaly jumps to the specified location|
+|goto|`goto label;`<br>or _(in a switch block)_<br>`goto case X;`<br>`goto default;`|Unconditionally jumps to the specified location.<br>In a switch block can also jump to one of the case labels.<br><sub>**Note**: A label is any identifier that's appears at the beginning of an instruction and is followed by a colon. **e.g.**: in `printout: println('hello');` _printout_ is the label.</sub>|
 |return|`return;`<br>or<br>`return expression;`|Returns from a function with or without a value.|
 |throw|`throw exception;`<br>or<br>`throw "some error message";`|Raises an error and stops the execution of the script until the raised error is caught by a **try-catch-finally** statement.|
 
@@ -297,7 +297,7 @@ Some data types in AddyScript have methods that can be used to iterate over inst
 |-|-|-|
 |`int int::times(closure action)`<br>`long long::times(closure action)`|Performs the given action n times where n is the integer value on which the method is invoked.|`4.times(\|i\| => println('hello!'));`|
 |`string string::each(closure action)`<br>`list list::each(closure action)`<br>`map map::each(closure action)`<br>`set set::each(closure action)`<br>`set queue::each(closure action)`<br>`set stack::each(closure action)`|Repeats the given action on each item (each character for strings or each key-value pair for maps) of the target object. When the target object is a map, the closure expects two arguments. In any other case, it expects a single argument.|`l = [4, 2, 5, 3, 8, 6];`<br>`sum = 0;`<br>`l.each(\|x\| => sum += x);`<br>`println(sum);`|
-|`list list::eachIndex(closure action)`|Repeats the given action on each index of the target list.|`l = [4, 2, 5, 3, 8, 6];`<br>`l.eachIndex(\|i\| => l[i] *= 2);`<br>`prinln(l.join(', '));`|
+|`list list::eachIndex(closure action)`|Repeats the given action on each index of the target list.|`l = [4, 2, 5, 3, 8, 6];`<br>`l.eachIndex(\|i\| => l[i] *= 2);`<br>`println(l.join(', '));`|
 |`map map::eachKey(closure action)`|Repeats the given action on each key of the target map.|`m = {'age' => 30, 'weight' => 80, 'height' => 170};`<br>`m.eachKey(\|k\| => println(k + ': ' + m[k]));`|
 |`map map::eachValue(closure action)`|Repeats the given action on each distinct value of the calling map.|`m = {'age' => 70, 'weight' => 70, 'height' => 180};`<br>`m.eachValue(\|v\| => println(v + ': ' + m.keysOf(v)));`|
 |`bool list::all(closure predicate)`<br>`bool set::all(closure predicate)`|Evaluates a predicate on each item of a list or set. Returns **true** if the predicate is true for all items; returns **false** otherwise.|`s = {4, 2, 0, 8, 6};`<br>`b = s.all(\|e\| => e % 2 == 0);`<br>`if (b) println('all them are even');`|

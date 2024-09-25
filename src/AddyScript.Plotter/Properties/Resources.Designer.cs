@@ -39,7 +39,7 @@ namespace AddyScript.Plotter.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Plotter.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AddyScript.Plotter.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -84,6 +84,15 @@ namespace AddyScript.Plotter.Properties {
         internal static string Function2Required {
             get {
                 return ResourceManager.GetString("Function2Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The {0} doesn&apos;t have support for slices.
+        /// </summary>
+        internal static string SlicingNotSupported {
+            get {
+                return ResourceManager.GetString("SlicingNotSupported", resourceCulture);
             }
         }
     }
