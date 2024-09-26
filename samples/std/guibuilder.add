@@ -672,8 +672,6 @@ static class Toolkit {
 
 /******************************************************** INITIALIZATION ***************************************************/
 
-__context.AddReference("System");
-__context.AddReference("System.Drawing");
 __context.AddReference("System.Windows.Forms");
 
 /********************************************************** DEMO ***********************************************************/

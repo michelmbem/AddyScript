@@ -108,7 +108,7 @@ namespace AddyScript.Ast.Statements
         public ClassMemberDecl[] GetMembers() => GetMembers(MemberKind.All);
 
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public override void AcceptTranslator(ITranslator translator)

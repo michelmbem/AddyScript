@@ -16,10 +16,6 @@ Attributes ::= '[' Attribute (',' Attribute)* ']'
 
 Attribute ::= IDENTIFIER ('(' (Expression? | ((Expression ',')? PropertyInitializerList)) ')')?
 
-PropertyInitializerList ::= PropertyInitializer (',' PropertyInitializer)*
-
-PropertyInitializer ::= IDENTIFIER '=' Expression
-
 ClassMember ::= MemberPrefix? MemberSpec
 
 MemberPrefix ::= (SCOPE ((MODIFIER Attributes?)? | (Attributes MODIFIER?)?)) | (MODIFIER ((SCOPE Attributes?)? |(Attributes SCOPE?)?)) | (Attributes ((SCOPE MODIFIER?)? | (MODIFIER SCOPE?)?))
@@ -30,9 +26,7 @@ ConstructorSpec ::= 'constructor' ParameterList Block
 
 ParameterList ::= '(' (Parameter (',' Parameter)*)? ')'
 
-Parameter ::= (ParameterPrefix IDENTIFIER) | (IDENTIFIER ('=' Literal)?)
-
-ParameterPrefix ::= 'ref' | 'params'
+Parameter ::= (((Attributes ('ref' | 'params')?) | (('ref' | 'params') Attributes?)) IDENTIFIER) | (Attributes? IDENTIFIER ('=' Literal)?)
 
 Literal ::= 'null' | BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | DATE | STRING
 
@@ -55,6 +49,10 @@ FunctionDecl ::= Attributes? 'function' IDENTIFIER ParameterList FunctionBody
 FunctionBody ::= ('=>' Expression ';') | Block
 
 ExternalFunctionDecl ::= Attributes? 'extern' 'function' IDENTIFIER ParameterList ';'
+
+PropertyInitializerList ::= PropertyInitializer (',' PropertyInitializer)*
+
+PropertyInitializer ::= IDENTIFIER '=' Expression
 
 ConstantDecl ::= 'const' PropertyInitializerList ';'
 

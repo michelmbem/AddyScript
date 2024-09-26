@@ -49,7 +49,7 @@ namespace AddyScript.Parsers
         /// </summary>
         public bool IsLiteral
         {
-            get { return TokenID.LT_Null <= TokenID && TokenID <= TokenID.LT_Date; }
+            get { return TokenID.LT_Null <= TokenID && TokenID <= TokenID.LT_String; }
         }
 
         /// <summary>

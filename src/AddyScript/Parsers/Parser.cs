@@ -1,19 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
-using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using Decimal = AddyScript.Runtime.DataItems.Decimal;
 using String = AddyScript.Runtime.DataItems.String;
-using Void = AddyScript.Runtime.DataItems.Void;
 
 
 namespace AddyScript.Parsers
@@ -46,6 +42,15 @@ namespace AddyScript.Parsers
         }
 
         /// <summary>
+        /// Recognizes a non-null statement.
+        /// </summary>
+        /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
+        public Statement RequiredStatement()
+        {
+            return Required(StatementWithLabels, string.Format(Resources.UnexpectedToken, token));
+        }
+
+        /// <summary>
         /// Recognizes a statement eventually prededed by labels.
         /// </summary>
         /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
@@ -72,71 +77,30 @@ namespace AddyScript.Parsers
                 Consume(1);
 
 
-            switch (token.TokenID)
+            return token.TokenID switch
             {
-                case TokenID.LeftBracket:
-                    return StatementWithAttributes();
-                case TokenID.KW_Import:
-                    return Import();
-                case TokenID.Modifier:
-                case TokenID.KW_Class:
-                    return Class();
-                case TokenID.KW_Function:
-                    return Function();
-                case TokenID.KW_Extern:
-                    return ExternalFunction();
-                case TokenID.KW_Const:
-                    return ConstantDecl();
-                case TokenID.KW_Var:
-                    return VariableDecl();
-                case TokenID.LeftBrace:
-                    return Block();
-                case TokenID.KW_If:
-                    return IfElse();
-                case TokenID.KW_Switch:
-                    return SwitchBlock();
-                case TokenID.KW_For:
-                    return ForLoop();
-                case TokenID.KW_ForEach:
-                    return ForEachLoop();
-                case TokenID.KW_While:
-                    return WhileLoop();
-                case TokenID.KW_Do:
-                    return DoLoop();
-                case TokenID.KW_Continue:
-                    return Continue();
-                case TokenID.KW_Break:
-                    return Break();
-                case TokenID.KW_Goto:
-                    return Goto();
-                case TokenID.KW_Return:
-                    return Return();
-                case TokenID.KW_Throw:
-                    return Throw();
-                case TokenID.KW_Try:
-                    return TryCatchFinally();
-                default:
-                    {
-                        Expression expr = Expression();
-                        
-                        if (expr != null)
-                        {
-                            Token last = Match(TokenID.SemiColon);
-                            expr.SetLocation(expr.Start, last.End);
-                        }
-
-                        return expr;
-                    }
-            }
-        }
-
-        /// <summary>
-        /// Recognizes a non-null statement.
-        /// </summary>
-        /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
-        public Statement RequiredStatement()
-        {
-            return Required(StatementWithLabels, string.Format(Resources.UnexpectedToken, token));
+                TokenID.LeftBracket => StatementWithAttributes(),
+                TokenID.KW_Import => Import(),
+                TokenID.Modifier or TokenID.KW_Class => Class(),
+                TokenID.KW_Function => Function(),
+                TokenID.KW_Extern => ExternalFunction(),
+                TokenID.KW_Const => ConstantDecl(),
+                TokenID.KW_Var => VariableDecl(),
+                TokenID.LeftBrace => Block(),
+                TokenID.KW_If => IfElse(),
+                TokenID.KW_Switch => SwitchBlock(),
+                TokenID.KW_For => ForLoop(),
+                TokenID.KW_ForEach => ForEachLoop(),
+                TokenID.KW_While => WhileLoop(),
+                TokenID.KW_Do => DoLoop(),
+                TokenID.KW_Continue => Continue(),
+                TokenID.KW_Break => Break(),
+                TokenID.KW_Goto => Goto(),
+                TokenID.KW_Return => Return(),
+                TokenID.KW_Throw => Throw(),
+                TokenID.KW_Try => TryCatchFinally(),
+                _ => ExpressionAsStatement(),
+            };
         }
 
         /// <summary>
@@ -149,19 +113,41 @@ namespace AddyScript.Parsers
         /// <returns>An <see cref="Ast.Statements.StatementWithAttributes"/></returns>
         protected StatementWithAttributes StatementWithAttributes()
         {
-            Token bookmark = Match(TokenID.LeftBracket);
+            Token first = Match(TokenID.LeftBracket);
             AttributeDecl[] attributes = List(Attribute, true, Resources.DuplicatedAttribute);
             Match(TokenID.RightBracket);
 
-            Statement statement = Statement();
-            if (statement is StatementWithAttributes stmtWA)
+            SkipComments();
+
+            StatementWithAttributes stmtWA = token.TokenID switch
             {
-                stmtWA.Attributes = attributes;
-                stmtWA.SetLocation(bookmark.Start, stmtWA.End);
-                return stmtWA;
+                TokenID.Modifier or TokenID.KW_Class => Class(),
+                TokenID.KW_Function => Function(),
+                TokenID.KW_Extern => ExternalFunction(),
+                _ => throw new ParseException(FileName, token, Resources.AttributesNotSupported),
+            };
+
+            stmtWA.Attributes = attributes;
+            stmtWA.SetLocation(first.Start, stmtWA.End);
+            return stmtWA;
+
+        }
+
+        /// <summary>
+        /// Reconizes an expression when it's used as a statement.
+        /// </summary>
+        /// <returns>An <see cref="Expression"/></returns>
+        protected Expression ExpressionAsStatement()
+        {
+            Expression expr = Expression();
+
+            if (expr != null)
+            {
+                Token last = Match(TokenID.SemiColon);
+                expr.SetLocation(expr.Start, last.End);
             }
 
-            throw new ScriptException(FileName, statement, Resources.AttributesNotSupported);
+            return expr;
         }
 
         /// <summary>
@@ -195,22 +181,22 @@ namespace AddyScript.Parsers
         {
             Token first = null;
 
-            Modifier classModifier = Modifier.Default;
+            Modifier modifier = Modifier.Default;
             if (TryMatch(TokenID.Modifier))
             {
                 first = token;
-                classModifier = (Modifier)first.Value;
+                modifier = (Modifier)first.Value;
                 Consume(1);
             }
 
-            Token maybeFirst = Match(TokenID.KW_Class);
-            first ??= maybeFirst;
+            Match(TokenID.KW_Class);
+            first ??= token;
             string className = Match(TokenID.Identifier).ToString();
 
             string superClassName = null;
             if (TryMatch(TokenID.Colon))
             {
-                if (classModifier == Modifier.Static)
+                if (modifier == Modifier.Static)
                     throw new ParseException(FileName, token, Resources.StaticClassHasNoSuperClass);
 
                 Consume(1);
@@ -218,80 +204,80 @@ namespace AddyScript.Parsers
             }
 
             Match(TokenID.LeftBrace);
-            PushClass(classModifier, className, superClassName);
-            ClassMemberDecl[] classMembers = Asterisk(ClassMember);
+            PushClass(modifier, className, superClassName);
+            ClassMemberDecl[] members = Asterisk(ClassMember);
 
             ClassMethodDecl constructor = null;
             ClassPropertyDecl indexer = null;
-            var classFields = new List<ClassFieldDecl>();
-            var classProperties= new List<ClassPropertyDecl>();
-            var classMethods = new List<ClassMethodDecl>();
-            var classEvents = new List<ClassEventDecl>();
+            var fields = new List<ClassFieldDecl>();
+            var properties= new List<ClassPropertyDecl>();
+            var methods = new List<ClassMethodDecl>();
+            var events = new List<ClassEventDecl>();
             
-            foreach (var classMember in classMembers)
+            foreach (var member in members)
             {
-                foreach (var otherMember in classMembers)
-                    if (classMember != otherMember && classMember.Name == otherMember.Name)
-                        throw new ScriptException(FileName, classMember, string.Format(Resources.MemberNameConfict, classMember.Name));
+                foreach (var otherMember in members)
+                    if (member != otherMember && member.Name == otherMember.Name)
+                        throw new ScriptException(FileName, member, string.Format(Resources.MemberNameConfict, member.Name));
                 
-                if (classModifier == Modifier.Static &&
-                    !(classMember.Modifier == Modifier.Static || classMember.Modifier == Modifier.StaticFinal))
-                    throw new ScriptException(FileName, classMember, Resources.StaticClassMember);
+                if (modifier == Modifier.Static &&
+                    !(member.Modifier == Modifier.Static || member.Modifier == Modifier.StaticFinal))
+                    throw new ScriptException(FileName, member, Resources.StaticClassMember);
 
-                if (classModifier != Modifier.Abstract && classMember.Modifier == Modifier.Abstract)
-                    throw new ScriptException(FileName, classMember, Resources.AbstractMethodInNonAbstractClass);
+                if (modifier != Modifier.Abstract && member.Modifier == Modifier.Abstract)
+                    throw new ScriptException(FileName, member, Resources.AbstractMethodInNonAbstractClass);
 
-                if (classMember is ClassFieldDecl classField)
+                if (member is ClassFieldDecl field)
                 {
-                    switch (classField.Modifier)
+                    switch (field.Modifier)
                     {
                         case Modifier.Abstract:
-                            throw new ScriptException(FileName, classField,
-                                string.Format(Resources.InvalidFieldModifier, classField.Modifier));
+                            throw new ScriptException(FileName, field,
+                                string.Format(Resources.InvalidFieldModifier, field.Modifier));
                         case Modifier.StaticFinal:
-                            if (classField.Initializer == null)
-                                throw new ScriptException(FileName, classField, Resources.ConstantFieldShouldBeInitialized);
+                            if (field.Initializer == null)
+                                throw new ScriptException(FileName, field, Resources.ConstantFieldShouldBeInitialized);
                             break;
                     }
 
-                    classFields.Add(classField);
+                    fields.Add(field);
                 }
                 else
                 {
-                    if (classMember.Modifier == Modifier.StaticFinal)
-                        throw new ScriptException(FileName, classMember, Resources.SpecificFieldModifier);
+                    if (member.Modifier == Modifier.StaticFinal)
+                        throw new ScriptException(FileName, member, Resources.SpecificFieldModifier);
 
-                    if (classMember is ClassPropertyDecl classProperty)
+                    if (member is ClassPropertyDecl property)
                     {
-                        if (classProperty.IsIndexer)
+                        if (property.IsIndexer)
                         {
                             if (indexer != null)
-                                throw new ScriptException(FileName, classMember, Resources.SingleIndexer);
+                                throw new ScriptException(FileName, member, Resources.SingleIndexer);
 
-                            indexer = classProperty;
+                            indexer = property;
                         }
                         else
-                            classProperties.Add(classProperty);
+                            properties.Add(property);
                     }
-                    else if (classMember is ClassMethodDecl classMethod)
+                    else if (member is ClassMethodDecl method)
                     {
-                        if (classMethod.Name == CurrentClass.Name)
+                        if (method.Name == CurrentClass.Name)
                         {
                             if (constructor != null)
-                                throw new ScriptException(FileName, classMember, Resources.SingleConstructor);
+                                throw new ScriptException(FileName, member, Resources.SingleConstructor);
 
-                            constructor = classMethod;
+                            constructor = method;
                         }
                         else
-                            classMethods.Add(classMethod);
+                            methods.Add(method);
                     }
-                    else if (classMember is ClassEventDecl classEvent)
+                    else if (member is ClassEventDecl _event)
                     {
-                        if (!(classEvent.Modifier == Modifier.Default || classEvent.Modifier == Modifier.Static))
-                            throw new ScriptException(FileName, classEvent,
-                                string.Format(Resources.InvalidFieldModifier, classEvent.Modifier));
+                        if (!(_event.Modifier == Modifier.Default || _event.Modifier == Modifier.Static))
+                            throw new ScriptException(FileName, _event,
+                                string.Format(Resources.InvalidFieldModifier, _event.Modifier));
 
-                        classEvents.Add(classEvent);
+                        events.Add(_event);
                     }
                 }
             }
@@ -299,8 +285,8 @@ namespace AddyScript.Parsers
             PopClass();
             Token last = Match(TokenID.RightBrace);
 
-            var classDef = new ClassDefinition(className, superClassName, classModifier, constructor, indexer,
-                                               [.. classFields], [.. classProperties], [.. classMethods], [.. classEvents]);
+            var classDef = new ClassDefinition(className, superClassName, modifier, constructor, indexer,
+                                               [.. fields], [.. properties], [.. methods], [.. events]);
             classDef.SetLocation(first.Start, last.End);
             return classDef;
         }
@@ -889,116 +875,123 @@ namespace AddyScript.Parsers
         }
 
         /// <summary>
-        /// Recognizes the definition of any class member.
+        /// Recognizes the definition of a class member.
         /// </summary>
         /// <returns>A <see cref="ClassMemberDecl"/></returns>
         protected ClassMemberDecl ClassMember()
         {
+            Tuple<Scope, Modifier, AttributeDecl[]> prefix = MemberPrefix(out Token first);
+
+            SkipComments();
+
+            ClassMemberDecl member;
+            switch (token.TokenID)
+            {
+                case TokenID.Identifier:
+                    member = ClassField(prefix.Item1, prefix.Item2);
+                    break;
+                case TokenID.KW_Constructor:
+                    if (prefix.Item2 != Modifier.Default)
+                        throw new ParseException(FileName, token, Resources.InvalidConstructorModifier);
+
+                    member = Constructor(prefix.Item1);
+                    break;
+                case TokenID.KW_Property:
+                    member = ClassProperty(prefix.Item1, prefix.Item2);
+                    break;
+                case TokenID.KW_Function:
+                    member = ClassMethod(prefix.Item1, prefix.Item2);
+                    break;
+                case TokenID.KW_Operator:
+                    if (prefix.Item2 != Modifier.Default)
+                        throw new ParseException(FileName, token, Resources.InvalidOperatorModifier);
+
+                    member = ClassOperator(prefix.Item1);
+                    break;
+                case TokenID.KW_Event:
+                    member = ClassEvent(prefix.Item1, prefix.Item2);
+                    break;
+                default:
+                    member = null;
+                    break;
+            }
+
+            if (member != null)
+            {
+                member.Attributes = prefix.Item3;
+
+                if (first != null)
+                    member.SetLocation(first.Start, member.End);
+            }
+
+            return member;
+        }
+
+        /// <summary>
+        /// Recognizes the scope, modifier and attributes of a class member.
+        /// </summary>
+        /// <param name="first">The initial <see cref="Token"/> of the member being recognized</param>
+        /// <returns>A tuple of 3 items</returns>
+        /// <throws></throws>
+        /// <exception cref="ParseException">Malformed prefix</exception>
+        protected Tuple<Scope, Modifier, AttributeDecl[]> MemberPrefix(out Token first)
+        {
             Scope scope = Scope.Private;
             Modifier modifier = Modifier.Default;
-            ClassMemberDecl classMember = null;
             AttributeDecl[] attributes = null;
-            Token realFirst = null;
-            bool gotScope = false, gotModifier = false, gotAttribute = false;
+            bool gotScope = false, gotModifier = false, gotAttributes = false;
             bool loop = true;
+
+            first = null;
 
             while (loop)
             {
-                bool consume = true;
                 SkipComments();
 
                 switch (token.TokenID)
                 {
                     case TokenID.Scope:
                         if (gotScope) throw new ParseException(FileName, token);
+                        
                         scope = (Scope)token.Value;
-                        realFirst = token;
+                        first = token;
+                        Consume(1);
                         gotScope = true;
                         break;
                     case TokenID.Modifier:
-                        if (gotModifier)
-                            switch (modifier)
-                            {
-                                case Modifier.Static:
-                                    if (token.Value.Equals(Modifier.Final))
-                                        modifier = Modifier.StaticFinal;
-                                    else
-                                        throw new ParseException(FileName, token);
-                                    break;
-                                case Modifier.Final:
-                                    if (token.Value.Equals(Modifier.Static))
-                                        modifier = Modifier.StaticFinal;
-                                    else
-                                        throw new ParseException(FileName, token);
-                                    break;
-                                default:
-                                    throw new ParseException(FileName, token);
-                            }
-                        else
+                        if (gotModifier) throw new ParseException(FileName, token);
+                        
+                        modifier = (Modifier)token.Value;
+                        first = token;
+                        Consume(1);
+
+                        if ((modifier == Modifier.Static &&
+                             TryMatch(t => t.TokenID == TokenID.Modifier && t.Value.Equals(Modifier.Final))) ||
+                            (modifier == Modifier.Final &&
+                             TryMatch(t => t.TokenID == TokenID.Modifier && t.Value.Equals(Modifier.Static))))
                         {
-                            modifier = (Modifier)token.Value;
-                            realFirst = token;
-                            gotModifier = true;
+                            modifier = Modifier.StaticFinal;
+                            Consume(1);
                         }
+                        
+                        gotModifier = true;
                         break;
                     case TokenID.LeftBracket:
-                        if (gotAttribute) throw new ParseException(FileName, token);
+                        if (gotAttributes) throw new ParseException(FileName, token);
+
+                        first = token;
                         Consume(1);
                         attributes = List(Attribute, true, Resources.DuplicatedAttribute);
                         Match(TokenID.RightBracket);
-                        consume = false;
-                        gotAttribute = true;
-                        break;
-                    case TokenID.Identifier:
-                        classMember = ClassField(scope, modifier);
-                        consume = false;
-                        loop = false;
-                        break;
-                    case TokenID.KW_Constructor:
-                        if (modifier != Modifier.Default)
-                            throw new ParseException(FileName, token, Resources.InvalidConstructorModifier);
-                        classMember = Constructor(scope);
-                        consume = false;
-                        loop = false;
-                        break;
-                    case TokenID.KW_Property:
-                        classMember = ClassProperty(scope, modifier);
-                        consume = false;
-                        loop = false;
-                        break;
-                    case TokenID.KW_Function:
-                        classMember = ClassMethod(scope, modifier);
-                        consume = false;
-                        loop = false;
-                        break;
-                    case TokenID.KW_Operator:
-                        if (modifier != Modifier.Default)
-                            throw new ParseException(FileName, token, Resources.InvalidOperatorModifier);
-                        classMember = ClassOperator(scope);
-                        consume = false;
-                        loop = false;
-                        break;
-                    case TokenID.KW_Event:
-                        classMember = ClassEvent(scope, modifier);
-                        consume = false;
-                        loop = false;
+                        gotAttributes = true;
                         break;
                     default:
-                        consume = false;
                         loop = false;
                         break;
                 }
-
-                if (consume) Consume(1);
             }
 
-            if (!(classMember == null || realFirst == null))
-            {
-                classMember.Attributes = attributes;
-                classMember.SetLocation(realFirst.Start, classMember.End);
-            }
-
-            return classMember;
+            return new Tuple<Scope, Modifier, AttributeDecl[]>(scope, modifier, attributes);
         }
 
         /// <summary>
@@ -1303,138 +1296,64 @@ namespace AddyScript.Parsers
         /// <returns>A <see cref="ParameterDecl"/></returns>
         protected ParameterDecl Parameter()
         {
-            string name = null, context = "initial";
+            string name = null;
             bool byRef = false, vaArgs = false;
             DataItem defaultValue = null;
             AttributeDecl[] attributes = null;
-            Token first = token, last = first;
+            Token first = null, last = null;
+            bool gotAttributes = false, gotPrefix = false, gotName = false;
+            bool loop = true;
 
-            do
+            while (loop)
             {
-                bool consume = true;
                 SkipComments();
 
-                switch (context)
+                switch (token.TokenID)
                 {
-                    case "initial":
-                        first = token;
+                    case TokenID.LeftBracket:
+                        if (gotAttributes || gotName) throw new ParseException(FileName, token);
 
-                        switch (first.TokenID)
-                        {
-                            case TokenID.KW_Ref:
-                                byRef = true;
-                                context = "prefix";
-                                break;
-                            case TokenID.KW_Params:
-                                vaArgs = true;
-                                context = "prefix";
-                                break;
-                            case TokenID.Identifier:
-                                name = token.ToString();
-                                context = "name";
-                                break;
-                            case TokenID.LeftBracket:
-                                Consume(1);
-                                attributes = List(Attribute, true, Resources.DuplicatedAttribute);
-                                Match(TokenID.RightBracket);
-                                consume = false;
-                                context = "attribute";
-                                break;
-                            default:
-                                consume = false;
-                                context = "done";
-                                break;
-                        }
+                        first ??= token;
+                        Consume(1);
+                        attributes = List(Attribute, true, Resources.DuplicatedAttribute);
+                        Match(TokenID.RightBracket);
+                        gotAttributes = true;
                         break;
-                    case "attribute":
-                        switch (token.TokenID)
-                        {
-                            case TokenID.KW_Ref:
-                                byRef = true;
-                                context = "prefix";
-                                break;
-                            case TokenID.KW_Params:
-                                vaArgs = true;
-                                context = "prefix";
-                                break;
-                            case TokenID.Identifier:
-                                name = token.ToString();
-                                context = "name";
-                                break;
-                            default:
-                                throw new ParseException(FileName, token);
-                        }
+                    case TokenID.KW_Ref:
+                        if (gotPrefix || gotName) throw new ParseException(FileName, token);
+
+                        byRef = gotPrefix = true;
+                        first ??= token;
+                        Consume(1);
                         break;
-                    case "prefix":
-                        switch (token.TokenID)
-                        {
-                            case TokenID.Identifier:
-                                name = token.ToString();
-                                context = "done";
-                                break;
-                            default:
-                                throw new ParseException(FileName, token);
-                        }
+                    case TokenID.KW_Params:
+                        if (gotPrefix || gotName) throw new ParseException(FileName, token);
+
+                        vaArgs = gotPrefix = true;
+                        first ??= token;
+                        Consume(1);
                         break;
-                    case "name":
-                        switch (token.TokenID)
-                        {
-                            case TokenID.Equal:
-                                context = "assign";
-                                break;
-                            default:
-                                consume = false;
-                                context = "done";
-                                break;
-                        }
+                    case TokenID.Identifier:
+                        if (gotName) throw new ParseException(FileName, token);
+
+                        name = token.ToString();
+                        gotName = true;
+                        last = token;
+                        first ??= last;
+                        Consume(1);
                         break;
-                    case "assign":
-                        switch (token.TokenID)
-                        {
-                            case TokenID.LT_Null:
-                                defaultValue = Void.Value;
-                                context = "done";
-                                break;
-                            case TokenID.LT_Boolean:
-                                defaultValue = Boolean.FromBool((bool)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_Integer:
-                                defaultValue = new Integer((int)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_Long:
-                                defaultValue = new Long((BigInteger)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_Float:
-                                defaultValue = new Float((double)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_Decimal:
-                                defaultValue = new Decimal((BigDecimal)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_Date:
-                                defaultValue = new Date((DateTime)token.Value);
-                                context = "done";
-                                break;
-                            case TokenID.LT_String:
-                                defaultValue = new String((string)token.Value);
-                                context = "done";
-                                break;
-                            default:
-                                throw new ParseException(FileName, token, Resources.LiteralRequired);
-                        }
+                    case TokenID.Equal:
+                        if (gotPrefix || !gotName) throw new ParseException(FileName, token);
+
+                        Consume(1);
+                        last = Match(t => t.IsLiteral);
+                        defaultValue = DataItemFactory.CreateDataItem(last.Value);
+                        break;
+                    default:
+                        loop = false;
                         break;
                 }
-
-                if (consume)
-                {
-                    last = token;
-                    Consume(1);
-                }
-            } while (context != "done");
+            }
 
             if (name == null) return null;
 

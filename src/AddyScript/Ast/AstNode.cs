@@ -9,7 +9,7 @@ namespace AddyScript.Ast
     public abstract class AstNode : ScriptElement
     {
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public abstract void AcceptTranslator(ITranslator translator);

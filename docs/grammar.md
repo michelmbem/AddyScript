@@ -97,22 +97,6 @@ Attributes ::= '[' Attribute ( ',' Attribute )* ']'
 Attribute ::= IDENTIFIER ( '(' ( Expression | ( Expression ',' )? PropertyInitializerList )? ')' )?
 ```
 
-**PropertyInitializerList:**
-
-![PropertyInitializerList](diagram/PropertyInitializerList.svg)
-
-```
-PropertyInitializerList ::= PropertyInitializer ( ',' PropertyInitializer )*
-```
-
-**PropertyInitializer:**
-
-![PropertyInitializer](diagram/PropertyInitializer.svg)
-
-```
-PropertyInitializer ::= IDENTIFIER '=' Expression
-```
-
 **ClassMember:**
 
 ![ClassMember](diagram/ClassMember.svg)
@@ -165,15 +149,7 @@ ParameterList ::= '(' ( Parameter ( ',' Parameter )* )? ')'
 ![Parameter](diagram/Parameter.svg)
 
 ```
-Parameter ::= ParameterPrefix IDENTIFIER | IDENTIFIER ( '=' Literal )?
-```
-
-**ParameterPrefix:**
-
-![ParameterPrefix](diagram/ParameterPrefix.svg)
-
-```
-ParameterPrefix ::= 'ref' | 'params'
+Parameter ::= ( Attributes ( 'ref' | 'params' )? | ( 'ref' | 'params' ) Attributes? ) IDENTIFIER | Attributes? IDENTIFIER ( '=' Literal )?
 ```
 
 **Literal:**
@@ -309,6 +285,22 @@ ConstantDecl ::= 'const' PropertyInitializerList ';'
 
 ```
 VariableDecl ::= 'var' PropertyInitializerList ';'
+```
+
+**PropertyInitializerList:**
+
+![PropertyInitializerList](diagram/PropertyInitializerList.svg)
+
+```
+PropertyInitializerList ::= PropertyInitializer ( ',' PropertyInitializer )*
+```
+
+**PropertyInitializer:**
+
+![PropertyInitializer](diagram/PropertyInitializer.svg)
+
+```
+PropertyInitializer ::= IDENTIFIER '=' Expression
 ```
 
 **Block:**

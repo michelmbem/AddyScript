@@ -43,7 +43,7 @@ namespace AddyScript.Ast.Statements
         public Expression Resource { get; set; }
 
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public override void AcceptTranslator(ITranslator translator)

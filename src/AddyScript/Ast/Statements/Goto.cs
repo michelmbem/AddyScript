@@ -19,7 +19,7 @@ namespace AddyScript.Ast.Statements
         public string LabelName { get; private set; } = labelName;
 
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public override void AcceptTranslator(ITranslator translator)

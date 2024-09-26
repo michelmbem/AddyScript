@@ -22,7 +22,7 @@ namespace AddyScript.Ast.Expressions
         public InnerFunction Function { get; private set; } = function;
 
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public override void AcceptTranslator(ITranslator translator)

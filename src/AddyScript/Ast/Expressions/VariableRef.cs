@@ -19,7 +19,7 @@ namespace AddyScript.Ast.Expressions
         public string Name { get; private set; } = name;
 
         /// <summary>
-        /// Translates this statement.
+        /// Translates this node.
         /// </summary>
         /// <param name="translator">The translator to use</param>
         public override void AcceptTranslator(ITranslator translator)
