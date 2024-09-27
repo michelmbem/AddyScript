@@ -13,4 +13,22 @@ println('after the removal of item 4');
 println('---------------------------');
 println('copy  : ' + l1);
 println('clone : ' + l2);
+println();
+
+o = new {brand = 'Toyota', model = 'Avensis', year = 2014};
+o1 = o;
+o2 = o.clone();
+
+println('before the modification of "model"');
+println('----------------------------');
+println('copy  : ' + o1);
+println('clone : ' + o2);
+println();
+
+o.model = 'Rav4';
+println('after the modification of "model"');
+println('---------------------------');
+println('copy  : ' + o1);
+println('clone : ' + o2);
+
 readln();

@@ -2362,7 +2362,7 @@ namespace AddyScript.Runtime
                     index = int.Parse(mask);
             }
 
-            var value = RuntimeServices.ToString(values[index], format);
+            var value = values[index].ToString(format, CultureInfo.CurrentUICulture);
             if (length < 0)
                 value = value.PadRight(-length);
             else if (length > 0)

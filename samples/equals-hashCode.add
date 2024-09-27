@@ -1,0 +1,57 @@
+class Product
+{
+	public constructor(id = 0, name = '', description = '', price = 0)
+	{
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.price = price;
+	}
+	
+	public property id;
+	
+	public property name;
+	
+	public property description;
+	
+	public property price;
+	
+	public function equals(other) => other is Product && other.id === this.id;
+	
+	public function hashCode() => this.id.hashCode();
+	
+	public function toString(fmt = '') => $'Product {{id = {this.id}, name = {this.name}}}';
+}
+
+products = [
+	new Product(1, 'Yellow Sofa', 'A nice yellow sofa', 1050),
+	new Product(2, 'Samsung Fridge', 'A two-doors Samsung fridge', 2075),
+	new Product(1, 'Cooking Set', 'An amasing cooking set', 180),
+	new Product(3, 'Panasonic Microwave', 'A huge Panasonic microwave oven', 220),
+	new Product(4, 'Red Tesla 3 Car', 'A beautiful red Tesla series 3 car', 1050),
+	new Product(3, 'Gabonese Statues', 'A pair of statues for Gabon representing a couple', 45)
+];
+
+println('items in the list:');
+println(products.join(NEWLINE));
+println();
+
+s = {};
+products.each(|p| => s.add(p));
+
+println('items in the set:');
+println(((list)s).join(NEWLINE));
+println();
+
+distincts = products.aggregate([], function (acc, val)
+                                   {
+	                                   if (!(acc contains val))
+		                                   acc.add(val);
+	                                   return acc;
+                                   });
+
+println('distinct items:');
+println(distincts.join(NEWLINE));
+println();
+
+readln();

@@ -5,6 +5,7 @@ using AddyScript.Ast.Expressions;
 using AddyScript.Translators;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+using System.Linq;
 
 
 namespace AddyScript.Runtime
@@ -48,15 +49,10 @@ namespace AddyScript.Runtime
         public static DataItem Invoke(string method, Class klass, params object[] args)
         {
             var name = new QualifiedName(klass.Name, method);
+            var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
+            new StaticMethodCall(name, literals).AcceptTranslator(Interpreter);
 
-            var literals = new Expression[args.Length];
-            for (int i = 0; i < args.Length; ++i)
-                literals[i] = new Literal(DataItemFactory.CreateDataItem(args[i]));
-
-            var call = new StaticMethodCall(name, literals);
-            call.AcceptTranslator(Interpreter);
-
-            return Interpreter.ReturnedValue;
+            return Interpreter.ReturnedValue; ;
         }
 
         /// <summary>

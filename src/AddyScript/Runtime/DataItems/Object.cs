@@ -44,8 +44,20 @@ namespace AddyScript.Runtime.DataItems
             get { return new Tuple<Class, Dictionary<string, DataItem>>(klass, fields); }
         }
 
+        public override object Clone()
+        {
+            var cloneFields = new Dictionary<string, DataItem>();
+
+            foreach (var pair in fields)
+                cloneFields.Add(pair.Key, (DataItem)pair.Value.Clone());
+
+            return new Object(klass, cloneFields);
+        }
+
         public override string ToString(string format, IFormatProvider formatProvider)
         {
+            if (IsOverridden("toString")) return RuntimeServices.ToString(this, format);
+
             var sb = new StringBuilder();
             sb.AppendFormat("<{0} {{", Class.Name);
 
@@ -62,6 +74,21 @@ namespace AddyScript.Runtime.DataItems
             if (trimEnd) sb.Remove(sb.Length - 2, 2);
 
             return sb.Append("}>").ToString();
+        }
+
+        protected override bool UnsafeEquals(DataItem other)
+        {
+            return IsOverridden("equals") ? RuntimeServices.Equals(this, other) : base.UnsafeEquals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return IsOverridden("hashCode") ? RuntimeServices.HashCode(this) : base.GetHashCode();
+        }
+
+        protected override int UnsafeCompareTo(DataItem other)
+        {
+            return IsOverridden("compareTo") ? RuntimeServices.CompareTo(this, other) : base.UnsafeCompareTo(other);
         }
 
         public override object ConvertTo(Type targetType)
@@ -93,6 +120,11 @@ namespace AddyScript.Runtime.DataItems
         public override void SetProperty(string propertyName, DataItem value)
         {
             fields[propertyName] = value;
+        }
+
+        private bool IsOverridden(string methodName)
+        {
+            return klass != Class.Object && klass.GetDeclaredMember(methodName, MemberKind.Method) != null;
         }
     }
 }

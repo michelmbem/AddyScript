@@ -49,7 +49,7 @@ namespace AddyScript.Translators
         private string fileName = string.Empty;
         private MissingReferenceAction misRefAct = MissingReferenceAction.Fail;
         private JumpCode jumpCode = JumpCode.None;
-        private DataItem returnedValue;
+        private DataItem returnedValue; // Do not reference this field twice expecting it to have the same value!
         private Goto lastGoto;
         
         #endregion
@@ -112,9 +112,9 @@ namespace AddyScript.Translators
                             ++counter;
                             break;
                         case JumpCode.Goto:
-                            if (program.Labels.ContainsKey(lastGoto.LabelName))
+                            if (program.Labels.TryGetValue(lastGoto.LabelName, out Label label))
                             {
-                                counter = program.Labels[lastGoto.LabelName].Address;
+                                counter = label.Address;
                                 jumpCode = JumpCode.None;
                                 break;
                             }
@@ -361,9 +361,11 @@ namespace AddyScript.Translators
             if (returnTypeProperty != null)
             {
                 returnTypeProperty.Expression.AcceptTranslator(this);
-                returnType = GetTypeByName(returnedValue.ToString()) ??
+                string returnTypeName = returnedValue.ToString();
+
+                returnType = GetTypeByName(returnTypeName) ??
                     throw new ScriptException(fileName, returnTypeProperty,
-                        string.Format(Resources.InvalidTypeReference, returnedValue));
+                        string.Format(Resources.InvalidTypeReference, returnTypeName));
             }
 
             var paramTypes = new Type[extDecl.Parameters.Length];
@@ -468,6 +470,7 @@ namespace AddyScript.Translators
                         returnedValue = Undefined.Value;
                     else
                         initializer.Expression.AcceptTranslator(this);
+
                     currentFrame.PutItem(initializer.Name, returnedValue);
                 }
                 else if (frame != currentFrame)
@@ -479,6 +482,7 @@ namespace AddyScript.Translators
                                 returnedValue = Undefined.Value;
                             else
                                 initializer.Expression.AcceptTranslator(this);
+
                             currentFrame.PutItem(initializer.Name, returnedValue);
                             break;
                         default:
@@ -565,9 +569,9 @@ namespace AddyScript.Translators
             binExpr.LeftOperand.AcceptTranslator(this);
             DataItem leftOperand = returnedValue;
 
-            if ((binExpr.Operator == BinaryOperator.AndAlso && !returnedValue.AsBoolean) ||
-                (binExpr.Operator == BinaryOperator.OrElse && returnedValue.AsBoolean) ||
-                (binExpr.Operator == BinaryOperator.IfEmpty && !returnedValue.IsEmpty())) return;
+            if ((binExpr.Operator == BinaryOperator.AndAlso && !leftOperand.AsBoolean) ||
+                (binExpr.Operator == BinaryOperator.OrElse && leftOperand.AsBoolean) ||
+                (binExpr.Operator == BinaryOperator.IfEmpty && !leftOperand.IsEmpty())) return;
 
             try
             {
@@ -584,7 +588,8 @@ namespace AddyScript.Translators
                         return;
                     }
 
-                    if (binExpr.Operator == BinaryOperator.Plus && binExpr.RightOperand is Literal l && l.Value.Class == Class.String)
+                    if (binExpr.Operator == BinaryOperator.Plus && binExpr.RightOperand is Literal literal &&
+                        literal.Value.Class == Class.String)
                     {
                         // Handle string concatenation when the left operand is an object
                         new MethodCall(new Literal(leftOperand), "toString").AcceptTranslator(this);
@@ -603,9 +608,10 @@ namespace AddyScript.Translators
                 if (binExpr.Operator == BinaryOperator.AndAlso || binExpr.Operator == BinaryOperator.OrElse ||
                     binExpr.Operator == BinaryOperator.IfEmpty) return;
 
-                returnedValue = leftOperand.ConversionNeeded(returnedValue.Class, binExpr.Operator)
-                              ? leftOperand.ConvertTo(returnedValue.Class).BinaryOperation(binExpr.Operator, returnedValue)
-                              : leftOperand.BinaryOperation(binExpr.Operator, returnedValue);
+                DataItem rightOperand = returnedValue;
+                returnedValue = leftOperand.ConversionNeeded(rightOperand.Class, binExpr.Operator)
+                              ? leftOperand.ConvertTo(rightOperand.Class).BinaryOperation(binExpr.Operator, rightOperand)
+                              : leftOperand.BinaryOperation(binExpr.Operator, rightOperand);
             }
             catch (InvalidCastException)
             {
@@ -634,46 +640,45 @@ namespace AddyScript.Translators
         public void TranslateUnaryExpression(UnaryExpression unExpr)
         {
             unExpr.Operand.AcceptTranslator(this);
+            DataItem operand = returnedValue;
 
             try
             {
-                if (returnedValue.Class.Inherits(Class.Object) && IsOverloadable(unExpr.Operator, out bool postfix))
+                if (operand.Class.Inherits(Class.Object) && IsOverloadable(unExpr.Operator, out bool postfix))
                 {
                     string methodName = ClassMethod.GetMethodName(unExpr.Operator);
-                    ClassMethod method = returnedValue.Class.GetMethod(methodName) ??
+                    ClassMethod method = operand.Class.GetMethod(methodName) ??
                         throw new RuntimeException(fileName, unExpr, string.Format(Resources.OperatorCantBeApplied,
-                            CodeGenerator.UnaryOperatorToString(unExpr.Operator), returnedValue.Class.Name));
+                            CodeGenerator.UnaryOperatorToString(unExpr.Operator), operand.Class.Name));
 
                     CheckAccess(method, unExpr);
 
                     Expression[] args = postfix ? [new Literal()] : [];
-                    Invoke(method.Function, methodName, method.Holder, returnedValue, args);
+                    Invoke(method.Function, methodName, method.Holder, operand, args);
                 }
                 else
                     switch (unExpr.Operator)
                     {
                         case UnaryOperator.PreIncrement:
-                            Assign(unExpr.Operand, new Integer(returnedValue.AsInt32 + 1));
+                            Assign(unExpr.Operand, new Integer(operand.AsInt32 + 1));
                             break;
                         case UnaryOperator.PostIncrement:
-                            DataItem beforeIncrement = returnedValue;
-                            Assign(unExpr.Operand, new Integer(returnedValue.AsInt32 + 1));
-                            returnedValue = beforeIncrement;
+                            Assign(unExpr.Operand, new Integer(operand.AsInt32 + 1));
+                            returnedValue = operand;
                             break;
                         case UnaryOperator.PreDecrement:
-                            Assign(unExpr.Operand, new Integer(returnedValue.AsInt32 - 1));
+                            Assign(unExpr.Operand, new Integer(operand.AsInt32 - 1));
                             break;
                         case UnaryOperator.PostDecrement:
-                            DataItem beforeDecrement = returnedValue;
-                            Assign(unExpr.Operand, new Integer(returnedValue.AsInt32 - 1));
-                            returnedValue = beforeDecrement;
+                            Assign(unExpr.Operand, new Integer(operand.AsInt32 - 1));
+                            returnedValue = operand;
                             break;
                         case UnaryOperator.NotEmpty:
-                            if (returnedValue.IsEmpty())
+                            if (operand.IsEmpty())
                                 throw new RuntimeException(fileName, unExpr, Resources.ValueShouldNotBeEmpty);
                             break;
                         default:
-                            returnedValue = returnedValue.UnaryOperation(unExpr.Operator);
+                            returnedValue = operand.UnaryOperation(unExpr.Operator);
                             break;
                     }
             }
@@ -698,8 +703,10 @@ namespace AddyScript.Translators
             {
                 cplxInit.RealPartInitializer.AcceptTranslator(this);
                 double realPart = returnedValue.AsDouble;
+
                 cplxInit.ImaginaryPartInitializer.AcceptTranslator(this);
                 double imaginaryPart = returnedValue.AsDouble;
+
                 returnedValue = new Complex(realPart, imaginaryPart);
             }
             catch (ScriptException)
@@ -746,6 +753,7 @@ namespace AddyScript.Translators
                 {
                     item.Key.AcceptTranslator(this);
                     DataItem key = returnedValue;
+
                     item.Value.AcceptTranslator(this);
                     dict.Add(key, returnedValue);
                 }
@@ -795,7 +803,7 @@ namespace AddyScript.Translators
                 try
                 {
                     propInit.Expression.AcceptTranslator(this);
-                    fields[propInit.Name] = returnedValue;
+                    fields.Add(propInit.Name, returnedValue);
                 }
                 catch (ScriptException)
                 {
@@ -840,9 +848,12 @@ namespace AddyScript.Translators
                 switch (frameItem.Kind)
                 {
                     case FrameItemKind.Variable:
-                        returnedValue = (DataItem)frameItem;
-                        if (returnedValue == Undefined.Value && misRefAct == MissingReferenceAction.Fail)
-                            throw new RuntimeException(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
+                        {
+                            var variable = (DataItem)frameItem;
+                            if (variable == Undefined.Value && misRefAct == MissingReferenceAction.Fail)
+                                throw new RuntimeException(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
+                            returnedValue = variable;
+                        }
                         break;
                     case FrameItemKind.Constant:
                         returnedValue = ((Constant)frameItem).Value;
@@ -859,14 +870,16 @@ namespace AddyScript.Translators
         {
             try
             {
+                DataItem itemValue;
+
                 ResolveItemRef(itemRef, out DataItem owner, out DataItem index, out ClassProperty indexer);
 
                 if (owner == null)
-                    returnedValue = null;
+                    itemValue = null;
                 else if (owner == Void.Value && itemRef.Optional)
-                    returnedValue = Void.Value;
+                    itemValue = Void.Value;
                 else if (indexer == null)
-                    returnedValue = owner?.GetItem(index);
+                    itemValue = owner.GetItem(index);
                 else
                 {
                     if (!indexer.CanRead)
@@ -874,10 +887,13 @@ namespace AddyScript.Translators
 
                     CheckAccess(indexer.Reader, itemRef);
                     Invoke(indexer.Reader.Function, indexer.Name, indexer.Holder, owner, new Literal(index));
+                    return;
                 }
 
-                if (returnedValue == null && misRefAct != MissingReferenceAction.Ignore)
+                if (itemValue == null && misRefAct != MissingReferenceAction.Ignore)
                     throw new RuntimeException(fileName, itemRef, string.Format(Resources.IndexNotFound, index));
+
+                returnedValue = itemValue;
             }
             catch (ScriptException)
             {
@@ -908,8 +924,9 @@ namespace AddyScript.Translators
                 }
 
                 sliceRef.Owner.AcceptTranslator(this);
+                DataItem owner = returnedValue;
 
-                switch (returnedValue.Class.ClassID)
+                switch (owner.Class.ClassID)
                 {
                     case ClassID.Void:
                         if (!sliceRef.Optional) goto default;
@@ -917,7 +934,7 @@ namespace AddyScript.Translators
                         break;
                     case ClassID.String:
                         {
-                            string str = returnedValue.ToString();
+                            string str = owner.ToString();
                             while (lBound < 0) lBound += str.Length;
                             while (uBound <= 0) uBound += str.Length;
                             returnedValue = new String(str[lBound..uBound]);
@@ -925,7 +942,7 @@ namespace AddyScript.Translators
                         break;
                     case ClassID.List:
                         {
-                            List<DataItem> lst = returnedValue.AsList;
+                            List<DataItem> lst = owner.AsList;
                             while (lBound < 0) lBound += lst.Count;
                             while (uBound <= 0) uBound += lst.Count;
                             returnedValue = new List(lst[lBound..uBound]);
@@ -933,7 +950,7 @@ namespace AddyScript.Translators
                         break;
                     default:
                         throw new RuntimeException(fileName, sliceRef,
-                            string.Format(Resources.SlicingNotSupported, returnedValue.Class.Name));
+                            string.Format(Resources.SlicingNotSupported, owner.Class.Name));
                 }
             }
             catch (ScriptException)
@@ -950,37 +967,42 @@ namespace AddyScript.Translators
         {
             try
             {
+                DataItem propValue;
+
                 ResolvePropertyRef(propertyRef, out DataItem owner, out ClassMember member);
 
                 if (owner == null)
-                    returnedValue = null;
+                    propValue = null;
                 else if (owner == Void.Value && propertyRef.Optional)
-                    returnedValue = Void.Value;
-                if (member is ClassField field)
-                    returnedValue = (member.Modifier == Modifier.Static) || (member.Modifier == Modifier.StaticFinal)
-                                  ? field.SharedValue
-                                  : owner.GetProperty(member.Name);
-                else if (member is ClassProperty property)
-                {
-                    if (!property.CanRead)
-                        throw new RuntimeException(fileName, propertyRef, Resources.CannotReadProperty);
-                    
-                    CheckAccess(property.Reader, propertyRef);
-                    Invoke(property.Reader.Function, property.Name, property.Holder, owner);
-                }
+                    propValue = Void.Value;
+                else if (member == null)
+                    propValue = owner.GetProperty(propertyRef.PropertyName);
+                else if (member is ClassField field)
+                    propValue = (member.Modifier == Modifier.Static) || (member.Modifier == Modifier.StaticFinal)
+                              ? field.SharedValue
+                              : owner.GetProperty(member.Name);
                 else if (member is ClassMethod method)
                 {
                     var parameters = method.Function.Parameters;
                     var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
-                    var fn = new Function(parameters, Block.Return(new MethodCall(propertyRef.Owner, method.Name, args)));
-                    returnedValue = new Closure(fn);
+                    var fn = new Function(parameters, Block.Return(new MethodCall(new Literal(owner), method.Name, args)));
+                    propValue = new Closure(fn);
                 }
-                else // member is certainly null, trying to get an undeclared field
-                    returnedValue = owner.GetProperty(propertyRef.PropertyName);
+                else // member is surely a ClassProperty
+                {
+                    var property = (ClassProperty)member;
+                    if (!property.CanRead) throw new RuntimeException(fileName, propertyRef, Resources.CannotReadProperty);
 
-                if (returnedValue == null && misRefAct != MissingReferenceAction.Ignore)
+                    CheckAccess(property.Reader, propertyRef);
+                    Invoke(property.Reader.Function, property.Name, property.Holder, owner);
+                    return;
+                }
+
+                if (propValue == null && misRefAct != MissingReferenceAction.Ignore)
                     throw new RuntimeException(fileName, propertyRef,
                         string.Format(Resources.PropertyNotFoundInObject, propertyRef.PropertyName));
+
+                returnedValue = propValue;
             }
             catch (ScriptException)
             {
@@ -1077,14 +1099,12 @@ namespace AddyScript.Translators
             try
             {
                 anCall.Callee.AcceptTranslator(this);
-                if (returnedValue is not Closure)
-                    throw new RuntimeException(fileName, anCall.Callee, Resources.CalleeIsNotClosure);
 
-                Function function = returnedValue.AsFunction;
-                InvocationContext ctx = currentFrame.Context;
-                if (function.DeclaringFrame != null)
-                    ctx = function.DeclaringFrame.Context;
+                DataItem target = returnedValue;
+                if (target is not Closure) throw new RuntimeException(fileName, anCall.Callee, Resources.CalleeIsNotClosure);
 
+                Function function = target.AsFunction;
+                InvocationContext ctx = function.DeclaringFrame != null ? function.DeclaringFrame.Context : currentFrame.Context;
                 Invoke(function, anCall.FunctionName, ctx.MethodHolder, ctx.MethodTarget, anCall.Arguments, anCall.NamedArgs);
             }
             catch (ScriptException)
@@ -1102,9 +1122,10 @@ namespace AddyScript.Translators
             try
             {
                 methodCall.Target.AcceptTranslator(this);
-                if (returnedValue == Void.Value && methodCall.Optional) return;
-
+                
                 DataItem methodTarget = returnedValue;
+                if (methodTarget == Void.Value && methodCall.Optional) return;
+
                 ClassMethod method = methodTarget.Class.GetMethod(methodCall.FunctionName);
                 Class methodHolder = currentFrame.Context.MethodHolder;
                 Function function = null;
@@ -1309,8 +1330,7 @@ namespace AddyScript.Translators
 
                 if (member is ClassProperty property)
                 {
-                    if (!property.CanRead)
-                        throw new RuntimeException(fileName, ppr, Resources.CannotReadProperty);
+                    if (!property.CanRead) throw new RuntimeException(fileName, ppr, Resources.CannotReadProperty);
 
                     Invoke(property.Reader.Function, property.Name, property.Holder, currentFrame.Context.MethodTarget);
                 }
@@ -1405,8 +1425,8 @@ namespace AddyScript.Translators
 
                 misRefAct = MissingReferenceAction.Ignore;
                 typeVerif.Expression.AcceptTranslator(this);
-                bool b = returnedValue == null ? klass == Class.Void : returnedValue.InstanceOf(klass);
-                returnedValue = Boolean.FromBool(b);
+                DataItem retVal = returnedValue;
+                returnedValue = Boolean.FromBool((retVal == null && klass == Class.Void) || retVal.InstanceOf(klass));
             }
             catch (ScriptException)
             {
@@ -1436,9 +1456,11 @@ namespace AddyScript.Translators
             try
             {
                 conversion.Expression.AcceptTranslator(this);
-                if (returnedValue.Class.Inherits(Class.Object))
+
+                DataItem converted = returnedValue;
+                if (converted.Class.Inherits(Class.Object))
                     throw new RuntimeException(fileName, conversion.Expression,
-                        string.Format(Resources.CannotConvertFrom, returnedValue.Class.Name));
+                        string.Format(Resources.CannotConvertFrom, converted.Class.Name));
 
                 if (rootFrame.GetItem(conversion.TypeName) is not Class klass)
                     throw new RuntimeException(fileName, conversion,
@@ -1448,7 +1470,7 @@ namespace AddyScript.Translators
                     throw new RuntimeException(fileName, conversion,
                         string.Format(Resources.CannotConvertTo, conversion.TypeName));
 
-                returnedValue = returnedValue.ConvertTo(klass);
+                returnedValue = converted.ConvertTo(klass);
             }
             catch (ScriptException)
             {
@@ -1655,9 +1677,12 @@ namespace AddyScript.Translators
         public void TranslateThrow(Throw _throw)
         {
             _throw.Expression.AcceptTranslator(this);
-            if (returnedValue.InstanceOf(Class.Exception))
-                throw new RuntimeException(fileName, _throw, returnedValue);
-            throw new RuntimeException(fileName, _throw, returnedValue.ToString());
+            DataItem thrown = returnedValue;
+
+            if (thrown.InstanceOf(Class.Exception))
+                throw new RuntimeException(fileName, _throw, thrown);
+
+            throw new RuntimeException(fileName, _throw, thrown.ToString());
         }
 
         public void TranslateTryCatchFinally(TryCatchFinally tcf)
@@ -1704,6 +1729,7 @@ namespace AddyScript.Translators
                     {
                         jumpCode = JumpCode.None;
                         tcf.FinallyBlock.AcceptTranslator(this);
+
                         if (jumpCode == JumpCode.Goto)
                             finalException = new RuntimeException(fileName, lastGoto, Resources.CannotJumpOutOfFinallyBlock);
                     }
@@ -1798,18 +1824,20 @@ namespace AddyScript.Translators
             try
             {
                 altCopy.Original.AcceptTranslator(this);
-                
-                if (returnedValue.Class.ClassID != ClassID.Object)
+
+                DataItem original = returnedValue;
+                if (original.Class.ClassID != ClassID.Object)
                     throw new RuntimeException(fileName, altCopy, Resources.InvalidOperandForWith);
 
                 var copyFields = new Dictionary<string, DataItem>();
 
-                foreach (var originalField in returnedValue.AsDynamicObject)
+                foreach (var originalField in original.AsDynamicObject)
                     copyFields.Add(originalField.Key, originalField.Value);
 
-                returnedValue = new Object(returnedValue.Class, copyFields);
+                DataItem copy = new Object(original.Class, copyFields);
+                ApplyPropertyInitializers(altCopy, copy, altCopy.PropertyInitializers);
 
-                ApplyPropertyInitializers(altCopy, returnedValue, altCopy.PropertyInitializers);
+                returnedValue = copy;
             }
             catch (ScriptException)
             {
@@ -1939,8 +1967,7 @@ namespace AddyScript.Translators
         private void RegisterLabel(string name, Label label)
         {
             IFrameItem frameItem = currentFrame.GetItem(name);
-            if (frameItem != null)
-                throw new ScriptException(fileName, label, string.Format(Resources.NameConflict, name));
+            if (frameItem != null) throw new ScriptException(fileName, label, string.Format(Resources.NameConflict, name));
             
             currentFrame.PutItem(name, label);
         }
@@ -2006,10 +2033,12 @@ namespace AddyScript.Translators
                     if (counter == positionalArgs.Length - 1)
                     {
                         positionalArgs[counter].AcceptTranslator(this);
-                        if (returnedValue.Class == Class.List)
-                            vaList = returnedValue;
+                        DataItem argValue = returnedValue;
+
+                        if (argValue.Class == Class.List)
+                            vaList = argValue;
                         else
-                            vaList.AsList.Add(returnedValue);
+                            vaList.AsList.Add(argValue);
                     }
                     else
                     {
@@ -2279,17 +2308,17 @@ namespace AddyScript.Translators
                 }
 
                 initializer.Expression.AcceptTranslator(this);
+                DataItem propValue = returnedValue;
 
                 if (member is ClassProperty property)
                 {
-                    if (!property.CanWrite)
-                        throw new ScriptException(fileName, initializer, Resources.CannotWriteProperty);
+                    if (!property.CanWrite) throw new ScriptException(fileName, initializer, Resources.CannotWriteProperty);
 
                     CheckAccess(property.Writer, initializer.Expression);
-                    Invoke(property.Writer.Function, property.Name, property.Holder, target, new Literal(returnedValue));
+                    Invoke(property.Writer.Function, property.Name, property.Holder, target, new Literal(propValue));
                 }
                 else
-                    target.SetProperty(initializer.Name, returnedValue);
+                    target.SetProperty(initializer.Name, propValue);
             }
 
             returnedValue = savedValue;
@@ -2302,8 +2331,7 @@ namespace AddyScript.Translators
         /// <returns>A <see cref="DataItem"/></returns>
         private DataItem ConvertException(ScriptException sx)
         {
-            if (sx is RuntimeException rx && rx.Thrown != null)
-                return rx.Thrown;
+            if (sx is RuntimeException rx && rx.Thrown != null) return rx.Thrown;
             
             var ex = new Object(Class.Exception);
             InitializeFields(ex);
@@ -2717,9 +2745,11 @@ namespace AddyScript.Translators
             try
             {
                 expr.AcceptTranslator(this);
-                return returnedValue.Class.Inherits(Class.Object)
-                     ? GetProgrammaticEnumerable(returnedValue, expr)
-                     : returnedValue.GetEnumerable();
+                DataItem enumerated = returnedValue;
+
+                return enumerated.Class.Inherits(Class.Object)
+                     ? GetProgrammaticEnumerable(enumerated, expr)
+                     : enumerated.GetEnumerable();
             }
             catch (ScriptException)
             {
