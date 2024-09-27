@@ -46,6 +46,8 @@ namespace AddyScript.Runtime.DataItems
 
         public override object Clone()
         {
+            if (IsOverridden("clone")) return RuntimeServices.Clone(this);
+
             var cloneFields = new Dictionary<string, DataItem>();
 
             foreach (var pair in fields)
@@ -78,17 +80,31 @@ namespace AddyScript.Runtime.DataItems
 
         protected override bool UnsafeEquals(DataItem other)
         {
-            return IsOverridden("equals") ? RuntimeServices.Equals(this, other) : base.UnsafeEquals(other);
+            return IsOverridden("equals")
+                 ? RuntimeServices.Equals(this, other)
+                 : base.UnsafeEquals(other);
         }
 
         public override int GetHashCode()
         {
-            return IsOverridden("hashCode") ? RuntimeServices.HashCode(this) : base.GetHashCode();
+            return IsOverridden("hashCode")
+                 ? RuntimeServices.HashCode(this)
+                 : base.GetHashCode();
         }
 
         protected override int UnsafeCompareTo(DataItem other)
         {
-            return IsOverridden("compareTo") ? RuntimeServices.CompareTo(this, other) : base.UnsafeCompareTo(other);
+            return IsOverridden("compareTo")
+                 ? RuntimeServices.CompareTo(this, other)
+                 : base.UnsafeCompareTo(other);
+        }
+
+        public override void Dispose()
+        {
+            if (IsOverridden("dispose"))
+                RuntimeServices.Dispose(this);
+            else
+                base.Dispose();
         }
 
         public override object ConvertTo(Type targetType)

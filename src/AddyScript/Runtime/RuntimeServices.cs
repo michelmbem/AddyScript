@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Translators;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
-using System.Linq;
 
 
 namespace AddyScript.Runtime
@@ -42,13 +42,13 @@ namespace AddyScript.Runtime
         /// <summary>
         /// Invokes a static method with the given arguments.
         /// </summary>
-        /// <param name="method">The method's name</param>
-        /// <param name="klass">The class from which to call a method</param>
+        /// <param name="methodName">The name of the method that should be invoked</param>
+        /// <param name="methodHolder">The class that holds the method</param>
         /// <param name="args">The arguments to pass to the method</param>
         /// <returns>The value returned by the method</returns>
-        public static DataItem Invoke(string method, Class klass, params object[] args)
+        public static DataItem Invoke(string methodName, Class methodHolder, params object[] args)
         {
-            var name = new QualifiedName(klass.Name, method);
+            var name = new QualifiedName(methodHolder.Name, methodName);
             var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
             new StaticMethodCall(name, literals).AcceptTranslator(Interpreter);
 
@@ -58,20 +58,15 @@ namespace AddyScript.Runtime
         /// <summary>
         /// Invokes a method from the given object with the given arguments.
         /// </summary>
-        /// <param name="method">The method's name</param>
-        /// <param name="caller">The object from which to call a method</param>
+        /// <param name="methodName">The name of the method that should be invoked</param>
+        /// <param name="methodTarget">The object from which to call a method</param>
         /// <param name="args">The arguments to pass to the method</param>
         /// <returns>The value returned by the method</returns>
-        public static DataItem Invoke(string method, DataItem caller, params object[] args)
+        public static DataItem Invoke(string methodName, DataItem methodTarget, params object[] args)
         {
-            Expression callingExpr = new Literal(caller);
-
-            var literals = new Expression[args.Length];
-            for (int i = 0; i < args.Length; ++i)
-                literals[i] = new Literal(DataItemFactory.CreateDataItem(args[i]));
-
-            var call = new MethodCall(callingExpr, method, literals);
-            call.AcceptTranslator(Interpreter);
+            Expression targetExpr = new Literal(methodTarget);
+            var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
+            new MethodCall(targetExpr, methodName, literals).AcceptTranslator(Interpreter);
 
             return Interpreter.ReturnedValue;
         }

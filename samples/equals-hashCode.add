@@ -20,7 +20,8 @@ class Product
 	
 	public function hashCode() => this.id.hashCode();
 	
-	public function toString(fmt = '') => $'Product {{id = {this.id}, name = {this.name}}}';
+	public function toString(fmt = '')
+		=> $'Product {{id = {this.id}, name = "{this.name}", price = {this.price:c}}}';
 }
 
 products = [

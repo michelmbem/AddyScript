@@ -9,7 +9,9 @@ namespace AddyScript.Interactive
 {
     static class Program
     {
-        const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\nGitHub page: https://github.com/michelmbem/AddyScript.\r\nUse the exit() function to quit.";
+        const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\n" +
+                                              "GitHub page: https://github.com/michelmbem/AddyScript.\r\n" +
+                                              "Use the exit() function to quit.";
         const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
         const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
         const string MAIN_PROMPT = ">>> ";
@@ -32,9 +34,6 @@ namespace AddyScript.Interactive
                 ShowError(ex);
                 Environment.Exit(1);
             }
-
-            InnerFunction.Globals.Add(SourceFunction(options.Context));
-            InnerFunction.Globals.Add(ExitFunction());
 
             switch (options.ExecutionMode)
             {
@@ -93,6 +92,9 @@ namespace AddyScript.Interactive
 
         private static void RunInteractive(ScriptContext context)
         {
+            InnerFunction.Globals.Add(SourceFunction(context));
+            InnerFunction.Globals.Add(ExitFunction());
+
             var engine = new ScriptEngine(context);
 
             ShowWelcome();

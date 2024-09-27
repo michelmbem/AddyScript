@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
@@ -7,7 +8,6 @@ using AddyScript.Translators;
 using AddyScript.Parsers;
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
-using System.Linq;
 using AddyScript.Ast.Statements;
 
 

@@ -312,6 +312,6 @@ There is a set of members that any class in AddyScript (including the void type)
 |`any clone()`|method|Gets a deep copy of an object. For most types, this simply returns the target object itself. _clone_ is specially useful with collections and objects (native or not). For a native object, clone tests if the object's type implements the _ICloneable_ interface and if so, invokes its _Clone_ method.|
 |`void dispose()`|method|Tries to release the unmanaged resources held by the target object. Does nothing for most types. For a collection or an object, recursively calls itself on each item or field. For a native object, tests if the object's type implements the _IDisposable_ interface and if so, invokes its _Dispose_ method.|
 
-Apart from the _type_ property, any of these members can be overridden in your custom classes. At this time, AddyScript does not internally make an intensive usage of these methods but this will certainly change in the future. So be aware of that.
+Apart from the _type_ property, any of these members can be overridden in your custom classes. AddyScript internally uses them to compare data items and to identify them in collections.
 
 [Home](README.md) | [Previous](userfunc.md) | [Next](inheritance.md)
