@@ -49,7 +49,7 @@ Creating a custom statement can be summarized as follows:
    public void TranslateUnless(Unless unless)
    {
       if (!IsTrue(unless.Condition))
-         unless.Body.AccepCompiler(this);
+         unless.Body.AcceptTranslator(this);
    }
    ```
 

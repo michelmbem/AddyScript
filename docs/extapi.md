@@ -33,13 +33,13 @@ public static class MyExtensions
 
 ### Adding custom builtin classes
 
-Defining a new built-in class in AddyScript can have two meanings: it can mean adding a primitive type to the scripting engine. It can also mean adding a new object type to the scripting engine. Defining a new primitive type requires much more effort than creating a new object class. In all cases, you will need to create an instance of the _AddyScript.Runtime.OOP.Class_ meta-class and add it to the AddyScript._Runtime.Class.OOP.Predefined_ collection.
+Defining a new built-in class in AddyScript can have two meanings: it can mean adding a primitive type to the scripting engine. It can also mean adding a new object type to the scripting engine. Defining a new primitive type requires much more effort than creating a new object class. In all cases, you will need to create an instance of the _AddyScript.Runtime.OOP.Class_ meta-class and add it to the AddyScript._Runtime.Class.OOP.Class.Predefined_ collection.
 
 #### Object classes
 
 For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly as its base class. The meta-class has a constructor that allows you to specify the parent class. Afterwards, you will only need to provide member definitions to the new class. All members can be defined manually. For _property_ or _method_ members, this means creating their AST from scratch. But there is a shortcut which consists in creating an _InnerFunction_ which will not be added to the _InnerFunction.Globals_ collection but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_ or _AddyScript.Runtime.OOP.ClassProperty_ using one of the _ToInstanceMethod_, _ToStaticMethod_, _ToInstanceProperty_ or _ToStaticProperty_ methods of the _InnerFunction_ class.
 
-Exemple:
+Example:
 
 This is how we could define the _Exception_ class if it didn't exist in AddyScript
 
