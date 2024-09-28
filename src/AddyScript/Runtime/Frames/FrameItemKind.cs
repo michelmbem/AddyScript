@@ -1,14 +1,14 @@
-﻿namespace AddyScript.Runtime.Frames
+﻿namespace AddyScript.Runtime.Frames;
+
+
+/// <summary>
+/// Kinds of frame's item.
+/// </summary>
+public enum FrameItemKind
 {
-    /// <summary>
-    /// Kinds of frame's item.
-    /// </summary>
-    public enum FrameItemKind
-    {
-        Class,
-        Function,
-        Constant,
-        Variable,
-        Label
-    }
+    Class,
+    Function,
+    Constant,
+    Variable,
+    Label
 }

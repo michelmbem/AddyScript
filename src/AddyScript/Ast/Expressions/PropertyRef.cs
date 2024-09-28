@@ -1,3 +1,4 @@
+using AddyScript.Runtime.DataItems;
 using AddyScript.Translators;
 
 
@@ -11,7 +12,7 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="owner">The object to which the property belongs</param>
     /// <param name="propertyName">The property's name</param>
-    public class PropertyRef(Expression owner, string propertyName) : Expression
+    public class PropertyRef(Expression owner, string propertyName) : Reference
     {
 
         /// <summary>
@@ -38,6 +39,17 @@ namespace AddyScript.Ast.Expressions
         public static PropertyRef This(string propertyName)
         {
             return new PropertyRef(new SelfReference(), propertyName);
+        }
+
+
+        /// <summary>
+        /// Operates assignment to this reference.
+        /// </summary>
+        /// <param name="processor">The assignment processor to use</param>
+        /// <param name="rValue">The value that should be assigned to this reference</param>
+        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        {
+            processor.AssignToProperty(this, rValue);
         }
 
         /// <summary>

@@ -1,13 +1,13 @@
-﻿namespace AddyScript.Runtime.Frames
+﻿namespace AddyScript.Runtime.Frames;
+
+
+/// <summary>
+/// Represents anything that could be stored in a <see cref="Frame"/>.
+/// </summary>
+public interface IFrameItem
 {
     /// <summary>
-    /// Represents anything that could be stored in a <see cref="Frame"/>.
+    /// Gets the kind of item this object is.
     /// </summary>
-    public interface IFrameItem
-    {
-        /// <summary>
-        /// Gets the kind of item this object is.
-        /// </summary>
-        FrameItemKind Kind { get; }
-    }
+    FrameItemKind Kind { get; }
 }

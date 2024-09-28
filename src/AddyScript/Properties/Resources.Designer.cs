@@ -31,7 +31,7 @@ namespace AddyScript.Properties {
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
         /// </summary>
@@ -653,13 +653,42 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("IterationNotSupported", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à An iterator cannot return a value.
+        /// </summary>
+        internal static string IteratorCantReturnValue
+        {
+            get
+            {
+                return ResourceManager.GetString("IteratorCantReturnValue", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Recherche une chaîne localisée semblable à The script is trying to jump to a case label out of a switch block.
         /// </summary>
         internal static string JumpToCaseLabelOutOfSwitchBlock {
             get {
                 return ResourceManager.GetString("JumpToCaseLabelOutOfSwitchBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The list of variables can&apos;t be empty.
+        /// </summary>
+        internal static string ListCantBeEmpty {
+            get {
+                return ResourceManager.GetString("ListCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Both lists should have the same length.
+        /// </summary>
+        internal static string ListLengthMismatch {
+            get {
+                return ResourceManager.GetString("ListLengthMismatch", resourceCulture);
             }
         }
         
@@ -1268,11 +1297,22 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The left operand of 'with' should be an object.
+        ///   Recherche une chaîne localisée semblable à The value should not be empty.
         /// </summary>
         internal static string ValueShouldNotBeEmpty {
             get {
                 return ResourceManager.GetString("ValueShouldNotBeEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The yield statement can only be used in an iterator.
+        /// </summary>
+        internal static string YieldUsedOutOfIterator
+        {
+            get
+            {
+                return ResourceManager.GetString("YieldUsedOutOfIterator", resourceCulture);
             }
         }
     }

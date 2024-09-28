@@ -1,6 +1,6 @@
 xmlDoc = new Microsoft::XMLDOM();
 xmlDoc.async = false;
-xmlDoc.load("../../../Examples/data/people.xml");
+xmlDoc.load("../../../samples/data/people.xml");
 
 foreach (person in xmlDoc.selectNodes("/people/person"))
 {

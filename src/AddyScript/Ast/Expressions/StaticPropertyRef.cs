@@ -1,3 +1,4 @@
+using AddyScript.Runtime.DataItems;
 using AddyScript.Translators;
 
 
@@ -11,13 +12,24 @@ namespace AddyScript.Ast.Expressions
     /// Initializes a new instance of StaticPropertyRef
     /// </remarks>
     /// <param name="name">The qualified property's name</param>
-    public class StaticPropertyRef(QualifiedName name) : Expression
+    public class StaticPropertyRef(QualifiedName name) : Reference
     {
 
         /// <summary>
         /// The qualified property's name.
         /// </summary>
         public QualifiedName Name { get; private set; } = name;
+
+
+        /// <summary>
+        /// Operates assignment to this reference.
+        /// </summary>
+        /// <param name="processor">The assignment processor to use</param>
+        /// <param name="rValue">The value that should be assigned to this reference</param>
+        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        {
+            processor.AssignToStaticProperty(this, rValue);
+        }
 
         /// <summary>
         /// Translates this node.

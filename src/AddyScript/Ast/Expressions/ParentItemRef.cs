@@ -1,3 +1,4 @@
+using AddyScript.Runtime.DataItems;
 using AddyScript.Translators;
 
 
@@ -11,13 +12,24 @@ namespace AddyScript.Ast.Expressions
     /// Initializes a new instance of ParentIndexerRef
     /// </remarks>
     /// <param name="index">The expression used to evaluate the index</param>
-    public class ParentIndexerRef(Expression index) : Expression
+    public class ParentIndexerRef(Expression index) : Reference
     {
 
         /// <summary>
         /// The expression used to evaluate the index.
         /// </summary>
         public Expression Index { get; private set; } = index;
+
+
+        /// <summary>
+        /// Operates assignment to this reference.
+        /// </summary>
+        /// <param name="processor">The assignment processor to use</param>
+        /// <param name="rValue">The value that should be assigned to this reference</param>
+        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        {
+            processor.AssignToParentItem(this, rValue);
+        }
 
         /// <summary>
         /// Translates this node.

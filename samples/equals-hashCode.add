@@ -26,11 +26,14 @@ class Product
 
 products = [
 	new Product(1, 'Yellow Sofa', 'A nice yellow sofa', 1050),
-	new Product(2, 'Samsung Fridge', 'A two-doors Samsung fridge', 2075),
+	new Product(2, 'Two-doors Fridge', 'A two-doors fridge', 2075),
 	new Product(1, 'Cooking Set', 'An amasing cooking set', 180),
-	new Product(3, 'Panasonic Microwave', 'A huge Panasonic microwave oven', 220),
-	new Product(4, 'Red Tesla 3 Car', 'A beautiful red Tesla series 3 car', 1050),
-	new Product(3, 'Gabonese Statues', 'A pair of statues for Gabon representing a couple', 45)
+	new Product(3, 'Huge Microwave', 'A huge microwave oven', 220),
+	new Product(4, 'Electric Red Car', 'A beautiful electric red car', 1050),
+	new Product(3, 'Gabonese Statues', 'A pair of statues for Gabon representing a couple', 45),
+	new Product(2, 'Silver Hair Dryer', 'A shining hair dryer', 35),
+	new Product(4, 'Italian Tomato Can', 'A 1Kg tomato can from Italy', 12),
+	new Product(1, 'Very Smart TV', 'A TV that\'s realy smart', 1800)
 ];
 
 println('items in the list:');

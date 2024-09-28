@@ -169,7 +169,7 @@ namespace AddyScript.Gui
                 abstract as bool break case catch class closure complex const constructor contains continue date decimal default
                 do else endswith event extern false final finally float for foreach function goto if import in int is list long
                 map matches new null object operator params private property protected public queue rational read ref resource
-                return set stack startswith static string super switch this throw true try typeof var void while with write
+                return set stack startswith static string super switch this throw true try typeof var void while with write yield
             ");
 
             scintilla.SetKeywords(1, @"
@@ -299,7 +299,7 @@ namespace AddyScript.Gui
                 println?3 private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5
                 readln?3 ref?0 resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0
                 string?1 super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 typeof?4 unpack?3 var?0 void?1
-                while?0 with?0 write?5
+                while?0 with?0 write?5 yield?0
             ";
 
             foreach (string keyword in Regex.Split(keywords, @"\s+"))

@@ -198,4 +198,19 @@
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>The {0} type does not have support for slice extraction</value>
   </data>
+  <data name="NoEmptyLValue" xml:space="preserve">
+    <value>No lValue is defined</value>
+  </data>
+  <data name="NoEmptyRValue" xml:space="preserve">
+    <value>No rValue is defined</value>
+  </data>
+  <data name="TooManyRValues" xml:space="preserve">
+    <value>There are too many values to the right of the '=' operator</value>
+  </data>
+  <data name="YieldUsedOutOfIterator" xml:space="preserve">
+    <value>The yield statement can only be used in an iterator</value>
+  </data>
+  <data name="IteratorCantReturnValue" xml:space="preserve">
+    <value>An iterator cannot return a value</value>
+  </data>
 </root>
