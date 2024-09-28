@@ -7,19 +7,19 @@ In the example below, we will illustrate how inheritance is handled in AddyScrip
 ```Cpp
 class Employee : Person
 {
-	public constructor(name, sex, age, hireDate, department, jobTitle)
-		 : super(name, sex, age)
-	{
-		this.hireDate = hireDate;
-		this.department = department;
-		this.jobTitle = jobTitle;
-	}
-	
-	public property hireDate;
-	
-	public property department;
-	
-	public property jobTitle;
+    public constructor(name, sex, age, hireDate, department, jobTitle)
+         : super(name, sex, age)
+    {
+        this.hireDate = hireDate;
+        this.department = department;
+        this.jobTitle = jobTitle;
+    }
+    
+    public property hireDate;
+    
+    public property department;
+    
+    public property jobTitle;
 }
 
 // Usage:
@@ -40,25 +40,25 @@ Example:
 // A base abstract class with a single abstract method
 abstract class Pet
 {
-	public abstract function cry();
+    public abstract function cry();
 }
 
 // A subclass with a custom cry
 class Cat : Pet
 {
-	public function cry() => println('meow');
+    public function cry() => println('meow');
 }
 
 // Another subclass with a custom cry
 class Dog : Pet
 {
-	public function cry() => println('woof');
+    public function cry() => println('woof');
 }
 
 // Another subclass with a custom cry
 class Pig : Pet
 {
-	public function cry() => println('gruing');
+    public function cry() => println('gruing');
 }
 
 // a set of pets
@@ -66,7 +66,7 @@ pets = {new Dog(), new Cat(), new Pig()};
 
 // making them all cry
 foreach (pet in pets)
-	pet.cry();
+    pet.cry();
 ```
 
 ### The super keyword
