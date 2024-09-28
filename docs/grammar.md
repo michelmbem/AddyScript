@@ -51,9 +51,11 @@ Statement ::= ImportDirective
             | Continue
             | Break
             | Goto
+            | Yield
             | Return
             | Throw
             | TryCatchFinally
+            | GroupAssignment
             | Expression ';'
 ```
 
@@ -399,6 +401,14 @@ Break ::= 'break' ';'
 Goto ::= 'goto' ( IDENTIFIER | 'case' ( BOOLEAN | INTEGER | STRING ) | 'default' ) ';'
 ```
 
+**Yield:**
+
+![Yield](diagram/Yield.svg)
+
+```
+Yield ::= 'yield' Expression ';'
+```
+
 **Return:**
 
 ![Return](diagram/Return.svg)
@@ -421,6 +431,14 @@ Throw ::= 'throw' Expression ';'
 
 ```
 TryCatchFinally ::= 'try' ( '(' Expression ')' )? Block ( 'catch' '(' IDENTIFIER ')' Block )? ( 'finally' Block )?
+```
+
+**GroupAssignment:**
+
+![GroupAssignment](diagram/GroupAssignment.svg)
+
+```
+GroupAssignment ::= '(' ExpressionList ')' '=' '(' ExpressionList ')' ';'
 ```
 
 **Expression:**

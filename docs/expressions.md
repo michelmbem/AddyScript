@@ -196,7 +196,10 @@ foreach (item in lst)
        println('something else');
 ```
 
-This also works with user-defined classes and takes inheritance into account: if B inherits A then _'instance_of_B is A'_ returns **true**.
+**Notes**:
+
+* This also works with user-defined classes and takes inheritance into account: if B is a subclass of A, then for any instance b of B, `b is A` returns **true**.
+* For any data item x, the `x is void` test is simply a way to check whether x is declared in the current scope or not (exactly like JavaScript's `x === 'undefined'`). This behavior may change in the future.
 
 ### Conversion
 
@@ -213,7 +216,7 @@ Remember that this doesn't work for custom classes. But most of the time, it wil
 
 Below are listed AddyScript's operators with their meaning:
 
-|Operator|Desciption|
+|Operator|Description|
 |:-:|-|
 |+ (unary)|Identity, does nothing|
 |- (unary)|Opposite; transforms negative values to positive and vice-versa|
@@ -283,6 +286,45 @@ From the lowest to the highest priority, we have:
 ### Expressions
 
 An expression is any combination of operands and operators that can produce a value. An operand can be a literal value, a named constant, a reference to a variable, a reference to a list item, a reference to a field or property, a function or method call, the keyword **this**, an assignment, a unary expression, a binary expression, a ternary expression or any of these into parenthesis.
+
+### Assignments
+
+An assignment is a particular kind of expression where a value is set to a location in memory. So it's made of two child expressions: the **lvalue** which represents the memory location about to be set, and the **rvalue** which represents the value that's being assigned to the lvalue. Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (=). So an assignment in AddyScript typically looks like this:
+
+```
+lvalue = rvalue;
+```
+
+But AddyScript provides other assignment operators which are combinations of binary arithmetic or logical operators with the equal sign. When such an operator is used, the initial value of lvalue is combined with rvalue using the given binary operator and then the result is reassigned to lvalue. The complete list of these combined operators is given in the table below:
+
+|Operator|Equivalence|
+|:-:|-|
+|`+=`|`a += b` is equivalent to `a = a + b`|
+|`-=`|`a -= b` is equivalent to `a = a - b`|
+|`*=`|`a *= b` is equivalent to `a = a * b`|
+|`/=`|`a /= b` is equivalent to `a = a / b`|
+|`%=`|`a %= b` is equivalent to `a = a % b`|
+|`**=`|`a **= b` is equivalent to `a = a ** b`|
+|`<<=`|`a <<= b` is equivalent to `a = a << b`|
+|`>>=`|`a >>= b` is equivalent to `a = a >> b`|
+|`&=`|`a &= b` is equivalent to `a = a & b`|
+|`\|=`|`a \|= b` is equivalent to `a = a \| b`|
+|`^=`|`a ^= b` is equivalent to `a = a ^ b`|
+|`??=`|`a ??= b` is equivalent to `a = a ?? b`|
+
+#### Group Assignment
+
+Sometimes you need to assign values ​​to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`. But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**. In a group assignment, a tuple of values ​​is assigned to a tuple of variables (in the broad sense of the term). This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
+
+```
+(var1, var2, ..., varN) = (val1, val2, ..., valN);
+```
+
+**Notes**:
+* Only the equal sign (=) is supported for this type of assignment. Combined operators are not.
+* Both tuples must have exactly the same number of elements.
+* Neither tuple must be empty.
+* Each element of the left tuple must be a valid reference (such as a variable, a list element, or an object property).
 
 ### Reading and printing values from/to the console
 

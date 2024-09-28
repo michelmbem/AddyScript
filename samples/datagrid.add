@@ -8,25 +8,14 @@ const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../.
 
 function createColumn($property, header = null, type = "text", width = 100, readonly = false)
 {
-	var column;
-	
-	switch (type)
+	var column = type switch
 	{
-		case "text":
-			column = new DataGridViewTextBoxColumn();
-			break;
-		case "check":
-			column = new DataGridViewCheckBoxColumn();
-			break;
-		case "combo":
-			column = new DataGridViewComboBoxColumn();
-			break;
-		case "image":
-			column = new DataGridViewImageColumn();
-			break;
-		default:
-			throw "Invalid column type : " + type;
-	}
+		"text" => new DataGridViewTextBoxColumn(),
+		"check" => new DataGridViewCheckBoxColumn(),
+		"combo" => new DataGridViewComboBoxColumn(),
+		"image" => new DataGridViewImageColumn(),
+		_ => throw "Invalid column type : " + type
+	};
 	
 	column.DataPropertyName = $property;
 	column.HeaderText = header ?? $property;
@@ -99,21 +88,17 @@ function formClosing(sender, args)
 {
 	if (ds.HasChanges())
 	{
-		ans = MessageBox::Show(
-				"Save the changes made to data before exit?",
-				"Possible change loss",
-				"YesNoCancel",
-				"Question");
-		
-		switch (ans)
-		{
-			case "Yes":
-				da.Update(ds, "Products");
-				break;
-			case "Cancel":
-				args.Cancel = true;
-				return;
-		}
+		MessageBox::Show(
+			"Save the changes made to data before exit?",
+			"Possible change loss",
+			"YesNoCancel",
+			"Question"
+		) switch {
+			"Yes" => da.Update(ds, "Products"),
+			"Cancel" => args.Cancel = true
+		};
+	
+		if (args.Cancel) return;
 	}
 	
 	dbo.dispose();

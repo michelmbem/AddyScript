@@ -4,7 +4,7 @@ StatementWithLabels ::= Label* Statement
 
 Label ::= IDENTIFIER ':'
 
-Statement ::= ImportDirective | ClassDefinition | FunctionDecl | ExternalFunctionDecl | ConstantDecl | VariableDecl | Block | IfElse | SwitchBlock | ForLoop | ForEachLoop | WhileLoop | DoLoop | Continue | Break | Goto | Return | Throw | TryCatchFinally | (Expression ';')
+Statement ::= ImportDirective | ClassDefinition | FunctionDecl | ExternalFunctionDecl | ConstantDecl | VariableDecl | Block | IfElse | SwitchBlock | ForLoop | ForEachLoop | WhileLoop | DoLoop | Continue | Break | Goto | Yield | Return | Throw | TryCatchFinally | GroupAssignment | (Expression ';')
 
 ImportDirective ::= 'import' QualifiedName ('as' IDENTIFIER)? ';'
 
@@ -82,11 +82,15 @@ Break ::= 'break' ';'
 
 Goto ::= 'goto' (IDENTIFIER | ('case' (BOOLEAN | INTEGER | STRING)) | 'default') ';'
 
+Yield ::= 'yield' Expression ';'
+
 Return ::= 'return' Expression? ';'
 
 Throw ::= 'throw' Expression ';'
 
 TryCatchFinally ::= 'try' ('(' Expression ')')? Block ('catch' '(' IDENTIFIER ')' Block)? ('finally' Block)?
+
+GroupAssignment ::= '(' ExpressionList ')' '=' '(' ExpressionList ')' ';'
 
 Expression ::= Assignment
 

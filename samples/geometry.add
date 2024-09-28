@@ -3,15 +3,13 @@ abstract class Geometry
 	public abstract function perimeter();
 	
 	public abstract function surface();
-	
 }
 
 class Rectangle : Geometry
 {
 	public constructor(length, width)
 	{
-		this.length = length;
-		this.width = width;
+		(this.length, this.width) = (length, width);
 	}
 	
 	public property length { read; private write; }
@@ -32,7 +30,6 @@ class Rectangle : Geometry
 	{
 		return $'Rectangle {{ length: {this.length}, width: {this.width} }}';
 	}
-	
 }
 
 class Square : Rectangle
@@ -45,15 +42,13 @@ class Square : Rectangle
 	{
 		return $'Square {{ side: {this.length} }}';
 	}
-	
 }
 
 class Ellipse : Geometry
 {
 	public constructor(a, b)
 	{
-		this.a = a;
-		this.b = b;
+		(this.a, this.b) = (a, b);
 	}
 	
 	public property a { read; private write; }
@@ -74,7 +69,6 @@ class Ellipse : Geometry
 	{
 		return $'Ellipse {{ semi-major-axis: {this.a}, semi-minor-axis: {this.b} }}';
 	}
-	
 }
 
 class Circle : Ellipse
@@ -87,7 +81,6 @@ class Circle : Ellipse
 	{
 		return $'Circle {{ radius: {this.a} }}';
 	}
-	
 }
 
 geoms = [null] * 5;
@@ -95,6 +88,7 @@ geoms[0] = new Rectangle(6, 4);
 geoms[1] = new Square(5);
 geoms[2] = new Ellipse(5, 4);
 geoms[3] = new Circle(3);
+
 try
 {
 	geoms.add(new Geometry());
@@ -105,6 +99,7 @@ catch (e)
 	println(e.name + ' : ' + e.message);
 	println();
 }
+
 foreach (geom in geoms)
 {
 	println(title = (geom ?? 'null') + ':');
@@ -113,4 +108,5 @@ foreach (geom in geoms)
 	println(' - surface = {0:0.##}', geom?.surface());
 	println();
 }
+
 readln();
