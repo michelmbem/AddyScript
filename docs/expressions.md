@@ -91,7 +91,7 @@ Even if you don't have to explicitly define the type of your variables in AddySc
 
 |Type|Description|.Net equivalent|
 |:-:|-|-|
-|void|The type of null or anything that's undefined|System.Void|
+|void|The type of **null** or any undefined symbol|System.Void|
 |bool|A boolean: **true** or **false**|System.Boolean|
 |int|A 32-bits signed integer: ranging from -2147483648 to 2147483647. Operations on this type may produce a result of the **long** type as soon as an overflow occurs. Dividing two **int**s produces a result of the **rational** type when the dividend is not divisible by the divisor.|System.Int32|
 |long|A limitless-precision signed integer.|System.Numerics.BigInteger|
@@ -110,7 +110,7 @@ Even if you don't have to explicitly define the type of your variables in AddySc
 |resource|A reference to an imported .Net or COM object|System.Object|
 |closure|A reference to a function or method, a callback.|System.Delegate|
 |Exception|The representation of an error that occurs at runtime.|System.Exception|
-|Attribute|||
+|Attribute|Additional information attached to a function, class, class member, or parameter that can be used by the scripting engine to apply special processing to the target symbol|System.Attribute|
 |TypeInfo|A set of information describing a type. Used for introspection.|System.Type|
 |MemberInfo|A set of information describing a class member, the base class of FieldInfo, Property, MethodInfo and EventInfo. Used for introspection.|System.Reflection.MemberInfo|
 |FieldInfo|A set of information describing a field. Used for introspection.|System.Reflection.FieldInfo|
@@ -140,7 +140,7 @@ Depending on their type, literal values have the following forms:
 * **String**: a sequence of unicode characters between single or double quotes. When a backslash (\\) appears in a string, it alters the meaning of the following characters. Combinations of backslash and its followers are called **escape sequences** and have the following meaning:
 
     * **\\\\**: a literal backslash
-    * **\\'**: a single quote (not needed in strings wrapped double quotes)
+    * **\\'**: a single quote (not needed in strings wrapped in double quotes)
     * **\\"**: a double quote (not needed in strings wrapped in single quotes)
     * **\\t**: a horizontal tabulation
     * **\\v**: a vertical tabulation
