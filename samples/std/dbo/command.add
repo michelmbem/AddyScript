@@ -1,5 +1,5 @@
 import connection;
-import fetch;
+import fetch_funcs;
 import iterator;
 
 class DBOCommand
@@ -8,14 +8,14 @@ class DBOCommand
 	private command;
 	private prepared;
 	
-	public constructor(connection, commandText, commandType)
+	public constructor(connection!, commandText!, commandType!)
 	{
 		this.connection = connection;
 		this.command = connection.createCommand(commandText, commandType);
 		this.prepared = false;
 	}
 	
-	public function addParam(parameter)
+	public function addParam(parameter!)
 	{
 		var dbParam = this.command.CreateParameter();
 		this.command.Parameters.Add(dbParam);
@@ -41,13 +41,13 @@ class DBOCommand
 		return this;
 	}
 	
-	public function addParams(params parameters)
+	public function addParams(.. parameters)
 	{
 		parameters.each(|p| => this.addParam(p));
 		return this;
 	}
 	
-	public function setParam(index, value)
+	public function setParam(index!, value!)
 	{
 		this.command.Parameters[index].Value = value;
 		return this;
@@ -59,7 +59,7 @@ class DBOCommand
 		return this;
 	}
 	
-	public function setAllParams(params values)
+	public function setAllParams(.. values)
 	{
 		var k = 0, parameter;
 		foreach (parameter in this.command.Parameters) {
@@ -73,18 +73,18 @@ class DBOCommand
 		return this;
 	}
 	
-	public function query(fetch = null)
+	public function query(fetch_func = null)
 	{
 		var reader, result;
 		
-		if (fetch === null)
-			fetch = fetch_index_list;
+		if (fetch_func === null)
+			fetch_func = fetch_index_list;
 		
 		try {
 			this.command.Transaction = this.connection.transaction;
 			this.ensurePrepared();
 			reader = this.command.ExecuteReader();
-			result = fetch(reader);	
+			result = fetch_func(reader);	
 		}
 		catch (ex) {
 			throw ex;
@@ -132,7 +132,7 @@ class DBOCommand
 		return result;
 	}
 	
-	public function eachRow(action, processor = null)
+	public function eachRow(action!, processor = null)
 	{
 		var iterator, row;
 		
@@ -157,7 +157,7 @@ class DBOCommand
 		}
 	}
 	
-	public function fill(dataSet, tableName, createCmdBldr = false)
+	public function fill(dataSet!, tableName!, createCmdBldr = false)
 	{
 		var adapter;
 		
@@ -176,7 +176,7 @@ class DBOCommand
 		return adapter;
 	}
 	
-	public function getDataSet(tableName)
+	public function getDataSet(tableName!)
 	{
 		var dataSet = new System::Data::DataSet(tableName);
 		this.fill(dataSet, tableName).Dispose();

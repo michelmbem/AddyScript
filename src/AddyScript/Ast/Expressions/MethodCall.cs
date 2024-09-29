@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using AddyScript.Translators;
 
@@ -15,7 +16,7 @@ namespace AddyScript.Ast.Expressions
     /// <param name="methodName">The name of the method to invoke</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the method</param>
     /// <param name="namedArgs">The collection of named arguments passed to the method</param>
-    public class MethodCall(Expression target, string methodName, Expression[] positionalArgs,
+    public class MethodCall(Expression target, string methodName, ListItem[] positionalArgs,
                             Dictionary<string, Expression> namedArgs)
         : FunctionCall(methodName, positionalArgs, namedArgs)
     {
@@ -27,7 +28,7 @@ namespace AddyScript.Ast.Expressions
         /// <param name="methodName">The name of the method to invoke</param>
         /// <param name="arguments">The list of arguments passed to the method</param>
         public MethodCall(Expression target, string methodName, params Expression[] arguments)
-            : this(target, methodName, arguments, null)
+            : this(target, methodName, ToListItems(arguments), null)
         {
         }
 

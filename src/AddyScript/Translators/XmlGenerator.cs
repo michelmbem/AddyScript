@@ -197,17 +197,14 @@ public class XmlGenerator : ITranslator
 
         currentElement = document.CreateElement("LValues");
         tmpElement.AppendChild(currentElement);
-
         foreach (Expression lValue in grpAssign.LValues)
             lValue.AcceptTranslator(this);
 
-        currentElement = document.CreateElement("RValues");
-        tmpElement.AppendChild(currentElement);
-
-        foreach (Expression rValue in grpAssign.RValues)
-            rValue.AcceptTranslator(this);
-
         currentElement = previousElement;
+
+        XmlElement rValuesElement = document.CreateElement("RValues");
+        tmpElement.AppendChild(rValuesElement);
+        ProcessListItems(rValuesElement, grpAssign.RValues);
     }
 
     public void TranslateTernaryExpression(TernaryExpression terExpr)
@@ -296,15 +293,7 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("ListInitializer");
         currentElement.AppendChild(tmpElement);
-
-        XmlElement previousElement = currentElement;
-
-        currentElement = document.CreateElement("Items");
-        tmpElement.AppendChild(currentElement);
-        foreach (Expression item in listInit.Items)
-            item.AcceptTranslator(this);
-
-        currentElement = previousElement;
+        ProcessListItems(tmpElement, listInit.Items);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
@@ -318,15 +307,7 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("SetInitializer");
         currentElement.AppendChild(tmpElement);
-
-        XmlElement previousElement = currentElement;
-        
-        currentElement = document.CreateElement("Items");
-        tmpElement.AppendChild(currentElement);
-        foreach (Expression item in setInit.Items)
-            item.AcceptTranslator(this);
-        
-        currentElement = previousElement;
+        ProcessListItems(tmpElement, setInit.Items);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objectInit)
@@ -870,9 +851,7 @@ public class XmlGenerator : ITranslator
         {
             currentElement = document.CreateElement("Arguments");
             parent.AppendChild(currentElement);
-
-            foreach (Expression argument in call.Arguments)
-                argument.AcceptTranslator(this);
+            ProcessListItems(currentElement, call.Arguments);
         }
 
         if (call.NamedArgs != null)
@@ -924,7 +903,8 @@ public class XmlGenerator : ITranslator
         XmlElement tmpElement = document.CreateElement("ParameterDecl");
         tmpElement.SetAttribute("Name", parameter.Name);
         tmpElement.SetAttribute("ByRef", parameter.ByRef.ToString());
-        tmpElement.SetAttribute("VaArgs", parameter.VaArgs.ToString());
+        tmpElement.SetAttribute("VaList", parameter.VaList.ToString());
+        tmpElement.SetAttribute("CanBeEmpty", parameter.CanBeEmpty.ToString());
         parent.AppendChild(tmpElement);
 
         if (parameter.DefaultValue != null)
@@ -954,6 +934,27 @@ public class XmlGenerator : ITranslator
             initializer.Expression.AcceptTranslator(this);
             currentElement = previousElement;
         }
+    }
+
+    private void ProcessListItems(XmlElement parent, ListItem[] initializers)
+    {
+        foreach (ListItem initializer in initializers)
+            ProcessListItem(parent, initializer);
+    }
+
+    private void ProcessListItem(XmlElement parent, ListItem initializer)
+    {
+        XmlElement tmpElement = document.CreateElement("Item");
+        tmpElement.SetAttribute("Spread", initializer.Spread.ToString());
+        parent.AppendChild(tmpElement);
+
+        XmlElement previousElement = currentElement;
+
+        currentElement = document.CreateElement("Expression");
+        previousElement.AppendChild(currentElement);
+        initializer.Expression.AcceptTranslator(this);
+
+        currentElement = previousElement;
     }
 
     private void ProcessMapItemInitializers(XmlElement parent, MapItemInitializer[] initializers)

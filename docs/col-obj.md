@@ -6,11 +6,11 @@ Collections are ways to store multiple values ​​in a single variable. AddySc
 
 ### Lists
 
-A list is a collection in which items are accessed by index. It is a kind of dynamically sized array. You typically create a list using a list initializer. After creating a list, you can add new items to it using the "add" or "insert" methods. You can remove existing items from it using the "remove" and "removeAt" methods. A list is searched using the **contains** operator or the "indexOf" and "lastIndexOf" methods. The contents of the list can be sorted using the "sort" method. The "inverse" method returns a list with the same contents but with the items ordered in reverse order. To get the number of items currently stored in the list, simply read the "count" property and finally, to empty the list, call the "clear" method. Here is an example of using a list in AddyScript.
+A list is a collection in which items are accessed by index. It is a kind of dynamically sized array. You typically create a list using a list initializer. After creating a list, you can add new items to it using the "add" or "insert" methods. You can remove existing items from it using the "remove" and "removeAt" methods. A list is searched using the **contains** operator or the "indexOf" and "lastIndexOf" methods. The contents of the list can be sorted using the "sort" method. The "inverse" method returns a list with the same contents but with the items ordered in reverse order. To get the number of items currently stored in the list, simply read the "size" property and finally, to empty the list, call the "clear" method. Here is an example of using a list in AddyScript.
 
 Example:
 
-```Cpp
+```JS
 n = (int) readln('How many names? ');
 names = [];
 
@@ -38,7 +38,7 @@ else
 {
     i = (int) readln('Enter a position in the list: ');
     
-    if (i < names.count)
+    if (i < names.size)
     {
         names.insert(i, someName);
         println('After insertion of {0} at position {1}: {2}', someName, i, names);
@@ -78,7 +78,7 @@ In addition to the above operators, the **list** class exposes the following mem
 
 |Member|Nature|Description|
 |-|-|-|
-|`int count { read; }`|property|Gets the number of items currently stored in the list.|
+|`int size { read; }`|property|Gets the number of items currently stored in the list.|
 |`void add(any value)`|method|Appends an item to the list.|
 |`void insert(int position, any value)`|method|Inserts an item at the given position into the list. Negative values of the optional start parameter are processed modulo the length of the list.|
 |`void insertAll(int position, list values)`|method|Inserts the items of the given collection at the given position into the list. Negative values of the optional start parameter are processed modulo the length of the list.|
@@ -98,11 +98,11 @@ In addition to the above operators, the **list** class exposes the following mem
 
 ### Maps
 
-A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indexes are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "count" property. The "containsKey" and "containsValue" methods are used to check the existence of a particular pair in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map, the collection returned by "getValues" will contain only one copy of it. To get all the keys related to a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is related to. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).count`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
+A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indexes are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "size" property. The "containsKey" and "containsValue" methods are used to check the existence of a particular pair in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map, the collection returned by "getValues" will contain only one copy of it. To get all the keys related to a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is related to. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).size`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
 
 Example:
 
-```Cpp
+```JS
 tom = {'name' => 'Tom Berenger', 'job' => 'Lawyer', 'age' => 38};
 tom['company'] = 'Holy Lawyers & co.';
 tom['hire date'] = `2004-05-18`;
@@ -165,7 +165,7 @@ In addition to the above operators, the **map** class exposes the following memb
 
 |Member|Nature|Description|
 |-|-|-|
-|`int count { read; }`|property|Gets the number of key-value pairs currently stored in the map.|
+|`int size { read; }`|property|Gets the number of key-value pairs currently stored in the map.|
 |`set keys { read; }`|property|Gets a set of all the keys of a map.|
 |`set values { read; }`|property|Gets a set of all the distinct values of a map.|
 |`bool containsKey(any key)`|method|Checks if the map contains the given key.|
@@ -178,11 +178,11 @@ In addition to the above operators, the **map** class exposes the following memb
 
 ### Sets
 
-A set is an emulation of the mathematical concept of a set. It is a kind of map in which we are only interested in the keys. Like lists and maps, you typically create a set using a set initializer. After that, you can add elements to it using the "add" method or get the number of elements stored by reading the "count" property. The "contains" operator can be used to check the existence of a particular element in a set. To remove an element from a set, simply call the "remove" method. Finally, to empty a set, simply call its "clear" method. Here is an example of using a set in AddyScript.
+A set is an emulation of the mathematical concept of a set. It is a kind of map in which we are only interested in the keys. Like lists and maps, you typically create a set using a set initializer. After that, you can add elements to it using the "add" method or get the number of elements stored by reading the "size" property. The "contains" operator can be used to check the existence of a particular element in a set. To remove an element from a set, simply call the "remove" method. Finally, to empty a set, simply call its "clear" method. Here is an example of using a set in AddyScript.
 
 Example:
 
-```Cpp
+```JS
 t = {'john', 'mike', 'bob'};
 u = {'steve', 'mike', 'john'};
 
@@ -231,14 +231,14 @@ In addition to the above operators, the **set** class exposes the following memb
 
 |Member|Nature|Description|
 |-|-|-|
-|`int count { read; }`|property|Gets the number of elements currently stored in the set.|
+|`int size { read; }`|property|Gets the number of elements currently stored in the set.|
 |`void add(any value)`|method|Adds a value to the set. If the same value if already contained in the set, an exception will be thrown.|
 |`bool remove(any value)`|method|Tries to remove a value pair from a set. Returns true on success, false otherwise.|
 |`void clear()`|method|Empties a set.|
 
 ### Queues
 
-A queue is a collection that implements the first-in, first-out design pattern. You will typically get a queue from a call to **queue**::of. After that, you can add elements to it using the "enqueue" method or get the number of elements stored in it by reading the "count" property. To extract an element from a queue, use the "dequeue" method. The "peek" method does the same thing, except that it does not remove the element from the queue. Finally, to empty a queue, simply call its "clear" method.
+A queue is a collection that implements the first-in, first-out design pattern. You will typically get a queue from a call to **queue**::of. After that, you can add elements to it using the "enqueue" method or get the number of elements stored in it by reading the "size" property. To extract an element from a queue, use the "dequeue" method. The "peek" method does the same thing, except that it does not remove the element from the queue. Finally, to empty a queue, simply call its "clear" method.
 
 #### Queue API
 
@@ -246,7 +246,7 @@ The following table summarizes all the properties and methods provided by the Ad
 
 |Member|Nature|Description|
 |-|-|-|
-|`int count { read; }`|property|Gets the number of elements currently stored in the queue.|
+|`int size { read; }`|property|Gets the number of elements currently stored in the queue.|
 |`void enqueue(any value)`|method|Adds a value to the queue.|
 |`any dequeue()`|method|Extracts and returns the oldest value in the queue.|
 |`any peek()`|method|Gets the oldest value in the queue without removing it.|
@@ -254,7 +254,7 @@ The following table summarizes all the properties and methods provided by the Ad
 
 ### Stacks
 
-A stack is a collection that implements the last-in, first-out design pattern. You will typically get a stack as a result of a call to **stack**::of. After that, you can add elements to it using the "push" method or get the number of elements stored in it by reading the "count" property. To pop an element off the stack, use the "pop" method. The "peek" method does the same thing, but it does not remove the element from the stack. Finally, to empty a stack, simply call its "clear" method.
+A stack is a collection that implements the last-in, first-out design pattern. You will typically get a stack as a result of a call to **stack**::of. After that, you can add elements to it using the "push" method or get the number of elements stored in it by reading the "size" property. To pop an element off the stack, use the "pop" method. The "peek" method does the same thing, but it does not remove the element from the stack. Finally, to empty a stack, simply call its "clear" method.
 
 #### Stack API
 
@@ -262,7 +262,7 @@ The following table summarizes all the properties and methods provided by the Ad
 
 |Member|Nature|Description|
 |-|-|-|
-|`int count { read; }`|property|Gets the number of elements currently stored in the stack.|
+|`int size { read; }`|property|Gets the number of elements currently stored in the stack.|
 |`void push(any value)`|method|Adds a value to the stack.|
 |`any pop()`|method|Pops a value from the stack.|
 |`any peek()`|method|Peeks the value that's on top the stack without removing it.|
@@ -284,7 +284,7 @@ An object initializer is a comma-separated list of field initializers enclosed i
 
 Example:
 
-```Cpp
+```JS
 student = new {firstName = 'John', lastName = 'Alberti', age = 12};
 println('{0} {1} is aged {2}', student.firstName, student.lastName, student.age);
 ```
@@ -293,7 +293,7 @@ Sometimes it is better to initialize the object with an empty initializer and th
 
 Example:
 
-```Cpp
+```JS
 student = new {};
 student.firstName = 'André';
 student.lastName = 'Dikos';
@@ -306,7 +306,7 @@ Finally, it is worth mentioning that AddyScript has the ability to convert a map
 
 Example:
 
-```Cpp
+```JS
 hash = {'long' => 120, 'large' => 80, 'depth' => 20};
 shape = (object) hash;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth);

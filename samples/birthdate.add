@@ -1,6 +1,6 @@
 println("hello! it's {0:t} o'clock", now());
 d = (date) readln("what's your birth date? ");
-println("it was a " + d.get("weekday"));
+println("it was a " + d["weekday"]);
 today = now().$date;
 println("you are {0} years old now", today.subtract(d, "year"));
 d = d.add(1, "year");

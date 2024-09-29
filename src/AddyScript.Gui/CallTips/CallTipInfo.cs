@@ -34,7 +34,7 @@ namespace AddyScript.Gui.CallTips
 
                 if (parameter.ByRef)
                     textBuilder.Append("ref ");
-                else if (parameter.VaArgs)
+                else if (parameter.VaList)
                     textBuilder.Append("params ");
 
                 textBuilder.Append(parameter.Name);
@@ -53,7 +53,7 @@ namespace AddyScript.Gui.CallTips
                             break;
                     }
 
-                parameters.Add(new ParameterInfo(paramStart, textBuilder.Length, parameter.VaArgs));
+                parameters.Add(new ParameterInfo(paramStart, textBuilder.Length, parameter.VaList));
             }
 
             Text = textBuilder.Append(')').ToString();

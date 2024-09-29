@@ -9,14 +9,14 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of ListInitializer
     /// </remarks>
-    /// <param name="items">The expressions that are listed between the delimiters</param>
-    public class ListInitializer(params Expression[] items) : Expression
+    /// <param name="items">The <see cref="ListItem"/>s that are listed between the delimiters</param>
+    public class ListInitializer(params ListItem[] items) : Expression
     {
 
         /// <summary>
-        /// The expressions that are listed between the delimiters.
+        /// The <see cref="ListItem"/> that are listed between the delimiters.
         /// </summary>
-        public Expression[] Items { get; private set; } = items;
+        public ListItem[] Items { get; private set; } = items;
 
         /// <summary>
         /// Translates this node.

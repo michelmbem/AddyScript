@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using AddyScript.Translators;
 
@@ -15,7 +16,7 @@ namespace AddyScript.Ast.Expressions
     /// <param name="name">The qualified method's name</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the method</param>
     /// <param name="namedArgs">The collection of named arguments passed to the method</param>
-    public class StaticMethodCall(QualifiedName name, Expression[] positionalArgs, Dictionary<string, Expression> namedArgs)
+    public class StaticMethodCall(QualifiedName name, ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
         : CallWithNamedArgs(positionalArgs, namedArgs)
     {
 
@@ -25,7 +26,7 @@ namespace AddyScript.Ast.Expressions
         /// <param name="name">The qualified method's name</param>
         /// <param name="arguments">The arguments passed to the method</param>
         public StaticMethodCall(QualifiedName name, params Expression[] arguments)
-            : this(name, arguments, null)
+            : this(name, ToListItems(arguments), null)
         {
         }
 

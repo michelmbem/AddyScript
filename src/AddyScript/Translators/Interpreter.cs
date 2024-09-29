@@ -552,7 +552,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             else
                 TranslateBinaryExpression(assignment);
 
-            Assign(assignment.LeftOperand, returnedValue);
+            DataItem rValue = returnedValue;
+            Assign(assignment.LeftOperand, rValue);
+            returnedValue = rValue;
         }
         catch (ScriptException)
         {
@@ -568,16 +570,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         try
         {
-            var values = new DataItem[grpAssign.RValues.Length];
-            
-            for (int i = 0; i < values.Length; ++i)
-            {
-                grpAssign.RValues[i].AcceptTranslator(this);
-                values[i] = returnedValue;
-            }
+            DataItem[] rValues = EvaluateArguments(grpAssign.RValues).Item1;
 
-            for (int i = 0; i < values.Length; ++i)
-                Assign(grpAssign.LValues[i], values[i]);
+            if (rValues.Length != grpAssign.LValues.Length)
+                throw new RuntimeException(fileName, grpAssign, Resources.ListLengthMismatch);
+
+            for (int i = 0; i < rValues.Length; ++i)
+                Assign(grpAssign.LValues[i], rValues[i]);
         }
         catch (ScriptException)
         {
@@ -756,12 +755,16 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         var list = new List<DataItem>();
 
-        foreach (Expression item in listInit.Items)
+        foreach (ListItem item in listInit.Items)
         {
             try
             {
-                item.AcceptTranslator(this);
-                list.Add(returnedValue);
+                item.Expression.AcceptTranslator(this);
+
+                if (item.Spread)
+                    list.AddRange(returnedValue.AsList);
+                else
+                    list.Add(returnedValue);
             }
             catch (ScriptException)
             {
@@ -807,12 +810,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         var hashSet = new HashSet<DataItem>();
 
-        foreach (Expression item in setInit.Items)
+        foreach (ListItem item in setInit.Items)
         {
             try
             {
-                item.AcceptTranslator(this);
-                hashSet.Add(returnedValue);
+                item.Expression.AcceptTranslator(this);
+
+                if (item.Spread)
+                    foreach (DataItem value in returnedValue.AsHashSet)
+                        hashSet.Add(value);
+                else
+                    hashSet.Add(returnedValue);
             }
             catch (ScriptException)
             {
@@ -1215,8 +1223,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             else if (targetMethod is ClassField field)
             {
                 Function function = null;
-                if (field.SharedValue is Closure)
-                    function = field.SharedValue.AsFunction;
+                if (field.SharedValue is Closure) function = field.SharedValue.AsFunction;
 
                 if (function == null)
                     throw new RuntimeException(fileName, staticCall, string.Format(Resources.MethodNotFound, field.Name, staticCall.Name));
@@ -1272,7 +1279,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     args = new DataItem[ctorCall.Arguments.Length];
                     for (int i = 0; i < ctorCall.Arguments.Length; ++i)
                     {
-                        ctorCall.Arguments[i].AcceptTranslator(this);
+                        ctorCall.Arguments[i].Expression.AcceptTranslator(this);
                         args[i] = returnedValue;
                     }
                 }
@@ -1425,7 +1432,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         for (int i = 0; i < arguments.Length; ++i)
         {
-            innerCall.Arguments[i].AcceptTranslator(this);
+            innerCall.Arguments[i].Expression.AcceptTranslator(this);
             arguments[i] = returnedValue;
         }
 
@@ -1439,7 +1446,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         for (int i = 0; i < extCall.Arguments.Length; ++i)
         {
-            extCall.Arguments[i].AcceptTranslator(this);
+            extCall.Arguments[i].Expression.AcceptTranslator(this);
             args[i] = returnedValue.ConvertTo(parameters[i].ParameterType);
         }
 
@@ -2139,15 +2146,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
     /// <returns>A dictionary of frame items</returns>
     private Dictionary<string, IFrameItem> GetInitialFrameItems(Function function, string functionName,
-                                                                Expression[] positionalArgs,
+                                                                ListItem[] positionalArgs,
                                                                 Dictionary<string, Expression> namedArgs)
     {
         // Make sure we are not dealing with null references
         positionalArgs ??= [];
         namedArgs ??= [];
 
-        int totalArgCount = positionalArgs.Length;
-        
+        // Get the positional arguments values
+        Tuple<DataItem[], ListItem[]> posArgValues = EvaluateArguments(positionalArgs);
+        int totalArgCount = posArgValues.Item1.Length;
+
         // Check that every named argument matches a parameter declared in the function's header
         // Also compute the total argument count
         foreach (string argName in namedArgs.Keys)
@@ -2157,7 +2166,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (paramIndex < 0)
                 throw new ArgumentException(string.Format(Resources.FunctionHasNoParameterNamed, functionName, argName));
 
-            if (paramIndex < positionalArgs.Length)
+            if (paramIndex < posArgValues.Item1.Length)
                 throw new ArgumentException(string.Format(Resources.ParameterSuppliedTwice, argName));
 
             ++totalArgCount;
@@ -2176,47 +2185,40 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         var frameItems = new Dictionary<string, IFrameItem>();
         int counter = 0;
         Parameter parameter;
+        ListItem argument;
+        DataItem argValue;
 
         // Pass the positional arguments
-        while (counter < positionalArgs.Length)
+        while (counter < posArgValues.Item1.Length)
         {
             parameter = function.Parameters[counter];
+            argument = posArgValues.Item2[counter];
+            argValue = posArgValues.Item1[counter];
 
-            if (parameter.VaArgs)
+            // Check that parameters are not passed by reference from expressions with the spread operator
+            if (parameter.ByRef && argument.Spread)
+                throw new ScriptException(fileName, argument, Resources.InvalidLValue);
+
+            if (parameter.VaList)
             {
                 // If the current parameter is a variably sized list,
                 // fill it with the remaining arguments
-                DataItem vaList = new List();
+                DataItem vaList;
 
-                if (counter == positionalArgs.Length - 1)
-                {
-                    positionalArgs[counter].AcceptTranslator(this);
-                    DataItem argValue = returnedValue;
-
-                    if (argValue.Class == Class.List)
-                        vaList = argValue;
-                    else
-                        vaList.AsList.Add(argValue);
-                }
+                if (counter == posArgValues.Item1.Length - 1)
+                    vaList = argValue.Class == Class.List ? argValue : new List([argValue]);
                 else
-                {
-                    int k = counter;
+                    vaList = new List(posArgValues.Item1[counter..]);
 
-                    do
-                    {
-                        positionalArgs[k++].AcceptTranslator(this);
-                        vaList.AsList.Add(returnedValue);
-                    } while (k < positionalArgs.Length);
-                }
-
+                CheckEmptiness(parameter, vaList, argument);
                 frameItems.Add(parameter.Name, vaList);
                 counter = int.MaxValue;
             }
             else
             {
                 // Otherwise, set the value provided to the parameter
-                positionalArgs[counter].AcceptTranslator(this);
-                frameItems.Add(parameter.Name, returnedValue);
+                CheckEmptiness(parameter, argValue, argument);
+                frameItems.Add(parameter.Name, argValue);
                 ++counter;
             }
         }
@@ -2229,10 +2231,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (namedArgs.TryGetValue(parameter.Name, out Expression arg))
             {
                 arg.AcceptTranslator(this);
-                frameItems.Add(parameter.Name, returnedValue);
+                argValue = returnedValue;
+
+                CheckEmptiness(parameter, argValue, arg);
+                frameItems.Add(parameter.Name, argValue);
             }
             else if (counter >= minNumArgs)
-                frameItems.Add(parameter.Name, parameter.VaArgs ? new List() : parameter.DefaultValue);
+                frameItems.Add(parameter.Name, parameter.VaList ? new List() : parameter.DefaultValue);
             else
                 throw new ArgumentException(string.Format(Resources.MissingPameter, parameter.Name, functionName));
 
@@ -2248,20 +2253,34 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
+    /// Check that a parameter that cannot be empty is not actually supplied an empty value.
+    /// </summary>
+    /// <param name="parameter">The parameter to check</param>
+    /// <param name="argValue">The value that's being given to the parameter</param>
+    /// <param name="argElement">The argument's definition in the code</param>
+    /// <exception cref="ScriptException">If <paramref name="argValue"/> is an empty value</exception>
+    private void CheckEmptiness(Parameter parameter, DataItem argValue, ScriptElement argElement)
+    {
+        if (!parameter.CanBeEmpty && argValue.IsEmpty())
+            throw new ScriptException(fileName, argElement, Resources.ValueShouldNotBeEmpty);
+    }
+
+    /// <summary>
     /// Copies back the modified value of each <i>byref</i> parameter upon function's completion.<br/>
     /// For inline functions, also updates the variables imported from the declaring function's context.
     /// </summary>
     /// <param name="function">The function for which values are copied back</param>
     /// <param name="arguments">The real arguments of the function</param>
     /// <param name="frameItems">The frame's items to copy back</param>
-    private void CopyBackFrameItems(Function function, Expression[] arguments, Dictionary<string, IFrameItem> frameItems)
+    private void CopyBackFrameItems(Function function, ListItem[] arguments, Dictionary<string, IFrameItem> frameItems)
     {
         var namesToSkip = new HashSet<string>();
 
         for (int i = 0; i < function.Parameters.Length; ++i)
         {
             Parameter parameter = function.Parameters[i];
-            if (parameter.ByRef) Assign(arguments[i], (DataItem)frameItems[parameter.Name]);
+            if (parameter.ByRef)
+                Assign(arguments[i].Expression, (DataItem)frameItems[parameter.Name]);
             namesToSkip.Add(parameter.Name);
         }
 
@@ -2282,7 +2301,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
     private void Invoke(Function function, string name, Class holder, DataItem target,
-                        Expression[] positionalArgs, Dictionary<string, Expression> namedArgs)
+                        ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
     {
         var frameItems = GetInitialFrameItems(function, name, positionalArgs, namedArgs);
         PushFrame(holder, target, name, frameItems);
@@ -2316,7 +2335,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="arguments">The arguments passed to the function</param>
     private void Invoke(Function function, string name, Class holder, DataItem target, params Expression[] arguments)
     {
-        Invoke(function, name, holder, target, arguments, null);
+        Invoke(function, name, holder, target, Call.ToListItems(arguments), null);
     }
 
     /// <summary>
@@ -2522,7 +2541,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private DataItem ConvertAttribute(AttributeDecl attribute)
     {
         var ctorCall = new ConstructorCall(new QualifiedName(Class.Attribute.Name),
-                                           [new Literal(new String(attribute.Name))],
+                                           [new ListItem(new Literal(new String(attribute.Name)))],
                                            null,
                                            attribute.PropertyInitializers);
         ctorCall.CopyLocation(attribute);
@@ -2720,8 +2739,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         InitializeFields(parameterInfo);
         parameterInfo.SetProperty("_name", new String(parameter.Name));
         parameterInfo.SetProperty("_byRef", Boolean.FromBool(parameter.ByRef));
-        parameterInfo.SetProperty("_vaArgs", Boolean.FromBool(parameter.VaArgs));
+        parameterInfo.SetProperty("_vaList", Boolean.FromBool(parameter.VaList));
         parameterInfo.SetProperty("_defaultValue", parameter.DefaultValue ?? Void.Value);
+        parameterInfo.SetProperty("_canBeEmpty", Boolean.FromBool(parameter.CanBeEmpty));
         parameterInfo.SetProperty("_attributes", GetAttributeList(parameter.Attributes));
 
         return parameterInfo;
@@ -2804,46 +2824,42 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <exception cref="MissingMethodException">
     /// When there is no method with the name <paramref name="methodName"/> in type indicated by <paramref name="type"/>
     /// </exception>
-    private void InvokeNative(Type type, string methodName, object target, Expression[] arguments)
+    private void InvokeNative(Type type, string methodName, object target, ListItem[] arguments)
     {
         const BindingFlags flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance |
                                    BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
 
         arguments ??= [];
 
-        var argValues = new DataItem[arguments.Length];
-        var nativeArgValues = new object[argValues.Length];
+        Tuple<DataItem[], ListItem[]> argValues = EvaluateArguments(arguments);
+        object[] nativeArgValues;
         object result;
-
-        for (int i = 0; i < arguments.Length; ++i)
-        {
-            arguments[i].AcceptTranslator(this);
-            argValues[i] = returnedValue;
-        }
         
         if (type.IsCOMObject)
         {
-            for (int i = 0; i < argValues.Length; ++i)
-                nativeArgValues[i] = argValues[i].AsNativeObject;
-
+            nativeArgValues = argValues.Item1.Select(val => val.AsNativeObject).ToArray();
             result = type.InvokeMember(methodName, flags, null, target, nativeArgValues);
         }
         else
         {
-            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, argValues, flags) ??
+            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, argValues.Item1, flags) ??
                 throw new MissingMethodException(type.FullName, methodName);
 
             ParameterInfo[] parameters = matchedMethod.GetParameters();
-            for (int i = 0; i < argValues.Length; ++i)
-                nativeArgValues[i] = argValues[i].ConvertTo(parameters[i].ParameterType);
+            bool[] isParamOut = parameters.Select(p => p.IsOut || p.IsRetval).ToArray();
 
+            for (int i = 0; i < isParamOut.Length; ++i)
+                if (isParamOut[i] && argValues.Item2[i].Spread)
+                    throw new ScriptException(fileName, argValues.Item2[i], Resources.InvalidLValue);
+
+            nativeArgValues = argValues.Item1.Select((val, i) => val.ConvertTo(parameters[i].ParameterType)).ToArray();
             result = matchedMethod.Invoke(target, nativeArgValues);
 
-            for (int i = 0; i < arguments.Length; ++i)
-                if ((parameters[i].IsOut || parameters[i].ParameterType.IsArray) && arguments[i] is Reference _ref)
+            for (int i = 0; i < isParamOut.Length; ++i)
+                if (isParamOut[i] || parameters[i].ParameterType.IsArray)
                     try
                     {
-                        _ref.AcceptAssignmentProcessor(this, DataItemFactory.CreateDataItem(nativeArgValues[i]));
+                        Assign(argValues.Item2[i].Expression, DataItemFactory.CreateDataItem(nativeArgValues[i]));
                     }
                     catch (RuntimeException)
                     {
@@ -3235,6 +3251,48 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         else
             throw new RuntimeException(fileName, lValue, Resources.InvalidLValue);
 
+    }
+
+    /// <summary>
+    /// Evaluates a set of positional arguments and returns their values.
+    /// </summary>
+    /// <param name="arguments">The given set of positional arguments</param>
+    /// <returns>A <see cref="Tuple{DataItem[], ListItem[]}"/></returns>
+    /// <exception cref="ScriptException">The evaluation of an argument failed</exception>
+    private Tuple<DataItem[], ListItem[]> EvaluateArguments(ListItem[] arguments)
+    {
+        List<DataItem> argValues = [];
+        List<ListItem> args = [];
+
+        foreach (ListItem argument in arguments)
+        {
+            try
+            {
+                argument.Expression.AcceptTranslator(this);
+
+                if (argument.Spread)
+                    foreach (DataItem item in returnedValue.AsList)
+                    {
+                        argValues.Add(item);
+                        args.Add(argument);
+                    }
+                else
+                {
+                    argValues.Add(returnedValue);
+                    args.Add(argument);
+                }
+            }
+            catch (ScriptException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ScriptException(fileName, argument, ex);
+            }
+        }
+
+        return new([.. argValues], [.. args]);
     }
 
     #endregion

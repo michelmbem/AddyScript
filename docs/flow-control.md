@@ -12,7 +12,7 @@ The if-else statement is used to perform an action only if a certain condition i
 
 Example:
 
-```Cpp
+```JS
 n = randint(20); // n is a randomly generated number between 0 and 20
 
 if (n > 10)
@@ -25,7 +25,7 @@ if (n > 10)
 
 Example:
 
-```Cpp
+```JS
 i = randint(100); // i is a randomly generated number between 0 and 100
 
 if (i % 2 == 0)
@@ -63,7 +63,7 @@ Breaks are not required but if a **break** is missing, execution will continue a
 
 Example:
 
-```Cpp
+```JS
 result = (int)readln("What's your result? ");
 
 switch (result)
@@ -121,7 +121,7 @@ expression switch {
 
 Example 1:
 
-```Cpp
+```JS
 n = (int)readln('Please type a number: ');
 
 res = n switch {
@@ -142,7 +142,7 @@ println(res);
 
 Example 2:
 
-```Cpp
+```JS
 o = new {name = 'my object', size = 18, color = 'blue'};
 
 res = o switch {
@@ -186,7 +186,7 @@ Syntax:
 
 Example:
 
-```Cpp
+```JS
 i = 1;
 while (i <= 12)
 {
@@ -205,7 +205,7 @@ Syntax:
 
 Example:
 
-```Cpp
+```JS
 i = 1;
 
 do
@@ -225,7 +225,7 @@ Syntax:
 
 Example:
 
-```Cpp
+```JS
 for (i = 1; i <= 12; ++i)
    println('2 x {0} = {1}', i, 2*i);
 ```
@@ -248,7 +248,7 @@ Form 1:
 
 Example:
 
-```Cpp
+```JS
 words = ['john', 'paul', 'second', 'the', 'pope'];
 
 foreach (word in words)
@@ -263,7 +263,7 @@ Form 2:
 
 Example:
 
-```Cpp
+```JS
 jobs = {'paul' => 'general manager', 'roland' => 'accountant', 'david' => 'driver'};
 
 foreach (name => job in jobs)
@@ -279,7 +279,7 @@ For a class to implement the iterator protocol, it must expose 3 methods named *
 
 Example:
 
-```Cpp
+```JS
 class Range
 {
    private start;
@@ -322,7 +322,7 @@ Alternatively, a class can implement the iterator protocol simply by exposing an
 
 Example:
 
-```Cpp
+```JS
 class Range
 {
    private start;

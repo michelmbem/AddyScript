@@ -6,7 +6,7 @@ Example:
 
 Introspecting the **Exception** class
 
-```Cpp
+```JS
 function dumpScope(scope)
 {
     switch (scope)

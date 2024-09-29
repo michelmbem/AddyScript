@@ -40,8 +40,7 @@ println('items in the list:');
 println(products.join(NEWLINE));
 println();
 
-s = {};
-products.each(|p| => s.add(p));
+s = {..products};
 
 println('items in the set:');
 println(((list)s).join(NEWLINE));

@@ -14,7 +14,7 @@ class Range
 		this.step = step;
 	}
 	
-	public property count
+	public property size
 	{
 		read => (int)((this.end - this.start) / this.step);
 	}
@@ -23,7 +23,7 @@ class Range
 	{
 		read
 		{
-			if (__key < 0 || __key >= this.count)
+			if (__key < 0 || __key >= this.size)
 				throw 'index out of range';
 				
 			return this.start + this.step * __key;
@@ -76,7 +76,7 @@ if (__name == 'main')
 {
 	var r = xrange(10, step: 2);
 	
-	for (i = 0; i < r.count; ++i)
+	for (i = 0; i < r.size; ++i)
 		print($'{r[i]} ');
 	println();
 	

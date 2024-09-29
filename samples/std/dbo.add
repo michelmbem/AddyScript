@@ -4,23 +4,23 @@ class DBO
 {
 	private connection;
 	
-	public constructor (providerName, connectionString)
+	public constructor (providerName!, connectionString!)
 	{
-		this.connection = new DBOConnection(providerName!, connectionString!);
+		this.connection = new DBOConnection(providerName, connectionString);
 		this.connection.open();
 	}
 	
-	public function query(commandText, fetch = null)
+	public function query(commandText!, fetch_func = null)
 	{
 		var command, reader, result;
 		
-		fetch ??= fetch_index_list;
+		fetch_func ??= fetch_index_list;
 		
 		try {
-			command = this.connection.createCommand(commandText!);
+			command = this.connection.createCommand(commandText);
 			command.Transaction = this.connection.transaction;
 			reader = command.ExecuteReader();
-			result = fetch(reader);
+			result = fetch_func(reader);
 		}
 		catch (ex) {
 			throw ex;
@@ -36,12 +36,12 @@ class DBO
 		return result;
 	}
 	
-	public function queryScalar(commandText)
+	public function queryScalar(commandText!)
 	{
 		var command, result;
 		
 		try {
-			command = this.connection.createCommand(commandText!);
+			command = this.connection.createCommand(commandText);
 			command.Transaction = this.connection.transaction;
 			result = command.ExecuteScalar();
 		}
@@ -52,19 +52,19 @@ class DBO
 		return result;
 	}
 	
-	public function find(table, field, condition)
+	public function find(table!, field!, criterion!)
 	{
 		var sb = new System::Text::StringBuilder();
-		sb.Append("SELECT ").Append(field!).Append(" FROM ").Append(table!).Append(" WHERE ").Append(condition!);
+		sb.Append("SELECT ").Append(field).Append(" FROM ").Append(table).Append(" WHERE ").Append(criterion);
 		return this.queryScalar(sb.ToString());
 	}
 	
-	public function exec(commandText)
+	public function exec(commandText!)
 	{
 		var command, result;
 		
 		try {
-			command = this.connection.createCommand(commandText!);
+			command = this.connection.createCommand(commandText);
 			command.Transaction = this.connection.transaction;
 			result = command.ExecuteNonQuery();
 		}
@@ -75,15 +75,14 @@ class DBO
 		return result;
 	}
 	
-	public function eachRow(commandText, action, processor = null)
+	public function eachRow(commandText!, action!, processor = null)
 	{
 		var command, iterator, row;
 		
-		action!; // Require action to be non-empty
 		processor ??= to_object;
 		
 		try {
-			command = this.connection.createCommand(commandText!);
+			command = this.connection.createCommand(commandText);
 			command.Transaction = this.connection.transaction;
 			iterator = new DBOIterator(command, processor);
 			foreach (row in iterator) action(row);
@@ -100,15 +99,15 @@ class DBO
 		}
 	}
 	
-	public function fill(dataSet, tableName, commandText, createCmdBldr = false)
+	public function fill(dataSet!, tableName!, commandText!, createCmdBldr = false)
 	{
 		var command, adapter;
 		
 		try {
-			command = this.connection.createCommand(commandText!);
+			command = this.connection.createCommand(commandText);
 			command.Transaction = this.connection.transaction;
 			adapter = DBOConfig::createDataAdapter(command);
-			adapter.Fill(dataSet!, tableName!);
+			adapter.Fill(dataSet, tableName!);
 			if (createCmdBldr)
 				DBOConfig::createCommandBuilder(adapter);
 		}
@@ -119,21 +118,21 @@ class DBO
 		return adapter;
 	}
 	
-	public function getDataSet(tableName, commandText)
+	public function getDataSet(tableName!, commandText!)
 	{
-		var dataSet = new System::Data::DataSet(tableName!);
-		this.fill(dataSet, tableName, commandText!).Dispose();
+		var dataSet = new System::Data::DataSet(tableName);
+		this.fill(dataSet, tableName, commandText).dispose();
 		return dataSet;
 	}
 	
-	public function prepare(commandText, commandType = 'Text')
+	public function prepare(commandText!, commandType! = 'Text')
 	{
-		return new DBOCommand(this.connection, commandText!, commandType);
+		return new DBOCommand(this.connection, commandText, commandType);
 	}
 	
-	public function execMany(commandText, parameters, values)
+	public function execMany(commandText!, parameters, values)
 	{
-		var cmd = this.prepare(commandText!).addParams(parameters);
+		var cmd = this.prepare(commandText).addParams(parameters);
 		values.each(|v| => cmd.setAllParams(v).exec()); // Note! values has to be a list of lists
 	}
 	
@@ -275,7 +274,7 @@ if (__name === 'main')
 			println('-' * 34);
 			ds = dbo.getDataSet("Products", "select top 10 * from products");
 			foreach (row in ds.Tables[0].Rows)
-				println('{0} {1}', row['ProductID'], row['ProductName']);
+				println('{0} {1}', ..[row['ProductID'], row['ProductName']]);
 			ds.Dispose();
 		}
 		catch (ex) {

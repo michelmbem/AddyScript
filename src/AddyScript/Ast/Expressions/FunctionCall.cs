@@ -14,7 +14,7 @@ namespace AddyScript.Ast.Expressions
     /// <param name="functionName">The name of the function to invoke</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
-    public class FunctionCall(string functionName, Expression[] positionalArgs, Dictionary<string, Expression> namedArgs)
+    public class FunctionCall(string functionName, ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
         : CallWithNamedArgs(positionalArgs, namedArgs)
     {
 
@@ -24,7 +24,7 @@ namespace AddyScript.Ast.Expressions
         /// <param name="functionName">The name of the function to invoke</param>
         /// <param name="arguments">The list of arguments passed to the function</param>
         public FunctionCall(string functionName, params Expression[] arguments)
-            : this(functionName, arguments, null)
+            : this(functionName, ToListItems(arguments), null)
         {
         }
 

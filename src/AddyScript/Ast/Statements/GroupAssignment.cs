@@ -9,7 +9,7 @@ namespace AddyScript.Ast.Statements
     /// </summary>
     /// <param name="lValues">The variables to set values to</param>
     /// <param name="rValues">The values that should be set to the variables</param>
-    public class GroupAssignment(Expression[] lValues, Expression[] rValues) : Statement
+    public class GroupAssignment(Expression[] lValues, ListItem[] rValues) : Statement
     {
         /// <summary>
         /// The variables to set values to.
@@ -19,7 +19,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The values that should be set to the variables.
         /// </summary>
-        public Expression[] RValues { get; private set; } = rValues;
+        public ListItem[] RValues { get; private set; } = rValues;
 
         /// <summary>
         /// Translates this node.

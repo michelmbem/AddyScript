@@ -48,7 +48,7 @@ namespace AddyScript.Ast.Statements
                 Parameter p2 = method.Function.Parameters[i];
 
                 if (p1.ByRef != p2.ByRef ||
-                    p1.VaArgs != p2.VaArgs ||
+                    p1.VaList != p2.VaList ||
                     (p1.DefaultValue == null && p2.DefaultValue != null) ||
                     (p1.DefaultValue != null && p2.DefaultValue == null))
                     return false;

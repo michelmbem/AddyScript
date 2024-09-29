@@ -12,26 +12,19 @@ namespace AddyScript.Runtime;
 /// </remarks>
 /// <param name="name">The parameter's name.</param>
 /// <param name="byRef">Determines if the parameter is passed by reference or not</param>
-/// <param name="vaArgs">Determines if the parameter is a variably sized arguments list or not</param>
+/// <param name="vaList">Determines if the parameter is a variably sized arguments list or not</param>
 /// <param name="defaultValue">The default value for this parameter if any</param>
-public class Parameter(string name, bool byRef, bool vaArgs, DataItem defaultValue)
+/// <param name="canBeEmpty">Tells if empty values are allowed for this parameter or not</param>
+public class Parameter(string name, bool byRef, bool vaList, DataItem defaultValue = null, bool canBeEmpty = true)
 {
     /// <summary>
     /// Initializes a new instance of Parameter.
     /// </summary>
     /// <param name="name">The parameter's name.</param>
-    public Parameter(string name)
-        : this(name, false, false, null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of Parameter.
-    /// </summary>
-    /// <param name="name">The parameter's name.</param>
     /// <param name="defaultValue">The default value for this parameter if any</param>
-    public Parameter(string name, DataItem defaultValue)
-        : this(name, false, false, defaultValue)
+    /// <param name="canBeEmpty">Tells if empty values are allowed for this parameter or not</param>
+    public Parameter(string name, DataItem defaultValue = null, bool canBeEmpty = true)
+        : this(name, false, false, defaultValue, canBeEmpty)
     {
     }
 
@@ -48,7 +41,7 @@ public class Parameter(string name, bool byRef, bool vaArgs, DataItem defaultVal
     /// <summary>
     /// Determines if the parameter is a variably sized arguments list or not.
     /// </summary>
-    public bool VaArgs { get; private set; } = vaArgs;
+    public bool VaList { get; private set; } = vaList;
 
     /// <summary>
     /// The parameter's default value if any.
@@ -56,9 +49,14 @@ public class Parameter(string name, bool byRef, bool vaArgs, DataItem defaultVal
     public DataItem DefaultValue { get; private set; } = defaultValue;
 
     /// <summary>
+    /// Tells if empty values are allowed for this parameter or not.
+    /// </summary>
+    public bool CanBeEmpty => canBeEmpty;
+
+    /// <summary>
     /// Gets if this parameter is optional or not.
     /// </summary>
-    public bool Optional => VaArgs || DefaultValue != null;
+    public bool Optional => VaList || DefaultValue != null;
 
     /// <summary>
     /// The parameter's attributes.

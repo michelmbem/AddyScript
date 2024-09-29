@@ -1,4 +1,4 @@
-function addList(ref lst, elem)
+function addList(&lst, elem)
 {
 	if (lst === null)
 		lst = new {value = elem, next = null};

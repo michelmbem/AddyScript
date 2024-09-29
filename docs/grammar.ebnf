@@ -26,7 +26,7 @@ ConstructorSpec ::= 'constructor' ParameterList Block
 
 ParameterList ::= '(' (Parameter (',' Parameter)*)? ')'
 
-Parameter ::= (((Attributes ('ref' | 'params')?) | (('ref' | 'params') Attributes?)) IDENTIFIER) | (Attributes? IDENTIFIER ('=' Literal)?)
+Parameter ::= (((Attributes ('&' | '..')?) | (('&' | '..') Attributes?)) IDENTIFIER '!'?) | (Attributes? IDENTIFIER '!'? ('=' Literal)?)
 
 Literal ::= 'null' | BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | DATE | STRING
 
@@ -90,7 +90,11 @@ Throw ::= 'throw' Expression ';'
 
 TryCatchFinally ::= 'try' ('(' Expression ')')? Block ('catch' '(' IDENTIFIER ')' Block)? ('finally' Block)?
 
-GroupAssignment ::= '(' ExpressionList ')' '=' '(' ExpressionList ')' ';'
+GroupAssignment ::= '(' ExpressionList ')' '=' '(' ListItems ')' ';'
+
+ListItems ::= ListItem (',' ListItem)*
+
+ListItem ::= '..'? Expression
 
 Expression ::= Assignment
 
@@ -120,7 +124,7 @@ PrefixUnaryExpression ::= ('+' | '-' | '~' | '!' | '++' | '--')* Composite
 
 Composite ::= Atom (('[' (Expression | (Expression? '..' Expression?)) ']') | ('.' IDENTIFIER ArgumentList?) | ArgumentList | ('switch' '{' MatchCaseList '}') | ('with' '{' PropertyInitializerList '}'))*
 
-ArgumentList ::= '(' (ExpressionList (',' NamedArgList)? | NamedArgList)? ')'
+ArgumentList ::= '(' (ListItems (',' NamedArgList)? | NamedArgList)? ')'
 
 NamedArgList ::= NamedArg (',' NamedArg)*
 
@@ -166,7 +170,7 @@ ParenthesizedExpression ::= '(' Expression ')'
 
 AtomStartingWithLBrace ::= SetInitializer | MapInitializer
 
-SetInitializer ::= '{' ExpressionList? '}'
+SetInitializer ::= '{' ListItems? '}'
 
 MapInitializer ::= '{' (MapItemInitializerList | '=>') '}'
 
@@ -174,7 +178,7 @@ MapItemInitializerList ::= MapItemInitializer (',' MapItemInitializer)*
 
 MapItemInitializer ::= Expression '=>' Expression
 
-ListInitializer ::= '[' ExpressionList? ']'
+ListInitializer ::= '[' ListItems? ']'
 
 Lambda ::= '|' (Parameter (',' Parameter)*)? '|' '=>' ((Expression ';') | Block)
 

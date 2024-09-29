@@ -4,7 +4,7 @@
 
 In the example below, we will illustrate how inheritance is handled in AddyScript by creating a subclass of the Person class introduced in the previous section. The example also shows how to invoke the constructor of the parent class (to initialize inherited fields).
 
-```Cpp
+```JS
 class Employee : Person
 {
     public constructor(name, sex, age, hireDate, department, jobTitle)
@@ -36,7 +36,7 @@ Polymorphism is nothing more than the ability to override inherited members in d
 
 Example:
 
-```Cpp
+```JS
 // A base abstract class with a single abstract method
 abstract class Pet
 {

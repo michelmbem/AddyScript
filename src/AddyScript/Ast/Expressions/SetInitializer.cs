@@ -9,8 +9,8 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of SetInitializer
     /// </remarks>
-    /// <param name="items">The expressions that are listed between the delimiters</param>
-    public class SetInitializer(params Expression[] items) : ListInitializer(items)
+    /// <param name="items">The <see cref="ListItem"/>s that are listed between the delimiters</param>
+    public class SetInitializer(params ListItem[] items) : ListInitializer(items)
     {
 
         /// <summary>

@@ -6,7 +6,7 @@ AddyScript is a dynamic language. This means that you don't have to declare vari
 
 Examples:
 
-```Cpp
+```JS
 n = 10; // n is an integer
 n = 7.5; // now n is of type float
 n = now(); // n becomes a date
@@ -26,7 +26,7 @@ Even if AddyScript is able to dynamically declare variables, there are still som
 
 Example:
 
-```Cpp
+```JS
 // a global variable named toto
 toto = 10;
 
@@ -58,7 +58,7 @@ A constant is a read-only variable. That is: it's assigned a value once and cann
 
 Example:
 
-```Cpp
+```JS
 // declare a constant named MAX_ITEMS
 const MAX_ITEMS = 10;
 
@@ -180,7 +180,7 @@ Initializers are like literal values for composite types: they provide initial v
 
 You can check the type of an expression by using the **is** operator. Here is an illustration:
 
-```Cpp
+```JS
 lst = [5, 'andy', now(), PI, new Exception("")];
 
 foreach (item in lst)
@@ -205,7 +205,7 @@ foreach (item in lst)
 
 For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
 
-```Cpp
+```JS
 d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
@@ -321,10 +321,22 @@ Sometimes you need to assign values ​​to multiple variables. You can do this
 ```
 
 **Notes**:
+
 * Only the equal sign (=) is supported for this type of assignment. Combined operators are not.
 * Both tuples must have exactly the same number of elements.
 * Neither tuple must be empty.
-* Each element of the left tuple must be a valid reference (such as a variable, a list element, or an object property).
+* Each element of the left tuple must be a valid reference (such as a variable, a list item, or an object property).
+* The right tuple can contain elements of type **list** or **set** preceded by the spread operator (..). In this case, the contents of the collection replace the collection itself in the tuple. This is very convenient for assigning values ​​to several variables at once from elements of a collection.
+    
+    Example:
+
+    ```JS
+    l = [7, 6, 4];
+    (a, b, c) = (..l);
+    println($'a = {a}');
+    println($'b = {b}');
+    println($'c = {c}');
+    ```
 
 ### Reading and printing values from/to the console
 

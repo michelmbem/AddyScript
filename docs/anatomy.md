@@ -4,13 +4,13 @@ A script in AddyScript is a sequence of statements in any order. Even an empty f
 
 #### Simply printing _"Hello World!"_ to the standard output:
 
-```Cpp
+```JS
 println('Hello World!');
 ```
 
 #### Reading _n_ from the standard input and computing the sum and average of n numbers:
 
-```Cpp
+```JS
 n = (int)readln('How many numbers? ');
 sum = 0;
 
@@ -27,7 +27,7 @@ println($'The averrage is {sum / n}');
 
 #### Declaring a function to say _"Hello"_ to each name in a list:
 
-```Cpp
+```JS
 function hello(name)
 {
    println($'Hello {name}');

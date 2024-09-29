@@ -103,7 +103,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     {
         get
         {
-            if (Parameters.Length > 0 && Parameters[Parameters.Length - 1].VaArgs)
+            if (Parameters.Length > 0 && Parameters[Parameters.Length - 1].VaList)
                 return int.MaxValue;
 
             return Parameters.Length;

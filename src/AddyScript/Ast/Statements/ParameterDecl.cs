@@ -12,9 +12,10 @@ namespace AddyScript.Ast.Statements
     /// </remarks>
     /// <param name="name">The parameter's name.</param>
     /// <param name="byRef">Determines if the parameter is passed by reference or not</param>
-    /// <param name="vaArgs">Determines if the parameter is a variably sized arguments list or not</param>
+    /// <param name="vaList">Determines if the parameter is a variably sized arguments list or not</param>
     /// <param name="defaultValue">The default value for this parameter if any</param>
-    public class ParameterDecl(string name, bool byRef, bool vaArgs, DataItem defaultValue) : SymbolWithAttributes
+    /// <param name="canBeEmpty">Tells if empty values are allowed for this parameter or not</param>
+    public class ParameterDecl(string name, bool byRef, bool vaList, DataItem defaultValue, bool canBeEmpty) : SymbolWithAttributes
     {
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// Determines if the parameter is a variably sized arguments list or not.
         /// </summary>
-        public bool VaArgs { get; private set; } = vaArgs;
+        public bool VaList { get; private set; } = vaList;
 
         /// <summary>
         /// The parameter's default value if any.
@@ -38,12 +39,17 @@ namespace AddyScript.Ast.Statements
         public DataItem DefaultValue { get; private set; } = defaultValue;
 
         /// <summary>
+        /// Tells if empty values are allowed for this parameter or not.
+        /// </summary>
+        public bool CanBeEmpty => canBeEmpty;
+
+        /// <summary>
         /// Create a <see cref="Parameter"/> from this instance.
         /// </summary>
         /// <returns>A <see cref="Parameter"/></returns>
         public Parameter ToParameter()
         {
-            return new Parameter(Name, ByRef, VaArgs, DefaultValue);
+            return new Parameter(Name, ByRef, VaList, DefaultValue, CanBeEmpty);
         }
 
         #region Overrides

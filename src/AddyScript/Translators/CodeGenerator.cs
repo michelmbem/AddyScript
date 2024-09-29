@@ -230,7 +230,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         DumpExpressionsList(grpAssign.LValues);
         textWriter.Write(" = ");
-        DumpExpressionsList(grpAssign.RValues);
+        DumpList(grpAssign.RValues, "(", ")");
         textWriter.WriteLine(';');
     }
 
@@ -283,7 +283,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
-        DumpExpressionsList(listInit.Items, "[", "]");
+        DumpList(listInit.Items);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
@@ -293,7 +293,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
-        DumpExpressionsList(setInit.Items, "{", "}");
+        DumpList(setInit.Items, "{", "}");
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
@@ -942,11 +942,12 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             DumpAttributesList(parameter.Attributes, false);
 
         if (parameter.ByRef)
-            textWriter.Write("ref ");
-        else if (parameter.VaArgs)
-            textWriter.Write("params ");
+            textWriter.Write('&');
+        else if (parameter.VaList)
+            textWriter.Write(".. ");
 
         textWriter.Write(SafeName(parameter.Name));
+        if (!parameter.CanBeEmpty) textWriter.Write('!');
 
         DataItem defVal = parameter.DefaultValue;
         if (defVal == null) return;
@@ -988,23 +989,18 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
     }
 
-    private void DumpArgumentsList(Expression[] positionalArgs, Dictionary<string, Expression> namedArgs,
+    private void DumpArgumentsList(ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs,
                                    string prefix = "(", string suffix = ")")
     {
         textWriter.Write(prefix);
 
         bool firstArg = true;
 
-        if (positionalArgs != null)
-            foreach (Expression arg in positionalArgs)
-            {
-                if (firstArg)
-                    firstArg = false;
-                else
-                    textWriter.Write(", ");
-
-                arg.AcceptTranslator(this);
-            }
+        if (positionalArgs != null && positionalArgs.Length > 0)
+        {
+            DumpList(positionalArgs, string.Empty, string.Empty);
+            firstArg = false;
+        }
 
         if (namedArgs != null)
             foreach (var argPair in namedArgs)
@@ -1056,6 +1052,25 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             textWriter.Write(" = ");
             propertyInitializer.Expression.AcceptTranslator(this);
         }
+    }
+
+    private void DumpList(ListItem[] items, string prefix = "[", string suffix = "]")
+    {
+        textWriter.Write(prefix);
+
+        for (int i = 0; i < items.Length; ++i)
+        {
+            if (i > 0) textWriter.Write(", ");
+            DumpListItem(items[i]);
+        }
+
+        textWriter.Write(suffix);
+    }
+
+    private void DumpListItem(ListItem item)
+    {
+        if (item.Spread) textWriter.Write(".. ");
+        item.Expression.AcceptTranslator(this);
     }
 
     private void DumpMapItemInitializersList(MapItemInitializer[] itemInitializers, string prefix = "{", string suffix = "}")

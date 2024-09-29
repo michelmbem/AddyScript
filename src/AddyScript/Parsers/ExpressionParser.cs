@@ -486,7 +486,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Ast.Expressions.SelfReference"/></returns>
     protected SelfReference SelfReference()
     {
-        if (CurrentFunction == null || !CurrentFunction.IsMethod || CurrentFunction.IsStatic)
+        if (!CurrentFunction.IsMethod || CurrentFunction.IsStatic)
             throw new ParseException(FileName, token, Resources.ThisUsedOutOfMethod);
 
         var selfRef = new SelfReference();
@@ -568,7 +568,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.Identifier:
                 {
                     QualifiedName className = QualifiedName(ref first, ref last);
-                    Tuple<Expression[], Dictionary<string, Expression>> args;
+                    Tuple<ListItem[], Dictionary<string, Expression>> args;
                     PropertyInitializer[] fields = null;
 
                     if (token.TokenID == TokenID.LeftParenthesis)
@@ -578,7 +578,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         last = Match(TokenID.RightParenthesis);
                     }
                     else
-                        args = new Tuple<Expression[], Dictionary<string, Expression>>(null, null);
+                        args = new Tuple<ListItem[], Dictionary<string, Expression>>(null, null);
 
                     if (TryMatch(TokenID.LeftBrace))
                     {
@@ -739,14 +739,15 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// </returns>
     protected Expression AtomStartingWithLBrace()
     {
-        bool isSet = false;
-        MapItemInitializer[] mapItems = [];
-        Expression[] setItems = [];
+        List<MapItemInitializer> mapItems = [];
+        List<ListItem> setItems = [];
 
         Token first = Match(TokenID.LeftBrace);
 
-        Expression e1 = Expression();
-        if (e1 == null)
+        ListItem firstItem = ListItem();
+        bool isSet = false;
+
+        if (firstItem == null)
         {
             if (TryMatch(TokenID.Arrow))
                 Consume(1);
@@ -757,36 +758,32 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             if (TryMatch(TokenID.Arrow))
             {
+                if (firstItem.Spread) throw new ParseException(FileName, token);
+
                 Consume(1);
-                var e2 = RequiredExpression();
-                var tmpList = new List<MapItemInitializer> { new (e1, e2) };
+                var value = RequiredExpression();
 
-                if (TryMatch(TokenID.Comma))
-                {
-                    Consume(1);
-                    tmpList.AddRange(List(MapItemInitializer, false, null));
-                }
-
-                mapItems = [.. tmpList];
+                var mapItem = new MapItemInitializer(firstItem.Expression, value);
+                mapItem.SetLocation(firstItem.Start, value.End);
+                mapItems.Add(mapItem);
             }
             else
             {
+                setItems.Add(firstItem);
                 isSet = true;
-                var tmpList = new List<Expression> { e1 };
-
-                if (TryMatch(TokenID.Comma))
-                {
-                    Consume(1);
-                    tmpList.AddRange(List(Expression, false, null));
-                }
-
-                setItems = [.. tmpList];
             }
+
+            if (TryMatch(TokenID.Comma)) Consume(1);
+
+            if (isSet)
+                setItems.AddRange(List(ListItem, false, null));
+            else
+                mapItems.AddRange(List(MapItemInitializer, false, null));
         }
 
         Token last = Match(TokenID.RightBrace);
 
-        Expression initializer = isSet ? new SetInitializer(setItems) : new MapInitializer(mapItems);
+        Expression initializer = isSet ? new SetInitializer([.. setItems]) : new MapInitializer([.. mapItems]);
         initializer.SetLocation(first.Start, last.End);
         return initializer;
     }
@@ -798,7 +795,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     protected Expression ListInitializer()
     {
         Token first = Match(TokenID.LeftBracket);
-        Expression[] items = List(Expression, false, null);
+        ListItem[] items = List(ListItem, false, null);
         Token last = Match(TokenID.RightBracket);
 
         var initializer = new ListInitializer(items);
@@ -957,7 +954,37 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a map item's initializer.
+    /// Recognizes a list or set item initializer.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.ListItem"/></returns>
+    protected ListItem ListItem()
+    {
+        ScriptLocation start = null;
+        Expression expr;
+        bool spread;
+
+        if (TryMatch(TokenID.DoubleDot))
+        {
+            start = token.Start;
+            Consume(1);
+            expr = RequiredExpression();
+            spread = true;
+        }
+        else
+        {
+            expr = Expression();
+            spread = false;
+        }
+
+        if (expr == null) return null;
+
+        var item = new ListItem(expr, spread);
+        item.SetLocation(start ?? expr.Start, expr.End);
+        return item;
+    }
+
+    /// <summary>
+    /// Recognizes a map item initializer.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.MapItemInitializer"/></returns>
     protected MapItemInitializer MapItemInitializer()
@@ -977,9 +1004,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes the set of arguments passed to a function or method when it's called.
     /// </summary>
     /// <returns>A <see cref="Tuple{Expression[], Dictionary{string, Expression}}"/></returns>
-    protected Tuple<Expression[], Dictionary<string, Expression>> FunctionArguments()
+    protected Tuple<ListItem[], Dictionary<string, Expression>> FunctionArguments()
     {
-        var positionalArgs = new List<Expression>();
+        var positionalArgs = new List<ListItem>();
         var namedArgs = new Dictionary<string, Expression>();
         int section = 0; // 0 => positional arguments section
 
@@ -1001,7 +1028,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
             else
             {
-                Expression arg = Expression();
+                ListItem arg = ListItem();
                 
                 if (arg != null)
                 {
@@ -1013,7 +1040,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         section = -1;
                 }
                 else if (positionalArgs.Count > 0)
-                    throw new ParseException(FileName, token, Resources.ExpressionRequired);
+                    throw new ParseException(FileName, token, Resources.InvalidListTermination);
                 else
                     section = -1;
             }
@@ -1039,7 +1066,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 section = -1;
         }
 
-        return new Tuple<Expression[], Dictionary<string, Expression>>([.. positionalArgs], namedArgs);
+        return new Tuple<ListItem[], Dictionary<string, Expression>>([.. positionalArgs], namedArgs);
     }
 
     /// <summary>

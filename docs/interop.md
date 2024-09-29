@@ -4,7 +4,7 @@
 
 AddyScript provides tight integration with the .Net platform. A script can create instances of virtually any .Net type, initialize its properties, and invoke its methods. The scripting engine has an intelligent mechanism to map .Net types to their AddyScript counterparts and vice versa. Even generic types are supported. It is also possible to use AddyScript functions as event handlers for instances of .Net classes. Just remember that for a type to be visible from the script, its assembly must be in the References property of the ScriptContext object passed to the constructor of the current instance of the ScriptEngine class when it is created. Here is an example of using the System.Collections.Generic.LinkedList<>, the System.Collections.Generic.SortedDictionary<> and the System.Tuple<> classes:
 
-```Cpp
+```JS
 function underline(msg)
 {
     println(msg);
@@ -44,7 +44,7 @@ The integration of AddyScript into the .Net platform is well demonstrated in som
 
 Well, you do this the same way you access static members of AddyScript types. Here's an example:
 
-```Cpp
+```JS
 // Enumeration members can either be represented by their name or by their integer value.
 path = System::IO::Path::Combine(System::Environment::GetFolderPath('DesktopDirectory'), 'Products.xls');
 
@@ -56,7 +56,7 @@ if (System::IO::File::Exists(path))
 
 The **import** directive can be used to import .Net types and/or namespaces. Here is what the previous example would look like with an import directive:
 
-```Cpp
+```JS
 // from the System namespace, import only the Environment type
 import System::Environment;
 // import the entire System.IO namespace
@@ -69,7 +69,7 @@ if (File::Exists(path)) File::Delete(path);
 
 An optional alias can be provided for the imported namespace or type to avoid possible naming conflicts. Illustration:
 
-```Cpp
+```JS
 import System::Environment as Env;
 import System::IO as IO;
 
@@ -82,7 +82,7 @@ if (IO::File::Exists(path)) IO::File::Delete(path);
 
 The scripting engine supports COM interoperability over .Net. This allows you to create and manage instances of COM objects just like you do with regular .Net classes. Below is an example of a script that automates MS Word:
 
-```Cpp
+```JS
 objWord = new Word::Application();
 objWord.Visible = true;
 

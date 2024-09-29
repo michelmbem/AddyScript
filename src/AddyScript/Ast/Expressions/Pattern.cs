@@ -194,9 +194,9 @@ namespace AddyScript.Ast.Expressions
 
         public override Expression GetMatchTest(Expression arg)
         {
-            var parameter = new ParameterDecl(parameterName, false, false, null);
+            var parameter = new ParameterDecl(parameterName, false, false, null, true);
             var inlineFn = new InlineFunction([parameter], Block.Return(predicate));
-            return new AnonymousCall(inlineFn, [arg], null);
+            return new AnonymousCall(inlineFn, [new ListItem(arg)], null);
         }
     }
 

@@ -13,16 +13,15 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="positionalArgs">The list of positional arguments passed to the constructor</param>
     /// <param name="namedArgs">The collection of named arguments passed to the constructor</param>
-    public class ParentConstructorCall(Expression[] positionalArgs, Dictionary<string, Expression> namedArgs)
+    public class ParentConstructorCall(ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
         : CallWithNamedArgs(positionalArgs, namedArgs)
     {
-
         /// <summary>
         /// Initializes a new instance of ParentConstructorCall.
         /// </summary>
-        /// <param name="arguments">The list of arguments passed to the constructor</param>
-        public ParentConstructorCall(params Expression[] arguments)
-            : this(arguments, null)
+        /// <param name="positionalArgs">The list of positional arguments passed to the constructor</param>
+        public ParentConstructorCall(params Expression[] positionalArgs)
+            : this(ToListItems(positionalArgs), null)
         {
         }
 

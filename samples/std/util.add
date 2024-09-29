@@ -3,7 +3,7 @@ function compare(a, b)
     return sign(a - b);
 }
 
-function swap(ref a, ref b)
+function swap(&a, &b)
 {
 	(a, b) = (b, a);
 }

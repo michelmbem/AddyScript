@@ -151,7 +151,7 @@ ParameterList ::= '(' ( Parameter ( ',' Parameter )* )? ')'
 ![Parameter](diagram/Parameter.svg)
 
 ```
-Parameter ::= ( Attributes ( 'ref' | 'params' )? | ( 'ref' | 'params' ) Attributes? ) IDENTIFIER | Attributes? IDENTIFIER ( '=' Literal )?
+Parameter ::= ( Attributes ( '&' | '..' )? | ( '&' | '..' ) Attributes? ) IDENTIFIER '!'? | Attributes? IDENTIFIER '!'? ( '=' Literal )?
 ```
 
 **Literal:**
@@ -438,7 +438,24 @@ TryCatchFinally ::= 'try' ( '(' Expression ')' )? Block ( 'catch' '(' IDENTIFIER
 ![GroupAssignment](diagram/GroupAssignment.svg)
 
 ```
-GroupAssignment ::= '(' ExpressionList ')' '=' '(' ExpressionList ')' ';'
+GroupAssignment ::= '(' ExpressionList ')' '=' '(' ListItems ')' ';'
+```
+
+**ListItems:**
+
+![ListItems](diagram/ListItems.svg)
+
+```
+ListItems
+         ::= ListItem ( ',' ListItem )*
+```
+
+**ListItem:**
+
+![ListItem](diagram/ListItem.svg)
+
+```
+ListItem ::= '..'? Expression
 ```
 
 **Expression:**
@@ -586,7 +603,7 @@ Composite ::= Atom ( '[' ( Expression | Expression? '..' Expression? ) ']' | '.'
 ![ArgumentList](diagram/ArgumentList.svg)
 
 ```
-ArgumentList ::= '(' ( ExpressionList ( ',' NamedArgList )? | NamedArgList )? ')'
+ArgumentList ::= '(' ( ListItems ( ',' NamedArgList )? | NamedArgList )? ')'
 ```
 
 **NamedArgList:**
@@ -791,7 +808,7 @@ AtomStartingWithLBrace ::= SetInitializer | MapInitializer
 ![SetInitializer](diagram/SetInitializer.svg)
 
 ```
-SetInitializer ::= '{' ExpressionList? '}'
+SetInitializer ::= '{' ListItems? '}'
 ```
 
 **MapInitializer:**
@@ -823,7 +840,7 @@ MapItemInitializer ::= Expression '=>' Expression
 ![ListInitializer](diagram/ListInitializer.svg)
 
 ```
-ListInitializer ::= '[' ExpressionList? ']'
+ListInitializer ::= '[' ListItems? ']'
 ```
 
 **Lambda:**

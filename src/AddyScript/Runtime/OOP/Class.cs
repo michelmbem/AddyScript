@@ -357,7 +357,7 @@ public class Class : IFrameItem
         // Create the list::last method
         var lastFunction = new Function([new Parameter("__predicate")],
                                         new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                              PropertyRef.This("count"),
+                                                                                                              PropertyRef.This("size"),
                                                                                                               new Literal(new Integer(1)))) ],
                                                               new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
                                                                                    new VariableRef("i"),
@@ -374,7 +374,7 @@ public class Class : IFrameItem
                                              new Block(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
                                                                    new BinaryExpression(BinaryOperator.LessThan,
                                                                                         new VariableRef("i"),
-                                                                                        PropertyRef.This("count")),
+                                                                                        PropertyRef.This("size")),
                                                                    [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
                                                                    new IfElse(new FunctionCall("__predicate", ItemRef.This(new VariableRef("i"))),
                                                                               new Return(new VariableRef("i")))),
@@ -385,7 +385,7 @@ public class Class : IFrameItem
         // Create the list::findLastIndex method
         var findLastIndexFunction = new Function([new Parameter("__predicate")],
                                                  new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                                       PropertyRef.This("count"),
+                                                                                                                       PropertyRef.This("size"),
                                                                                                                        new Literal(new Integer(1)))) ],
                                                                        new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
                                                                                             new VariableRef("i"),
@@ -450,7 +450,8 @@ public class Class : IFrameItem
                                                                                                          "add",
                                                                                                          new VariableRef("__value")),
                                                                                           new Assignment(new ItemRef(new VariableRef("__groups"), new VariableRef("__group_id")),
-                                                                                                         new ListInitializer(new VariableRef("__value")))))),
+                                                                                                         new ListInitializer(new ListItem(new VariableRef("__value"),
+                                                                                                                             false)))))),
                                                      new Return(new VariableRef("__groups"))));
 
         List.RegisterMethod(new ClassMethod("groupBy", Scope.Public, Modifier.Final, groupByFunction));
@@ -927,8 +928,9 @@ public class Class : IFrameItem
         return [
             new ClassField("_name", Scope.Private, Modifier.Default, null),
             new ClassField("_byRef", Scope.Private, Modifier.Default, null),
-            new ClassField("_vaArgs", Scope.Private, Modifier.Default, null),
+            new ClassField("_vaList", Scope.Private, Modifier.Default, null),
             new ClassField("_defaultValue", Scope.Private, Modifier.Default, null),
+            new ClassField("_canBeEmpty", Scope.Private, Modifier.Default, null),
             new ClassField("_attributes", Scope.Private, Modifier.Default, null)
         ];
     }
@@ -942,8 +944,9 @@ public class Class : IFrameItem
         return [
             new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
             new ClassProperty("byRef", Scope.Public, Modifier.Default, "_byRef", PropertyAccess.Read),
-            new ClassProperty("vaArgs", Scope.Public, Modifier.Default, "_vaArgs", PropertyAccess.Read),
+            new ClassProperty("vaList", Scope.Public, Modifier.Default, "_vaList", PropertyAccess.Read),
             new ClassProperty("defaultValue", Scope.Public, Modifier.Default, "_defaultValue", PropertyAccess.Read),
+            new ClassProperty("canBeEmpty", Scope.Public, Modifier.Default, "_canBeEmpty", PropertyAccess.Read),
             new ClassProperty("attributes", Scope.Public, Modifier.Default, "_attributes", PropertyAccess.Read)
         ];
     }

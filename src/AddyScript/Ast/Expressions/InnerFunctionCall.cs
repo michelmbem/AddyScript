@@ -13,7 +13,7 @@ namespace AddyScript.Ast.Expressions
     /// <param name="function">The inner function to call</param>
     /// <param name="arguments">The list of arguments</param>
     public class InnerFunctionCall(InnerFunction function, params Expression[] arguments)
-        : Call(arguments)
+        : Call(ToListItems(arguments))
     {
 
         /// <summary>

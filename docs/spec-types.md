@@ -8,7 +8,7 @@ A rational number is a pair of integers resulting from their division. The first
 
 Example:
 
-```Cpp
+```JS
 a = 3/4;
 b = 1/4;
 
@@ -41,7 +41,7 @@ A complex number is a pair of floating-point numbers treated as a single unit. T
 
 Example:
 
-```Cpp
+```JS
 a = (2, -1); // 2-i
 b = (1, 2); // 1+2i
 
@@ -72,10 +72,10 @@ Date/time values ​​are instances of the **date** class. You will typically c
 
 Example:
 
-```Cpp
+```JS
 println("hello! it's {0:t} o'clock", now());
 d = (date)readln("what's your birth date? ");
-println("it was a " + d.get("weekday"));
+println("it was a " + d["weekday"]);
 today = now().$date;
 println("you are {0} years old now", today.subtract(d, "year"));
 d = d.add(1, "year");
@@ -97,9 +97,9 @@ In addition to those operators, the **date** class exposes the following members
 |Member|Nature|Description|
 |-|-|-|
 |`date of(params int[] values)`|static method|A static factory method for creating dates.<br>Accepts 3, 4, 6 or 7 arguments (all of the **int** type).<br>The arguments are interpreted like this:<ul><li>3 arguments: year, month, day.</li><li>4 arguments: hour, minute, second, millisecond.</li><li>6 arguments: year, month, day, hour, minute, second.</li><li>7 arguments: year, month, day, hour, minute, second, millisecond.</li></ul>|
+|`int\|string [string part]`|indexer|Extracts some part from the target date object. Known parts are: "year", "month", "yearday", "weekday", "day", "hour", "minute", "second" and "millisecond".|
 |`date $date { read; }`|property|Extracts the "date" component (in the strict sense of the term) of a date object.|
 |`date time { read; }`|property|Extracts the "time" component of a date object.|
-|`int\|string get(string part)`|method|Extracts some part from the target date object. Known parts are: "year", "month", "yearday", "weekday", "day", "hour", "minute", "second" and "millisecond".|
 |`long ticks { read; }`|property|Gets the number of ticks stored in the target date's instance.|
 |`date add(int amount, string unit)`|method|Adds some amount of the given unit to the target date object and returns an altered copy of it. The target itself remains unchanged. Accepted units are: "year", "month", "day", "hour", "minute", "second" and "millisecond".|
 |`date addTicks(long ticks)`|method|Adds some ticks to the target date object and returns an altered copy of it. The target itself remains unchanged.|
@@ -111,7 +111,7 @@ In AddyScript, sequences of characters more commonly called _strings_ are instan
 
 Example:
 
-```Cpp
+```JS
 s = readln("Type some text: ");
 
 println("Lower case: " + s.toLower());

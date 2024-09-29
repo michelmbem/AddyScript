@@ -43,8 +43,6 @@ public class Keyword
         Register("as", TokenID.KW_As);
         Register("extern", TokenID.KW_Extern);
         Register("function", TokenID.KW_Function);
-        Register("ref", TokenID.KW_Ref);
-        Register("params", TokenID.KW_Params);
         Register("yield", TokenID.KW_Yield);
         Register("return", TokenID.KW_Return);
         Register("class", TokenID.KW_Class);

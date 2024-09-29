@@ -41,7 +41,7 @@ public abstract class BasicParser
     protected BasicParser(Lexer lexer)
     {
         // Initializes the lexer and peeks the first token from it.
-        this.lexer = lexer ?? throw new ArgumentNullException("lexer");
+        this.lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
         token = Ll(1);
 
         // Stores the default '__main' function on top of the stack
@@ -216,14 +216,13 @@ public abstract class BasicParser
     /// <summary>
     /// Executes some parsing method and verifies that the returned value is non-null.
     /// </summary>
-    /// <typeparam name="T">The type of element to be recognized</typeparam>
+    /// <typeparam name="T">The type of element to recognize</typeparam>
     /// <param name="recognizer">The recognition method</param>
     /// <param name="errorMessage">
-    /// The message of the exception to be thrown whenever <paramref name="recognizer"/> returns null
+    /// The message of the exception thrown whenever <paramref name="recognizer"/> returns null
     /// </param>
     /// <returns>A non-null instance of the desired type</returns>
-    protected T Required<T>(Recognizer<T> recognizer, string errorMessage)
-        where T : ScriptElement
+    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         return recognizer() ?? throw new ParseException(FileName, token, errorMessage);
     }
@@ -231,13 +230,12 @@ public abstract class BasicParser
     /// <summary>
     /// Recognizes a sequence of non-terminal symbols of the same type.
     /// </summary>
-    /// <typeparam name="T">The type of non-terminal symbols to be recognized</typeparam>
+    /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
     /// <param name="recognizer">The method used to recognize each symbol</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] Asterisk<T>(Recognizer<T> recognizer)
-        where T : ScriptElement
+    protected T[] Asterisk<T>(Recognizer<T> recognizer) where T : ScriptElement
     {
-        var elements = new List<T>();
+        List<T> elements = [];
         T element = recognizer();
 
         while (element != null)
@@ -252,17 +250,14 @@ public abstract class BasicParser
     /// <summary>
     /// Recognizes a non-empty sequence of non-terminal symbols of the same type.
     /// </summary>
-    /// <typeparam name="T">The type of non-terminal symbols to be recognized</typeparam>
+    /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
     /// <param name="recognizer">The method used to recognize each symbol</param>
     /// <param name="errorMessage">The message of the exception thrown if the list is empty</param>
     /// <returns>A non-empty array of instances of the desired type</returns>
-    protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage)
-        where T : ScriptElement
+    protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length <= 0)
-            throw new ParseException(FileName, token, errorMessage);
-
+        if (elements.Length <= 0) throw new ParseException(FileName, token, errorMessage);
         return elements;
     }
 
@@ -274,13 +269,12 @@ public abstract class BasicParser
     /// <param name="checkUnicity">Tells if each symbol must be unique</param>
     /// <param name="errorMessage">The message of the exception thrown if a symbol is duplicated in the list</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage)
-        where T : ScriptElement
+    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage) where T : ScriptElement
     {
         T element = recognizer();
-        if (element == null) return new T[0];
+        if (element == null) return [];
 
-        var elements = new List<T> { element };
+        List<T> elements = [element];
 
         while (TryMatch(TokenID.Comma))
         {
@@ -417,19 +411,19 @@ public abstract class BasicParser
     /// <summary>
     /// Represents a block at parse time.
     /// </summary>
-    protected class ParseTimeBlock(BasicParser.ParseTimeBlock next)
+    protected class ParseTimeBlock(ParseTimeBlock next)
     {
         public List<ParseTimeLabel> Labels { get; private set; } = [];
         public ParseTimeBlock Next { get; private set; } = next;
 
-        public Dictionary<string, Label> ConvertLabels(AstNode[] nodes)
+        public Dictionary<string, Label> ConvertLabels(Statement[] statements)
         {
             var converted = new Dictionary<string, Label>();
             int counter = 0;
 
             foreach (ParseTimeLabel label in Labels)
             {
-                while (counter < nodes.Length && nodes[counter].Start.Offset < label.End.Offset)
+                while (counter < statements.Length && statements[counter].Start.Offset < label.End.Offset)
                     ++counter;
 
                 converted[label.Name] = new Label(counter);

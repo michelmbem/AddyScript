@@ -115,7 +115,7 @@ An operator overload specification consists of the **operator** keyword followed
 
 In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method and an event.
 
-```Cpp
+```JS
 class Person
 {
     private _name;
@@ -197,7 +197,7 @@ Where
 
 Example: let's add a constructor in the Person class
 
-```Cpp
+```JS
 class Person
 {
     private _name;
@@ -267,7 +267,7 @@ A constructor call can be followed by a set of property initializers. This allow
 
 Example:
 
-```Cpp
+```JS
 class Point
 {
     public property x;

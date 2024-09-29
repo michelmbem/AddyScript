@@ -1,7 +1,7 @@
 import sys::console; // for 'setForeground', 'resetColor' and 'clearScreen'
 
 // Adds an element to the tree
-function addTree(ref tree, elem, prn = null)
+function addTree(&tree, elem, prn = null)
 {
 	if (tree === null)
 		tree = new {value = elem, parent = prn, left = null, right = null};

@@ -1,6 +1,6 @@
 import rowproc;
 
-function fetch_index(reader)
+function fetch_index(reader!)
 {
 	var result = null;
 	if (reader.Read())
@@ -8,7 +8,7 @@ function fetch_index(reader)
 	return result;
 }
 
-function fetch_assoc(reader)
+function fetch_assoc(reader!)
 {
 	var result = null;
 	if (reader.Read())
@@ -16,7 +16,7 @@ function fetch_assoc(reader)
 	return result;
 }
 
-function fetch_object(reader)
+function fetch_object(reader!)
 {
 	var result = null;
 	if (reader.Read())
@@ -24,7 +24,7 @@ function fetch_object(reader)
 	return (object) result;
 }
 
-function fetch_index_list(reader)
+function fetch_index_list(reader!)
 {
 	var result = [];
 	while (reader.Read())
@@ -32,7 +32,7 @@ function fetch_index_list(reader)
 	return result;
 }
 
-function fetch_assoc_list(reader)
+function fetch_assoc_list(reader!)
 {
 	var result = [];
 	while (reader.Read())
@@ -40,7 +40,7 @@ function fetch_assoc_list(reader)
 	return result;
 }
 
-function fetch_object_list(reader)
+function fetch_object_list(reader!)
 {
 	var result = [];
 	while (reader.Read())
@@ -48,7 +48,7 @@ function fetch_object_list(reader)
 	return result;
 }
 
-function fetch_list(reader)
+function fetch_list(reader!)
 {
 	var result = [];
 	while (reader.Read())

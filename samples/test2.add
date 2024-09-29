@@ -13,7 +13,7 @@ abstract class A
 		write => this._list[__key] = __value;
 	}
 	
-	public property count => this._list.count;
+	public property size => this._list.size;
 	
 	protected function first() => this._list[0];
 	
@@ -40,7 +40,7 @@ class B : A
 		write => super[__key] = (int)__value;
 	}
 	
-	public property count => super::count;
+	public property size => super::size;
 	
 	public function getFirst()
 	{
@@ -55,13 +55,13 @@ class B : A
 
 b = new B(prefix: '{', suffix: '}');
 println($'b = {b}');
-println($'b.count = {b.count}');
-mid = (int)(b.count / 2);
+println($'b.size = {b.size}');
+mid = (int)(b.size / 2);
 b[mid] = 10 * PI;
 println($'b[{mid}] = {b[mid]}');
 
 print('all items: ');
-foreach (x in b) print(x + ', ');
+foreach (x in b) print((__key > 0 ? ', ' : '') + x);
 println();
 
 firstGetter = b.getFirst();

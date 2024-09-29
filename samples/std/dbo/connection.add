@@ -5,7 +5,7 @@ class DBOConnection
 	private _connection;
 	private _transactions;
 	
-	public constructor (providerName, connectionString)
+	public constructor (providerName!, connectionString!)
 	{
 		this._connection = DBOConfig::createConnection(providerName);
 		this._connection.ConnectionString = connectionString;
@@ -14,7 +14,7 @@ class DBOConnection
 	
 	public property inTransaction
 	{
-		read { return this._transactions.count > 0; }
+		read { return this._transactions.size > 0; }
 	}
 	
 	public property transaction
@@ -33,7 +33,7 @@ class DBOConnection
 		this._transactions.clear();
 	}
 	
-	public function createCommand(commandText, commandType = 'Text')
+	public function createCommand(commandText!, commandType! = 'Text')
 	{
 		var command = this._connection.CreateCommand();
 		command.CommandText = commandText;

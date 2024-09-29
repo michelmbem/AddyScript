@@ -34,7 +34,7 @@ static class DBOConfig
 		}
 	};
 
-	public static function createConnection(providerName) {
+	public static function createConnection(providerName!) {
 		if (DBOConfig::providers.containsKey(providerName)) {
 			var provider = DBOConfig::providers[providerName];			
 			var assembly = __context.LoadAssembly(provider.assemblyName);
@@ -51,13 +51,13 @@ static class DBOConfig
 		}
 	}
 
-	public static function createDataAdapter(selectCommand) {
+	public static function createDataAdapter(selectCommand!) {
 		var cmdType = selectCommand.GetType();
 		var daType = cmdType.Assembly.GetType(cmdType.FullName.replace('Command', 'DataAdapter'));
 		return Activator::CreateInstance(daType, [selectCommand]);
 	}
 
-	public static function createCommandBuilder(dataAdapter) {
+	public static function createCommandBuilder(dataAdapter!) {
 		var daType = dataAdapter.GetType();
 		var cbType = daType.Assembly.GetType(daType.FullName.replace('DataAdapter', 'CommandBuilder'));
 		return Activator::CreateInstance(cbType, [dataAdapter]);

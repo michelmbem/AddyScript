@@ -8,7 +8,7 @@ AddyScript's **try-catch-finally** statement provides an elegant way to handle e
 
 Let the user enter an expression that we will evaluate. The expression entered by the user may be wrong.
 
-```Cpp
+```JS
 retry:
 f = readln('f(x) = ');
 x = (float) readln('x = ');
@@ -68,7 +68,7 @@ There is a special variant of the **try-catch-finally** statement that has an ar
 
 Let's copy a file from one place to another with a Stream that should be close at the end.
 
-```Cpp
+```JS
 import System::Environment;
 import System::IO;
 

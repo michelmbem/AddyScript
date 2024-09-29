@@ -64,11 +64,14 @@ function dumpProperty($property)
 function dumpParameter(parameter)
 {
 	if (parameter.byRef)
-		print("ref ");
-	else if (parameter.vaArgs)
-		print("params ");
+		print("&");
+	else if (parameter.vaList)
+		print("..");
 	
 	print(parameter.name);
+	
+	if (!parameter.canBeEmpty)
+		print("!");
 	
 	var defVal = parameter.defaultValue;
 	if (defVal is string)

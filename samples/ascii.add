@@ -18,8 +18,8 @@ for (i = 0; i < 16; i++)
 	setForeground('Yellow');
 	print('{0:X} ', i);
 	resetColor();
-    
-    if (!({0, 1, 8, 9} contains i))
+	
+	if (!({0, 1, 8, 9} contains i))
     {
         for (j = 0; j < 16; j++)
         {

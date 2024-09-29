@@ -1,7 +1,7 @@
 namespace AddyScript.Ast.Expressions
 {
     /// <summary>
-    /// An item as it appears in an map's initializer.
+    /// An item as it appears in an map initializer.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of MapItemInitializer

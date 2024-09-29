@@ -13,7 +13,8 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="method">A wrapper around the target native function</param>
     /// <param name="arguments">The arguments passed to the target function</param>
-    public class ExternalFunctionCall(MethodInfo method, params Expression[] arguments) : Call(arguments)
+    public class ExternalFunctionCall(MethodInfo method, params Expression[] arguments)
+        : Call(ToListItems(arguments))
     {
 
         /// <summary>

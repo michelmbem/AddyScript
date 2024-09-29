@@ -105,14 +105,16 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         ];
 
         InnerFunction[] commonFunctions = [EqualsFunction, HashCodeFunction, CompareToFunction, ToStringFunction, CloneFunction, DisposeFunction];
-        InnerFunction[] dateFunctions = [DateGet, DateAdd, DateAddTicks, DateSubtract];
+        InnerFunction[] dateProperties = [DateGetDate, DateGetTime, DateGetTicks];
+        InnerFunction[] dateFunctions = [DateAdd, DateAddTicks, DateSubtract];
         InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
         InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
+        InnerFunction[] mapProperties = [MapSize, MapKeys, MapValues];
         InnerFunction[] mapFunctions = [MapContainsKey, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
         InnerFunction[] setFunctions = [SetAdd, SetRemove, SetClear];
         InnerFunction[] queueFunctions = [QueueEnqueue, QueuePeek, QueueDequeue, QueueClear];
         InnerFunction[] stackFunctions = [StackPush, StackPeek, StackPop, StackClear];
-
+        
         foreach (InnerFunction function in commonFunctions)
             foreach (Class cls in Class.Predefined)
                 if (cls.SuperClass == null)
@@ -126,10 +128,10 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         Class.Complex.RegisterProperty(ComplexImaginary.ToInstanceProperty());
         Class.Complex.RegisterMethod(ComplexConjugate.ToInstanceMethod());
 
-        Class.Date.RegisterProperty(DateGetDate.ToInstanceProperty());
-        Class.Date.RegisterProperty(DateGetTime.ToInstanceProperty());
-        Class.Date.RegisterProperty(DateGetTicks.ToInstanceProperty());
+        Class.Date.RegisterIndexer(DateGet.ToIndexer());
         Class.Date.RegisterMethod(DateOf.ToStaticMethod());
+        foreach (InnerFunction function in dateProperties)
+            Class.Date.RegisterProperty(function.ToInstanceProperty());
         foreach (InnerFunction function in dateFunctions)
             Class.Date.RegisterMethod(function.ToInstanceMethod());
 
@@ -137,26 +139,25 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         foreach (InnerFunction function in stringFunctions)
             Class.String.RegisterMethod(function.ToInstanceMethod());
 
-        Class.List.RegisterProperty(ListCount.ToInstanceProperty());
+        Class.List.RegisterProperty(ListSize.ToInstanceProperty());
         foreach (InnerFunction function in listFunctions)
             Class.List.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Map.RegisterProperty(MapCount.ToInstanceProperty());
-        Class.Map.RegisterProperty(MapKeys.ToInstanceProperty());
-        Class.Map.RegisterProperty(MapValues.ToInstanceProperty());
+        foreach (InnerFunction function in mapProperties)
+            Class.Map.RegisterProperty(function.ToInstanceProperty());
         foreach (InnerFunction function in mapFunctions)
             Class.Map.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Set.RegisterProperty(SetCount.ToInstanceProperty());
+        Class.Set.RegisterProperty(SetSize.ToInstanceProperty());
         foreach (InnerFunction function in setFunctions)
             Class.Set.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Queue.RegisterProperty(QueueCount.ToInstanceProperty());
+        Class.Queue.RegisterProperty(QueueSize.ToInstanceProperty());
         Class.Queue.RegisterMethod(QueueOf.ToStaticMethod());
         foreach (InnerFunction function in queueFunctions)
             Class.Queue.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Stack.RegisterProperty(StackCount.ToInstanceProperty());
+        Class.Stack.RegisterProperty(StackSize.ToInstanceProperty());
         Class.Stack.RegisterMethod(StackOf.ToStaticMethod());
         foreach (InnerFunction function in stackFunctions)
             Class.Stack.RegisterMethod(function.ToInstanceMethod());
@@ -1271,7 +1272,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem ListCountLogic(DataItem[] arguments)
+    private static DataItem ListSizeLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsList.Count);
     }
@@ -1441,7 +1442,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem MapCountLogic(DataItem[] arguments)
+    private static DataItem MapSizeLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsDictionary.Count);
     }
@@ -1468,7 +1469,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem SetCountLogic(DataItem[] arguments)
+    private static DataItem SetSizeLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsHashSet.Count);
     }
@@ -1504,7 +1505,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem QueueCountLogic(DataItem[] arguments)
+    private static DataItem QueueSizeLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsQueue.Count);
     }
@@ -1540,7 +1541,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem StackCountLogic(DataItem[] arguments)
+    private static DataItem StackSizeLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsStack.Count);
     }
@@ -2005,7 +2006,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the number of items in a list.
     /// </summary>
-    public static readonly InnerFunction ListCount = new ("count", [new Parameter("self")], ListCountLogic);
+    public static readonly InnerFunction ListSize = new ("size", [new Parameter("self")], ListSizeLogic);
 
     /// <summary>
     /// Sorts a list in ascending order.
@@ -2094,7 +2095,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the number of key-value pairs of a map.
     /// </summary>
-    public static readonly InnerFunction MapCount = new ("count", [new Parameter("self")], MapCountLogic);
+    public static readonly InnerFunction MapSize = new ("size", [new Parameter("self")], MapSizeLogic);
 
     #endregion
 
@@ -2118,7 +2119,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the number of items in a set.
     /// </summary>
-    public static readonly InnerFunction SetCount = new ("count", [new Parameter("self")], SetCountLogic);
+    public static readonly InnerFunction SetSize = new ("size", [new Parameter("self")], SetSizeLogic);
 
     #endregion
 
@@ -2152,7 +2153,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the number of items in a set.
     /// </summary>
-    public static readonly InnerFunction QueueCount = new ("count", [new Parameter("self")], QueueCountLogic);
+    public static readonly InnerFunction QueueSize = new ("size", [new Parameter("self")], QueueSizeLogic);
 
     #endregion
 
@@ -2186,7 +2187,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the number of items in a set.
     /// </summary>
-    public static readonly InnerFunction StackCount = new ("count", [new Parameter("self")], StackCountLogic);
+    public static readonly InnerFunction StackSize = new ("size", [new Parameter("self")], StackSizeLogic);
 
     #endregion
 
@@ -2251,8 +2252,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <returns>A <see cref="ClassProperty"/></returns>
     public ClassProperty ToStaticProperty()
     {
-        var getter = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Static, ToFunction());
-        return new ClassProperty(Name, Scope.Public, Modifier.Static, getter, null);
+        var reader = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Static, ToFunction());
+        return new ClassProperty(Name, Scope.Public, Modifier.Static, reader, null);
     }
 
     /// <summary>
@@ -2261,8 +2262,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <returns>A <see cref="ClassProperty"/></returns>
     public ClassProperty ToInstanceProperty()
     {
-        var getter = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Default, ToMethodFunction());
-        return new ClassProperty(Name, Scope.Public, Modifier.Default, getter, null);
+        var reader = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Default, ToMethodFunction());
+        return new ClassProperty(Name, Scope.Public, Modifier.Default, reader, null);
+    }
+
+    /// <summary>
+    /// Wraps an inner function into a readonly indexer.
+    /// </summary>
+    /// <returns>A <see cref="ClassProperty"/></returns>
+    public ClassProperty ToIndexer()
+    {
+        var reader = new ClassMethod(ClassProperty.GetReaderName(ClassProperty.INDEXER_NAME), Scope.Public, Modifier.Default, ToMethodFunction());
+        return new ClassProperty(ClassProperty.INDEXER_NAME, Scope.Public, Modifier.Default, reader, null);
     }
 
     #endregion

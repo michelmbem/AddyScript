@@ -4,7 +4,7 @@ class DBOIterator
 	private processor;
 	private reader;
 	
-	public constructor(command, processor)
+	public constructor(command!, processor!)
 	{
 		this.command = command;
 		this.processor = processor;

@@ -11,7 +11,7 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="positionalArgs">The list of positional arguments passed to the function or method</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function or method</param>
-    public abstract class CallWithNamedArgs(Expression[] positionalArgs, Dictionary<string, Expression> namedArgs)
+    public abstract class CallWithNamedArgs(ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
         : Call(positionalArgs)
     {
 

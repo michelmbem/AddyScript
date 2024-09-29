@@ -17,7 +17,7 @@ function functionName (comma_separated_list_of_parameters)
 
 Example:
 
-```Cpp
+```JS
 function sayHello()
 {
     println("Hello to anyone!");
@@ -48,7 +48,7 @@ function functionName (comma_separated_list_of_parameters) => expression;
 
 Example:
 
-```Cpp
+```JS
 function addTwo(a, b) => a + b;
 
 n = (float)readln('first number: ');
@@ -69,7 +69,8 @@ Positional arguments must always come first in an argument list. Once a named ar
 
 Example:
 
-```Cpp
+```JS
+// A function that concatenates values and wrap between a prefix and a suffix
 function concat(values, separator = ', ', prefix = '{', suffix = '}')
 	=> prefix + values.join(separator) + suffix;
 
@@ -101,11 +102,41 @@ s5 = concat(suffix: '[', separator: ':', values: l, prefix: ']');
 println('s5 = ' + s5);
 ```
 
+#### Spreading arguments
+
+An important feature of the AddyScript syntax is that you can invoke a function with arguments of type **list** or **set** preceded by the **spread operator** (..). This tells AddyScript that the **list** or **set** should be substituted for its contents. This works similarly to the right operand of group assignment. The only requirement here is that none of the parameters provided by the spread collection should be passed to the function by reference.
+
+Example:
+
+```Js
+function add(a, b, c) => a + b + c;
+
+res = add(1, 2, 3);
+println('add(1, 2, 3)' + res);
+// Output: 6
+
+l = [5, 6, 7];
+res = add(..l);
+println('add(..l)' + res);
+// Output: 18
+
+s = {9, 10};
+res = add(..s, 11);
+println('add(..s, 11)' + res);
+// Output: 30
+
+res = add(..l[2..], ..s);
+println('add(..l[2..], ..s)' + res);
+// Output: 26
+```
+
 ### Manage how parameters are passed to a function
 
-A parameter can be passed to a function by value, by reference, or as a variable-length list of values. By default, parameters are passed by value. To indicate that a parameter is passed by reference, simply prefix it with the **ref** keyword. Similarly, prefixing a parameter with the **params** keyword indicates that it represents a variable-length list of values. Note that a variable-length list of values ​​must always be the last in a parameter list. Thus, a function cannot have multiple variable-length lists of values ​​in its header.
+A parameter can be passed to a function by value, by reference, or as a variable-length list of values. By default, parameters are passed by value. To indicate that a parameter is passed by reference, simply prefix it with the ampersand sign (&). Similarly, prefixing a parameter with the double-dot sign (..) keyword indicates that it represents a variable-length list of values. Note that a variable-length list of values ​​must always be the last in a parameter list. Thus, a function cannot have multiple variable-length lists of values ​​in its header.
 
 When a parameter is passed by value to a function, it can be assigned a default value. This makes the parameter optional (i.e., it does not need to be provided with a value when calling the function). Once you add an optional parameter to a parameter list, the only types of parameters that can follow are other optional parameters and a variable-length list of values.
+
+Another feature that AddyScript offers in handling function parameters is emptiness checking. When a parameter name is followed by an exclamation mark (!) in a function header, this tells AddyScript that the parameter in question should not receive empty values. Empty here means a null reference, a zero-length string, or an empty collection. Whenever the parameter receives such a value, an exception is thrown.
 
 ### Closures
 
@@ -113,9 +144,9 @@ A closure is a function used as a variable. Closures are typically used to pass 
 
 Example:
 
-```Cpp
-// Repeats an action on each item of a list; parameter 'action' is a closure
-function repeat(l, action)
+```JS
+// Repeats an action on each item of a list; parameter 'action' is a (mandatory) closure
+function repeat(l, action!)
 {
     foreach (item in l)
         action(item);
@@ -159,7 +190,7 @@ Each parameter in the formal parameter list must be decorated with a Type attrib
 
 The following example shows how to invoke the Win32 MessageBox function from a script:
 
-```Cpp
+```JS
 [LibImport("user32", procName = "MessageBox", returnType = "Int32")]
 extern function msgbox(
         [Type("IntPtr")] hWnd,
