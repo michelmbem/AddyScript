@@ -36,6 +36,7 @@ function hello(name)
 }
 
 names = ['john', 'mike', 'bill', 'david', 'mark', 'roger'];
+
 // Hello to everyone:
 foreach (name in names)
    hello(name);
