@@ -172,7 +172,7 @@ Initializers are like literal values for composite types: they provide initial v
 
 * **Map**: a sequence of key-value pairs between curly braces separated by commas. Each pair has the form: `key => value` where key and value are both expressions. **e.g.**: `{'name' => 'joe', 'age' => 18, 'job' => 'student'}`.
 
-* **Set**: a sequence of expressions enclosed in curly brackets separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with list initializers the spread operator can be used to include the contents of another collection.
+* **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with list initializers the spread operator can be used to include the contents of another collection.
 
     **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
 
