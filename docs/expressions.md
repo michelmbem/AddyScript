@@ -166,15 +166,15 @@ Depending on their type, literal values have the following forms:
 
 Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: complex numbers, lists, maps and sets. Depending on their type, initializers have the following forms:
 
-* **Complex number**: a couple of floating-point numbers between parenthesis; the first number in the couple represents the real part of the complex number while the second represents the imaginary part. **e.g.**: `(2, -1)` stands for 2-i; `(1, 3)` stands for 1+3i.
+* **Complex number**: a pair of floating point numbers in parentheses; the first number in the pair represents the real part of the complex number while the second represents the imaginary part. **e.g.**: `(2, -1)` means 2-i; `(1, 3)` means 1+3i.
 
-* **List**: a sequence of expressions (literal or not) between square braces separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`).
+* **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. If a list item is a sequential collection (i.e. a **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
 
-* **Map**: a sequence of key-value couples between curly braces separated by commas. Each couple has the form: key =&gt; value where key and value are both expressions. **e.g.**: `{'name' =&gt; 'joe', 'age' =&gt; 18, 'job' =&gt; 'student'}`.
+* **Map**: a sequence of key-value pairs between curly braces separated by commas. Each pair has the form: `key => value` where key and value are both expressions. **e.g.**: `{'name' => 'joe', 'age' => 18, 'job' => 'student'}`.
 
-* **Set**: a sequence of expressions between curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`.
+* **Set**: a sequence of expressions enclosed in curly brackets separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with list initializers the spread operator can be used to include the contents of another collection.
 
-    **Note**: An empty map initializer must have this form: `{=&gt;}`. This helps to make a difference between an empty map initializer and an empty set initializer.
+    **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
 
 ### Type checking
 
