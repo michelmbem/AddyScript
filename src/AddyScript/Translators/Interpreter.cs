@@ -570,7 +570,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         try
         {
-            DataItem[] rValues = EvaluateArguments(grpAssign.RValues).Item1;
+            DataItem[] rValues = ExpandList(grpAssign.RValues).Item1;
 
             if (rValues.Length != grpAssign.LValues.Length)
                 throw new RuntimeException(fileName, grpAssign, Resources.ListLengthMismatch);
@@ -753,30 +753,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
-        var list = new List<DataItem>();
-
-        foreach (ListItem item in listInit.Items)
-        {
-            try
-            {
-                item.Expression.AcceptTranslator(this);
-
-                if (item.Spread)
-                    list.AddRange(returnedValue.AsList);
-                else
-                    list.Add(returnedValue);
-            }
-            catch (ScriptException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new ScriptException(fileName, item, ex);
-            }
-        }
-
-        returnedValue = new List(list);
+        returnedValue = new List(ExpandList(listInit.Items).Item1);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
@@ -808,31 +785,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
-        var hashSet = new HashSet<DataItem>();
-
-        foreach (ListItem item in setInit.Items)
-        {
-            try
-            {
-                item.Expression.AcceptTranslator(this);
-
-                if (item.Spread)
-                    foreach (DataItem value in returnedValue.AsHashSet)
-                        hashSet.Add(value);
-                else
-                    hashSet.Add(returnedValue);
-            }
-            catch (ScriptException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new ScriptException(fileName, item, ex);
-            }
-        }
-
-        returnedValue = new Set(hashSet);
+        returnedValue = new Set(ExpandList(setInit.Items).Item1);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
@@ -2144,18 +2097,20 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="functionName">The function's name</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
+    /// <param name="expandedArgList">Contains the expanded list of all arguments when this method completes</param>
     /// <returns>A dictionary of frame items</returns>
     private Dictionary<string, IFrameItem> GetInitialFrameItems(Function function, string functionName,
                                                                 ListItem[] positionalArgs,
-                                                                Dictionary<string, Expression> namedArgs)
+                                                                Dictionary<string, Expression> namedArgs,
+                                                                out List<Expression> expandedArgList)
     {
         // Make sure we are not dealing with null references
         positionalArgs ??= [];
         namedArgs ??= [];
 
-        // Get the positional arguments values
-        Tuple<DataItem[], ListItem[]> posArgValues = EvaluateArguments(positionalArgs);
-        int totalArgCount = posArgValues.Item1.Length;
+        // Expand the list of positional arguments
+        Tuple<DataItem[], ListItem[]> expandedPosArgs = ExpandList(positionalArgs);
+        int totalArgCount = expandedPosArgs.Item1.Length;
 
         // Check that every named argument matches a parameter declared in the function's header
         // Also compute the total argument count
@@ -2166,7 +2121,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (paramIndex < 0)
                 throw new ArgumentException(string.Format(Resources.FunctionHasNoParameterNamed, functionName, argName));
 
-            if (paramIndex < posArgValues.Item1.Length)
+            if (paramIndex < expandedPosArgs.Item1.Length)
                 throw new ArgumentException(string.Format(Resources.ParameterSuppliedTwice, argName));
 
             ++totalArgCount;
@@ -2184,16 +2139,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         var frameItems = new Dictionary<string, IFrameItem>();
         int counter = 0;
-        Parameter parameter;
-        ListItem argument;
-        DataItem argValue;
 
-        // Pass the positional arguments
-        while (counter < posArgValues.Item1.Length)
+        // Pass the positional arguments first
+        while (counter < expandedPosArgs.Item1.Length)
         {
-            parameter = function.Parameters[counter];
-            argument = posArgValues.Item2[counter];
-            argValue = posArgValues.Item1[counter];
+            Parameter parameter = function.Parameters[counter];
+            ListItem argument = expandedPosArgs.Item2[counter];
+            DataItem argValue = expandedPosArgs.Item1[counter];
 
             // Check that parameters are not passed by reference from expressions with the spread operator
             if (parameter.ByRef && argument.Spread)
@@ -2203,12 +2155,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             {
                 // If the current parameter is a variably sized list,
                 // fill it with the remaining arguments
-                DataItem vaList;
-
-                if (counter == posArgValues.Item1.Length - 1)
-                    vaList = argValue.Class == Class.List ? argValue : new List([argValue]);
-                else
-                    vaList = new List(posArgValues.Item1[counter..]);
+                var vaList = new List(expandedPosArgs.Item1[counter..]);
 
                 CheckEmptiness(parameter, vaList, argument);
                 frameItems.Add(parameter.Name, vaList);
@@ -2223,18 +2170,21 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
         }
 
-        // Finish with the named arguments and optional parameters default values
+        expandedArgList = expandedPosArgs.Item2.Select(item => item.Expression).ToList();
+
+        // Then finish with the named arguments and optional parameters default values
         while (counter < function.Parameters.Length)
         {
-            parameter = function.Parameters[counter];
+            Parameter parameter = function.Parameters[counter];
 
-            if (namedArgs.TryGetValue(parameter.Name, out Expression arg))
+            if (namedArgs.TryGetValue(parameter.Name, out Expression argument))
             {
-                arg.AcceptTranslator(this);
-                argValue = returnedValue;
+                argument.AcceptTranslator(this);
+                DataItem argValue = returnedValue;
 
-                CheckEmptiness(parameter, argValue, arg);
+                CheckEmptiness(parameter, argValue, argument);
                 frameItems.Add(parameter.Name, argValue);
+                expandedArgList.Add(argument);
             }
             else if (counter >= minNumArgs)
                 frameItems.Add(parameter.Name, parameter.VaList ? new List() : parameter.DefaultValue);
@@ -2253,16 +2203,16 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
-    /// Check that a parameter that cannot be empty is not actually supplied an empty value.
+    /// Checks that a parameter that cannot be empty is not actually supplied an empty value.
     /// </summary>
-    /// <param name="parameter">The parameter to check</param>
+    /// <param name="parameter">The parameter that's receiving a value</param>
     /// <param name="argValue">The value that's being given to the parameter</param>
-    /// <param name="argElement">The argument's definition in the code</param>
+    /// <param name="argument">The source code element that was evaluated to <paramref name="argValue"/></param>
     /// <exception cref="ScriptException">If <paramref name="argValue"/> is an empty value</exception>
-    private void CheckEmptiness(Parameter parameter, DataItem argValue, ScriptElement argElement)
+    private void CheckEmptiness(Parameter parameter, DataItem argValue, ScriptElement argument)
     {
         if (!parameter.CanBeEmpty && argValue.IsEmpty())
-            throw new ScriptException(fileName, argElement, Resources.ValueShouldNotBeEmpty);
+            throw new ScriptException(fileName, argument, Resources.ValueShouldNotBeEmpty);
     }
 
     /// <summary>
@@ -2271,17 +2221,19 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// </summary>
     /// <param name="function">The function for which values are copied back</param>
     /// <param name="arguments">The real arguments of the function</param>
-    /// <param name="frameItems">The frame's items to copy back</param>
-    private void CopyBackFrameItems(Function function, ListItem[] arguments, Dictionary<string, IFrameItem> frameItems)
+    /// <param name="frameItems">The captured frame items to copy back</param>
+    private void CopyBackFrameItems(Function function, List<Expression> arguments,
+                                    Dictionary<string, IFrameItem> frameItems)
     {
-        var namesToSkip = new HashSet<string>();
+        HashSet<string> namesToSkip = [];
 
         for (int i = 0; i < function.Parameters.Length; ++i)
         {
             Parameter parameter = function.Parameters[i];
-            if (parameter.ByRef)
-                Assign(arguments[i].Expression, (DataItem)frameItems[parameter.Name]);
             namesToSkip.Add(parameter.Name);
+
+            if (parameter.ByRef)
+                Assign(arguments[i], (DataItem)frameItems[parameter.Name]);
         }
 
         if (function.DeclaringFrame != null)
@@ -2303,7 +2255,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private void Invoke(Function function, string name, Class holder, DataItem target,
                         ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
     {
-        var frameItems = GetInitialFrameItems(function, name, positionalArgs, namedArgs);
+        var frameItems = GetInitialFrameItems(function, name, positionalArgs, namedArgs,
+                                              out List<Expression> expandedArgList);
+
         PushFrame(holder, target, name, frameItems);
 
         try
@@ -2311,14 +2265,15 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             function.Body.AcceptTranslator(this);
 
             if (jumpCode == JumpCode.Goto)
-                throw new RuntimeException(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
+                throw new RuntimeException(fileName, lastGoto,
+                    string.Format(Resources.MissingLabel, lastGoto.LabelName));
         }
         finally
         {
             PopFrame();
 
             DataItem result = returnedValue;
-            CopyBackFrameItems(function, positionalArgs, frameItems);
+            CopyBackFrameItems(function, expandedArgList, frameItems);
             returnedValue = result;
 
             jumpCode = JumpCode.None;
@@ -2831,35 +2786,39 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         arguments ??= [];
 
-        Tuple<DataItem[], ListItem[]> argValues = EvaluateArguments(arguments);
+        Tuple<DataItem[], ListItem[]> expandedArgs = ExpandList(arguments);
         object[] nativeArgValues;
         object result;
         
         if (type.IsCOMObject)
         {
-            nativeArgValues = argValues.Item1.Select(val => val.AsNativeObject).ToArray();
+            nativeArgValues = expandedArgs.Item1.Select(val => val.AsNativeObject).ToArray();
             result = type.InvokeMember(methodName, flags, null, target, nativeArgValues);
         }
         else
         {
-            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, argValues.Item1, flags) ??
+            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, expandedArgs.Item1, flags) ??
                 throw new MissingMethodException(type.FullName, methodName);
 
             ParameterInfo[] parameters = matchedMethod.GetParameters();
             bool[] isParamOut = parameters.Select(p => p.IsOut || p.IsRetval).ToArray();
 
             for (int i = 0; i < isParamOut.Length; ++i)
-                if (isParamOut[i] && argValues.Item2[i].Spread)
-                    throw new ScriptException(fileName, argValues.Item2[i], Resources.InvalidLValue);
+                if (isParamOut[i] && expandedArgs.Item2[i].Spread)
+                    throw new ScriptException(fileName, expandedArgs.Item2[i], Resources.InvalidLValue);
 
-            nativeArgValues = argValues.Item1.Select((val, i) => val.ConvertTo(parameters[i].ParameterType)).ToArray();
+            nativeArgValues = expandedArgs.Item1
+                                          .Select((val, i) => val.ConvertTo(parameters[i].ParameterType))
+                                          .ToArray();
+
             result = matchedMethod.Invoke(target, nativeArgValues);
 
             for (int i = 0; i < isParamOut.Length; ++i)
                 if (isParamOut[i] || parameters[i].ParameterType.IsArray)
                     try
                     {
-                        Assign(argValues.Item2[i].Expression, DataItemFactory.CreateDataItem(nativeArgValues[i]));
+                        Assign(expandedArgs.Item2[i].Expression,
+                               DataItemFactory.CreateDataItem(nativeArgValues[i]));
                     }
                     catch (RuntimeException)
                     {
@@ -3254,32 +3213,32 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
-    /// Evaluates a set of positional arguments and returns their values.
+    /// Expands a list potentially containing items with the spread operator to its full contents.
     /// </summary>
-    /// <param name="arguments">The given set of positional arguments</param>
+    /// <param name="listItems">The list that should be expanded</param>
     /// <returns>A <see cref="Tuple{DataItem[], ListItem[]}"/></returns>
     /// <exception cref="ScriptException">The evaluation of an argument failed</exception>
-    private Tuple<DataItem[], ListItem[]> EvaluateArguments(ListItem[] arguments)
+    private Tuple<DataItem[], ListItem[]> ExpandList(ListItem[] listItems)
     {
-        List<DataItem> argValues = [];
-        List<ListItem> args = [];
+        List<DataItem> values = [];
+        List<ListItem> valueItems = [];
 
-        foreach (ListItem argument in arguments)
+        foreach (ListItem item in listItems)
         {
             try
             {
-                argument.Expression.AcceptTranslator(this);
+                item.Expression.AcceptTranslator(this);
 
-                if (argument.Spread)
-                    foreach (DataItem item in returnedValue.AsList)
+                if (item.Spread)
+                    foreach (DataItem value in returnedValue.AsList)
                     {
-                        argValues.Add(item);
-                        args.Add(argument);
+                        values.Add(value);
+                        valueItems.Add(item);
                     }
                 else
                 {
-                    argValues.Add(returnedValue);
-                    args.Add(argument);
+                    values.Add(returnedValue);
+                    valueItems.Add(item);
                 }
             }
             catch (ScriptException)
@@ -3288,11 +3247,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
             catch (Exception ex)
             {
-                throw new ScriptException(fileName, argument, ex);
+                throw new ScriptException(fileName, item, ex);
             }
         }
 
-        return new([.. argValues], [.. args]);
+        return new([.. values], [.. valueItems]);
     }
 
     #endregion

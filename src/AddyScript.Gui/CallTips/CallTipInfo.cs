@@ -33,11 +33,13 @@ namespace AddyScript.Gui.CallTips
                 int paramStart = textBuilder.Length;
 
                 if (parameter.ByRef)
-                    textBuilder.Append("ref ");
+                    textBuilder.Append('&');
                 else if (parameter.VaList)
-                    textBuilder.Append("params ");
+                    textBuilder.Append("..");
 
                 textBuilder.Append(parameter.Name);
+
+                if (!parameter.CanBeEmpty) textBuilder.Append('!');
 
                 if (parameter.DefaultValue != null)
                     switch (parameter.DefaultValue.Class.ClassID)

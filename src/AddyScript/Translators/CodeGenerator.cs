@@ -944,7 +944,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         if (parameter.ByRef)
             textWriter.Write('&');
         else if (parameter.VaList)
-            textWriter.Write(".. ");
+            textWriter.Write("..");
 
         textWriter.Write(SafeName(parameter.Name));
         if (!parameter.CanBeEmpty) textWriter.Write('!');

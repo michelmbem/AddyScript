@@ -41,7 +41,7 @@ function readlst(prompt = 'values : ', separator = @'\s+', convert = null)
 if (__name == 'main') {
 	l = readlst(convert: |x| => (float)x);
 	s = l.aggregate(.0, |x, i| => x += i);
-	m = s / l.count;
+	m = s / l.size;
 	println('l = ' + l);
 	println('sum(l) = ' + s);
 	println('avg(l) = ' + m);
