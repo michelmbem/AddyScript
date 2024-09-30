@@ -45,7 +45,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /**
      * Note: Do not read a state field twice expecting it to have the same value!
      * Invocations of RuntimeServices methods may change the value of state field at any time.
-     * This applies more especifically to returnedValue: always make a copy of it for later use.
+     * This applies more especifically to returnedValue: always make a copy of it for later reuse.
      */
 
     private readonly HashSet<string> importedModules = [];

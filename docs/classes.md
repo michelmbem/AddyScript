@@ -118,22 +118,22 @@ In this example, we will define a Person class with 3 fields, 4 properties (3 of
 ```JS
 class Person
 {
+    // Fields
     private _name;
     private _sex = 'Male';
     private _courtesy = 'Mr.';
     
+    // A property with the 'compact' syntax
     public property name
     {
         read => this._name;
         write => this._name = __value;
     }
     
+    // A property with the typical syntax
     public property sex
     {
-        read
-        {
-            return this._sex;
-        }
+        read { return this._sex; }
         write
         {
             // Updating sex will also update courtesy and raise the sex_changed event
@@ -148,14 +148,16 @@ class Person
         }
     }
     
-    // Read-only property encapsulating the _courtesy field
+    // A read-only property encapsulating the _courtesy field
     public property courtesy => this._courtesy;
     
-    // Fully automatic property
+    // A fully automatic property
     public property age;
     
+    // An event
     public event sex_changed(oldSex, newSex);
     
+    // A method
     public function summary()
     {
         return $'{this.courtesy} {this.name}, {this.sex} person aged {this.age}';
@@ -180,7 +182,7 @@ In the body of a method, the **this** keyword can be used to refer to the curren
 
 ### Constructors
 
-In AddyScript, a class has a single constructor since the language does not support method overloading. The definition of a constructor follows this special syntax:
+A **constructor** is a special method that is automatically invoked by the scripting engine when an instance of a class is created to initialize that instance. In AddyScript, a class has only one constructor since the language does not support method overloading. The definition of a constructor follows this special syntax:
 
 ```
  [scope] constructor (list_of_parameters) [: super(list_of_arguments)]
@@ -192,7 +194,13 @@ In AddyScript, a class has a single constructor since the language does not supp
 Where
 
 * _scope_ is one of the **private**, **protected** and **public** keywords. If no scope is provided, **private** is assumed by default.
-* The optional 'column-super' part is used to invoke the contructor of the superclass (if any) prior to any other statement.
+
+    _scope_ has the following effects on instance creation:
+    * **private**: Only the class will be able to create instances of itself.
+    * **protected**: Only the class and its derived classes will be able to create instances of itself.
+    * **public**: Instances of the class can be created anywhere in the code.
+
+* The optional 'column-super' part is used to invoke the constructor of the parent class (if any) prior to any other statement.
 * A constructor is not allowed to return a value.
 
 Example: let's add a constructor in the Person class
@@ -200,30 +208,30 @@ Example: let's add a constructor in the Person class
 ```JS
 class Person
 {
+    // Fields: we don't need default values anymore as the constructor is supplying them
     private _name;
-    private _sex = 'Male';
-    private _courtesy = 'Mr.';
+    private _sex;
+    private _courtesy;
     
     // Here is the constructor, all parameters are made optional to allow the user to omit them
-    public constructor(name = "Anonymous", sex = "Male", age = 20)
+    public constructor(name = "", sex = "Male", age = 0)
     {
        this.name = name;
        this.sex = sex;
        this.age = age;
     }
     
+    // A property with the 'compact' syntax
     public property name
     {
         read => this._name;
         write => this._name = __value;
     }
     
+    // A property with the typical syntax
     public property sex
     {
-        read
-        {
-            return this._sex;
-        }
+        read { return this._sex; }
         write
         {
             // Updating sex will also update courtesy and raise the sex_changed event
@@ -238,17 +246,19 @@ class Person
         }
     }
     
-    // Read-only property encapsulating the _courtesy field
+    // A read-only property encapsulating the _courtesy field
     public property courtesy => this._courtesy;
     
-    // Fully automatic property
+    // A fully automatic property
     public property age;
     
+    // An event
     public event sex_changed(oldSex, newSex);
     
+    // A method
     public function summary()
     {
-        return format($'{this.courtesy} {this.name}, {this.sex} person aged {this.age}');
+        return $'{this.courtesy} {this.name}, {this.sex} person aged {this.age}';
     }
 }
 

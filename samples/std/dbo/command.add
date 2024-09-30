@@ -41,7 +41,7 @@ class DBOCommand
 		return this;
 	}
 	
-	public function addParams(.. parameters)
+	public function addParams(..parameters)
 	{
 		parameters.each(|p| => this.addParam(p));
 		return this;
@@ -59,7 +59,7 @@ class DBOCommand
 		return this;
 	}
 	
-	public function setAllParams(.. values)
+	public function setAllParams(..values)
 	{
 		var k = 0, parameter;
 		foreach (parameter in this.command.Parameters) {

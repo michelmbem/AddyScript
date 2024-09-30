@@ -132,8 +132,8 @@ class DBO
 	
 	public function execMany(commandText!, parameters, values)
 	{
-		var cmd = this.prepare(commandText).addParams(parameters);
-		values.each(|v| => cmd.setAllParams(v).exec()); // Note! values has to be a list of lists
+		var cmd = this.prepare(commandText).addParams(..parameters);
+		values.each(|v| => cmd.setAllParams(..v).exec()); // Note! values has to be a list of lists
 	}
 	
 	public function beginTransaction()
@@ -216,7 +216,7 @@ if (__name === 'main')
 			println();
 			println('after rolling back transaction:');
 			cmd = dbo.prepare('select * from test');
-			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			cmd.eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			println();
@@ -266,7 +266,7 @@ if (__name === 'main')
 			println();
 			println('after rolling back transaction:');
 			cmd = dbo.prepare('select * from test');
-			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			cmd.eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			println();
@@ -316,7 +316,7 @@ if (__name === 'main')
 			println();
 			println('after rolling back transaction:');
 			cmd = dbo.prepare('test', 'TableDirect');
-			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			cmd.eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			println();
@@ -368,7 +368,7 @@ if (__name === 'main')
 			println();
 			println('after rolling back transaction:');
 			cmd = dbo.prepare('select * from test'); // 'TableDirect' not supported!
-			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			cmd.eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			println();
@@ -417,7 +417,7 @@ if (__name === 'main')
 			println();
 			println('after rolling back transaction:');
 			cmd = dbo.prepare('test', 'TableDirect');
-			cmd.eachRow(|t| => println('{0} : {1}', t), to_list);
+			cmd.eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			println();

@@ -270,87 +270,10 @@ foreach (name => job in jobs)
    println(name + ' is a ' + job);
 ```
 
-**Note**:
-Even in the first form, there is an implicit key named **__key**. In both forms, the _collection_ must be a **string**, a **list**, a **map**, a **set**, a native object implementing the **IEnumerable** interface or an AddyScript object implementing the **iterator protocol**.
+**Notes**:
 
-#### The iterator protocol:
-
-For a class to implement the iterator protocol, it must expose 3 methods named **moveFirst**, **hasNext**, and **moveNext** respectively. The role of **moveFirst** is to position the internal cursor on the first logical element of the collection (assuming your class is a custom collection). **hasNext** is supposed to return a boolean indicating whether the iteration can continue or not. Finally, **moveNext** is responsible for moving the internal cursor forward, returning the value pointed to by the cursor at each step. The _xrange.add_ sample script provided with the demo demonstrates this functionality.
-
-Example:
-
-```JS
-class Range
-{
-   private start;
-   private end;
-   private step;
-   private current;
-   
-   public constructor(start, end = 0, step = 1)
-   {
-      // Swap start and end to be in the correct order
-      if (start > end) (start, end) = (end, start);
-      // Ensure that step is always positive
-      if (step <= 0) throw 'step has to be positive';
-      
-      this.start = start;
-      this.end = end;
-      this.step = step;
-   }
-   
-   public function moveFirst()
-   {
-      this.current = this.start;
-   }
-   
-   public function hasNext() => this.current < this.end;
-   
-   public function moveNext()
-   {
-      var current = this.current;
-      this.current += this.step;
-      return current;
-   }
-}
-
-foreach (item in new Range(5, 25, 5))
-   println(item);
-```
-
-Alternatively, a class can implement the iterator protocol simply by exposing an **iterator** method whose body would contain a succession of calls to the **yield** operator.
-
-Example:
-
-```JS
-class Range
-{
-   private start;
-   private end;
-   private step;
-   
-   public constructor(start, end = 0, step = 1)
-   {
-      // Swap start and end to be in the correct order
-      if (start > end) (start, end) = (end, start);
-      // Ensure that step is always positive
-      if (step <= 0) throw 'step has to be positive';
-      
-      this.start = start;
-      this.end = end;
-      this.step = step;
-   }
-   
-   public function iterator()
-   {
-      for (var current = this.start; current < this.end; current += this.step)
-         yield current;
-   }
-}
-
-foreach (item in new Range(5, 25, 5))
-   println(item);
-```
+* Even in the first form, there is an implicit key named **__key**. In both forms, the _collection_ must be a **string**, a **list**, a **map**, a **set**, a native object implementing the **IEnumerable** interface or an AddyScript object implementing the **iterator protocol**.
+* It is possible to use the foreach loop to iterate over instances of user-defined classes if their class implements the _interator protocol_. We'll come back on this in the section dedicated to [inheritance and polymorphism](inheritance.md).
 
 ### Jumps
 
@@ -364,11 +287,9 @@ Jumps allow execution to resume from a location other than the next instruction.
 |return|`return;`<br>or<br>`return expression;`|Returns from a function with or without a value.|
 |throw|`throw exception;`<br>or<br>`throw "some error message";`|Raises an error and stops the execution of the script until the raised error is caught by a **try-catch-finally** statement.|
 
-**Note**: The **yield** statement we mentioned in the **iterator protocol** section has a similar syntax to the **return** and **throw** statements, but it is not actually a jump statement. It simply tells AddyScript what value should be returned by an iterator at each step.
-
 ### Iteration Methods
 
-Some data types in AddyScript have methods that can be used to iterate over instances of those types. Such a method is generally equivalent to a loop, except that it is more compact and can appear anywhere an expression is expected (which loops cannot do). The following table summarizes AddyScript iteration methods and the classes to which they belong.
+Some data types in AddyScript have methods that can be used to iterate over values of those types. Such a method is generally equivalent to a loop, except that it is more compact and can appear anywhere an expression is expected (which loops cannot do). The following table summarizes AddyScript iteration methods and the classes to which they belong.
 
 |Method|Description|Example|
 |-|-|-|

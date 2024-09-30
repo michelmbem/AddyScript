@@ -776,8 +776,9 @@ public partial struct BigDecimal
     private readonly BigDecimal Inflate(int decs)
     {
         if (decs <= scale) return this;
+
         BigInteger powers = BigInteger.Pow(BigIntegerTen, decs - scale);
-        return new (unscaled * powers, decs);
+        return new(unscaled * powers, decs);
     }
 
     private readonly BigDecimal Deflate()
@@ -791,16 +792,17 @@ public partial struct BigDecimal
         {
             BigInteger q = BigInteger.DivRem(i, BigIntegerTen, out BigInteger r);
             if (r != BigInteger.Zero) break;
+
             i = q;
             --decs;
         }
 
-        return new (i, decs);
+        return new(i, decs);
     }
 
     private readonly BigDecimal Opposite()
     {
-        return new (-unscaled, scale);
+        return new(-unscaled, scale);
     }
 
     private static int Compare(BigDecimal a, BigDecimal b)
@@ -847,7 +849,7 @@ public partial struct BigDecimal
     private static BigDecimal Modulo(BigDecimal a, BigDecimal b)
     {
         // Assuming a.scale == b.scale
-        BigInteger q = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
+        _ = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
         return new BigDecimal(r, a.scale).Deflate();
     }
 
