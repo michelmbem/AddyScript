@@ -206,85 +206,18 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         }
 
         Match(TokenID.LeftBrace);
-        PushClass(modifier, className, superClassName);
-        ClassMemberDecl[] members = Asterisk(ClassMember);
-
+        
         ClassMethodDecl constructor = null;
         ClassPropertyDecl indexer = null;
-        var fields = new List<ClassFieldDecl>();
-        var properties= new List<ClassPropertyDecl>();
-        var methods = new List<ClassMethodDecl>();
-        var events = new List<ClassEventDecl>();
-        
-        foreach (var member in members)
-        {
-            foreach (var otherMember in members)
-                if (member != otherMember && member.Name == otherMember.Name)
-                    throw new ScriptException(FileName, member, string.Format(Resources.MemberNameConfict, member.Name));
-            
-            if (modifier == Modifier.Static &&
-                !(member.Modifier == Modifier.Static || member.Modifier == Modifier.StaticFinal))
-                throw new ScriptException(FileName, member, Resources.StaticClassMember);
+        List<ClassFieldDecl> fields = [];
+        List<ClassPropertyDecl> properties = [];
+        List<ClassMethodDecl> methods = [];
+        List<ClassEventDecl> events = [];
 
-            if (modifier != Modifier.Abstract && member.Modifier == Modifier.Abstract)
-                throw new ScriptException(FileName, member, Resources.AbstractMethodInNonAbstractClass);
-
-            if (member is ClassFieldDecl field)
-            {
-                switch (field.Modifier)
-                {
-                    case Modifier.Abstract:
-                        throw new ScriptException(FileName, field,
-                            string.Format(Resources.InvalidFieldModifier, field.Modifier));
-                    case Modifier.StaticFinal:
-                        if (field.Initializer == null)
-                            throw new ScriptException(FileName, field, Resources.ConstantFieldShouldBeInitialized);
-                        break;
-                }
-
-                fields.Add(field);
-            }
-            else
-            {
-                if (member.Modifier == Modifier.StaticFinal)
-                    throw new ScriptException(FileName, member, Resources.SpecificFieldModifier);
-
-                if (member is ClassPropertyDecl property)
-                {
-                    if (property.IsIndexer)
-                    {
-                        if (indexer != null)
-                            throw new ScriptException(FileName, member, Resources.SingleIndexer);
-
-                        indexer = property;
-                    }
-                    else
-                        properties.Add(property);
-                }
-                else if (member is ClassMethodDecl method)
-                {
-                    if (method.Name == CurrentClass.Name)
-                    {
-                        if (constructor != null)
-                            throw new ScriptException(FileName, member, Resources.SingleConstructor);
-
-                        constructor = method;
-                    }
-                    else
-                        methods.Add(method);
-                }
-                else if (member is ClassEventDecl _event)
-                {
-                    if (!(_event.Modifier == Modifier.Default || _event.Modifier == Modifier.Static))
-                        throw new ScriptException(FileName, _event,
-                            string.Format(Resources.InvalidFieldModifier, _event.Modifier));
-
-                    events.Add(_event);
-                }
-            }
-        }
-
+        PushClass(modifier, className, superClassName);
+        IdentifiyClassMembers(modifier, Asterisk(ClassMember), ref constructor, ref indexer, fields, properties, methods, events);
         PopClass();
+
         Token last = Match(TokenID.RightBrace);
 
         var classDef = new ClassDefinition(className, superClassName, modifier, constructor, indexer,
@@ -1285,6 +1218,96 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         var classEvent = new ClassEventDecl(name, scope, modifier, parameters);
         classEvent.SetLocation(first.Start, end);
         return classEvent;
+    }
+
+    /// <summary>
+    /// Identifies the members of a class definition and initializes the corresponding property accordingly.
+    /// </summary>
+    /// <param name="modifier">The modifier of the class</param>
+    /// <param name="members">The list of all members defined for the target class</param>
+    /// <param name="constructor">Will contain a reference to the constructor after identification</param>
+    /// <param name="indexer">Will contain a reference to the indexer after identification</param>
+    /// <param name="fields">Will contain a collection of field definitions after identification</param>
+    /// <param name="properties">Will contain a collection of property definitions after identification</param>
+    /// <param name="methods">Will contain a collection of method definitions after identification</param>
+    /// <param name="events">Will contain a collection of event definitions after identification</param>
+    /// <exception cref="ScriptException">If a rule of syntax is violated</exception>
+    protected void IdentifiyClassMembers(Modifier modifier, ClassMemberDecl[] members,
+                                         ref ClassMethodDecl constructor, ref ClassPropertyDecl indexer,
+                                         List<ClassFieldDecl> fields, List<ClassPropertyDecl> properties,
+                                         List<ClassMethodDecl> methods, List<ClassEventDecl> events)
+    {
+        foreach (ClassMemberDecl member in members)
+        {
+            // Check that each member has a unique name
+            foreach (ClassMemberDecl otherMember in members)
+                if (member != otherMember && member.Name == otherMember.Name)
+                    throw new ScriptException(FileName, member, string.Format(Resources.MemberNameConfict, member.Name));
+
+            // Check that each member of a static class is also static
+            if (modifier == Modifier.Static && !(member.Modifier == Modifier.Static || member.Modifier == Modifier.StaticFinal))
+                throw new ScriptException(FileName, member, Resources.StaticClassMember);
+
+            // Check that there is no abstract member in a non-abstract class
+            if (modifier != Modifier.Abstract && member.Modifier == Modifier.Abstract)
+                throw new ScriptException(FileName, member, Resources.AbstractMethodInNonAbstractClass);
+
+            if (member is ClassFieldDecl field)
+            {
+                switch (field.Modifier)
+                {
+                    case Modifier.Abstract: // A field cannot be abstract
+                        throw new ScriptException(FileName, field, string.Format(Resources.InvalidFieldModifier, field.Modifier));
+                    case Modifier.StaticFinal:  // A static final field (i.e. a class constant) should have a default value
+                        if (field.Initializer == null)
+                            throw new ScriptException(FileName, field, Resources.ConstantFieldShouldBeInitialized);
+                        break;
+                }
+
+                fields.Add(field);
+            }
+            else
+            {
+                // Only fields can be class constants
+                if (member.Modifier == Modifier.StaticFinal)
+                    throw new ScriptException(FileName, member, Resources.SpecificFieldModifier);
+
+                if (member is ClassPropertyDecl property)
+                {
+                    if (property.IsIndexer)
+                    {
+                        // The indexer has to be unique
+                        if (indexer != null)
+                            throw new ScriptException(FileName, member, Resources.SingleIndexer);
+
+                        indexer = property;
+                    }
+                    else
+                        properties.Add(property);
+                }
+                else if (member is ClassMethodDecl method)
+                {
+                    if (method.Name == CurrentClass.Name)
+                    {
+                        // The constructor also has to be unique
+                        if (constructor != null)
+                            throw new ScriptException(FileName, member, Resources.SingleConstructor);
+
+                        constructor = method;
+                    }
+                    else
+                        methods.Add(method);
+                }
+                else if (member is ClassEventDecl evt)
+                {
+                    // Events cannot be abstract
+                    if (evt.Modifier == Modifier.Abstract)
+                        throw new ScriptException(FileName, evt, string.Format(Resources.InvalidFieldModifier, evt.Modifier));
+
+                    events.Add(evt);
+                }
+            }
+        }
     }
 
     /// <summary>
