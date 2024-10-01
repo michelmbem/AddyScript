@@ -35,8 +35,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
         var labels = CurrentFunction.CurrentBlock.ConvertLabels(statements);
         var program = new Program(FileName, statements) {Labels = labels};
-        if (statements.Length > 0)
-            program.SetLocation(statements[0].Start, statements[^1].End);
+        if (statements.Length > 0) program.SetLocation(statements[0].Start, statements[^1].End);
 
         return program;
     }
@@ -73,8 +72,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     protected Statement Statement()
     {
         // Skip empty statements
-        while (TryMatch(TokenID.SemiColon))
-            Consume(1);
+        while (TryMatch(TokenID.SemiColon)) Consume(1);
 
 
         return token.TokenID switch
@@ -358,7 +356,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="Ast.Statements.VariableDecl"/></returns>
     protected VariableDecl VariableDecl()
     {
-        var initializers = new List<PropertyInitializer>();
+        List<PropertyInitializer> initializers = [];
         Token first = Match(TokenID.KW_Var);
 
         while (TryMatch(TokenID.Identifier))
@@ -383,7 +381,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
         Token last = Match(TokenID.SemiColon);
 
-        var varDecl = new VariableDecl(initializers.ToArray());
+        var varDecl = new VariableDecl([.. initializers]);
         varDecl.SetLocation(first.Start, last.Start);
         return varDecl;
     }
@@ -445,8 +443,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Match(TokenID.RightParenthesis);
         Match(TokenID.LeftBrace);
 
-        var cases = new List<CaseLabel>();
-        var stmtList = new List<Statement>();
+        List<CaseLabel> cases = [];
+        List<Statement> stmtList = [];
         int address = 0, defCase = int.MaxValue;
         Dictionary<string, Label> labels;
         Statement[] stmts;
@@ -1249,7 +1247,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
             // Check that there is no abstract member in a non-abstract class
             if (modifier != Modifier.Abstract && member.Modifier == Modifier.Abstract)
-                throw new ScriptException(FileName, member, Resources.AbstractMethodInNonAbstractClass);
+                throw new ScriptException(FileName, member, Resources.AbstractMemberInNonAbstractClass);
 
             if (member is ClassFieldDecl field)
             {

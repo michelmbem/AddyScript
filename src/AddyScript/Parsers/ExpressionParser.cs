@@ -451,11 +451,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Creates an instance of <see cref="Ast.Expressions.Literal"/> with the given value.
     /// </summary>
-    /// <param name="value">The value to embed in the outcoming literalSegment</param>
+    /// <param name="value">The value to wrap in a literal expression</param>
     /// <returns>A <see cref="Ast.Expressions.Literal"/></returns>
     protected Literal Literal(DataItem value)
     {
-        var literal = value == null ? new Literal() : new Literal(value);
+        Literal literal = value != null ? new(value) : new();
         literal.CopyLocation(token);
         Consume(1);
 
@@ -482,42 +482,37 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes expressions that start with the <b>super</b> keyword.
     /// </summary>
     /// <returns>
-    /// A <see cref="ParentMethodCall"/> or a <see cref="ParentPropertyRef"/> or a <see cref="ParentIndexerRef"/>
+    /// A <see cref="ParentMethodCall"/>, a <see cref="ParentPropertyRef"/>, or a <see cref="ParentIndexerRef"/>
     /// </returns>
     protected Expression AtomStartingWithSuper()
     {
         Expression expr;
         Token first = Match(TokenID.KW_Super), last;
 
-        if (CurrentFunction == null || !CurrentFunction.IsMethod)
+        if (!CurrentFunction.IsMethod)
             throw new ParseException(FileName, first, Resources.SuperUsedOutOfMethod);
 
         if (TryMatch(TokenID.DoubleColon))
         {
             Consume(1);
-            string memberName = Match(TokenID.Identifier).ToString();
+            last = Match(TokenID.Identifier);
+            string memberName = last.ToString();
 
             if (TryMatch(TokenID.LeftParenthesis))
             {
                 Consume(1);
                 (var positionalArgs, var namedArgs) = FunctionArguments();
-                last = Match(TokenID.RightParenthesis);
-
                 expr = new ParentMethodCall(memberName, positionalArgs, namedArgs);
+                last = Match(TokenID.RightParenthesis);
             }
             else
-            {
-                last = token;
                 expr = new ParentPropertyRef(memberName);
-            }
         }
         else
         {
             Match(TokenID.LeftBracket);
-            var index = RequiredExpression();
+            expr = new ParentIndexerRef(RequiredExpression());
             last = Match(TokenID.RightBracket);
-
-            expr = new ParentIndexerRef(index);
         }
 
         expr.SetLocation(first.Start, last.End);
@@ -542,9 +537,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.LeftBrace:
                 {
                     Consume(1);
-                    PropertyInitializer[] fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
+                    expr = new ObjectInitializer(List(PropertyInitializer, true, Resources.DuplicatedProperty));
                     last = Match(TokenID.RightBrace);
-                    expr = new ObjectInitializer(fields);
                 }
                 break;
             case TokenID.Identifier:
@@ -625,8 +619,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             Consume(1);
             (var positionalArgs, var namedArgs) = FunctionArguments();
-            last = Match(TokenID.RightParenthesis);
             expr = new StaticMethodCall(name, positionalArgs, namedArgs);
+            last = Match(TokenID.RightParenthesis);
         }
         else
             expr = new StaticPropertyRef(name);
@@ -653,10 +647,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             Consume(1);
             (var positionalArgs, var namedArgs) = FunctionArguments();
-            last = Match(TokenID.RightParenthesis);
             expr = name.IsIdentifier
                  ? new FunctionCall(name[0].Value, positionalArgs, namedArgs)
                  : new StaticMethodCall(name, positionalArgs, namedArgs);
+            last = Match(TokenID.RightParenthesis);
         }
         else
             expr = name.IsIdentifier
@@ -679,6 +673,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
         Token first = Match(TokenID.LeftParenthesis);
 
+        // Case of a conversion
         if (TryMatch(TokenID.TypeName) && LookAhead(TokenID.RightParenthesis, out int k))
         {
             string typeName = token.ToString();
@@ -691,6 +686,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             return conversion;
         }
 
+        // Other cases: parenthesized expressions and complex initializers
         var expr = RequiredExpression();
 
         SkipComments();
@@ -700,9 +696,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             case TokenID.Comma:
                 Consume(1);
-                var otherExpr = RequiredExpression();
+                expr = new ComplexInitializer(expr, RequiredExpression());
                 last = Match(TokenID.RightParenthesis);
-                expr = new ComplexInitializer(expr, otherExpr);
                 break;
             case TokenID.RightParenthesis:
                 Consume(1);
@@ -729,7 +724,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         List<ListItem> setItems = [];
 
         Token first = Match(TokenID.LeftBrace);
-
         ListItem firstItem = ListItem();
         bool isSet = false;
 
@@ -748,7 +742,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
                 Consume(1);
                 var value = RequiredExpression();
-
                 var mapItem = new MapItemInitializer(firstItem.Expression, value);
                 mapItem.SetLocation(firstItem.Start, value.End);
                 mapItems.Add(mapItem);
@@ -909,7 +902,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Ast.Expressions.QualifiedName"/></returns>
     protected QualifiedName QualifiedName(ref Token first, ref Token last)
     {
-        var parts = new List<NamePart>();
+        List<NamePart> parts = [];
         string ident;
         int paramCount;
 
@@ -937,7 +930,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             Consume(1);
         }
 
-        return new QualifiedName(parts.ToArray());
+        return new QualifiedName([.. parts]);
     }
 
     /// <summary>
@@ -948,11 +941,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
         if (!TryMatch(TokenID.Identifier)) return null;
 
-        string fieldName = token.ToString();
         Token first = token;
+        string fieldName = first.ToString();
         Consume(1);
         Match(TokenID.Equal);
-        var fieldValue = RequiredExpression();
+        Expression fieldValue = RequiredExpression();
         
         var initializer = new PropertyInitializer(fieldName, fieldValue);
         initializer.SetLocation(first.Start, fieldValue.End);
@@ -1046,7 +1039,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         section = -1;
                 }
                 else if (positionalArgs.Count > 0)
-                    throw new ParseException(FileName, token, Resources.InvalidListTermination);
+                    throw new ParseException(FileName, token, Resources.AbnormalListTermination);
                 else
                     section = -1;
             }

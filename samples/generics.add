@@ -1,5 +1,10 @@
 import System::Collections::Generic;
-import reflection;	// for underline
+
+function underline(msg)
+{
+	println(msg);
+	println('-' * msg.length);
+}
 
 l = new LinkedList{1}();
 for (i = 1; i < 1000; i *= 2)

@@ -280,7 +280,7 @@ public abstract class BasicParser
         {
             Consume(1);
 
-            element = Required(recognizer, Resources.InvalidListTermination);
+            element = Required(recognizer, Resources.AbnormalListTermination);
             if (checkUnicity && elements.Contains(element))
                 throw new ScriptException(FileName, element, errorMessage);
 

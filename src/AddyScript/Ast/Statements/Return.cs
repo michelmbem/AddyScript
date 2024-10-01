@@ -7,28 +7,22 @@ namespace AddyScript.Ast.Statements
     /// <summary>
     /// Represents a 'return' statement.
     /// </summary>
-    public class Return : Statement
+    public class Return : StatementWithExpression
     {
         /// <summary>
         /// Initializes a new instance of Return
         /// </summary>
-        public Return()
+        public Return() : base(null)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of Return
         /// </summary>
-        /// <param name="expr">The expression to be returned</param>
-        public Return(Expression expr)
+        /// <param name="expression">The returned expression</param>
+        public Return(Expression expression) : base(expression)
         {
-            Expression = expr;
         }
-
-        /// <summary>
-        /// The expression to be returned
-        /// </summary>
-        public Expression Expression { get; private set; }
 
         /// <summary>
         /// Translates this node.

@@ -31,7 +31,7 @@ namespace AddyScript.Properties {
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
+        
         /// <summary>
         ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
         /// </summary>
@@ -61,6 +61,15 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à abnormal list termination, another item was expected.
+        /// </summary>
+        internal static string AbnormalListTermination {
+            get {
+                return ResourceManager.GetString("AbnormalListTermination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à An abstract member can&apos;t have a body.
         /// </summary>
         internal static string AbstractMemberCantHaveBody {
@@ -70,11 +79,11 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à A non abstract class cannot contain an abstract method.
+        ///   Recherche une chaîne localisée semblable à A non abstract class cannot have abstract members.
         /// </summary>
-        internal static string AbstractMethodInNonAbstractClass {
+        internal static string AbstractMemberInNonAbstractClass {
             get {
-                return ResourceManager.GetString("AbstractMethodInNonAbstractClass", resourceCulture);
+                return ResourceManager.GetString("AbstractMemberInNonAbstractClass", resourceCulture);
             }
         }
         
@@ -412,15 +421,6 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;}&apos; should be escaped by duplication in interpolated strings.
-        /// </summary>
-        internal static string DuplicateRBraceInInterpolatedString {
-            get {
-                return ResourceManager.GetString("DuplicateRBraceInInterpolatedString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Event {0} is already declared in ancestor {1}.
         /// </summary>
         internal static string EventDeclaredInAncestor {
@@ -574,15 +574,6 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Invalid list termination.
-        /// </summary>
-        internal static string InvalidListTermination {
-            get {
-                return ResourceManager.GetString("InvalidListTermination", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à The left operand is not a valid lvalue.
         /// </summary>
         internal static string InvalidLValue {
@@ -653,18 +644,16 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("IterationNotSupported", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à An iterator cannot return a value.
+        ///   Recherche une chaîne localisée semblable à An iterator cannot return any value.
         /// </summary>
-        internal static string IteratorCantReturnValue
-        {
-            get
-            {
+        internal static string IteratorCantReturnValue {
+            get {
                 return ResourceManager.GetString("IteratorCantReturnValue", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Recherche une chaîne localisée semblable à The script is trying to jump to a case label out of a switch block.
         /// </summary>
@@ -792,15 +781,6 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à A &apos;declaringType&apos; field is missing in the &apos;Method&apos; attribute.
-        /// </summary>
-        internal static string MissingDeclaringTypeProperty {
-            get {
-                return ResourceManager.GetString("MissingDeclaringTypeProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Label &apos;{0}&apos; is not declared in the current scope.
         /// </summary>
         internal static string MissingLabel {
@@ -810,16 +790,7 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à No &apos;Method&apos; attribute is attached to function {0}.
-        /// </summary>
-        internal static string MissingMethodAttribute {
-            get {
-                return ResourceManager.GetString("MissingMethodAttribute", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à No argument is supplied for the {0} parameter of {1}.
+        ///   Recherche une chaîne localisée semblable à No value was supplied for the &apos;{0}&apos; parameter of {1}.
         /// </summary>
         internal static string MissingPameter {
             get {
@@ -828,7 +799,7 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Cannot load module {0}. Check the &apos;SearchPath&apos; property of your ScriptContext.
+        ///   Recherche une chaîne localisée semblable à Cannot load module {0}. Check the &apos;ImportPaths&apos; property of your ScriptContext.
         /// </summary>
         internal static string ModuleNotFound {
             get {
@@ -1216,6 +1187,15 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Could not find any symbol named {0}.
+        /// </summary>
+        internal static string UndefinedSymbol {
+            get {
+                return ResourceManager.GetString("UndefinedSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Type or namespace {0} is undefined.
         /// </summary>
         internal static string UndefinedType {
@@ -1304,14 +1284,12 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("ValueShouldNotBeEmpty", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The yield statement can only be used in an iterator.
+        ///   Recherche une chaîne localisée semblable à yield can only be used in an iterator.
         /// </summary>
-        internal static string YieldUsedOutOfIterator
-        {
-            get
-            {
+        internal static string YieldUsedOutOfIterator {
+            get {
                 return ResourceManager.GetString("YieldUsedOutOfIterator", resourceCulture);
             }
         }

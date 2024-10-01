@@ -11,13 +11,8 @@ namespace AddyScript.Ast.Statements
     /// Initializes a new instance of Throw
     /// </remarks>
     /// <param name="expr">The exception to be thrown</param>
-    public class Throw(Expression expr) : Statement
+    public class Throw(Expression expr) : StatementWithExpression(expr)
     {
-
-        /// <summary>
-        /// The expression to be returned
-        /// </summary>
-        public Expression Expression { get; private set; } = expr;
 
         /// <summary>
         /// Translates this node.

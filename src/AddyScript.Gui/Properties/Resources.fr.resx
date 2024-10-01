@@ -189,19 +189,4 @@
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>Le type {0} ne prend pas en charge l'extration de tranches</value>
   </data>
-  <data name="NoEmptyLValue" xml:space="preserve">
-    <value>La liste de gauche ne peut être vide</value>
-  </data>
-  <data name="NoEmptyRValue" xml:space="preserve">
-    <value>La liste de droite ne peut être vide</value>
-  </data>
-  <data name="TooManyRValues" xml:space="preserve">
-    <value>Il y a trop de valeurs à droite de l'opérateur '='</value>
-  </data>
-  <data name="YieldUsedOutOfIterator" xml:space="preserve">
-    <value>L'instruction yield ne peut être utilisée que dans un itérateur</value>
-  </data>
-  <data name="IteratorCantReturnValue" xml:space="preserve">
-    <value>Un itérateur ne retourne pas de valeur</value>
-  </data>
 </root>

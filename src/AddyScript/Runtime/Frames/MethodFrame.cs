@@ -42,18 +42,12 @@ public class MethodFrame : Frame
     /// <summary>
     /// The context under which the frame is created.
     /// </summary>
-    public InvocationContext Context
-    {
-        get { return context; }
-    }
+    public InvocationContext Context => context;
 
     /// <summary>
     /// Gets the root <see cref="BlockFrame"/> of this <see cref="MethodFrame"/>
     /// </summary>
-    public BlockFrame RootBlock
-    {
-        get { return rootBlock; }
-    }
+    public BlockFrame RootBlock => rootBlock;
 
     /// <summary>
     /// Pushes a new <see cref="BlockFrame"/> on top of the internal block related frames stack.

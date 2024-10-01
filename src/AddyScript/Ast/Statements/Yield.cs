@@ -11,13 +11,8 @@ namespace AddyScript.Ast.Statements
     /// Initializes a new instance of Yield
     /// </remarks>
     /// <param name="expr">The expression to yield</param>
-    public class Yield(Expression expr) : Statement
+    public class Yield(Expression expr) : StatementWithExpression(expr)
     {
-
-        /// <summary>
-        /// The expression to yield.
-        /// </summary>
-        public Expression Expression { get; private set; } = expr;
 
         /// <summary>
         /// Translates this node.

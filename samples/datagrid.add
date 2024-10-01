@@ -6,7 +6,7 @@ const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../.
 //const PROVIDER = "mssql";
 //const CONNECTION_STRING = "Data Source=(local);Initial Catalog=Northwind;Integrated Security=Yes";
 
-function createColumn($property, header = null, type = "text", width = 100, readonly = false)
+function createColumn($property, header = '', type = "text", width = 100, readonly = false)
 {
 	var column = type switch
 	{
@@ -44,7 +44,7 @@ function createColumns(grid, ds)
 	col3.DisplayMember = "CategoryName";
 	col3.DisplayStyle = "Nothing";
 	
-	col4 = createColumn("QuantityPerUnit", "Quantity Per Unit", width: 120);
+	col4 = createColumn("QuantityPerUnit", "Qty/Unit", width: 120);
 	
 	col5 = createColumn("UnitPrice", "Unit Price");
 	col5.DefaultCellStyle.Format = "c";
