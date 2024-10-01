@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
+
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
