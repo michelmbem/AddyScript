@@ -753,7 +753,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
-        returnedValue = new List(ExpandList(listInit.Items).Item1);
+        (var elements, _) = ExpandList(listInit.Items);
+        returnedValue = new List(elements);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
@@ -785,7 +786,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
-        returnedValue = new Set(ExpandList(setInit.Items).Item1);
+        (var elements, _) = ExpandList(setInit.Items);
+        returnedValue = new Set(elements);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
@@ -2097,20 +2099,18 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="functionName">The function's name</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
-    /// <param name="expandedArgList">Contains the expanded list of all arguments when this method completes</param>
-    /// <returns>A dictionary of frame items</returns>
-    private Dictionary<string, IFrameItem> GetInitialFrameItems(Function function, string functionName,
-                                                                ListItem[] positionalArgs,
-                                                                Dictionary<string, Expression> namedArgs,
-                                                                out List<Expression> expandedArgList)
+    /// <returns>A <see cref="(Dictionary<string, IFrameItem>, List<Expression>)"/> tuple</returns>
+    private (Dictionary<string, IFrameItem>, List<Expression>) GetInitialFrameItems(Function function, string functionName,
+                                                                                    ListItem[] positionalArgs,
+                                                                                    Dictionary<string, Expression> namedArgs)
     {
         // Make sure we are not dealing with null references
         positionalArgs ??= [];
         namedArgs ??= [];
 
         // Expand the list of positional arguments
-        Tuple<DataItem[], ListItem[]> expandedPosArgs = ExpandList(positionalArgs);
-        int totalArgCount = expandedPosArgs.Item1.Length;
+        (DataItem[] argValues, ListItem[] argItems) = ExpandList(positionalArgs);
+        int totalArgCount = argValues.Length;
 
         // Check that every named argument matches a parameter declared in the function's header
         // Also compute the total argument count
@@ -2121,7 +2121,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (paramIndex < 0)
                 throw new ArgumentException(string.Format(Resources.FunctionHasNoParameterNamed, functionName, argName));
 
-            if (paramIndex < expandedPosArgs.Item1.Length)
+            if (paramIndex < argValues.Length)
                 throw new ArgumentException(string.Format(Resources.ParameterSuppliedTwice, argName));
 
             ++totalArgCount;
@@ -2133,19 +2133,18 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             throw new InvalidProgramException(string.Format(Resources.TooFewArgs, functionName));
 
         // Check the maximum number of arguments
-        int maxNumArgs = function.MaxNumArgs;
-        if (totalArgCount > maxNumArgs)
+        if (totalArgCount > function.MaxNumArgs)
             throw new InvalidProgramException(string.Format(Resources.TooManyArgs, functionName));
 
-        var frameItems = new Dictionary<string, IFrameItem>();
+        Dictionary<string, IFrameItem> frameItems = [];
         int counter = 0;
 
         // Pass the positional arguments first
-        while (counter < expandedPosArgs.Item1.Length)
+        while (counter < argValues.Length)
         {
             Parameter parameter = function.Parameters[counter];
-            ListItem argument = expandedPosArgs.Item2[counter];
-            DataItem argValue = expandedPosArgs.Item1[counter];
+            ListItem argument = argItems[counter];
+            DataItem argValue = argValues[counter];
 
             // Check that parameters are not passed by reference from expressions with the spread operator
             if (parameter.ByRef && argument.Spread)
@@ -2155,7 +2154,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             {
                 // If the current parameter is a variably sized list,
                 // fill it with the remaining arguments
-                var vaList = new List(expandedPosArgs.Item1[counter..]);
+                var vaList = new List(argValues[counter..]);
 
                 CheckEmptiness(parameter, vaList, argument);
                 frameItems.Add(parameter.Name, vaList);
@@ -2170,7 +2169,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
         }
 
-        expandedArgList = expandedPosArgs.Item2.Select(item => item.Expression).ToList();
+        List<Expression> expandedArgList = argItems.Select(argument => argument.Expression).ToList();
 
         // Then finish with the named arguments and optional parameters default values
         while (counter < function.Parameters.Length)
@@ -2199,7 +2198,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (!frameItems.ContainsKey(pair.Key))
                 frameItems.Add(pair.Key, pair.Value);
 
-        return frameItems;
+        return (frameItems, expandedArgList);
     }
 
     /// <summary>
@@ -2255,9 +2254,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private void Invoke(Function function, string name, Class holder, DataItem target,
                         ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
     {
-        var frameItems = GetInitialFrameItems(function, name, positionalArgs, namedArgs,
-                                              out List<Expression> expandedArgList);
-
+        (var frameItems, var expandedArgList) = GetInitialFrameItems(function, name, positionalArgs, namedArgs);
         PushFrame(holder, target, name, frameItems);
 
         try
@@ -2265,8 +2262,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             function.Body.AcceptTranslator(this);
 
             if (jumpCode == JumpCode.Goto)
-                throw new RuntimeException(fileName, lastGoto,
-                    string.Format(Resources.MissingLabel, lastGoto.LabelName));
+                throw new RuntimeException(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
         }
         finally
         {
@@ -2786,39 +2782,35 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         arguments ??= [];
 
-        Tuple<DataItem[], ListItem[]> expandedArgs = ExpandList(arguments);
+        (DataItem[] argValues, ListItem[] argItems) = ExpandList(arguments);
         object[] nativeArgValues;
         object result;
         
         if (type.IsCOMObject)
         {
-            nativeArgValues = expandedArgs.Item1.Select(val => val.AsNativeObject).ToArray();
+            nativeArgValues = argValues.Select(val => val.AsNativeObject).ToArray();
             result = type.InvokeMember(methodName, flags, null, target, nativeArgValues);
         }
         else
         {
-            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, expandedArgs.Item1, flags) ??
+            MethodInfo matchedMethod = DataItemBinder.FindMethod(type, methodName, argValues, flags) ??
                 throw new MissingMethodException(type.FullName, methodName);
 
             ParameterInfo[] parameters = matchedMethod.GetParameters();
             bool[] isParamOut = parameters.Select(p => p.IsOut || p.IsRetval).ToArray();
 
             for (int i = 0; i < isParamOut.Length; ++i)
-                if (isParamOut[i] && expandedArgs.Item2[i].Spread)
-                    throw new ScriptException(fileName, expandedArgs.Item2[i], Resources.InvalidLValue);
+                if (isParamOut[i] && argItems[i].Spread)
+                    throw new ScriptException(fileName, argItems[i], Resources.InvalidLValue);
 
-            nativeArgValues = expandedArgs.Item1
-                                          .Select((val, i) => val.ConvertTo(parameters[i].ParameterType))
-                                          .ToArray();
-
+            nativeArgValues = argValues.Select((val, i) => val.ConvertTo(parameters[i].ParameterType)).ToArray();
             result = matchedMethod.Invoke(target, nativeArgValues);
 
             for (int i = 0; i < isParamOut.Length; ++i)
                 if (isParamOut[i] || parameters[i].ParameterType.IsArray)
                     try
                     {
-                        Assign(expandedArgs.Item2[i].Expression,
-                               DataItemFactory.CreateDataItem(nativeArgValues[i]));
+                        Assign(argItems[i].Expression, DataItemFactory.CreateDataItem(nativeArgValues[i]));
                     }
                     catch (RuntimeException)
                     {
@@ -3216,9 +3208,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// Expands a list potentially containing items with the spread operator to its full contents.
     /// </summary>
     /// <param name="listItems">The list that should be expanded</param>
-    /// <returns>A <see cref="Tuple{DataItem[], ListItem[]}"/></returns>
+    /// <returns>A <see cref="(DataItem[], ListItem[])"/> tuple</returns>
     /// <exception cref="ScriptException">The evaluation of an argument failed</exception>
-    private Tuple<DataItem[], ListItem[]> ExpandList(ListItem[] listItems)
+    private (DataItem[], ListItem[]) ExpandList(ListItem[] listItems)
     {
         List<DataItem> values = [];
         List<ListItem> valueItems = [];
@@ -3251,7 +3243,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
         }
 
-        return new([.. values], [.. valueItems]);
+        return ([.. values], [.. valueItems]);
     }
 
     #endregion

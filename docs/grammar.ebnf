@@ -158,7 +158,7 @@ AtomStartingWithNew ::= ObjectInitializer | ConstructorCall
 
 ObjectInitializer ::= 'new' '{' PropertyInitializerList? '}'
 
-ConstructorCall ::= 'new' QualifiedName ArgumentList? ('{' PropertyInitializerList? '}')?
+ConstructorCall ::= 'new' QualifiedName ((ArgumentList ('{' PropertyInitializerList? '}')?) | ('{' PropertyInitializerList? '}'))
 
 AtomStartingWithLParen ::= Conversion | ComplexInitializer | ParenthesizedExpression
 

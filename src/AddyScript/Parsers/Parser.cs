@@ -925,7 +925,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="ClassMemberDecl"/></returns>
     protected ClassMemberDecl ClassMember()
     {
-        Tuple<Scope, Modifier, AttributeDecl[]> prefix = MemberPrefix(out Token first);
+        (Scope, Modifier, AttributeDecl[]) prefix = MemberPrefix(out Token first);
 
         SkipComments();
 
@@ -957,17 +957,17 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the scope, modifier and attributes of a class member.
     /// </summary>
     /// <param name="first">The initial <see cref="Token"/> of the member being recognized</param>
-    /// <returns>A tuple of 3 items</returns>
+    /// <returns>A <see cref="(Scope, Modifier, AttributeDecl[])"/> tuple</returns>
     /// <throws></throws>
     /// <exception cref="ParseException">Malformed prefix</exception>
-    protected Tuple<Scope, Modifier, AttributeDecl[]> MemberPrefix(out Token first)
+    protected (Scope, Modifier, AttributeDecl[]) MemberPrefix(out Token first)
     {
         Scope scope = Scope.Private;
         Modifier modifier = Modifier.Default;
         AttributeDecl[] attributes = null;
-        bool loop, gotScope, gotModifier, gotAttributes;
+        bool loop = true, gotScope = false, gotModifier = false, gotAttributes = false;
 
-        (first, loop, gotScope, gotModifier, gotAttributes) = (null, true, false, false, false);
+        first = null;
 
         while (loop)
         {
@@ -987,10 +987,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                     (first, modifier, gotModifier) = (token, (Modifier)token.Value, true);
                     Consume(1);
 
-                    if ((modifier == Modifier.Static &&
-                         TryMatch(t => t.TokenID == TokenID.Modifier && t.Value.Equals(Modifier.Final))) ||
-                        (modifier == Modifier.Final &&
-                         TryMatch(t => t.TokenID == TokenID.Modifier && t.Value.Equals(Modifier.Static))))
+                    if ((modifier == Modifier.Static && TryMatchValue(TokenID.Modifier, Modifier.Final)) ||
+                        (modifier == Modifier.Final && TryMatchValue(TokenID.Modifier, Modifier.Static)))
                     {
                         modifier = Modifier.StaticFinal;
                         Consume(1);
@@ -1012,7 +1010,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             }
         }
 
-        return new Tuple<Scope, Modifier, AttributeDecl[]>(scope, modifier, attributes);
+        return (scope, modifier, attributes);
     }
 
     /// <summary>
@@ -1394,13 +1392,27 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     }
 
     /// <summary>
+    /// Tests if the next <see cref="Token"/> that is not a comment has the given <see cref="TokenID"/> and value.
+    /// </summary>
+    /// <param name="requiredID">The <see cref="TokenID"/> we may want to match</param>
+    /// <param name="expectedValue">The value that we want to match</param>
+    /// <returns>
+    /// <b>true</b> if the token's ID is <paramref name="requiredID"/> and that its value is <paramref name="expectedValue"/>;
+    /// <b>false</b> otherwise
+    /// </returns>
+    protected bool TryMatchValue(TokenID requiredID, object expectedValue)
+    {
+        return TryMatch(t => t.TokenID == requiredID && t.Value.Equals(expectedValue));
+    }
+
+    /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment is the <paramref name="word"/> identifier.
     /// </summary>
     /// <param name="word">The identifier to match</param>
     /// <returns><b>true</b> if the token is the <paramref name="word"/> identifier; <b>false</b> otherwise</returns>
     protected bool TryMatchWord(string word)
     {
-        return TryMatch(t => t.TokenID == TokenID.Identifier && t.ToString() == word);
+        return TryMatchValue(TokenID.Identifier, word);
     }
 
     /// <summary>

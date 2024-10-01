@@ -12,7 +12,7 @@ function underline(msg)
 }
 
 // For generic .Net types, the number of type arguments should be specified in curly braces at the end of the name
-l = new System::Collections::Generic::LinkedList{1};
+l = new System::Collections::Generic::LinkedList{1}();
 for (i = 1; i < 1000; i *= 2)
     l.AddLast(i);
 
@@ -23,7 +23,7 @@ println('END');
 
 println();
 
-d = new System::Collections::Generic::SortedDictionary{2};
+d = new System::Collections::Generic::SortedDictionary{2}();
 names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
 names.each(|name| => d[name] = randint(18, 40));
 

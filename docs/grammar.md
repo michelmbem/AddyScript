@@ -760,7 +760,7 @@ ObjectInitializer ::= 'new' '{' PropertyInitializerList? '}'
 ![ConstructorCall](diagram/ConstructorCall.svg)
 
 ```
-ConstructorCall ::= 'new' QualifiedName ArgumentList? ( '{' PropertyInitializerList? '}' )?
+ConstructorCall ::= 'new' QualifiedName ( ArgumentList ( '{' PropertyInitializerList? '}' )? | '{' PropertyInitializerList? '}' )
 ```
 
 **AtomStartingWithLParen:**

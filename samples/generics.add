@@ -1,7 +1,7 @@
 import System::Collections::Generic;
 import reflection;	// for underline
 
-l = new LinkedList{1};
+l = new LinkedList{1}();
 for (i = 1; i < 1000; i *= 2)
 	l.AddLast(i);
 
@@ -11,7 +11,7 @@ foreach(item in l)
 println('END');
 println();
 
-d = new SortedDictionary{2};
+d = new SortedDictionary{2}();
 names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
 names.each(|name| => d[name] = randint(18, 40));
 

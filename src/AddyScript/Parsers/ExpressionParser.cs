@@ -98,7 +98,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Expression expr = Relation();
         if (expr == null) return null;
 
-        var moreRelations = new Queue<Tuple<BinaryOperator, Expression>>();
+        var moreRelations = new Queue<(BinaryOperator, Expression)>();
 
         while (TryMatchAny(TokenID.Ampersand, TokenID.DoubleAmpersand, TokenID.VerticalBar,
                            TokenID.DoubleVerticalBar, TokenID.Circumflex, TokenID.DoubleQuestion))
@@ -106,16 +106,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             BinaryOperator oper = token.ToBinaryOperator();
             Consume(1);
             var relation = Required(Relation, Resources.ExpressionRequired);
-            moreRelations.Enqueue(new Tuple<BinaryOperator, Expression>(oper, relation));
+            moreRelations.Enqueue((oper, relation));
         }
 
-        while (moreRelations.Count > 0)
-        {
-            var tuple = moreRelations.Dequeue();
-            expr = new BinaryExpression(tuple.Item1, expr, tuple.Item2);
-        }
-
-        return expr;
+        return LeftAssociativeChain(expr, moreRelations);
     }
 
     /// <summary>
@@ -176,23 +170,17 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Expression expr = Factor();
         if (expr == null) return null;
 
-        var moreFactors = new Queue<Tuple<BinaryOperator, Expression>>();
+        var moreFactors = new Queue<(BinaryOperator, Expression)>();
 
         while (TryMatchAny(TokenID.Plus, TokenID.Minus))
         {
             BinaryOperator oper = token.ToBinaryOperator();
             Consume(1);
             var factor = Required(Factor, Resources.ExpressionRequired);
-            moreFactors.Enqueue(new Tuple<BinaryOperator, Expression>(oper, factor));
+            moreFactors.Enqueue((oper, factor));
         }
 
-        while (moreFactors.Count > 0)
-        {
-            var tuple = moreFactors.Dequeue();
-            expr = new BinaryExpression(tuple.Item1, expr, tuple.Item2);
-        }
-
-        return expr;
+        return LeftAssociativeChain(expr, moreFactors);
     }
 
     /// <summary>
@@ -204,7 +192,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Expression expr = Exponentiation();
         if (expr == null) return null;
 
-        var moreExponentiations = new Queue<Tuple<BinaryOperator, Expression>>();
+        var moreExponentiations = new Queue<(BinaryOperator, Expression)>();
 
         while (TryMatchAny(TokenID.Asterisk, TokenID.Slash, TokenID.Percent,
                            TokenID.DoubleLessThan, TokenID.DoubleGreaterThan))
@@ -212,16 +200,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             BinaryOperator oper = token.ToBinaryOperator();
             Consume(1);
             var expon = Required(Exponentiation, Resources.ExpressionRequired);
-            moreExponentiations.Enqueue(new Tuple<BinaryOperator, Expression>(oper, expon));
+            moreExponentiations.Enqueue((oper, expon));
         }
 
-        while (moreExponentiations.Count > 0)
-        {
-            var tuple = moreExponentiations.Dequeue();
-            expr = new BinaryExpression(tuple.Item1, expr, tuple.Item2);
-        }
-
-        return expr;
+        return LeftAssociativeChain(expr, moreExponentiations);
     }
 
     /// <summary>
@@ -377,9 +359,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         if (TryMatch(TokenID.LeftParenthesis))
                         {
                             Consume(1);
-                            var args = FunctionArguments();
+                            (var positionalArgs, var namedArgs) = FunctionArguments();
                             bookmark = Match(TokenID.RightParenthesis);
-                            expr = new MethodCall(owner, memberName, args.Item1, args.Item2) { Optional = optional };
+                            expr = new MethodCall(owner, memberName, positionalArgs, namedArgs) { Optional = optional };
                         }
                         else
                             expr = new PropertyRef(owner, memberName) { Optional = optional };
@@ -390,11 +372,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 case TokenID.LeftParenthesis:
                     {
                         Consume(1);
-                        var args = FunctionArguments();
+                        (var positionalArgs, var namedArgs) = FunctionArguments();
                         bookmark = Match(TokenID.RightParenthesis);
 
                         Expression callee = expr;
-                        expr = new AnonymousCall(callee, args.Item1, args.Item2);
+                        expr = new AnonymousCall(callee, positionalArgs, namedArgs);
                         expr.SetLocation(callee.Start, bookmark.End);
                     }
                     break;
@@ -518,10 +500,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             if (TryMatch(TokenID.LeftParenthesis))
             {
                 Consume(1);
-                var args = FunctionArguments();
+                (var positionalArgs, var namedArgs) = FunctionArguments();
                 last = Match(TokenID.RightParenthesis);
 
-                expr = new ParentMethodCall(memberName, args.Item1, args.Item2);
+                expr = new ParentMethodCall(memberName, positionalArgs, namedArgs);
             }
             else
             {
@@ -568,17 +550,16 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.Identifier:
                 {
                     QualifiedName className = QualifiedName(ref first, ref last);
-                    Tuple<ListItem[], Dictionary<string, Expression>> args;
+                    ListItem[] positionalArgs = null;
+                    Dictionary<string, Expression> namedArgs = null;
                     PropertyInitializer[] fields = null;
 
                     if (token.TokenID == TokenID.LeftParenthesis)
                     {
                         Consume(1);
-                        args = FunctionArguments();
+                        (positionalArgs, namedArgs) = FunctionArguments();
                         last = Match(TokenID.RightParenthesis);
                     }
-                    else
-                        args = new Tuple<ListItem[], Dictionary<string, Expression>>(null, null);
 
                     if (TryMatch(TokenID.LeftBrace))
                     {
@@ -586,8 +567,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
                         last = Match(TokenID.RightBrace);
                     }
+                    else if (last.TokenID != TokenID.RightParenthesis)
+                    {
+                        Match(TokenID.LeftParenthesis);
+                        last = Match(TokenID.RightParenthesis);
+                    }
 
-                    expr = new ConstructorCall(className, args.Item1, args.Item2, fields);
+                    expr = new ConstructorCall(className, positionalArgs, namedArgs, fields);
                 }
                 break;
             default:
@@ -638,9 +624,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (TryMatch(TokenID.LeftParenthesis))
         {
             Consume(1);
-            var args = FunctionArguments();
+            (var positionalArgs, var namedArgs) = FunctionArguments();
             last = Match(TokenID.RightParenthesis);
-            expr = new StaticMethodCall(name, args.Item1, args.Item2);
+            expr = new StaticMethodCall(name, positionalArgs, namedArgs);
         }
         else
             expr = new StaticPropertyRef(name);
@@ -666,11 +652,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (token.TokenID == TokenID.LeftParenthesis)
         {
             Consume(1);
-            var args = FunctionArguments();
+            (var positionalArgs, var namedArgs) = FunctionArguments();
             last = Match(TokenID.RightParenthesis);
             expr = name.IsIdentifier
-                 ? new FunctionCall(name[0].Value, args.Item1, args.Item2)
-                 : new StaticMethodCall(name, args.Item1, args.Item2);
+                 ? new FunctionCall(name[0].Value, positionalArgs, namedArgs)
+                 : new StaticMethodCall(name, positionalArgs, namedArgs);
         }
         else
             expr = name.IsIdentifier
@@ -809,8 +795,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Ast.Expressions.StringInterpolation"/></returns>
     private StringInterpolation StringInterpolation()
     {
-        var substitutions = new List<Expression>();
-        var patternBuffer = new StringBuilder();
+        List<Expression> substitutions = [];
+        StringBuilder patternBuffer = new();
         string mutableString = token.ToString();
         int counter = 0, limit = mutableString.Length;
         char ch;
@@ -893,6 +879,26 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     protected virtual InlineFunction Lambda()
     {
         throw new NotSupportedException(Resources.UseParserForInlineFuncs);
+    }
+
+    /// <summary>
+    /// Construct a chain of binary expressions associative to the left by combining a first operand
+    /// with subsequent operands stored in a queue with corresponding operators.
+    /// </summary>
+    /// <param name="firstOperand">The first operand of the chain of binary expressions</param>
+    /// <param name="moreOps">A <see cref="Queue{T}"/> of <see cref="(BinaryOperator, Expression)"/> pairs</param>
+    /// <returns>A  <see cref="BinaryExpression"/></returns>
+    protected static Expression LeftAssociativeChain(Expression firstOperand, Queue<(BinaryOperator, Expression)> moreOps)
+    {
+        Expression chainExpr = firstOperand;
+
+        while (moreOps.Count > 0)
+        {
+            (BinaryOperator _operator, Expression operand) = moreOps.Dequeue();
+            chainExpr = new BinaryExpression(_operator, chainExpr, operand);
+        }
+
+        return chainExpr;
     }
 
     /// <summary>
@@ -1003,11 +1009,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes the set of arguments passed to a function or method when it's called.
     /// </summary>
-    /// <returns>A <see cref="Tuple{Expression[], Dictionary{string, Expression}}"/></returns>
-    protected Tuple<ListItem[], Dictionary<string, Expression>> FunctionArguments()
+    /// <returns>A <see cref="(ListItem[], Dictionary{string, Expression})"/> tuple</returns>
+    protected (ListItem[], Dictionary<string, Expression>) FunctionArguments()
     {
-        var positionalArgs = new List<ListItem>();
-        var namedArgs = new Dictionary<string, Expression>();
+        List<ListItem> positionalArgs = [];
+        Dictionary<string, Expression> namedArgs = [];
         int section = 0; // 0 => positional arguments section
 
         while (section == 0)
@@ -1066,7 +1072,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 section = -1;
         }
 
-        return new Tuple<ListItem[], Dictionary<string, Expression>>([.. positionalArgs], namedArgs);
+        return ([.. positionalArgs], namedArgs);
     }
 
     /// <summary>
