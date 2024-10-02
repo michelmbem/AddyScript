@@ -200,6 +200,7 @@ foreach (item in lst)
 
 * This also works with user-defined classes and takes inheritance into account: if B is a subclass of A, then for any instance b of B, `b is A` returns **true**.
 * For any data item x, the `x is void` test is simply a way to check whether x is declared in the current scope or not (exactly like JavaScript's `x === 'undefined'`). This behavior may change in the future.
+* The **is** operator can optionally be followed by the **not** keyword to complement the result. This means that `x is not some_type` is the same as `!(x is some_type)`
 
 ### Conversion
 

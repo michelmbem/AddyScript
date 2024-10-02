@@ -108,7 +108,7 @@ Condition ::= Relation (LogicalOperator Relation)*
 
 LogicalOperator ::= '&' | '&&' | '|' | '||' | '^' | '??'
 
-Relation ::= Term ((RelationalOperator Term) | ('is' (TYPE_NAME | IDENTIFIER)))?
+Relation ::= Term ((RelationalOperator Term) | ('is' 'not'? (TYPE_NAME | IDENTIFIER)))?
 
 RelationalOperator ::= '==' | '!=' | '<' | '>' | '<=' | '>=' | '===' | '!==' | 'startswith' | 'endswith' | 'contains' | 'matches'
 

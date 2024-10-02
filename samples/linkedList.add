@@ -23,8 +23,7 @@ function printList(lst)
 }
 
 lst = null;
-for (i = 1; i < 10000; i *= 2)
-	addList(lst, i);
+for (i = 1; i < MAXINT; i *= 2) addList(lst, i);
 println("List size: " + listSize(lst));
 print("List content: ");
 printList(lst);

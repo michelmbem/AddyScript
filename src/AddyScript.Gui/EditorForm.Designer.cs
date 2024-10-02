@@ -362,6 +362,7 @@
             scintilla.BorderStyle = ScintillaNET.BorderStyle.None;
             scintilla.ContextMenuStrip = editorMenu;
             resources.ApplyResources(scintilla, "scintilla");
+            scintilla.IndentationGuides = ScintillaNET.IndentView.LookBoth;
             scintilla.LexerName = "cpp";
             scintilla.MouseDwellTime = 500;
             scintilla.Name = "scintilla";

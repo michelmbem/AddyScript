@@ -6,9 +6,9 @@ import System::Console;
 
 const BLOCK_SIZE = 4096, EMPTY_BLOCK = '\0' * BLOCK_SIZE;
 
-file = new FileInfo(@"E:\Videos\TV Series\Breaking Bad\Saison 1\01x01.avi");
+file = new FileInfo(@"E:\Images\DCIM\Camera\20200902_143026.jpg");
 input = file.OpenRead();
-output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'BBS1E01.avi'));
+output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), file.Name));
 block = EMPTY_BLOCK;
 
 var m = 0, n;

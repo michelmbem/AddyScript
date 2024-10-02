@@ -528,7 +528,7 @@ LogicalOperator ::= '&'
 ![Relation](diagram/Relation.svg)
 
 ```
-Relation ::= Term ( RelationalOperator Term | 'is' ( TYPE_NAME | IDENTIFIER ) )?
+Relation ::= Term ( RelationalOperator Term | 'is' 'not'? ( TYPE_NAME | IDENTIFIER ) )?
 ```
 
 **RelationalOperator:**

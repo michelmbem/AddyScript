@@ -27,25 +27,31 @@ function getClosure()
 }
 
 println('Toto::getClosureStatic');
+println('----------------------');
 f = Toto::getClosureStatic();
 for (i = 0; i < 10; i += 2)
-	println(f(i));
-println();
+	print(f(i) + ' ');
+println('\n');
 
 println('Toto::getClosure');
+println('----------------');
 g = new Toto().getClosure();
 for (i = 0; i < 10; i += 2)
-	println(g(i));
-println();
+	print(g(i) + ' ');
+println('\n');
 
 println('getTotoClosure');
+println('--------------');
 h = getTotoClosure();
 for (i = 0; i < 10; i += 2)
-	println(h(i));
-println();
+	print(h(i) + ' ');
+println('\n');
 
 println('getClosure');
+println('----------');
 j = getClosure();
 for (i = 0; i < 10; i += 2)
-	println(j(i));
+	print(j(i) + ' ');
+println();
+
 readln();

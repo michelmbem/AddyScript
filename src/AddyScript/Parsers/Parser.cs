@@ -210,7 +210,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         List<ClassPropertyDecl> properties = [];
         List<ClassMethodDecl> methods = [];
         List<ClassEventDecl> events = [];
-
+        
         PushClass(modifier, className, superClassName);
         IdentifiyClassMembers(modifier, Asterisk(ClassMember), ref constructor, ref indexer, fields, properties, methods, events);
         PopClass();

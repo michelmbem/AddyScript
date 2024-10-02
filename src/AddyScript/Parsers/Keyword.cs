@@ -61,6 +61,7 @@ public class Keyword
         
         Register("typeof", TokenID.KW_TypeOf);
         Register("is", TokenID.KW_Is);
+        Register("not", TokenID.KW_Not);
         Register("startswith", TokenID.KW_StartsWith);
         Register("endswith", TokenID.KW_EndsWith);
         Register("contains", TokenID.KW_Contains);

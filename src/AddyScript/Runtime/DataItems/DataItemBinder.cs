@@ -249,8 +249,7 @@ public class DataItemBinder : Binder
                     TypeCode.String => 3,
                     _ => 4,
                 };
-            case ClassID.Long:
-            case ClassID.Decimal:
+            case ClassID.Long or ClassID.Decimal:
                 return Type.GetTypeCode(t) switch
                 {
                     TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
@@ -301,9 +300,7 @@ public class DataItemBinder : Binder
                     default:
                         return 4;
                 }
-            case ClassID.Set:
-            case ClassID.Queue:
-            case ClassID.Stack:
+            case ClassID.Set or ClassID.Queue or ClassID.Stack:
                 switch (Type.GetTypeCode(t))
                 {
                     case TypeCode.Object:
@@ -314,8 +311,7 @@ public class DataItemBinder : Binder
                     default:
                         return 4;
                 }
-            case ClassID.Object:
-            case ClassID.Resource:
+            case ClassID.Object or ClassID.Resource:
                 return Type.GetTypeCode(t) switch
                 {
                     TypeCode.DBNull or TypeCode.Object => 1,

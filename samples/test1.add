@@ -21,8 +21,8 @@ else
 	s = sum(t); // s = t.aggregate(0, |a, v| => a + v);
 	println("you've entered: " + t.join(", "));
 	println("the sum of items is: " + s);
-	println("the minimum is: " + min(t));
-	println("the maximum is: " + max(t));
+	println("the minimum is: " + min(..t));
+	println("the maximum is: " + max(..t));
 	println("the averrage is: " + (s / n));
 }
 

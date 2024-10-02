@@ -310,151 +310,100 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         double x = arguments[0].AsDouble;
         return x < 0
              ? new Complex(Complex64.ImaginaryOne * Math.Sqrt(-x))
-             : (DataItem)new Float(Math.Sqrt(x));
+             : new Float(Math.Sqrt(x));
     }
 
     private static DataItem SignLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        switch (arg.Class.ClassID)
+        return arg.Class.ClassID switch
         {
-            case ClassID.Integer:
-                return new Integer(Math.Sign(arg.AsInt32));
-            case ClassID.Long:
-                return new Integer(arg.AsBigInteger.Sign);
-            case ClassID.Rational:
-                return new Integer(arg.AsRational32.Sign);
-            case ClassID.Float:
-                return new Integer(Math.Sign(arg.AsDouble));
-            case ClassID.Decimal:
-                return new Integer(arg.AsBigDecimal.Sign);
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "sign,", arg.Class.Name));
-        }
+            ClassID.Integer => new Integer(Math.Sign(arg.AsInt32)),
+            ClassID.Long => new Integer(arg.AsBigInteger.Sign),
+            ClassID.Rational => new Integer(arg.AsRational32.Sign),
+            ClassID.Float => new Integer(Math.Sign(arg.AsDouble)),
+            ClassID.Decimal => new Integer(arg.AsBigDecimal.Sign),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "sign,", arg.Class.Name)),
+        };
     }
 
     private static DataItem AbsoluteValueLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        switch (arg.Class.ClassID)
+        return arg.Class.ClassID switch
         {
-            case ClassID.Integer:
-                return new Integer(Math.Abs(arg.AsInt32));
-            case ClassID.Long:
-                return new Long(BigInteger.Abs(arg.AsBigInteger));
-            case ClassID.Rational:
-                return new Rational(arg.AsRational32.Abs());
-            case ClassID.Float:
-                return new Float(Math.Abs(arg.AsDouble));
-            case ClassID.Decimal:
-                return new Decimal(arg.AsBigDecimal.Abs());
-            case ClassID.Complex:
-                return new Float(Complex64.Abs(arg.AsComplex64));
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "abs,", arg.Class.Name));
-        }
+            ClassID.Integer => new Integer(Math.Abs(arg.AsInt32)),
+            ClassID.Long => new Long(BigInteger.Abs(arg.AsBigInteger)),
+            ClassID.Rational => new Rational(arg.AsRational32.Abs()),
+            ClassID.Float => new Float(Math.Abs(arg.AsDouble)),
+            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Abs()),
+            ClassID.Complex => new Float(Complex64.Abs(arg.AsComplex64)),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "abs,", arg.Class.Name)),
+        };
     }
 
     private static DataItem MinimumLogic(DataItem[] arguments)
     {
         List<DataItem> list = arguments[0].AsList;
-        switch (list.Count)
+        return list.Count switch
         {
-            case 0:
-                return Void.Value;
-            case 1:
-                return list[0];
-            default:
-                DataItem minimum = list[0];
-
-                for (int i = 1; i < list.Count; ++i)
-                    if (list[i].CompareTo(minimum) < 0)
-                        minimum = list[i];
-
-                return minimum;
-        }
+            0 => Void.Value,
+            _ => list.Skip(1).Aggregate(list[0], (acc, val) => val.CompareTo(acc) < 0 ? val : acc),
+        };
     }
 
     private static DataItem MaximumLogic(DataItem[] arguments)
     {
         List<DataItem> list = arguments[0].AsList;
-        switch (list.Count)
+        return list.Count switch
         {
-            case 0:
-                return Void.Value;
-            case 1:
-                return list[0];
-            default:
-                DataItem maximum = list[0];
-
-                for (int i = 1; i < list.Count; ++i)
-                    if (list[i].CompareTo(maximum) > 0)
-                        maximum = list[i];
-
-                return maximum;
-        }
+            0 => Void.Value,
+            _ => list.Skip(1).Aggregate(list[0], (acc, val) => val.CompareTo(acc) > 0 ? val : acc),
+        };
     }
 
     private static DataItem TruncateLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        switch (arg.Class.ClassID)
+        return arg.Class.ClassID switch
         {
-            case ClassID.Float:
-                return new Float(Math.Truncate(arg.AsDouble));
-            case ClassID.Decimal:
-                return new Decimal(arg.AsBigDecimal.Truncate());
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "trunc,", arg.Class.Name));
-        }
+            ClassID.Float => new Float(Math.Truncate(arg.AsDouble)),
+            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Truncate()),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "trunc,", arg.Class.Name)),
+        };
     }
 
     private static DataItem FloorLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        switch (arg.Class.ClassID)
+        return arg.Class.ClassID switch
         {
-            case ClassID.Float:
-                return new Float(Math.Floor(arg.AsDouble));
-            case ClassID.Decimal:
-                return new Decimal(arg.AsBigDecimal.Floor());
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "floor,", arg.Class.Name));
-        }
+            ClassID.Float => new Float(Math.Floor(arg.AsDouble)),
+            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Floor()),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "floor,", arg.Class.Name)),
+        };
     }
 
     private static DataItem CeilingLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        switch (arg.Class.ClassID)
+        return arg.Class.ClassID switch
         {
-            case ClassID.Float:
-                return new Float(Math.Ceiling(arg.AsDouble));
-            case ClassID.Decimal:
-                return new Decimal(arg.AsBigDecimal.Ceiling());
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "ceil,", arg.Class.Name));
-        }
+            ClassID.Float => new Float(Math.Ceiling(arg.AsDouble)),
+            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Ceiling()),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "ceil,", arg.Class.Name)),
+        };
     }
 
     private static DataItem RoundLogic(DataItem[] arguments)
     {
         DataItem arg1 = arguments[0], arg2 = arguments[1];
-        switch (arg1.Class.ClassID)
+        return arg1.Class.ClassID switch
         {
-            case ClassID.Float:
-                return new Float(Math.Round(arg1.AsDouble, arg2.AsInt32));
-            case ClassID.Decimal:
-                return new Decimal(arg1.AsBigDecimal.Round(arg2.AsInt32));
-            default:
-                throw new InvalidOperationException(
-                    string.Format(Resources.TypeDoesNotSupportFunction, "round,", arg1.Class.Name));
-        }
+            ClassID.Float => new Float(Math.Round(arg1.AsDouble, arg2.AsInt32)),
+            ClassID.Decimal => new Decimal(arg1.AsBigDecimal.Round(arg2.AsInt32)),
+            _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "round,", arg1.Class.Name)),
+        };
     }
 
     private static DataItem NowLogic(DataItem[] arguments)
@@ -529,7 +478,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                 var parser = new Parser(new Lexer(new StringReader(command)));
                 var statement = parser.RequiredStatement();
                 statement.AcceptTranslator(interpreter);
-                command = command.Substring(statement.End.Offset);
+                command = command[statement.End.Offset..];
             }
         }
         catch (ParseException)
@@ -566,8 +515,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                         for (int i = 0; i < item.Count; ++i)
                             bf.Write((sbyte)values[k++].AsInt32);
                         break;
-                    case PackFormatType.Byte:
-                    case PackFormatType.Character:
+                    case PackFormatType.Byte or PackFormatType.Character:
                         for (int i = 0; i < item.Count; ++i)
                             bf.Write((byte)values[k++].AsInt32);
                         break;
@@ -618,7 +566,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                             var tmpString = values[k++].ToString();
                             int count = Math.Min(item.Count - 1, 255);
                             if (tmpString.Length > count)
-                                tmpString = tmpString.Substring(0, count);
+                                tmpString = tmpString[..count];
                             else if (tmpString.Length < count)
                                 tmpString = tmpString.PadRight(count, '\0');
                             bf.Write((byte)count);
@@ -671,8 +619,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                         for (int i = 0; i < item.Count; ++i)
                             list.Add(new Integer(br.ReadSByte()));
                         break;
-                    case PackFormatType.Byte:
-                    case PackFormatType.Character:
+                    case PackFormatType.Byte or PackFormatType.Character:
                         for (int i = 0; i < item.Count; ++i)
                             list.Add(new Integer(br.ReadByte()));
                         break;
@@ -2375,6 +2322,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         }
 
         var value = values[index].ToString(format, CultureInfo.CurrentUICulture);
+
         if (length < 0)
             value = value.PadRight(-length);
         else if (length > 0)

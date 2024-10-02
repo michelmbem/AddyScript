@@ -1,31 +1,28 @@
 import System::Collections::Generic;
 
-function underline(msg)
-{
-	println(msg);
-	println('-' * msg.length);
-}
-
 l = new LinkedList{1}();
 for (i = 1; i < 1000; i *= 2)
 	l.AddLast(i);
 
-underline('LinkedList{1}:');
+println('LinkedList{1}:');
+println('--------------');
 foreach(item in l)
 	print($'[{item}]->');
 println('END');
-println();
+println('\n');
 
 d = new SortedDictionary{2}();
 names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
 names.each(|name| => d[name] = randint(18, 40));
 
-underline('SortedDictionary{2}:');
+println('SortedDictionary{2}:');
+println('--------------------');
 foreach(key => value in d)
 	println($"{key}\t: {value}");
-println();
+println('\n');
 
-underline('System::Tuple{3}:');
+println('System::Tuple{3}:');
+println('-----------------');
 t = new System::Tuple{3}('Jason Donovan', 32, `2010-03-15`);
 println($"{t.Item1} is {t.Item2} years old, he works for us since {t.Item3:d}.");
 

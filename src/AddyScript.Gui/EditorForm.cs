@@ -168,8 +168,8 @@ namespace AddyScript.Gui
             scintilla.SetKeywords(0, @"
                 abstract as bool break case catch class closure complex const constructor contains continue date decimal default
                 do else endswith event extern false final finally float for foreach function goto if import in int is list long
-                map matches new null object operator private property protected public queue rational read resource return set
-                stack startswith static string super switch this throw true try typeof var void while with write yield
+                map matches new not null object operator private property protected public queue rational read resource return
+                set stack startswith static string super switch this throw true try typeof var void while with write yield
             ");
 
             scintilla.SetKeywords(1, @"
@@ -195,21 +195,27 @@ namespace AddyScript.Gui
 
             scintilla.Styles[Style.Cpp.EscapeSequence].ForeColor = Color.Olive;
 
-            int[] numberStyles = { Style.Cpp.Number, Style.Cpp.UserLiteral };
+            scintilla.Styles[Style.BraceLight].ForeColor = Color.Red;
+            scintilla.Styles[Style.BraceLight].BackColor = Color.WhiteSmoke;
+
+            scintilla.Styles[Style.BraceBad].ForeColor = Color.WhiteSmoke;
+            scintilla.Styles[Style.BraceBad].BackColor = Color.Red;
+
+            int[] numberStyles = [Style.Cpp.Number, Style.Cpp.UserLiteral];
 
             foreach (int style in numberStyles)
             {
                 scintilla.Styles[style].ForeColor = Color.Firebrick;
             }
 
-            int[] textStyles = { Style.Cpp.Character, Style.Cpp.String, Style.Cpp.StringEol, Style.Cpp.Verbatim };
+            int[] textStyles = [Style.Cpp.Character, Style.Cpp.String, Style.Cpp.StringEol, Style.Cpp.Verbatim];
 
             foreach (int style in textStyles)
             {
                 scintilla.Styles[style].ForeColor = Color.Green;
             }
 
-            int[] commentStyles = { Style.Cpp.Comment, Style.Cpp.CommentLine, Style.Cpp.CommentDoc };
+            int[] commentStyles = [Style.Cpp.Comment, Style.Cpp.CommentLine, Style.Cpp.CommentDoc];
 
             foreach (int style in commentStyles)
             {
@@ -218,7 +224,7 @@ namespace AddyScript.Gui
                 scintilla.Styles[style].ForeColor = Color.Gray;
             }
 
-            int[] marginStyles = { Style.LineNumber, Style.IndentGuide };
+            int[] marginStyles = [Style.LineNumber, Style.IndentGuide];
 
             foreach (int style in marginStyles)
             {
@@ -295,11 +301,11 @@ namespace AddyScript.Gui
                 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0 float?1
                 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1 is?4 list?1 log?3 log10?3
                 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2 min?3 MINDATE?2 MINFLOAT?2 MININT?2 NAN?2
-                new?4 NEWLINE?2 NINFINITY?2 now?3 null?2 object?1 operator?0 ord?3 pack?3 PI?2 PINFINITY?2 print?3 println?3
-                private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5 readln?3
-                resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1 super?0
-                switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 typeof?4 unpack?3 var?0 void?1 while?0 with?0
-                write?5 yield?0
+                new?4 NEWLINE?2 NINFINITY?2 not?0 now?3 null?2 object?1 operator?0 ord?3 pack?3 PI?2 PINFINITY?2 print?3
+                println?3 private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5
+                readln?3 resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1
+                super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 typeof?4 unpack?3 var?0 void?1 while?0
+                with?0 write?5 yield?0
             ";
 
             foreach (string keyword in Regex.Split(keywords, @"\s+"))
@@ -364,6 +370,20 @@ namespace AddyScript.Gui
         private static bool IsHotKey(KeyEventArgs e, Keys key, bool control = false, bool alt = false, bool shift = false)
         {
             return e.KeyCode == key && e.Control == control && e.Alt == alt && e.Shift == shift;
+        }
+
+        /// <summary>
+        /// Checks if a character is a brace in the broad sense of the word.
+        /// </summary>
+        /// <param name="c">The character to test</param>
+        /// <returns>A boolean</returns>
+        private static bool IsBrace(int c)
+        {
+            return c switch
+            {
+                '(' or ')' or '[' or ']' or '{' or '}' or '<' or '>' => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -628,12 +648,52 @@ namespace AddyScript.Gui
             currentLine.Indentation = previousLine.Indentation;
 
             string prevLineText = previousLine.Text.TrimEnd();
-            if (!(prevLineText.Length <= 0 || prevLineText.EndsWith(",") ||
-                  prevLineText.EndsWith(";") || prevLineText.EndsWith("}")))
+            if (!(prevLineText.Length <= 0 || prevLineText.EndsWith(',') ||
+                  prevLineText.EndsWith(';') || prevLineText.EndsWith('}')))
+            {
                 scintilla.InsertText(currentLine.IndentPosition, "\t");
+            }
 
             scintilla.SetSelection(currentLine.IndentPosition, currentLine.IndentPosition);
             scintilla.EndUndoAction();
+        }
+
+        /// <summary>
+        /// Hightlight matching braces.
+        /// </summary>
+        private void HighlightMatchingBraces()
+        {
+            // Has the caret changed position?
+            int caretPos = scintilla.CurrentPosition, bracePos1 = -1;
+
+            // Is there a brace to the left or right?
+            if (caretPos > 0 && IsBrace(scintilla.GetCharAt(caretPos - 1)))
+                bracePos1 = caretPos - 1;
+            else if (IsBrace(scintilla.GetCharAt(caretPos)))
+                bracePos1 = caretPos;
+
+            if (bracePos1 >= 0)
+            {
+                // Find the matching brace
+                int bracePos2 = scintilla.BraceMatch(bracePos1);
+
+                if (bracePos2 == Scintilla.InvalidPosition)
+                {
+                    scintilla.BraceBadLight(bracePos1);
+                    scintilla.HighlightGuide = 0;
+                }
+                else
+                {
+                    scintilla.BraceHighlight(bracePos1, bracePos2);
+                    scintilla.HighlightGuide = scintilla.GetColumn(bracePos1);
+                }
+            }
+            else
+            {
+                // Turn off brace matching
+                scintilla.BraceHighlight(Scintilla.InvalidPosition, Scintilla.InvalidPosition);
+                scintilla.HighlightGuide = 0;
+            }
         }
 
         /// <summary>
@@ -1084,7 +1144,10 @@ namespace AddyScript.Gui
         private void scintilla_UpdateUI(object sender, UpdateUIEventArgs e)
         {
             if (e.Change == UpdateChange.Selection)
+            {
                 UpdateCutCopyCaretInfo();
+                HighlightMatchingBraces();
+            }
         }
 
         private void scintilla_CharAdded(object sender, CharAddedEventArgs e)

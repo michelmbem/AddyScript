@@ -65,6 +65,7 @@ public enum TokenID
     Arrow,
     KW_TypeOf,
     KW_Is,
+    KW_Not,
     KW_StartsWith,
     KW_EndsWith,
     KW_Contains,

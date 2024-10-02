@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
+
 
 namespace AddyScript.Runtime.DataItems;
 
@@ -14,72 +16,39 @@ public static class DataItemFactory
 {
     public static DataItem CreateDataItem(object value)
     {
-        if (value == null) return Void.Value;
-        if (value is DataItem dyna) return dyna;
         if (value is Enum) return new String(value.ToString());
-        if (value is char[] chars) return new String(new string(chars));
-        if (value is byte[] bytes) return new String(StringUtil.ByteArray2String(bytes));
-        if (value is Array array)
+
+        return Type.GetTypeCode(value?.GetType()) switch
         {
-            var list = new List<DataItem>();
-
-            foreach (object item in array)
-                list.Add(CreateDataItem(item));
-
-            return new List(list);
-        }
-
-        switch (Type.GetTypeCode(value.GetType()))
-        {
-            case TypeCode.Boolean:
-                return Boolean.FromBool(Convert.ToBoolean(value));
-            case TypeCode.SByte:
-            case TypeCode.Byte:
-            case TypeCode.Int16:
-            case TypeCode.UInt16:
-            case TypeCode.Int32:
-                return new Integer(Convert.ToInt32(value));
-            case TypeCode.UInt32:
-            case TypeCode.Int64:
-                return new Long(Convert.ToInt64(value));
-            case TypeCode.UInt64:
-                return new Long(Convert.ToUInt64(value));
-            case TypeCode.Single:
-            case TypeCode.Double:
-                return new Float(Convert.ToDouble(value));
-            case TypeCode.Decimal:
-                return new Decimal(Convert.ToDecimal(value));
-            case TypeCode.DateTime:
-                return new Date(Convert.ToDateTime(value));
-            case TypeCode.Char:
-            case TypeCode.String:
-                return new String(Convert.ToString(value));
-            case TypeCode.Object:
-                if (value is BigInteger bigint)
-                    return new Long(bigint);
-                if (value is Rational32 rational)
-                    return new Rational(rational);
-                if (value is BigDecimal bigdec)
-                    return new Decimal(bigdec);
-                if (value is Complex64 complex)
-                    return new Complex(complex);
-                if (value is List<DataItem> list)
-                    return new List(list);
-                if (value is Dictionary<DataItem, DataItem> dict)
-                    return new Map(dict);
-                if (value is HashSet<DataItem> set)
-                    return new Set(set);
-                if (value is Queue<DataItem> queue)
-                    return new Queue(queue);
-                if (value is Stack<DataItem> stack)
-                    return new Stack(stack);
-                if (value is Tuple<Class, Dictionary<string, DataItem>> couple)
-                    return new Object(couple.Item1, couple.Item2);
-                if (value is Function function)
-                    return new Closure(function);
-                return new Resource(value);
-            default:
-                return new Resource(value);
-        }
+            TypeCode.Empty => Void.Value,
+            TypeCode.Boolean => Boolean.FromBool(Convert.ToBoolean(value)),
+            TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
+            TypeCode.UInt16 or TypeCode.Int32 => new Integer(Convert.ToInt32(value)),
+            TypeCode.UInt32 or TypeCode.Int64 => new Long(Convert.ToInt64(value)),
+            TypeCode.UInt64 => new Long(Convert.ToUInt64(value)),
+            TypeCode.Single or TypeCode.Double => new Float(Convert.ToDouble(value)),
+            TypeCode.Decimal => new Decimal(Convert.ToDecimal(value)),
+            TypeCode.DateTime => new Date(Convert.ToDateTime(value)),
+            TypeCode.Char or TypeCode.String => new String(Convert.ToString(value)),
+            _ => value switch
+            {
+                DataItem dataItem => dataItem,
+                BigInteger bigint => new Long(bigint),
+                BigDecimal bigdec => new Decimal(bigdec),
+                Rational32 rational => new Rational(rational),
+                Complex64 complex => new Complex(complex),
+                List<DataItem> list => new List(list),
+                HashSet<DataItem> set => new Set(set),
+                Queue<DataItem> queue => new Queue(queue),
+                Stack<DataItem> stack => new Stack(stack),
+                Dictionary<DataItem, DataItem> dict => new Map(dict),
+                (Class klass, Dictionary<string, DataItem> fields) => new Object(klass, fields),
+                Function function => new Closure(function),
+                char[] chars => new String(new string(chars)),
+                byte[] bytes => new String(StringUtil.ByteArray2String(bytes)),
+                Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)),
+                _ => new Resource(value),
+            },
+        };
     }
 }

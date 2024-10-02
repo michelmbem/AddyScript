@@ -26,15 +26,15 @@ class DBOCommand
 		else { // Assuming parameter is an object or a map with at least a 'name' property or key
 			parameter = (object) parameter;
 			dbParam.ParameterName = parameter.name;
-			if (!(parameter.dbType is void))
+			if (parameter.dbType is not void)
 				dbParam.DbType = parameter.dbType;
-			if (!(parameter.size is void))
+			if (parameter.size is not void)
 				dbParam.Size = parameter.size;
-			if (!(parameter.precision is void))
+			if (parameter.precision is not void)
 				dbParam.Precision = parameter.precision;
-			if (!(parameter.scale is void))
+			if (parameter.scale is not void)
 				dbParam.Scale = parameter.scale;
-			if (!(parameter.value is void))
+			if (parameter.value is not void)
 				dbParam.Value = parameter.value;
 		}
 		

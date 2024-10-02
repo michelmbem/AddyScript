@@ -306,9 +306,7 @@ public class Lexer
 
         switch (ch)
         {
-            case '\\':
-            case '\'':
-            case '"':
+            case '\\' or '\'' or '"':
                 Consume(1);
                 return ch.ToString();
             case '0':
@@ -335,11 +333,9 @@ public class Lexer
             case 'v':
                 Consume(1);
                 return "\v";
-            case 'x':
-            case 'X':
+            case 'x' or 'X':
                 return EscapeHex(2);
-            case 'u':
-            case 'U':
+            case 'u' or 'U':
                 return EscapeHex(4);
             default:
                 return "\\";
@@ -680,9 +676,7 @@ public class Lexer
 
             switch (ch)
             {
-                case '\r':
-                case '\n':
-                case EOF:
+                case '\r' or '\n' or EOF:
                     loop = false;
                     break;
                 default:
@@ -805,19 +799,15 @@ public class Lexer
 
         switch (ch)
         {
-            case 'l':
-            case 'L':
+            case 'l' or 'L':
                 return Token(TokenID.LT_Long, BigInteger.Zero, true);
-            case 'f':
-            case 'F':
+            case 'f' or 'F':
                 return Token(TokenID.LT_Float, 0D, true);
-            case 'd':
-            case 'D':
+            case 'd' or 'D':
                 return Token(TokenID.LT_Decimal, BigDecimal.Zero, true);
             case '.':
                 return char.IsDigit(Ll(2)) ? Number() : Token(TokenID.LT_Integer, 0, false);
-            case 'x':
-            case 'X':
+            case 'x' or 'X':
                 return HexNumber();
             default:
                 if (char.IsDigit(ch)) return Number();
@@ -925,8 +915,7 @@ public class Lexer
          */
         switch (ch)
         {
-            case '\'':
-            case '"':
+            case '\'' or '"':
                 tmpTok = LiteralString();
                 break;
             case '@':
