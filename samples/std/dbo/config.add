@@ -47,7 +47,6 @@ static class DBOConfig
 			var assembly = __context.LoadAssembly('System.Data.Common');
 			if (assembly === null) throw 'Could not load assembly System.Data.Common';
 			__context.AddReference(assembly);
-			
 			import System::Data::Common::DbProviderFactories;
 			var factory = DbProviderFactories::GetFactory(providerName);
 			if (factory === null) throw 'Could not find configuration for provider ' + providerName;

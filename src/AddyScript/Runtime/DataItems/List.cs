@@ -140,7 +140,7 @@ public sealed class List : DataItem
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = list.Count;
-        if (n >= l) return null;
+        if (l <= 0 || n >= l) return null;
         while (n < 0) n += l;
         return list[n];
     }
@@ -148,7 +148,7 @@ public sealed class List : DataItem
     public override void SetItem(DataItem index, DataItem value)
     {
         int n = index.AsInt32, l = list.Count;
-        if (n >= l) throw new ArgumentOutOfRangeException();
+        if (l <= 0 || n >= l) throw new ArgumentOutOfRangeException();
         while (n < 0) n += l;
         list[n] = value;
     }

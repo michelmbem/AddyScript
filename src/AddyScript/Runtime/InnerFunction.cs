@@ -212,16 +212,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem RandomIntegerLogic(DataItem[] arguments)
     {
-        int min = arguments[0].AsInt32,
-            max = arguments[1].AsInt32;
-
-        if (min > max)
-        {
-            int tmp = min;
-            min = max;
-            max = tmp;
-        }
-
+        int min = arguments[0].AsInt32, max = arguments[1].AsInt32;
+        if (min > max) (min, max) = (max, min);
         return new Integer(min + (int)(NextDouble(random) * (max - min)));
     }
 
@@ -710,8 +702,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem ToStringLogic(DataItem[] arguments)
     {
-        string s = arguments[0].ToString(arguments[1].ToString(),
-                                         CultureInfo.InvariantCulture);
+        string s = arguments[0].ToString(arguments[1].ToString(), CultureInfo.CurrentUICulture);
         return new String(s);
     }
 
@@ -770,43 +761,21 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem DateOfLogic(DataItem[] arguments)
     {
-        DateTime date;
-        DataItem[] values = arguments[0].AsList.ToArray();
-
-        switch (values.Length)
+        DataItem[] values = [.. arguments[0].AsList];
+        var date = values.Length switch
         {
-            case 3: // year, month and day
-                date = new DateTime(values[0].AsInt32,
-                                    values[1].AsInt32,
-                                    values[2].AsInt32);
-                break;
-            case 4: // hour, minute, second and millisecond
-                date = new DateTime(1, 1, 1,
-                                    values[0].AsInt32,
-                                    values[1].AsInt32,
-                                    values[2].AsInt32,
-                                    values[3].AsInt32);
-                break;
-            case 6: // year, month, day, hour, minute and second
-                date = new DateTime(values[0].AsInt32,
-                                    values[1].AsInt32,
-                                    values[2].AsInt32,
-                                    values[3].AsInt32,
-                                    values[4].AsInt32,
-                                    values[5].AsInt32);
-                break;
-            case 7: // year, month, day, hour, minute, second and millisecond
-                date = new DateTime(values[0].AsInt32,
-                                    values[1].AsInt32,
-                                    values[2].AsInt32,
-                                    values[3].AsInt32,
-                                    values[4].AsInt32,
-                                    values[5].AsInt32,
-                                    values[6].AsInt32);
-                break;
-            default:
-                throw new InvalidOperationException(string.Format(Resources.BadDateCreateCall, values.Length));
-        }
+            // year, month and day
+            3 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32),
+            // hour, minute, second and millisecond
+            4 => new DateTime(1, 1, 1, values[0].AsInt32, values[1].AsInt32, values[2].AsInt32, values[3].AsInt32),
+            // year, month, day, hour, minute and second
+            6 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32,
+                              values[3].AsInt32, values[4].AsInt32, values[5].AsInt32),
+            // year, month, day, hour, minute, second and millisecond
+            7 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32,
+                              values[3].AsInt32, values[4].AsInt32, values[5].AsInt32, values[6].AsInt32),
+            _ => throw new InvalidOperationException(string.Format(Resources.BadDateOfCall, values.Length)),
+        };
 
         return new Date(date);
     }
@@ -826,30 +795,20 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem self = arguments[0], arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "date::get", 1);
-            
-        switch (arg1.ToString())
+
+        return arg1.ToString() switch
         {
-            case "year":
-                return new Integer(self.AsDateTime.Year);
-            case "month":
-                return new Integer(self.AsDateTime.Month);
-            case "day":
-                return new Integer(self.AsDateTime.Day);
-            case "weekday":
-                return new String(self.AsDateTime.DayOfWeek.ToString());
-            case "yearday":
-                return new Integer(self.AsDateTime.DayOfYear);
-            case "hour":
-                return new Integer(self.AsDateTime.Hour);
-            case "minute":
-                return new Integer(self.AsDateTime.Minute);
-            case "second":
-                return new Integer(self.AsDateTime.Second);
-            case "millisecond":
-                return new Integer(self.AsDateTime.Millisecond);
-            default:
-                throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg1));
-        }
+            "year" => new Integer(self.AsDateTime.Year),
+            "month" => new Integer(self.AsDateTime.Month),
+            "day" => new Integer(self.AsDateTime.Day),
+            "weekday" => new String(self.AsDateTime.DayOfWeek.ToString()),
+            "yearday" => new Integer(self.AsDateTime.DayOfYear),
+            "hour" => new Integer(self.AsDateTime.Hour),
+            "minute" => new Integer(self.AsDateTime.Minute),
+            "second" => new Integer(self.AsDateTime.Second),
+            "millisecond" => new Integer(self.AsDateTime.Millisecond),
+            _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg1)),
+        };
     }
 
     private static DataItem DateGetTicksLogic(DataItem[] arguments)
@@ -861,26 +820,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem self = arguments[0], arg1 = arguments[1], arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "date::add", 2);
-        
-        switch (arg2.ToString())
+
+        return arg2.ToString() switch
         {
-            case "year":
-                return new Date(self.AsDateTime.AddYears(arg1.AsInt32));
-            case "month":
-                return new Date(self.AsDateTime.AddMonths(arg1.AsInt32));
-            case "day":
-                return new Date(self.AsDateTime.AddDays(arg1.AsDouble));
-            case "hour":
-                return new Date(self.AsDateTime.AddHours(arg1.AsDouble));
-            case "minute":
-                return new Date(self.AsDateTime.AddMinutes(arg1.AsDouble));
-            case "second":
-                return new Date(self.AsDateTime.AddSeconds(arg1.AsDouble));
-            case "millisecond":
-                return new Date(self.AsDateTime.AddMilliseconds(arg1.AsDouble));
-            default:
-                throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2));
-        }
+            "year" => new Date(self.AsDateTime.AddYears(arg1.AsInt32)),
+            "month" => new Date(self.AsDateTime.AddMonths(arg1.AsInt32)),
+            "day" => new Date(self.AsDateTime.AddDays(arg1.AsDouble)),
+            "hour" => new Date(self.AsDateTime.AddHours(arg1.AsDouble)),
+            "minute" => new Date(self.AsDateTime.AddMinutes(arg1.AsDouble)),
+            "second" => new Date(self.AsDateTime.AddSeconds(arg1.AsDouble)),
+            "millisecond" => new Date(self.AsDateTime.AddMilliseconds(arg1.AsDouble)),
+            _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2)),
+        };
     }
 
     private static DataItem DateAddTicksLogic(DataItem[] arguments)
@@ -893,26 +844,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem self = arguments[0], arg1 = arguments[1], arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "date::subtract", 2);
-        
-        switch (arg2.ToString())
+
+        return arg2.ToString() switch
         {
-            case "year":
-                return new Integer(YearDiff(self.AsDateTime, arg1.AsDateTime));
-            case "month":
-                return new Integer(MonthDiff(self.AsDateTime, arg1.AsDateTime));
-            case "day":
-                return new Integer((self.AsDateTime - arg1.AsDateTime).Days);
-            case "hour":
-                return new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalHours);
-            case "minute":
-                return new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMinutes);
-            case "second":
-                return new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalSeconds);
-            case "millisecond":
-                return new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMilliseconds);
-            default:
-                throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2));
-        }
+            "year" => new Integer(YearDiff(self.AsDateTime, arg1.AsDateTime)),
+            "month" => new Integer(MonthDiff(self.AsDateTime, arg1.AsDateTime)),
+            "day" => new Integer((self.AsDateTime - arg1.AsDateTime).Days),
+            "hour" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalHours),
+            "minute" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMinutes),
+            "second" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalSeconds),
+            "millisecond" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMilliseconds),
+            _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2)),
+        };
     }
 
     #endregion
@@ -1103,6 +1046,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region List specific methods
 
+    private static DataItem ListSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsList.Count);
+    }
+
     private static DataItem ListJoinLogic(DataItem[] arguments)
     {
         DataItem self = arguments[0], arg1 = arguments[1];
@@ -1219,11 +1167,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem ListSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsList.Count);
-    }
-
     private static DataItem ListSortLogic(DataItem[] arguments)
     {
         DataItem self = arguments[0], arg1 = arguments[1];
@@ -1293,6 +1236,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region Map specific methods
+
+    private static DataItem MapSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsDictionary.Count);
+    }
 
     private static DataItem MapContainsKeyLogic(DataItem[] arguments)
     {
@@ -1389,14 +1337,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem MapSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsDictionary.Count);
-    }
-
     #endregion
 
     #region Set specific methods
+
+    private static DataItem SetSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsHashSet.Count);
+    }
 
     private static DataItem SetAddLogic(DataItem[] arguments)
     {
@@ -1416,14 +1364,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem SetSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsHashSet.Count);
-    }
-
     #endregion
 
     #region Queue specific methods
+
+    private static DataItem QueueSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsQueue.Count);
+    }
 
     private static DataItem QueueOfLogic(DataItem[] arguments)
     {
@@ -1452,14 +1400,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem QueueSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsQueue.Count);
-    }
-
     #endregion
 
     #region Stack specific methods
+
+    private static DataItem StackSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsStack.Count);
+    }
 
     private static DataItem StackOfLogic(DataItem[] arguments)
     {
@@ -1486,11 +1434,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         arguments[0].AsStack.Clear();
         return Void.Value;
-    }
-
-    private static DataItem StackSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsStack.Count);
     }
 
     #endregion
@@ -1896,6 +1839,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region List specific methods
 
     /// <summary>
+    /// Gets the number of items in a list.
+    /// </summary>
+    public static readonly InnerFunction ListSize = new("size", [new Parameter("self")], ListSizeLogic);
+
+    /// <summary>
     /// Joins several strings into one.
     /// </summary>
     public static readonly InnerFunction ListJoin = new ("join", [new Parameter("self"), new Parameter("separator", new String(""))], ListJoinLogic);
@@ -1951,11 +1899,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public static readonly InnerFunction ListClear = new ("clear", [new Parameter("self")], ListClearLogic);
 
     /// <summary>
-    /// Gets the number of items in a list.
-    /// </summary>
-    public static readonly InnerFunction ListSize = new ("size", [new Parameter("self")], ListSizeLogic);
-
-    /// <summary>
     /// Sorts a list in ascending order.
     /// </summary>
     public static readonly InnerFunction ListSort = new ("sort", [new Parameter("self"), new Parameter("comparison", Void.Value)], ListSortLogic);
@@ -1988,6 +1931,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region Map specific methods
+
+    /// <summary>
+    /// Gets the number of key-value pairs of a map.
+    /// </summary>
+    public static readonly InnerFunction MapSize = new("size", [new Parameter("self")], MapSizeLogic);
 
     /// <summary>
     /// Checks if a map contains some key.
@@ -2039,14 +1987,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// </summary>
     public static readonly InnerFunction MapClear = new ("clear", [new Parameter("self")], MapClearLogic);
 
-    /// <summary>
-    /// Gets the number of key-value pairs of a map.
-    /// </summary>
-    public static readonly InnerFunction MapSize = new ("size", [new Parameter("self")], MapSizeLogic);
-
     #endregion
 
     #region Set specific methods
+
+    /// <summary>
+    /// Gets the number of items in a set.
+    /// </summary>
+    public static readonly InnerFunction SetSize = new("size", [new Parameter("self")], SetSizeLogic);
 
     /// <summary>
     /// Adds an item in a set.
@@ -2063,14 +2011,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// </summary>
     public static readonly InnerFunction SetClear = new ("clear", [new Parameter("self")], SetClearLogic);
 
-    /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction SetSize = new ("size", [new Parameter("self")], SetSizeLogic);
-
     #endregion
 
     #region Queue specific methods
+
+    /// <summary>
+    /// Gets the number of items in a set.
+    /// </summary>
+    public static readonly InnerFunction QueueSize = new("size", [new Parameter("self")], QueueSizeLogic);
 
     /// <summary>
     /// Creates a queue with the given initial content.
@@ -2097,14 +2045,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// </summary>
     public static readonly InnerFunction QueueClear = new ("clear", [new Parameter("self")], QueueClearLogic);
 
-    /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction QueueSize = new ("size", [new Parameter("self")], QueueSizeLogic);
-
     #endregion
 
     #region Stack specific methods
+
+    /// <summary>
+    /// Gets the number of items in a set.
+    /// </summary>
+    public static readonly InnerFunction StackSize = new("size", [new Parameter("self")], StackSizeLogic);
 
     /// <summary>
     /// Creates a stack with the given initial content.
@@ -2130,11 +2078,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Clears the content of a set.
     /// </summary>
     public static readonly InnerFunction StackClear = new ("clear", [new Parameter("self")], StackClearLogic);
-
-    /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction StackSize = new ("size", [new Parameter("self")], StackSizeLogic);
 
     #endregion
 

@@ -400,8 +400,8 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="MissingClosingParen" xml:space="preserve">
     <value>Parenthèse fermante attendue</value>
   </data>
-  <data name="BadDateCreateCall" xml:space="preserve">
-    <value>date::create attend 3, 4, 6 ou 7 arguments. Le nombre d'arguments ({0}) fourni est invalide.</value>
+  <data name="BadDateOfCall" xml:space="preserve">
+    <value>date::of attend 3, 4, 6 ou 7 arguments. Le nombre d'arguments ({0}) fourni est invalide.</value>
   </data>
   <data name="SingleCharExpected" xml:space="preserve">
     <value>L'argument {0} de la fonction {1} doit être un caractère unique</value>

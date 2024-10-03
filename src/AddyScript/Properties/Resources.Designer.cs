@@ -124,11 +124,11 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à date::create expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid..
+        ///   Recherche une chaîne localisée semblable à date::of expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid..
         /// </summary>
-        internal static string BadDateCreateCall {
+        internal static string BadDateOfCall {
             get {
-                return ResourceManager.GetString("BadDateCreateCall", resourceCulture);
+                return ResourceManager.GetString("BadDateOfCall", resourceCulture);
             }
         }
         

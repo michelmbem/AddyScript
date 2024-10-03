@@ -964,36 +964,50 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
             ResolvePropertyRef(propertyRef, out DataItem owner, out ClassMember member);
 
-            if (owner == null)
-                propValue = null;
-            else if (owner == Void.Value && propertyRef.Optional)
-                propValue = Void.Value;
-            else if (member == null)
-                propValue = owner.GetProperty(propertyRef.PropertyName);
-            else if (member is ClassField field)
-                propValue = (member.Modifier == Modifier.Static) || (member.Modifier == Modifier.StaticFinal)
-                          ? field.SharedValue
-                          : owner.GetProperty(member.Name);
-            else if (member is ClassMethod method)
+            switch (owner)
             {
-                var parameters = method.Function.Parameters;
-                var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
-                var fn = new Function(parameters, Block.Return(new MethodCall(new Literal(owner), method.Name, args)));
-                propValue = new Closure(fn);
-            }
-            else // member is surely a ClassProperty
-            {
-                var property = (ClassProperty)member;
-                if (!property.CanRead) throw new RuntimeException(fileName, propertyRef, Resources.CannotReadProperty);
+                case null:
+                    propValue = null;
+                    break;
+                case Void when propertyRef.Optional:
+                    propValue = Void.Value;
+                    break;
+                default:
+                    switch (member)
+                    {
+                        case null:
+                            propValue = owner.GetProperty(propertyRef.PropertyName);
+                            break;
+                        case ClassField field:
+                            propValue = (member.Modifier == Modifier.Static) || (member.Modifier == Modifier.StaticFinal)
+                                      ? field.SharedValue
+                                      : owner.GetProperty(member.Name);
+                            break;
+                        case ClassMethod method:
+                            {
+                                var parameters = method.Function.Parameters;
+                                var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
+                                var fn = new Function(parameters, Block.Return(new MethodCall(new Literal(owner), method.Name, args)));
+                                propValue = new Closure(fn);
+                            }
+                            break;
+                        default: // member is surely a ClassProperty
+                            {
+                                var property = (ClassProperty)member;
+                                if (!property.CanRead) throw new RuntimeException(fileName, propertyRef, Resources.CannotReadProperty);
 
-                CheckAccess(property.Reader, propertyRef);
-                Invoke(property.Reader.Function, property.Name, property.Holder, owner);
-                return;
+                                CheckAccess(property.Reader, propertyRef);
+                                Invoke(property.Reader.Function, property.Name, property.Holder, owner);
+                            }
+                            return;
+                    }
+                    break;
+
             }
 
             if (propValue == null && misRefAct != MissingReferenceAction.Ignore)
-                throw new RuntimeException(fileName, propertyRef,
-                    string.Format(Resources.PropertyNotFoundInObject, propertyRef.PropertyName));
+                throw new RuntimeException(fileName, propertyRef, string.Format(Resources.PropertyNotFoundInObject,
+                                                                                propertyRef.PropertyName));
 
             returnedValue = propValue;
         }

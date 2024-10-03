@@ -399,7 +399,7 @@ if (__name === 'main')
 	}
 
 	function postgres_test() {
-		const CONNECTION_STRING = 'Server=localhost;User=pagila_user;Password=pagilanator;Database=pagila'; // pagila is a port of MySQL's sakila to PostgreSQL
+		const CONNECTION_STRING = 'Server=localhost;User=postgres;Password=123456;Database=pagila'; // pagila is a port of MySQL's sakila to PostgreSQL
 		
 		println('Testing PostgreSQL with connection string: ' + CONNECTION_STRING);
 		println();
@@ -467,7 +467,7 @@ if (__name === 'main')
 			dbo.rollback();
 			println();
 			println('after rolling back transaction:');
-			dbo.prepare('select * from test').eachRow(|t| => println('{0} : {1}', t), to_list);
+			dbo.prepare('select * from test').eachRow(|t| => println('{0} : {1}', ..t), to_list);
 			println();
 			println('name of item #5: {0}', dbo.find('test', 'name', 'id = 5'));
 			// importing data from the mysql's world database:

@@ -267,6 +267,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Match(TokenID.Arrow);
 
         Block body;
+        PushFunction(null, CurrentFunction.IsMethod, false, CurrentFunction.IsStatic);
+
         if (TryMatch(TokenID.LeftBrace))
         {
 
@@ -279,6 +281,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             body = Ast.Statements.Block.Return(returned);
             body.CopyLocation(returned);
         }
+
+        PopFunction();
 
         var lambda = new InlineFunction(parameters, body);
         lambda.SetLocation(first.Start, body.End);

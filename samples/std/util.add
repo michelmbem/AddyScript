@@ -20,38 +20,43 @@ function range(begin, end = 0, incr = 1)
 function randlst(size, minimum, maximum = 0, rounding = 0)
 {
 	if (minimum > maximum) swap(minimum, maximum);
-	var l = [minimum] * size, extent = maximum - minimum;
-	size.times(|i| => l[i] = round(minimum + extent * rand(), rounding));
+	var l = [], extent = maximum - minimum;
+	size.times(|_| => l.add(round(minimum + extent * rand(), rounding)));
 	return l;
 }
 
 function randstr(len)
 {
 	const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-	var s = '', n = alphabet.length;
-	len.times(|i| => s += alphabet[randint(n)]);
-	return s;
+	var s = new System::Text::StringBuilder(), n = alphabet.length;
+	len.times(|i| => s.Append(alphabet[randint(n)]));
+	return s.ToString();
 }
 
-function readlst(prompt = 'values : ', separator = @'\s+', convert = null)
+function readlst(prompt = 'values : ', separator = @'\s+', converter = null)
 {
-    return readln(prompt).split(separator).select(convert ?? |x| => x);
+	return readln(prompt).split(separator)
+						 .where(|x| => x.length > 0)
+						 .select(converter ?? |x| => x);
 }
 
 if (__name == 'main') {
-	l = readlst(convert: |x| => (float)x);
+	l = readlst(converter: |x| => (float)x) ?? randlst(randint(20), 100);
 	s = l.aggregate(.0, |x, i| => x += i);
 	m = s / l.size;
 	println('l = ' + l);
 	println('sum(l) = ' + s);
 	println('avg(l) = ' + m);
 	println();
-	l = ["mbem", "ndjom", "mayo", "nguimbous", "mbousnoum", "ndjock"];
+	
+	l = [];
+	10.times(|i| => l.add(randstr(i + 1)));
 	s = l.aggregate("", |x, i| => x += "-" + i).substring(1);
 	println('l = ' + l);
 	println('join(l, "-") = ' + s);
 	println();
-	l = range(2, incr: .1);
-	println('range(2, step: .1) = ' + l);
+	
+	l = range(12, incr: 2);
+	println('range(12, step: 2) = ' + l);
 	readln();
 }

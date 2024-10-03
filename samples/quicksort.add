@@ -17,12 +17,12 @@ function partition(t, left, right)
 	
 	while (l < r)
 	{
-		while(l < r && t[l] <= pivot) l++;
-		while(l < r && t[r] >= pivot) r--;
+		while(l < r && t[l] <= pivot) ++l;
+		while(l < r && t[r] >= pivot) --r;
 		if(l < r) swap(t[l], t[r]);
 	}
 	
-	if (t[l] > pivot) l--;
+	if (t[l] > pivot) --l;
 	t[left] = t[l];
 	t[l] = pivot;
 	

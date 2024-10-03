@@ -9,6 +9,7 @@ using AddyScript.Properties;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.Utilities;
 using AddyScript.Runtime.OOP;
+using System.Linq;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -96,8 +97,7 @@ public sealed class String(string value) : DataItem
     {
         switch (format)
         {
-            case "x":
-            case "X":
+            case "x" or "X":
                 {
                     var sb = new StringBuilder();
 
@@ -105,7 +105,7 @@ public sealed class String(string value) : DataItem
                         if (32 <= c && c < 127)
                             sb.Append(c);
                         else
-                            sb.AppendFormat("\\x{0:x2}", (int)c);
+                            sb.AppendFormat("\\u{0:x4}", (int)c);
 
                     return sb.ToString();
                 }
@@ -120,13 +120,16 @@ public sealed class String(string value) : DataItem
 
     protected override int UnsafeCompareTo(DataItem other) => value.CompareTo(other.ToString());
 
-    public override object ConvertTo(Type targetType) => targetType.IsEnum
-         ? Enum.Parse(targetType, value)
-         : targetType == typeof(char[])
-         ? value.ToCharArray()
-         : targetType == typeof(byte[])
-         ? StringUtil.String2ByteArray(value)
-         : base.ConvertTo(targetType);
+    public override object ConvertTo(Type targetType)
+    {
+        return targetType switch
+        {
+            Type t when t.IsEnum => Enum.Parse(targetType, value),
+            Type t when t == typeof(char[]) => value.ToCharArray(),
+            Type t when t == typeof(byte[]) => StringUtil.String2ByteArray(value),
+            _ => base.ConvertTo(targetType)
+        };
+    }
 
     public override bool IsEmpty() => value.Length <= 0;
 
@@ -150,7 +153,7 @@ public sealed class String(string value) : DataItem
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = value.Length;
-        if (n >= l) return null;
+        if (l <= 0 || n >= l) return null;
         while (n < 0) n += l;
         return new String(value[n].ToString());
     }

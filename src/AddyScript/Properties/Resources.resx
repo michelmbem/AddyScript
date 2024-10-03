@@ -400,8 +400,8 @@ It requires some initialization to support the expected operation.</value>
   <data name="MissingClosingParen" xml:space="preserve">
     <value>Missing closing parenthesis</value>
   </data>
-  <data name="BadDateCreateCall" xml:space="preserve">
-    <value>date::create expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid.</value>
+  <data name="BadDateOfCall" xml:space="preserve">
+    <value>date::of expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid.</value>
   </data>
   <data name="SingleCharExpected" xml:space="preserve">
     <value>Argument {0} of '{1}' must be a single character</value>
