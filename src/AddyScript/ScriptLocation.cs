@@ -15,7 +15,7 @@ public class  ScriptLocation(int offset, int lineOffset, int lineNumber)
     /// <summary>
     /// Represents an undefined location in a script.
     /// </summary>
-    public static readonly ScriptLocation Empty = new (0, 0, 0);
+    public static readonly ScriptLocation Empty = new(0, 0, 0);
 
     /// <summary>
     /// An absolute position in the source file.

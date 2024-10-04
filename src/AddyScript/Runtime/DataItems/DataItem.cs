@@ -122,7 +122,8 @@ public abstract class DataItem
     {
         BinaryOperator.Identical or BinaryOperator.NotIdentical or BinaryOperator.Contains or
         BinaryOperator.StartsWith or BinaryOperator.EndsWith or BinaryOperator.Matches => false,
-        _ => (targetClass == Class.String) || (targetClass.ClassID > Class.ClassID),
+        BinaryOperator.Plus => targetClass == Class.String,
+        _ => Class.ClassID < targetClass.ClassID && targetClass.ClassID < ClassID.Date
     };
 
     public virtual DataItem ConvertTo(Class targetClass)

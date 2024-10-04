@@ -69,7 +69,7 @@ The list class supports the following operators:
 |[index]|an integer|Gets or sets the value of an item in the list. Negative indices are processed modulo the length of the list.|
 |[lbound..ubound]|2 integers|Gets a slice (i.e. a sub-list) of the target list. Either "lbound" or "ubound" can be omitted. When "lbound" is omitted it's replaced with 0, a missing "ubound" will be replaced with the length of the list.|
 |\+|2 lists|Concatenates two lists.|
-|\*|a list to the left and an integer to the right|Concatenates a list with itself the given number of times.|
+|\*|A list on one side and an integer on the other side|Concatenates a list with itself the given number of times.|
 |**contains**|a list to the left and anything to the right|Checks if the list contains the given value.|
 |==|2 lists|Checks that both lists have the same length and contain equal items at each position.|
 |!=|2 lists|Checks that both lists have different lengths or contain different items at least at one position.|

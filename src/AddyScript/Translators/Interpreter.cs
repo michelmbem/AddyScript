@@ -617,14 +617,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     return;
                 }
 
-                if (binExpr.Operator == BinaryOperator.Plus && binExpr.RightOperand is Literal literal &&
-                    literal.Value.Class == Class.String)
-                {
-                    // Handle string concatenation when the left operand is an object
-                    new MethodCall(new Literal(leftOperand), "toString").AcceptTranslator(this);
-                    leftOperand = returnedValue;
-                }
-                else if (!(binExpr.Operator == BinaryOperator.Equal || binExpr.Operator == BinaryOperator.NotEqual))
+                if (!(binExpr.Operator == BinaryOperator.Equal || binExpr.Operator == BinaryOperator.NotEqual ||
+                     (binExpr.Operator == BinaryOperator.Plus && binExpr.RightOperand is Literal literal &&
+                      literal.Value.Class == Class.String)))
                 {
                     // Handle equality/difference check: the corresponding operators don't have to be overloaded in general
                     throw new RuntimeException(fileName, binExpr, string.Format(Resources.OperatorCantBeApplied,

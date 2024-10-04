@@ -145,7 +145,7 @@ The string class supports the following operators:
 |Operator|Operands|Description|
 |:-:|-|-|
 |\+|Two string<br>or<br>A string on one side and anything else on the other side|Concatenates two strings.<br>Automatically casts to string any argument that's not a string by invoking its "toString" method.|
-|\*|A string to the left and an integer to the right|Concatenates a string to itself the given number of times.|
+|\*|A string on one side and an integer on the other side|Concatenates a string to itself the given number of times.|
 |startswith|Two strings|Returns **true** if the left string starts with the right string.<br>Returns **false** otherwise.|
 |endswith|Two strings|Returns **true** if the left string ends with the right string.<br>Returns **false** otherwise.|
 |contains|Two strings|Returns **true** if the right string is a substring of the left string.<br>Returns **false** otherwise.|
