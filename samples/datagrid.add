@@ -161,8 +161,8 @@ b1.add_Click(reload);
 b2 = new Button
 		 {
 			 Text = "Save",
-			 Location = new { X = 88, Y = 4},
-			 Size = new { Width = 80, Height = 24}
+			 Location = new { X = 88, Y = 4 },
+			 Size = new { Width = 80, Height = 24 }
 		 };
 b2.add_Click(update);
 

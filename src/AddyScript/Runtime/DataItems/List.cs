@@ -69,22 +69,28 @@ public sealed class List : DataItem
         return true;
     }
 
-    public override int GetHashCode() => list.GetHashCode();
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+
+        foreach (DataItem item in list)
+            hashCode.Add(item);
+
+        return hashCode.ToHashCode();
+    }
 
     protected override int UnsafeCompareTo(DataItem other)
     {
         var otherList = other.AsList;
-        int l = Math.Min(list.Count, otherList.Count);
+        int minCount = Math.Min(list.Count, otherList.Count);
 
-        for (int i = 0; i < l; ++i)
+        for (int i = 0; i < minCount; ++i)
         {
             int cmp = list[i].CompareTo(otherList[i]);
             if (cmp != 0) return cmp;
         }
 
-        if (list.Count < otherList.Count) return -1;
-        if (list.Count > otherList.Count) return +1;
-        return 0;
+        return Math.Sign(list.Count - otherList.Count);
     }
 
     public override bool IsEmpty() => list.Count <= 0;

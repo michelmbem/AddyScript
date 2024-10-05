@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+
 using AddyScript.Runtime.OOP;
 
 
@@ -188,7 +191,7 @@ public class DataItemBinder : Binder
     private static int Mismatch(DataItem v, Type t)
     {
         return v is Resource resource
-             ? Mismatch(resource.NativeType, t)
+             ? Mismatch(resource.AsNativeObject.GetType(), t)
              : Mismatch(v.Class, t);
     }
 
@@ -256,7 +259,7 @@ public class DataItemBinder : Binder
                     TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
                     TypeCode.UInt64 or TypeCode.Single or TypeCode.Double or TypeCode.Decimal => 2,
                     TypeCode.String => 3,
-                    _ => 4,
+                    _ => t == typeof(BigInteger) ? 1 : 4,
                 };
             case ClassID.Date:
                 return Type.GetTypeCode(t) switch
@@ -273,56 +276,39 @@ public class DataItemBinder : Binder
                     TypeCode.UInt64 or TypeCode.Single or TypeCode.Double or TypeCode.Decimal or
                     TypeCode.DateTime or TypeCode.Char => 2,
                     TypeCode.String => 0,
-                    TypeCode.Object => t.IsEnum || t == typeof(char[]) ? 2 : 4,
-                    _ => 4,
+                    _ => t.IsEnum || t == typeof(char[]) ? 2 : 4,
                 };
             case ClassID.Blob:
                 return Type.GetTypeCode(t) switch
                 {
                     TypeCode.String => 3,
-                    TypeCode.Object => t == typeof(byte[]) ? 0 : 4,
-                    _ => 4,
+                    _ => t == typeof(byte[]) ? 0 : 4,
                 };
-            case ClassID.Tuple:
+            case ClassID.Tuple or ClassID.List:
                 return Type.GetTypeCode(t) switch
                 {
-                    TypeCode.Object => t.IsAssignableTo(typeof(ITuple)) ? 0 : t.IsArray || t == typeof(IEnumerable) ? 1 : 4,
                     TypeCode.String => 3,
-                    _ => 4,
+                    _ => t.IsArray || t.IsAssignableTo(typeof(IList)) || t.IsAssignableTo(typeof(ITuple)) ? 1
+                       : t.IsAssignableTo(typeof(IEnumerable)) ? 2 : 4,
                 };
-            case ClassID.List:
-                switch (Type.GetTypeCode(t))
+            case ClassID.Set:
+                return Type.GetTypeCode(t) switch
                 {
-                    case TypeCode.Object:
-                        if (t.IsArray || t == typeof(IList) || t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
-                        return 4;
-                    case TypeCode.String:
-                        return 3;
-                    default:
-                        return 4;
-                }
-            case ClassID.Set or ClassID.Queue or ClassID.Stack:
-                switch (Type.GetTypeCode(t))
+                    TypeCode.String => 3,
+                    _ => t.IsArray || t.IsAssignableTo(typeof(ISet<>)) ? 1 : t.IsAssignableTo(typeof(IEnumerable)) ? 2 : 4,
+                };
+            case ClassID.Queue or ClassID.Stack:
+                return Type.GetTypeCode(t) switch
                 {
-                    case TypeCode.Object:
-                        if (t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
-                        return 4;
-                    case TypeCode.String:
-                        return 3;
-                    default:
-                        return 4;
-                }
+                    TypeCode.String => 3,
+                    _ => t.IsArray || t.IsAssignableTo(typeof(ICollection)) ? 1 : t.IsAssignableTo(typeof(IEnumerable)) ? 2 : 4,
+                };
             case ClassID.Map:
-                switch (Type.GetTypeCode(t))
+                return Type.GetTypeCode(t) switch
                 {
-                    case TypeCode.Object:
-                        if (t == typeof(IDictionary) || t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
-                        return 4;
-                    case TypeCode.String:
-                        return 3;
-                    default:
-                        return 4;
-                }
+                    TypeCode.String => 3,
+                    _ => t.IsAssignableTo(typeof(IDictionary)) ? 1 : t.IsAssignableTo(typeof(IEnumerable)) ? 2 : 4,
+                };
             case ClassID.Object or ClassID.Resource:
                 return Type.GetTypeCode(t) switch
                 {
@@ -419,9 +405,8 @@ public class DataItemBinder : Binder
             },
             TypeCode.Object => Type.GetTypeCode(t2) switch
             {
-                TypeCode.Object => t1.IsAssignableTo(t2) ? 1 : 4,
                 TypeCode.String => 3,
-                _ => 4,
+                _ => t1.IsAssignableTo(t2) ? 1 : 4,
             },
             _ => 4,
         };

@@ -63,22 +63,28 @@ public sealed class Tuple(DataItem[] items) : DataItem
         return true;
     }
 
-    public override int GetHashCode() => items.GetHashCode();
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        
+        foreach (DataItem item in items)
+            hashCode.Add(item);
+
+        return hashCode.ToHashCode();
+    }
 
     protected override int UnsafeCompareTo(DataItem other)
     {
-        var otherItems = other.AsArray;
-        int l = Math.Min(items.Length, otherItems.Length);
+        DataItem[] otherItems = other.AsArray;
+        int minLength = Math.Min(items.Length, otherItems.Length);
 
-        for (int i = 0; i < l; ++i)
+        for (int i = 0; i < minLength; ++i)
         {
             int cmp = items[i].CompareTo(otherItems[i]);
             if (cmp != 0) return cmp;
         }
 
-        if (items.Length < otherItems.Length) return -1;
-        if (items.Length > otherItems.Length) return +1;
-        return 0;
+        return Math.Sign(items.Length - otherItems.Length);
     }
 
     public override bool ConversionNeeded(Class targetClass, BinaryOperator _operator) => _operator switch

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 
 using AddyScript.Properties;
 using AddyScript.Runtime.OOP;
@@ -14,8 +13,6 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Resource(object handle) : DataItem
 {
-    public Type NativeType => handle.GetType();
-
     public override Class Class => Class.Resource;
 
     public override object AsNativeObject => handle;
@@ -57,39 +54,22 @@ public sealed class Resource(object handle) : DataItem
 
     public override object ConvertTo(Type targetType)
     {
-        return NativeType == targetType || NativeType.IsSubclassOf(targetType)
+        return handle.GetType().IsAssignableTo(targetType)
              ? handle
              : handle is IConvertible convertible
-             ? convertible.ToType(targetType, CultureInfo.InvariantCulture)
+             ? convertible.ToType(targetType, CultureInfo.CurrentUICulture)
              : base.ConvertTo(targetType);
     }
 
     public override DataItem GetProperty(string propertyName)
-        => Reflector.GetValue(NativeType, propertyName, handle);
+        => Reflector.GetValue(handle.GetType(), propertyName, handle);
 
     public override void SetProperty(string propertyName, DataItem value)
-        => Reflector.SetValue(NativeType, propertyName, handle, value);
+        => Reflector.SetValue(handle.GetType(), propertyName, handle, value);
 
-    public override DataItem GetItem(DataItem index)
-    {
-        const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
+    public override DataItem GetItem(DataItem index) => Reflector.GetItem(handle, index);
 
-        object obj = NativeType.IsCOMObject
-                   ? NativeType.InvokeMember("Item", flags, null, handle, [index.AsNativeObject])
-                   : NativeType.InvokeMember("get_Item", flags, new DataItemBinder(), handle, [index]);
-
-        return DataItemFactory.CreateDataItem(obj);
-    }
-
-    public override void SetItem(DataItem index, DataItem value)
-    {
-        const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
-
-        if (NativeType.IsCOMObject)
-            NativeType.InvokeMember("Item", flags, null, handle, [index.AsNativeObject, value.AsNativeObject]);
-        else
-            NativeType.InvokeMember("set_Item", flags, new DataItemBinder(), handle, [index, value]);
-    }
+    public override void SetItem(DataItem index, DataItem value) => Reflector.SetItem(handle, index, value);
 
     public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
     {
@@ -110,6 +90,6 @@ public sealed class Resource(object handle) : DataItem
                     DataItemFactory.CreateDataItem(item));
         }
         else
-            throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, NativeType.FullName));
+            throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, handle.GetType().FullName));
     }
 }

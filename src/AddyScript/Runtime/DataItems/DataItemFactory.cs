@@ -38,16 +38,18 @@ public static class DataItemFactory
                 Rational32 rational => new Rational(rational),
                 Complex64 complex => new Complex(complex),
                 byte[] bytes => new Blob(bytes),
-                char[] chars => new String(new string(chars)),
+                DataItem[] items => new Tuple(items),
                 List<DataItem> list => new List(list),
                 HashSet<DataItem> set => new Set(set),
                 Queue<DataItem> queue => new Queue(queue),
                 Stack<DataItem> stack => new Stack(stack),
                 Dictionary<DataItem, DataItem> dict => new Map(dict),
+                Dictionary<string, DataItem> fields => new Object(Class.Object, fields),
                 (Class klass, Dictionary<string, DataItem> fields) => new Object(klass, fields),
                 Function function => new Closure(function),
-                Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)),
+                char[] chars => new String(new string(chars)),
                 ITuple tuple => new Tuple(GetItems(tuple)),
+                Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)),
                 _ => new Resource(value),
             },
         };
@@ -56,8 +58,10 @@ public static class DataItemFactory
     private static DataItem[] GetItems(ITuple tuple)
     {
         var items = new DataItem[tuple.Length];
+
         for (int i = 0; i < tuple.Length; ++i)
             items[i] = CreateDataItem(tuple[i]);
+        
         return items;
     }
 }

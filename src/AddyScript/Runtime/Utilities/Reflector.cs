@@ -76,6 +76,31 @@ public static class Reflector
         }
     }
 
+    public static DataItem GetItem(object target, DataItem index)
+    {
+        const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
+
+        Type targetType = target.GetType();
+
+        object obj = targetType.IsCOMObject
+                   ? targetType.InvokeMember("Item", flags, null, target, [index.AsNativeObject])
+                   : targetType.InvokeMember("get_Item", flags, new DataItemBinder(), target, [index]);
+
+        return DataItemFactory.CreateDataItem(obj);
+    }
+
+    public static void SetItem(object target, DataItem index, DataItem value)
+    {
+        const BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
+
+        Type targetType = target.GetType();
+
+        if (targetType.IsCOMObject)
+            targetType.InvokeMember("Item", flags, null, target, [index.AsNativeObject, value.AsNativeObject]);
+        else
+            targetType.InvokeMember("set_Item", flags, new DataItemBinder(), target, [index, value]);
+    }
+
     private static MemberInfo GetValueMember(Type type, string memberName)
     {
         const MemberTypes types = MemberTypes.Field | MemberTypes.Property;
