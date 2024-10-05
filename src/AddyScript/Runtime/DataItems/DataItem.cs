@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Complex64 = System.Numerics.Complex;
@@ -12,6 +11,7 @@ using AddyScript.Properties;
 using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -189,7 +189,7 @@ public abstract class DataItem
             _ => targetType switch
             {
                 Type t when t == typeof(byte[]) => AsByteArray,
-                Type t when t.IsAssignableTo(typeof(ITuple)) => ToTuple(t, AsArray),
+                Type t when t.IsAssignableTo(typeof(ITuple)) => Reflector.CreateInstance(t, AsArray),
                 _ => AsNativeObject,
             },
         };
@@ -223,11 +223,4 @@ public abstract class DataItem
 
     public virtual IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
         => throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
-
-    protected static object ToTuple(Type tupleType, DataItem[] items)
-    {
-        Type[] itemTypes = items.Select(_ => typeof(DataItem)).ToArray();
-        Type constructedTupleType = tupleType.MakeGenericType(itemTypes);
-        return Activator.CreateInstance(constructedTupleType, items);
-    }
 }

@@ -966,8 +966,8 @@ public class Lexer
         {
             var start = new ScriptLocation(startOffset, startLineOffset, startLineNumber);
             Consume(1);
-            Token tmpTok = LiteralString();
-            return new Token(TokenID.LT_Blob, StringUtil.String2ByteArray((string)tmpTok.Value), start, tmpTok.End);
+            Token str = LiteralString();
+            return new Token(TokenID.LT_Blob, StringUtil.String2ByteArray(str.Value.ToString()), start, str.End);
         }
 
         return Identifier();

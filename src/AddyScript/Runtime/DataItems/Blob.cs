@@ -26,7 +26,7 @@ public sealed class Blob(byte[] buffer) : DataItem
     }
 
     public override string ToString(string format, IFormatProvider formatProvider)
-        => $"b'{Convert.ToBase64String(buffer)}'";
+        => StringUtil.ByteArray2String(buffer);
 
     protected override bool UnsafeEquals(DataItem other)
     {
@@ -56,15 +56,6 @@ public sealed class Blob(byte[] buffer) : DataItem
         if (buffer.Length < otherBuffer.Length) return -1;
         if (buffer.Length > otherBuffer.Length) return +1;
         return 0;
-    }
-
-    public override object ConvertTo(Type targetType)
-    {
-        return Type.GetTypeCode(targetType) switch
-        {
-            TypeCode.String => StringUtil.ByteArray2String(buffer),
-            _ => base.ConvertTo(targetType)
-        };
     }
 
     public override bool IsEmpty() => buffer.Length <= 0;

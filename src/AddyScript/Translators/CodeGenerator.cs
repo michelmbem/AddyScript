@@ -976,7 +976,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write(stringWrapper + EscapedString(dataItem.ToString(), false) + stringWrapper);
                 break;
             case ClassID.Blob:
-                textWriter.Write(dataItem.ToString());
+                textWriter.Write("b" + stringWrapper + EscapedString(dataItem.ToString(), false) + stringWrapper);
                 break;
         }
     }

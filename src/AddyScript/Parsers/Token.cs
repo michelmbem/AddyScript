@@ -1,7 +1,6 @@
-using System;
-
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Parsers;
@@ -147,7 +146,7 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
             TokenID.Modifier => Value.Equals(Modifier.StaticFinal)
                               ? "static final"
                               : Value.ToString().ToLower(),
-            TokenID.LT_Blob => $"b'{Convert.ToBase64String((byte[])Value)}'",
+            TokenID.LT_Blob => StringUtil.ByteArray2String((byte[])Value),
             _ => Value == null ? ToString(TokenID) : Value.ToString(),
         };
     }

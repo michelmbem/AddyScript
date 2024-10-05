@@ -1236,10 +1236,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     break;
                 case Type type:
                     {
-                        const BindingFlags flags = BindingFlags.CreateInstance | BindingFlags.OptionalParamBinding;
-                        
                         (DataItem[] args, _) = ExpandList(ctorCall.Arguments ?? []);
-                        object obj = type.InvokeMember(null, flags, new DataItemBinder(), null, args);
+                        object obj = Reflector.CreateInstance(type, args);
                         DataItem inst = DataItemFactory.CreateDataItem(obj);
 
                         if (ctorCall.PropertyInitializers != null)
@@ -2022,7 +2020,6 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         currentFrame.PutItem("EPSILON", new Constant(double.Epsilon));
         currentFrame.PutItem("PI", new Constant(Math.PI));
         currentFrame.PutItem("E", new Constant(Math.E));
-        currentFrame.PutItem("I", new Constant(Complex64.ImaginaryOne));
         currentFrame.PutItem("MINDATE", new Constant(DateTime.MinValue));
         currentFrame.PutItem("MAXDATE", new Constant(DateTime.MaxValue));
         currentFrame.PutItem("NEWLINE", new Constant(Environment.NewLine));

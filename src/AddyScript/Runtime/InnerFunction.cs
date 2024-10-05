@@ -108,7 +108,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         InnerFunction[] dateProperties = [DateGetDate, DateGetTime, DateGetTicks];
         InnerFunction[] dateFunctions = [DateAdd, DateAddTicks, DateSubtract];
         InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
-        InnerFunction[] blobFunctions = [BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo];
+        InnerFunction[] blobStaticFunctions = [BlobOf, BlobFromHexString, BlobFromBase64String];
+        InnerFunction[] blobFunctions = [BlobToHexString, BlobToBase64String, BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo];
         InnerFunction[] tupleFunctions = [TupleIndexOf, TupleLastIndexOf];
         InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
         InnerFunction[] mapProperties = [MapSize, MapKeys, MapValues];
@@ -142,7 +143,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             Class.String.RegisterMethod(function.ToInstanceMethod());
 
         Class.Blob.RegisterProperty(BlobLength.ToInstanceProperty());
-        Class.Blob.RegisterMethod(BlobOf.ToStaticMethod());
+        foreach (InnerFunction function in blobStaticFunctions)
+            Class.Blob.RegisterMethod(function.ToStaticMethod());
         foreach (InnerFunction function in blobFunctions)
             Class.Blob.RegisterMethod(function.ToInstanceMethod());
 
@@ -1062,6 +1064,26 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new Blob(new byte[arguments[0].AsInt32]);
     }
 
+    private static DataItem BlobFromHexStringLogic(DataItem[] arguments)
+    {
+        return new Blob(Convert.FromHexString(arguments[0].ToString()));
+    }
+
+    private static DataItem BlobToHexStringLogic(DataItem[] arguments)
+    {
+        return new String(Convert.ToHexString(arguments[0].AsByteArray));
+    }
+
+    private static DataItem BlobToBase64StringLogic(DataItem[] arguments)
+    {
+        return new String(Convert.ToBase64String(arguments[0].AsByteArray));
+    }
+
+    private static DataItem BlobFromBase64StringLogic(DataItem[] arguments)
+    {
+        return new Blob(Convert.FromBase64String(arguments[0].ToString()));
+    }
+
     private static DataItem BlobLengthLogic(DataItem[] arguments)
     {
         return new Integer(arguments[0].AsByteArray.Length);
@@ -1967,9 +1989,29 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public static readonly InnerFunction BlobLength = new("length", [new Parameter("self")], BlobLengthLogic);
 
     /// <summary>
-    /// Creates a blob optionally filled with the given initial value.
+    /// Creates a blob with the given number of bytes.
     /// </summary>
     public static readonly InnerFunction BlobOf = new("of", [new Parameter("length")], BlobOfLogic);
+
+    /// <summary>
+    /// Creates from the given hexadecimal string.
+    /// </summary>
+    public static readonly InnerFunction BlobFromHexString = new("fromHexString", [new Parameter("str")], BlobFromHexStringLogic);
+
+    /// <summary>
+    /// Converts a blob to a hexadecimal string.
+    /// </summary>
+    public static readonly InnerFunction BlobToHexString = new("toHexString", [new Parameter("self")], BlobToHexStringLogic);
+
+    /// <summary>
+    /// Creates from the given base 64 string.
+    /// </summary>
+    public static readonly InnerFunction BlobFromBase64String = new("fromBase64String", [new Parameter("str")], BlobFromBase64StringLogic);
+
+    /// <summary>
+    /// Converts a blob to a base 64 string.
+    /// </summary>
+    public static readonly InnerFunction BlobToBase64String = new("toBase64String", [new Parameter("self")], BlobToBase64StringLogic);
 
     /// <summary>
     /// Searches for a string in another string.
