@@ -189,25 +189,6 @@ public class XmlGenerator : ITranslator
         currentElement = previousElement;
     }
 
-    public void TranslateGroupAssignment(GroupAssignment grpAssign)
-    {
-        XmlElement tmpElement = document.CreateElement("GroupAssignment");
-        currentElement.AppendChild(tmpElement);
-
-        XmlElement previousElement = currentElement;
-
-        currentElement = document.CreateElement("LValues");
-        tmpElement.AppendChild(currentElement);
-        foreach (Expression lValue in grpAssign.LValues)
-            lValue.AcceptTranslator(this);
-
-        currentElement = previousElement;
-
-        XmlElement rValuesElement = document.CreateElement("RValues");
-        tmpElement.AppendChild(rValuesElement);
-        ProcessListItems(rValuesElement, grpAssign.RValues);
-    }
-
     public void TranslateTernaryExpression(TernaryExpression terExpr)
     {
         XmlElement tmpElement = document.CreateElement("TernaryExpression");
@@ -290,6 +271,13 @@ public class XmlGenerator : ITranslator
         currentElement = previousElement;
     }
 
+    public void TranslateTupleInitializer(TupleInitializer tupleInit)
+    {
+        XmlElement tmpElement = document.CreateElement("TupleInitializer");
+        currentElement.AppendChild(tmpElement);
+        ProcessListItems(tmpElement, tupleInit.Items);
+    }
+
     public void TranslateListInitializer(ListInitializer listInit)
     {
         XmlElement tmpElement = document.CreateElement("ListInitializer");
@@ -297,18 +285,18 @@ public class XmlGenerator : ITranslator
         ProcessListItems(tmpElement, listInit.Items);
     }
 
-    public void TranslateMapInitializer(MapInitializer mapInit)
-    {
-        XmlElement tmpElement = document.CreateElement("MapInitializer");
-        currentElement.AppendChild(tmpElement);
-        ProcessMapItemInitializers(tmpElement, mapInit.ItemInitializers);
-    }
-
     public void TranslateSetInitializer(SetInitializer setInit)
     {
         XmlElement tmpElement = document.CreateElement("SetInitializer");
         currentElement.AppendChild(tmpElement);
         ProcessListItems(tmpElement, setInit.Items);
+    }
+
+    public void TranslateMapInitializer(MapInitializer mapInit)
+    {
+        XmlElement tmpElement = document.CreateElement("MapInitializer");
+        currentElement.AppendChild(tmpElement);
+        ProcessMapItemInitializers(tmpElement, mapInit.ItemInitializers);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objectInit)

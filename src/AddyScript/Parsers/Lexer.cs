@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 
 using AddyScript.Runtime.NativeTypes;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Parsers;
@@ -55,73 +56,41 @@ public class Lexer
 
         char ch = SkipWhiteSpace();
 
-        switch (ch)
+        return ch switch
         {
-            case EOF:
-                return Token(TokenID.EndOfFile, null, true);
-            case ',':
-                return Token(TokenID.Comma, null, true);
-            case ';':
-                return Token(TokenID.SemiColon, null, true);
-            case '(':
-                return Token(TokenID.LeftParenthesis, null, true);
-            case ')':
-                return Token(TokenID.RightParenthesis, null, true);
-            case '[':
-                return Token(TokenID.LeftBracket, null, true);
-            case ']':
-                return Token(TokenID.RightBracket, null, true);
-            case '{':
-                return Token(TokenID.LeftBrace, null, true);
-            case '}':
-                return Token(TokenID.RightBrace, null, true);
-            case '~':
-                return Token(TokenID.Tilda, null, true);
-            case ':':
-                return Colon();
-            case '?':
-                return Question();
-            case '.':
-                return Dot();
-            case '=':
-                return Equal();
-            case '!':
-                return Exclamation();
-            case '<':
-                return Lt();
-            case '>':
-                return Gt();
-            case '+':
-                return Plus();
-            case '-':
-                return Minus();
-            case '*':
-                return Asterisk();
-            case '/':
-                return Slash();
-            case '%':
-                return Percent();
-            case '&':
-                return Ampersand();
-            case '|':
-                return Vbar();
-            case '^':
-                return Circumflex();
-            case '0':
-                return Zero();
-            case '@':
-                return Verbatim();
-            case '\'':
-            case '"':
-                return LiteralString();
-            case '$':
-                return Dollar();
-            case '`':
-                return Backtick();
-            default:
-                if (IsLegalFirstIdChar(ch)) return Identifier();
-                return char.IsDigit(ch) ? Number() : Unknown();
-        }
+            EOF => Token(TokenID.EndOfFile, null, true),
+            ',' => Token(TokenID.Comma, null, true),
+            ';' => Token(TokenID.SemiColon, null, true),
+            '(' => Token(TokenID.LeftParenthesis, null, true),
+            ')' => Token(TokenID.RightParenthesis, null, true),
+            '[' => Token(TokenID.LeftBracket, null, true),
+            ']' => Token(TokenID.RightBracket, null, true),
+            '{' => Token(TokenID.LeftBrace, null, true),
+            '}' => Token(TokenID.RightBrace, null, true),
+            '~' => Token(TokenID.Tilda, null, true),
+            ':' => Colon(),
+            '?' => Question(),
+            '.' => Dot(),
+            '=' => Equal(),
+            '!' => Exclamation(),
+            '<' => Lt(),
+            '>' => Gt(),
+            '+' => Plus(),
+            '-' => Minus(),
+            '*' => Asterisk(),
+            '/' => Slash(),
+            '%' => Percent(),
+            '&' => Ampersand(),
+            '|' => Vbar(),
+            '^' => Circumflex(),
+            '0' => Zero(),
+            '@' => Verbatim(),
+            '\'' or '"' => LiteralString(),
+            '$' => Dollar(),
+            '`' => Backtick(),
+            'b' or 'B' => LetterB(),
+            _ => IsLegalFirstIdChar(ch) ? Identifier() : char.IsDigit(ch) ? Number() : Unknown(),
+        };
     }
 
     /// <summary>
@@ -241,6 +210,9 @@ public class Lexer
                 'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                             ? Token(TokenID.LT_Float, aDouble, true)
                             : Token(TokenID.Unknown, nbrStr, true),
+                'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                            ? Token(TokenID.LT_Complex, new Complex(0, aDouble), true)
+                            : Token(TokenID.Unknown, nbrStr, true),
                 'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
                 _ => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                    ? Token(TokenID.LT_Float, aDouble, false)
@@ -252,6 +224,9 @@ public class Lexer
             'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(nbrStr), true),
             'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
                         ? Token(TokenID.LT_Float, aDouble, true)
+                        : Token(TokenID.Unknown, nbrStr, true),
+            'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                        ? Token(TokenID.LT_Complex, new Complex(0, aDouble), true)
                         : Token(TokenID.Unknown, nbrStr, true),
             'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
             _ => int.TryParse(nbrStr, NumberStyles.Integer, ci, out int anInt)
@@ -805,6 +780,8 @@ public class Lexer
                 return Token(TokenID.LT_Float, 0D, true);
             case 'd' or 'D':
                 return Token(TokenID.LT_Decimal, BigDecimal.Zero, true);
+            case 'i' or 'I':
+                return Token(TokenID.LT_Complex, Complex.Zero, true);
             case '.':
                 return char.IsDigit(Ll(2)) ? Number() : Token(TokenID.LT_Integer, 0, false);
             case 'x' or 'X':
@@ -975,6 +952,25 @@ public class Lexer
              : DateTime.TryParse(sb.ToString(), out DateTime aDateTime)
              ? Token(TokenID.LT_Date, aDateTime, true)
              : Token(TokenID.Unknown, "`" + sb + "`", true);
+    }
+
+    /// <summary>
+    /// Gets a token representing a symbol that starts with <b>b</b> or <b>B</b>.
+    /// </summary>
+    /// <returns>A banary string</returns>
+    private Token LetterB()
+    {
+        char ch = Ll(2);
+
+        if (ch == '\'' || ch == '"')
+        {
+            var start = new ScriptLocation(startOffset, startLineOffset, startLineNumber);
+            Consume(1);
+            Token tmpTok = LiteralString();
+            return new Token(TokenID.LT_Blob, StringUtil.String2ByteArray((string)tmpTok.Value), start, tmpTok.End);
+        }
+
+        return Identifier();
     }
 
     /// <summary>

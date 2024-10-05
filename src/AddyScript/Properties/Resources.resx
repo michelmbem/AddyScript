@@ -346,10 +346,10 @@
     <value>Cannot invoke abstract member {0}</value>
   </data>
   <data name="ClassHasNoProperty" xml:space="preserve">
-    <value>The {0} type has no property</value>
+    <value>Type {0} has no property named {1}</value>
   </data>
-  <data name="ClassHasNoIndexer" xml:space="preserve">
-    <value>The {0} type has no indexer</value>
+  <data name="ClassHasNoIndexReader" xml:space="preserve">
+    <value>Type {0} does not support reading element by index</value>
   </data>
   <data name="MissingAttribute" xml:space="preserve">
     <value>No '{0}' attribute is attached to the {1} external function</value>
@@ -528,5 +528,14 @@ It requires some initialization to support the expected operation.</value>
   </data>
   <data name="AbnormalListTermination" xml:space="preserve">
     <value>abnormal list termination, another item was expected</value>
+  </data>
+  <data name="TuplesAreImmutable" xml:space="preserve">
+    <value>Tuples are immutable</value>
+  </data>
+  <data name="ClassHasNoIndexWriter" xml:space="preserve">
+    <value>Type {0} does not support writing element by index</value>
+  </data>
+  <data name="CannotCreateEmptyTuple" xml:space="preserve">
+    <value>Could not create an empty tuple</value>
   </data>
 </root>

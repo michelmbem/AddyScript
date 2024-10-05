@@ -12,7 +12,7 @@ namespace AddyScript.Ast.Expressions
     /// Initializes a new instance of ParentIndexerRef
     /// </remarks>
     /// <param name="index">The expression used to evaluate the index</param>
-    public class ParentIndexerRef(Expression index) : Reference
+    public class ParentIndexerRef(Expression index) : Expression, IReference
     {
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
-        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
         {
             processor.AssignToParentItem(this, rValue);
         }

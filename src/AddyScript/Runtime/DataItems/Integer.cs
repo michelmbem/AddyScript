@@ -4,8 +4,8 @@ using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.NativeTypes;
-using AddyScript.Runtime.Utilities;
 using AddyScript.Runtime.OOP;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -66,7 +66,7 @@ public sealed class Integer(int value) : DataItem
                 BinaryOperator.Minus => new Integer(value - operand.AsInt32),
                 BinaryOperator.Times => operand.Class.ClassID switch
                 {
-                    ClassID.String or ClassID.List => operand.BinaryOperation(_operator, this),
+                    ClassID.String or ClassID.Blob or ClassID.Tuple or ClassID.List => operand.BinaryOperation(_operator, this),
                     _ => new Integer(checked(value * operand.AsInt32))
                 },
                 BinaryOperator.Divide => Rational.Simplify(new Rational32(value, operand.AsInt32)),

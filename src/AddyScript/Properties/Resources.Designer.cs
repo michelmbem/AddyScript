@@ -187,6 +187,15 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Could not create an empty tuple.
+        /// </summary>
+        internal static string CannotCreateEmptyTuple {
+            get {
+                return ResourceManager.GetString("CannotCreateEmptyTuple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Cannot create an instance of abstract or static class {0}.
         /// </summary>
         internal static string CannotCreateInstance {
@@ -277,16 +286,25 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The {0} type has no indexer.
+        ///   Recherche une chaîne localisée semblable à Type {0} does not support reading element by index.
         /// </summary>
-        internal static string ClassHasNoIndexer {
+        internal static string ClassHasNoIndexReader {
             get {
-                return ResourceManager.GetString("ClassHasNoIndexer", resourceCulture);
+                return ResourceManager.GetString("ClassHasNoIndexReader", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The {0} type has no property.
+        ///   Recherche une chaîne localisée semblable à Type {0} does not support writing element by index.
+        /// </summary>
+        internal static string ClassHasNoIndexWriter {
+            get {
+                return ResourceManager.GetString("ClassHasNoIndexWriter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type {0} has no property named {1}.
         /// </summary>
         internal static string ClassHasNoProperty {
             get {
@@ -1147,6 +1165,15 @@ namespace AddyScript.Properties {
         internal static string TRUE {
             get {
                 return ResourceManager.GetString("TRUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Tuples are immutable.
+        /// </summary>
+        internal static string TuplesAreImmutable {
+            get {
+                return ResourceManager.GetString("TuplesAreImmutable", resourceCulture);
             }
         }
         

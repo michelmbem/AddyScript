@@ -21,6 +21,8 @@ public sealed class List : DataItem
 
     public override Class Class => Class.List;
 
+    public override DataItem[] AsArray => [..list];
+
     public override List<DataItem> AsList => list;
 
     public override HashSet<DataItem> AsHashSet => new(list);
@@ -91,7 +93,7 @@ public sealed class List : DataItem
     {
         BinaryOperator.Plus => targetClass.ClassID switch
         {
-            ClassID.Set or ClassID.Queue or ClassID.Stack => false,
+            ClassID.Tuple or ClassID.Set or ClassID.Queue or ClassID.Stack => false,
             _ => base.ConversionNeeded(targetClass, _operator),
         },
         _ => base.ConversionNeeded(targetClass, _operator),

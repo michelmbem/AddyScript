@@ -18,6 +18,8 @@ public sealed class Stack : DataItem
 
     public override Class Class => Class.Stack;
 
+    public override DataItem[] AsArray => [.. stack];
+
     public override List<DataItem> AsList => new(stack);
 
     public override HashSet<DataItem> AsHashSet => new(stack);

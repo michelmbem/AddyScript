@@ -19,6 +19,8 @@ public sealed class Set : DataItem
 
     public override Class Class => Class.Set;
 
+    public override DataItem[] AsArray => [..hashSet];
+
     public override List<DataItem> AsList => new(hashSet);
 
     public override HashSet<DataItem> AsHashSet => hashSet;
@@ -66,7 +68,7 @@ public sealed class Set : DataItem
     {
         BinaryOperator.Plus => targetClass.ClassID switch
         {
-            ClassID.Queue or ClassID.Stack => false,
+            ClassID.Tuple or ClassID.List or ClassID.Queue or ClassID.Stack => false,
             _ => base.ConversionNeeded(targetClass, _operator),
         },
         _ => base.ConversionNeeded(targetClass, _operator),

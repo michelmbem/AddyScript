@@ -17,15 +17,15 @@ public interface ITranslator
     void TranslateVariableDecl(VariableDecl varDecl);
     void TranslateBlock(Block block);
     void TranslateAssignment(Assignment assignment);
-    void TranslateGroupAssignment(GroupAssignment grpAssign);
     void TranslateTernaryExpression(TernaryExpression terExpr);
     void TranslateBinaryExpression(BinaryExpression binExpr);
     void TranslateUnaryExpression(UnaryExpression unExpr);
     void TranslateLiteral(Literal literal);
     void TranslateComplexInitializer(ComplexInitializer cplxInit);
+    void TranslateTupleInitializer(TupleInitializer tupleInitializer);
     void TranslateListInitializer(ListInitializer listInit);
-    void TranslateMapInitializer(MapInitializer mapInit);
     void TranslateSetInitializer(SetInitializer setInit);
+    void TranslateMapInitializer(MapInitializer mapInit);
     void TranslateObjectInitializer(ObjectInitializer objInit);
     void TranslateInlineFunction(InlineFunction inlineFn);
     void TranslateVariableRef(VariableRef varRef);

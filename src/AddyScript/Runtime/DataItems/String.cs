@@ -7,9 +7,8 @@ using System.Text;
 using AddyScript.Ast.Expressions;
 using AddyScript.Properties;
 using AddyScript.Runtime.NativeTypes;
-using AddyScript.Runtime.Utilities;
 using AddyScript.Runtime.OOP;
-using System.Linq;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -23,14 +22,8 @@ public sealed class String(string value) : DataItem
     {
         get
         {
-            if (string.Compare(value, "false", true) == 0 ||
-                string.Compare(value, Resources.FALSE, true) == 0)
-                return false;
-
-            if (string.Compare(value, "true", true) == 0 ||
-                string.Compare(value, Resources.TRUE, true) == 0)
-                return true;
-
+            if (string.Compare(value, Resources.FALSE, true) == 0) return false;
+            if (string.Compare(value, Resources.TRUE, true) == 0) return true;
             return bool.Parse(value);
         }
     }
@@ -74,7 +67,7 @@ public sealed class String(string value) : DataItem
         }
     }
 
-    public override BigDecimal AsBigDecimal => new BigDecimal(value);
+    public override BigDecimal AsBigDecimal => new(value);
 
     public override DateTime AsDateTime
     {
@@ -88,6 +81,8 @@ public sealed class String(string value) : DataItem
             return result;
         }
     }
+
+    public override byte[] AsByteArray => StringUtil.String2ByteArray(value);
 
     public override object AsNativeObject => value;
 
@@ -126,7 +121,6 @@ public sealed class String(string value) : DataItem
         {
             Type t when t.IsEnum => Enum.Parse(targetType, value),
             Type t when t == typeof(char[]) => value.ToCharArray(),
-            Type t when t == typeof(byte[]) => StringUtil.String2ByteArray(value),
             _ => base.ConvertTo(targetType)
         };
     }

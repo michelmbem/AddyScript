@@ -346,10 +346,10 @@
     <value>Impossible d'invoquer le membre abstrait {0}</value>
   </data>
   <data name="ClassHasNoProperty" xml:space="preserve">
-    <value>Le type {0} n'a aucune propriété</value>
+    <value>Le type {0} n'a pas de propriété nommée {1}</value>
   </data>
-  <data name="ClassHasNoIndexer" xml:space="preserve">
-    <value>Le type {0} n'a aucun indexeur</value>
+  <data name="ClassHasNoIndexReader" xml:space="preserve">
+    <value>Le type {0} ne prend pas en charge la lecture d'élément par index</value>
   </data>
   <data name="MissingAttribute" xml:space="preserve">
     <value>Aucun attribut '{0}' n'est associé à la fonction externe {1}</value>
@@ -528,5 +528,14 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   </data>
   <data name="AbnormalListTermination" xml:space="preserve">
     <value>Fin de liste anormale, un élément de plus était attendu</value>
+  </data>
+  <data name="TuplesAreImmutable" xml:space="preserve">
+    <value>Les tuples sont immuables</value>
+  </data>
+  <data name="ClassHasNoIndexWriter" xml:space="preserve">
+    <value>Le type {0} ne prend pas en charge l'écriture d'élément par index</value>
+  </data>
+  <data name="CannotCreateEmptyTuple" xml:space="preserve">
+    <value>Impossible de créer un tuple vide</value>
   </data>
 </root>

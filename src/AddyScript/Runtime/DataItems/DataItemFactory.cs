@@ -6,7 +6,7 @@ using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
-using AddyScript.Runtime.Utilities;
+using System.Runtime.CompilerServices;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -37,6 +37,8 @@ public static class DataItemFactory
                 BigDecimal bigdec => new Decimal(bigdec),
                 Rational32 rational => new Rational(rational),
                 Complex64 complex => new Complex(complex),
+                byte[] bytes => new Blob(bytes),
+                char[] chars => new String(new string(chars)),
                 List<DataItem> list => new List(list),
                 HashSet<DataItem> set => new Set(set),
                 Queue<DataItem> queue => new Queue(queue),
@@ -44,11 +46,18 @@ public static class DataItemFactory
                 Dictionary<DataItem, DataItem> dict => new Map(dict),
                 (Class klass, Dictionary<string, DataItem> fields) => new Object(klass, fields),
                 Function function => new Closure(function),
-                char[] chars => new String(new string(chars)),
-                byte[] bytes => new String(StringUtil.ByteArray2String(bytes)),
                 Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)),
+                ITuple tuple => new Tuple(GetItems(tuple)),
                 _ => new Resource(value),
             },
         };
+    }
+
+    private static DataItem[] GetItems(ITuple tuple)
+    {
+        var items = new DataItem[tuple.Length];
+        for (int i = 0; i < tuple.Length; ++i)
+            items[i] = CreateDataItem(tuple[i]);
+        return items;
     }
 }

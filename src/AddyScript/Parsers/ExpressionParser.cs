@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Text;
+using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Properties;
@@ -11,7 +12,9 @@ using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
+using Complex = AddyScript.Runtime.DataItems.Complex;
 using String = AddyScript.Runtime.DataItems.String;
+using Blob = AddyScript.Runtime.DataItems.Blob;
 
 
 namespace AddyScript.Parsers;
@@ -431,8 +434,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             TokenID.LT_Integer => Literal(new Integer((int)token.Value)),
             TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
             TokenID.LT_Float => Literal(new Float((double)token.Value)),
+            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
             TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
             TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
+            TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
             TokenID.LT_String => Literal(new String((string)token.Value)),
             TokenID.KW_This => SelfReference(),
             TokenID.KW_Super => AtomStartingWithSuper(),
@@ -668,7 +673,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes expressions that start with an opening parenthesis.
     /// </summary>
     /// <returns>
-    /// A <see cref="Conversion"/>, a <see cref="ComplexInitializer"/>
+    /// A <see cref="Conversion"/>, a <see cref="TupleInitializer"/>
     /// or simply a parenthesized <see cref="Ast.Expressions.Expression"/>
     /// </returns>
     protected Expression AtomStartingWithLParen()
@@ -688,29 +693,34 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             return conversion;
         }
 
-        // Other cases: parenthesized expressions and complex initializers
-        var expr = RequiredExpression();
+        // Other cases: parenthesized expressions and tuple initializers
+        List<ListItem> listItems = [];
+        ListItem item = ListItem();
+        bool isTuple = false;
 
-        SkipComments();
-        Token last = token;
-
-        switch (last.TokenID)
+        while (item != null)
         {
-            case TokenID.Comma:
-                Consume(1);
-                expr = new ComplexInitializer(expr, RequiredExpression());
-                last = Match(TokenID.RightParenthesis);
-                break;
-            case TokenID.RightParenthesis:
-                Consume(1);
-                expr.IsParenthesized = true;
-                break;
-            default:
-                throw new ParseException(FileName, last, Resources.MissingClosingParen);
+            listItems.Add(item);
+            if (!TryMatch(TokenID.Comma)) break;
+            Consume(1);
+            item = ListItem();
+            isTuple = true;
+        }
+
+        Token last = Match(TokenID.RightParenthesis);
+
+        if (listItems.Count <= 0) throw new ParseException(FileName, last);
+
+        Expression expr;
+        if (isTuple || listItems[0].Spread)
+            expr = new TupleInitializer([.. listItems]);
+        else
+        {
+            expr = listItems[0].Expression;
+            expr.IsParenthesized = true;
         }
 
         expr.SetLocation(first.Start, last.End);
-
         return expr;
     }
 

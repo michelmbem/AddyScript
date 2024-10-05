@@ -12,7 +12,7 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="owner">The collection to which this item belongs</param>
     /// <param name="index">The expression used to evaluate the index</param>
-    public class ItemRef(Expression owner, Expression index) : Reference
+    public class ItemRef(Expression owner, Expression index) : Expression, IReference
     {
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
-        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
         {
             processor.AssignToItem(this, rValue);
         }

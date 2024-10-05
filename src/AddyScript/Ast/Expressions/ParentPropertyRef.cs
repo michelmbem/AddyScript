@@ -12,7 +12,7 @@ namespace AddyScript.Ast.Expressions
     /// Initializes a new instance of ParentPropertyRef
     /// </remarks>
     /// <param name="propertyName">The property's name</param>
-    public class ParentPropertyRef(string propertyName) : Reference
+    public class ParentPropertyRef(string propertyName) : Expression, IReference
     {
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace AddyScript.Ast.Expressions
 
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
-        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
         {
             processor.AssignToParentProperty(this, rValue);
         }

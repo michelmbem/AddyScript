@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -50,11 +52,14 @@ public abstract class DataItem
     public virtual DateTime AsDateTime
         => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Date.Name));
 
+    public virtual byte[] AsByteArray
+        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Blob.Name));
+
+    public virtual DataItem[] AsArray
+        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Tuple.Name));
+
     public virtual List<DataItem> AsList
         => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.List.Name));
-
-    public virtual Dictionary<DataItem, DataItem> AsDictionary
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Map.Name));
 
     public virtual HashSet<DataItem> AsHashSet
         => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Set.Name));
@@ -64,6 +69,9 @@ public abstract class DataItem
 
     public virtual Stack<DataItem> AsStack
         => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Stack.Name));
+
+    public virtual Dictionary<DataItem, DataItem> AsDictionary
+        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Map.Name));
 
     public virtual Dictionary<string, DataItem> AsDynamicObject
         => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Object.Name));
@@ -122,7 +130,8 @@ public abstract class DataItem
     {
         BinaryOperator.Identical or BinaryOperator.NotIdentical or BinaryOperator.Contains or
         BinaryOperator.StartsWith or BinaryOperator.EndsWith or BinaryOperator.Matches => false,
-        BinaryOperator.Plus => targetClass == Class.String,
+        BinaryOperator.Plus => (Class.ClassID < targetClass.ClassID && targetClass.ClassID < ClassID.Date) ||
+                               (targetClass == Class.String),
         _ => Class.ClassID < targetClass.ClassID && targetClass.ClassID < ClassID.Date
     };
 
@@ -141,11 +150,13 @@ public abstract class DataItem
             ClassID.Complex => new Complex(AsComplex64),
             ClassID.Date => new Date(AsDateTime),
             ClassID.String => new String(ToString()),
+            ClassID.Blob => new Blob(AsByteArray),
+            ClassID.Tuple => new Tuple(AsArray),
             ClassID.List => new List(AsList),
-            ClassID.Map => new Map(AsDictionary),
             ClassID.Set => new Set(AsHashSet),
             ClassID.Queue => new Queue(AsQueue),
             ClassID.Stack => new Stack(AsStack),
+            ClassID.Map => new Map(AsDictionary),
             ClassID.Object => new Object(AsDynamicObject),
             ClassID.Resource => new Resource(AsNativeObject),
             ClassID.Closure => new Closure(AsFunction),
@@ -153,26 +164,36 @@ public abstract class DataItem
         };
     }
 
-    public virtual object ConvertTo(Type targetType) => Type.GetTypeCode(targetType) switch
+    public virtual object ConvertTo(Type targetType)
     {
-        TypeCode.Boolean => AsBoolean,
-        TypeCode.SByte => (sbyte)AsInt32,
-        TypeCode.Byte => (byte)AsInt32,
-        TypeCode.Int16 => (short)AsInt32,
-        TypeCode.UInt16 => (ushort)AsInt32,
-        TypeCode.Int32 => AsInt32,
-        TypeCode.UInt32 => (uint)AsBigInteger,
-        TypeCode.Int64 => (long)AsBigInteger,
-        TypeCode.UInt64 => (ulong)AsBigInteger,
-        TypeCode.Single => (float)AsDouble,
-        TypeCode.Double => AsDouble,
-        TypeCode.Decimal => (decimal)AsBigDecimal,
-        TypeCode.DateTime => AsDateTime,
-        TypeCode.Char => (ToString() + char.MinValue)[0],
-        TypeCode.String => ToString(),
-        TypeCode.Object => targetType == typeof(DataItem) ? this : AsNativeObject,
-        _ => AsNativeObject,
-    };
+        if (targetType == GetType() || targetType == typeof(DataItem))
+            return this;
+
+        return Type.GetTypeCode(targetType) switch
+        {
+            TypeCode.Boolean => AsBoolean,
+            TypeCode.SByte => (sbyte)AsInt32,
+            TypeCode.Byte => (byte)AsInt32,
+            TypeCode.Int16 => (short)AsInt32,
+            TypeCode.UInt16 => (ushort)AsInt32,
+            TypeCode.Int32 => AsInt32,
+            TypeCode.UInt32 => (uint)AsBigInteger,
+            TypeCode.Int64 => (long)AsBigInteger,
+            TypeCode.UInt64 => (ulong)AsBigInteger,
+            TypeCode.Single => (float)AsDouble,
+            TypeCode.Double => AsDouble,
+            TypeCode.Decimal => (decimal)AsBigDecimal,
+            TypeCode.DateTime => AsDateTime,
+            TypeCode.Char => (ToString() + char.MinValue)[0],
+            TypeCode.String => ToString(),
+            _ => targetType switch
+            {
+                Type t when t == typeof(byte[]) => AsByteArray,
+                Type t when t.IsAssignableTo(typeof(ITuple)) => ToTuple(t, AsArray),
+                _ => AsNativeObject,
+            },
+        };
+    }
 
     public virtual DataItem UnaryOperation(UnaryOperator _operator)
         => throw new InvalidOperationException(string.Format(Resources.OperatorCantBeApplied,
@@ -189,17 +210,24 @@ public abstract class DataItem
     };
 
     public virtual DataItem GetProperty(string propertyName)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name));
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
 
     public virtual void SetProperty(string propertyName, DataItem value)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name));
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
 
     public virtual DataItem GetItem(DataItem index)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexer, Class.Name));
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexReader, Class.Name));
 
     public virtual void SetItem(DataItem index, DataItem value)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexer, Class.Name));
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexWriter, Class.Name));
 
     public virtual IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
         => throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
+
+    protected static object ToTuple(Type tupleType, DataItem[] items)
+    {
+        Type[] itemTypes = items.Select(_ => typeof(DataItem)).ToArray();
+        Type constructedTupleType = tupleType.MakeGenericType(itemTypes);
+        return Activator.CreateInstance(constructedTupleType, items);
+    }
 }

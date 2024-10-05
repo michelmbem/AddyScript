@@ -12,7 +12,7 @@ namespace AddyScript.Ast.Expressions
     /// </remarks>
     /// <param name="owner">The object to which the property belongs</param>
     /// <param name="propertyName">The property's name</param>
-    public class PropertyRef(Expression owner, string propertyName) : Reference
+    public class PropertyRef(Expression owner, string propertyName) : Expression, IReference
     {
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
-        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
         {
             processor.AssignToProperty(this, rValue);
         }

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Globalization;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 using AddyScript.Runtime.OOP;
 
 
@@ -273,27 +273,28 @@ public class DataItemBinder : Binder
                     TypeCode.UInt64 or TypeCode.Single or TypeCode.Double or TypeCode.Decimal or
                     TypeCode.DateTime or TypeCode.Char => 2,
                     TypeCode.String => 0,
-                    TypeCode.Object => t.IsEnum || t == typeof(char[]) || t == typeof(byte[]) ? 2 : 4,
+                    TypeCode.Object => t.IsEnum || t == typeof(char[]) ? 2 : 4,
+                    _ => 4,
+                };
+            case ClassID.Blob:
+                return Type.GetTypeCode(t) switch
+                {
+                    TypeCode.String => 3,
+                    TypeCode.Object => t == typeof(byte[]) ? 0 : 4,
+                    _ => 4,
+                };
+            case ClassID.Tuple:
+                return Type.GetTypeCode(t) switch
+                {
+                    TypeCode.Object => t.IsAssignableTo(typeof(ITuple)) ? 0 : t.IsArray || t == typeof(IEnumerable) ? 1 : 4,
+                    TypeCode.String => 3,
                     _ => 4,
                 };
             case ClassID.List:
                 switch (Type.GetTypeCode(t))
                 {
                     case TypeCode.Object:
-                        if (t.IsArray || t == typeof(IList) || t == typeof(ICollection) ||
-                            t == typeof(IEnumerable)) return 1;
-                        return 4;
-                    case TypeCode.String:
-                        return 3;
-                    default:
-                        return 4;
-                }
-            case ClassID.Map:
-                switch (Type.GetTypeCode(t))
-                {
-                    case TypeCode.Object:
-                        if (t == typeof(IDictionary) || t == typeof(ICollection) ||
-                            t == typeof(IEnumerable)) return 1;
+                        if (t.IsArray || t == typeof(IList) || t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
                         return 4;
                     case TypeCode.String:
                         return 3;
@@ -305,6 +306,17 @@ public class DataItemBinder : Binder
                 {
                     case TypeCode.Object:
                         if (t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
+                        return 4;
+                    case TypeCode.String:
+                        return 3;
+                    default:
+                        return 4;
+                }
+            case ClassID.Map:
+                switch (Type.GetTypeCode(t))
+                {
+                    case TypeCode.Object:
+                        if (t == typeof(IDictionary) || t == typeof(ICollection) || t == typeof(IEnumerable)) return 1;
                         return 4;
                     case TypeCode.String:
                         return 3;
@@ -341,93 +353,78 @@ public class DataItemBinder : Binder
     {
         if (t1 == t2) return 0;
 
-        switch (Type.GetTypeCode(t1))
+        return Type.GetTypeCode(t1) switch
         {
-            case TypeCode.Empty:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Empty => 0,
-                    TypeCode.Object or TypeCode.String or TypeCode.DBNull => 1,
-                    _ => 4,
-                };
-            case TypeCode.DBNull:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.DBNull => 0,
-                    _ => 1,
-                };
-            case TypeCode.Boolean:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Boolean => 0,
-                    TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or TypeCode.UInt16 or
-                    TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or TypeCode.UInt64 or
-                    TypeCode.Single or TypeCode.Double or TypeCode.Decimal => 1,
-                    TypeCode.String => 3,
-                    _ => 4,
-                };
-            case TypeCode.Int32:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
-                    TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.Single => 2,
-                    TypeCode.Int32 => 0,
-                    TypeCode.Int64 or TypeCode.UInt64 or TypeCode.Double or TypeCode.Decimal => 1,
-                    TypeCode.String => 3,
-                    _ => 4,
-                };
-            case TypeCode.Double:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
-                    TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
-                    TypeCode.UInt64 or TypeCode.Single or TypeCode.Decimal => 2,
-                    TypeCode.Double => 0,
-                    TypeCode.String => 3,
-                    _ => 4,
-                };
-            case TypeCode.Decimal:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
-                    TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
-                    TypeCode.UInt64 or TypeCode.Single or TypeCode.Double => 2,
-                    TypeCode.Decimal => 0,
-                    TypeCode.String => 3,
-                    _ => 4,
-                };
-            case TypeCode.DateTime:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.DateTime => 0,
-                    TypeCode.String => 3,
-                    _ => 4,
-                };
-            case TypeCode.String:
-                return Type.GetTypeCode(t2) switch
-                {
-                    TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
-                    TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
-                    TypeCode.UInt64 or TypeCode.Single or TypeCode.Double or TypeCode.Decimal or
-                    TypeCode.DateTime => 2,
-                    TypeCode.String => 0,
-                    _ => 4,
-                };
-            case TypeCode.Object:
-                switch (Type.GetTypeCode(t2))
-                {
-                    case TypeCode.Object:
-                        if (t1.IsSubclassOf(t2) ||
-                           (t2.IsInterface && Array.IndexOf(t1.GetInterfaces(), t2) >= 0)) return 1;
-                        return 4;
-                    case TypeCode.String:
-                        return 3;
-                    default:
-                        return 4;
-                }
-            default:
-                return 4;
-        }
+            TypeCode.Empty => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Empty => 0,
+                TypeCode.Object or TypeCode.String or TypeCode.DBNull => 1,
+                _ => 4,
+            },
+            TypeCode.DBNull => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.DBNull => 0,
+                _ => 1,
+            },
+            TypeCode.Boolean => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Boolean => 0,
+                TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or TypeCode.UInt16 or
+                TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or TypeCode.UInt64 or
+                TypeCode.Single or TypeCode.Double or TypeCode.Decimal => 1,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            TypeCode.Int32 => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
+                TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.Single => 2,
+                TypeCode.Int32 => 0,
+                TypeCode.Int64 or TypeCode.UInt64 or TypeCode.Double or TypeCode.Decimal => 1,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            TypeCode.Double => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
+                TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
+                TypeCode.UInt64 or TypeCode.Single or TypeCode.Decimal => 2,
+                TypeCode.Double => 0,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            TypeCode.Decimal => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
+                TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
+                TypeCode.UInt64 or TypeCode.Single or TypeCode.Double => 2,
+                TypeCode.Decimal => 0,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            TypeCode.DateTime => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.DateTime => 0,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            TypeCode.String => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Boolean or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or
+                TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or
+                TypeCode.UInt64 or TypeCode.Single or TypeCode.Double or TypeCode.Decimal or
+                TypeCode.DateTime => 2,
+                TypeCode.String => 0,
+                _ => 4,
+            },
+            TypeCode.Object => Type.GetTypeCode(t2) switch
+            {
+                TypeCode.Object => t1.IsAssignableTo(t2) ? 1 : 4,
+                TypeCode.String => 3,
+                _ => 4,
+            },
+            _ => 4,
+        };
     }
 
     #endregion

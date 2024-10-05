@@ -1,3 +1,5 @@
+using System;
+
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
 
@@ -32,7 +34,7 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     /// <summary>
     /// Gets if a token represent a literal number.
     /// </summary>
-    public bool IsNumeric => TokenID.LT_Integer <= TokenID && TokenID <= TokenID.LT_Decimal;
+    public bool IsNumeric => TokenID.LT_Integer <= TokenID && TokenID <= TokenID.LT_Complex;
 
     /// <summary>
     /// Gets if a token represent a literal string.
@@ -42,7 +44,7 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     /// <summary>
     /// Gets if a token represent a literal value.
     /// </summary>
-    public bool IsLiteral => TokenID.LT_Null <= TokenID && TokenID <= TokenID.LT_String;
+    public bool IsLiteral => TokenID.LT_Null <= TokenID && TokenID <= TokenID.LT_Blob;
 
     /// <summary>
     /// Gets if a token represent a keyword.
@@ -131,8 +133,8 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
             TokenID.DoubleGreaterThanEqual => ">>=",
             TokenID.Identifier or TokenID.MutableString or TokenID.TypeName or TokenID.Scope or
             TokenID.Modifier or TokenID.LineComment or TokenID.BlockComment or TokenID.EndOfFile => "[" + tokenID + "]",
-            TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
-            TokenID.LT_Decimal or TokenID.LT_String or TokenID.LT_Date => "[" + tokenID.ToString()[3..] + "]",
+            TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or TokenID.LT_Decimal or
+            TokenID.LT_Complex or TokenID.LT_String or TokenID.LT_Blob or TokenID.LT_Date => "[" + tokenID.ToString()[3..] + "]",
             _ => tokenID.ToString()[3..].ToLower(),
         };
     }
@@ -145,6 +147,7 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
             TokenID.Modifier => Value.Equals(Modifier.StaticFinal)
                               ? "static final"
                               : Value.ToString().ToLower(),
+            TokenID.LT_Blob => $"b'{Convert.ToBase64String((byte[])Value)}'",
             _ => Value == null ? ToString(TokenID) : Value.ToString(),
         };
     }

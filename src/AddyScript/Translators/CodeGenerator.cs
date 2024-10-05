@@ -20,26 +20,18 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 {
     #region Keywords
 
-    private static readonly string[] typeNames = {
-                                                     "bool", "closure", "complex", "date", "decimal",
-                                                     "float", "int", "list", "long", "map", "object", "queue",
-                                                     "rational", "resource", "set", "stack", "string", "void"
-                                                 };
+    private static readonly string[] typeNames = [
+        "blob", "bool", "closure", "complex", "date", "decimal", "float", "int", "list", "long",
+        "map", "object", "queue", "rational", "resource", "set", "stack", "string", "tuple", "void"
+    ];
 
-    private static readonly string[] keywords = {
-                                                    "abstract", "break", "case", "catch",
-                                                    "class", "const", "constructor",
-                                                    "contains", "continue", "default",
-                                                    "do", "else", "endswith", "extern", "event",
-                                                    "false", "final", "finally", "for",
-                                                    "foreach", "function", "goto", "if",
-                                                    "import", "in", "is", "local", "matches",
-                                                    "new", "null", "params", "private", "property",
-                                                    "protected", "public", "ref", "return",
-                                                    "startswith", "static", "super", "switch",
-                                                    "this", "throw", "true", "try", "typeof",
-                                                    "using", "while"
-                                                };
+    private static readonly string[] keywords = [
+        "abstract", "break", "case", "catch", "class", "const", "constructor", "contains", "continue", "default",
+        "do", "else", "endswith", "extern", "event", "false", "final", "finally", "for", "foreach", "function",
+        "goto", "if", "import", "in", "is", "local", "matches", "new", "null", "private", "property", "protected",
+        "public", "return", "startswith", "static", "super", "switch", "this", "throw", "true", "try", "typeof",
+        "using", "yield", "while"
+    ];
 
     #endregion
 
@@ -226,14 +218,6 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         MayBeParenthesize(assignment.RightOperand);
     }
 
-    public void TranslateGroupAssignment(GroupAssignment grpAssign)
-    {
-        DumpExpressionsList(grpAssign.LValues);
-        textWriter.Write(" = ");
-        DumpList(grpAssign.RValues, "(", ")");
-        textWriter.WriteLine(';');
-    }
-
     public void TranslateTernaryExpression(TernaryExpression terExpr)
     {
         MayBeParenthesize(terExpr.Test);
@@ -281,19 +265,24 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(')');
     }
 
+    public void TranslateTupleInitializer(TupleInitializer tupleInit)
+    {
+        DumpList(tupleInit.Items, "(", ")");
+    }
+
     public void TranslateListInitializer(ListInitializer listInit)
     {
         DumpList(listInit.Items);
     }
 
-    public void TranslateMapInitializer(MapInitializer mapInit)
-    {
-        DumpMapItemInitializersList(mapInit.ItemInitializers);
-    }
-
     public void TranslateSetInitializer(SetInitializer setInit)
     {
         DumpList(setInit.Items, "{", "}");
+    }
+
+    public void TranslateMapInitializer(MapInitializer mapInit)
+    {
+        DumpMapItemInitializersList(mapInit.ItemInitializers);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
@@ -985,6 +974,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 break;
             case ClassID.String:
                 textWriter.Write(stringWrapper + EscapedString(dataItem.ToString(), false) + stringWrapper);
+                break;
+            case ClassID.Blob:
+                textWriter.Write(dataItem.ToString());
                 break;
         }
     }

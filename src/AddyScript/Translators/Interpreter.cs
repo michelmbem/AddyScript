@@ -23,6 +23,7 @@ using Complex = AddyScript.Runtime.DataItems.Complex;
 using Label = AddyScript.Ast.Statements.Label;
 using Object = AddyScript.Runtime.DataItems.Object;
 using String = AddyScript.Runtime.DataItems.String;
+using Tuple = AddyScript.Runtime.DataItems.Tuple;
 using Void = AddyScript.Runtime.DataItems.Void;
 
 
@@ -563,28 +564,6 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
     }
 
-    public void TranslateGroupAssignment(GroupAssignment grpAssign)
-    {
-        try
-        {
-            DataItem[] rValues = ExpandList(grpAssign.RValues).Item1;
-
-            if (rValues.Length != grpAssign.LValues.Length)
-                throw new RuntimeException(fileName, grpAssign, Resources.ListLengthMismatch);
-
-            for (int i = 0; i < rValues.Length; ++i)
-                Assign(grpAssign.LValues[i], rValues[i]);
-        }
-        catch (ScriptException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new RuntimeException(fileName, grpAssign, ex);
-        }
-    }
-
     public void TranslateTernaryExpression(TernaryExpression terExpr)
     {
         if (IsTrue(terExpr.Test))
@@ -743,10 +722,22 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
     }
 
+    public void TranslateTupleInitializer(TupleInitializer tupleInit)
+    {
+        (var elements, _) = ExpandList(tupleInit.Items);
+        returnedValue = new Tuple([.. elements]);
+    }
+
     public void TranslateListInitializer(ListInitializer listInit)
     {
         (var elements, _) = ExpandList(listInit.Items);
         returnedValue = new List(elements);
+    }
+
+    public void TranslateSetInitializer(SetInitializer setInit)
+    {
+        (var elements, _) = ExpandList(setInit.Items);
+        returnedValue = new Set(elements);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
@@ -774,12 +765,6 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
 
         returnedValue = new Map(dict);
-    }
-
-    public void TranslateSetInitializer(SetInitializer setInit)
-    {
-        (var elements, _) = ExpandList(setInit.Items);
-        returnedValue = new Set(elements);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
@@ -926,6 +911,23 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                         while (lBound < 0) lBound += str.Length;
                         while (uBound <= 0) uBound += str.Length;
                         returnedValue = new String(str[lBound..uBound]);
+                    }
+                    break;
+                case ClassID.Blob:
+                    {
+                        byte[] bytes = owner.AsByteArray;
+                        while (lBound < 0) lBound += bytes.Length;
+                        while (uBound <= 0) uBound += bytes.Length;
+                        returnedValue = new Blob(bytes[lBound..uBound]);
+                    }
+                    break;
+                case ClassID.Tuple:
+                    {
+                        DataItem[] items = owner.AsArray;
+                        while (lBound < 0) lBound += items.Length;
+                        while (uBound <= 0) uBound += items.Length;
+                        if (lBound >= uBound) throw new ArgumentOutOfRangeException(Resources.CannotCreateEmptyTuple);
+                        returnedValue = new Tuple(items[lBound..uBound]);
                     }
                     break;
                 case ClassID.List:
@@ -1359,7 +1361,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             Class superClass = currentFrame.Context.MethodHolder.SuperClass;
             ClassProperty indexer = superClass.Indexer ??
-                throw new RuntimeException(fileName, pir, string.Format(Resources.ClassHasNoIndexer, superClass.Name));
+                throw new RuntimeException(fileName, pir, string.Format(Resources.ClassHasNoIndexReader, superClass.Name));
 
             if (indexer.Modifier == Modifier.Abstract)
                 throw new RuntimeException(fileName, pir, string.Format(Resources.CannotInvokeAbstractMember, indexer.FullName));
@@ -1934,7 +1936,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         Class superClass = currentFrame.Context.MethodHolder.SuperClass;
         ClassProperty indexer = superClass.Indexer ??
-            throw new RuntimeException(fileName, pir, string.Format(Resources.ClassHasNoIndexer, superClass.Name));
+            throw new RuntimeException(fileName, pir, string.Format(Resources.ClassHasNoIndexWriter, superClass.Name));
 
         if (indexer.Modifier == Modifier.Abstract)
             throw new RuntimeException(fileName, pir, string.Format(Resources.CannotInvokeAbstractMember, indexer.FullName));
@@ -2799,14 +2801,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             result = matchedMethod.Invoke(target, nativeArgValues);
 
             for (int i = 0; i < isParamOut.Length; ++i)
-                if (isParamOut[i] || parameters[i].ParameterType.IsArray)
-                    try
-                    {
-                        Assign(argItems[i].Expression, DataItemFactory.CreateDataItem(nativeArgValues[i]));
-                    }
-                    catch (RuntimeException)
-                    {
-                    }
+                if (isParamOut[i])
+                    Assign(argItems[i].Expression, DataItemFactory.CreateDataItem(nativeArgValues[i]));
         }
 
         returnedValue = DataItemFactory.CreateDataItem(result);
@@ -3189,7 +3185,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <exception cref="RuntimeException">lValue is not a valid memory location</exception>
     private void Assign(Expression lValue, DataItem rValue)
     {
-        if (lValue is Reference reference)
+        if (lValue is IReference reference)
             reference.AcceptAssignmentProcessor(this, rValue);
         else
             throw new RuntimeException(fileName, lValue, Resources.InvalidLValue);

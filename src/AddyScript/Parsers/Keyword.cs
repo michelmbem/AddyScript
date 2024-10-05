@@ -90,11 +90,13 @@ public class Keyword
         Register("complex", TokenID.TypeName, "complex");
         Register("date", TokenID.TypeName, "date");
         Register("string", TokenID.TypeName, "string");
+        Register("blob", TokenID.TypeName, "blob");
+        Register("tuple", TokenID.TypeName, "tuple");
         Register("list", TokenID.TypeName, "list");
-        Register("map", TokenID.TypeName, "map");
         Register("set", TokenID.TypeName, "set");
         Register("queue", TokenID.TypeName, "queue");
         Register("stack", TokenID.TypeName, "stack");
+        Register("map", TokenID.TypeName, "map");
         Register("object", TokenID.TypeName, "object");
         Register("resource", TokenID.TypeName, "resource");
         Register("closure", TokenID.TypeName, "closure");

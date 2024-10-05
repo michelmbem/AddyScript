@@ -11,7 +11,7 @@ namespace AddyScript.Ast.Expressions
     /// Initializes a new instance of VariableRef
     /// </remarks>
     /// <param name="name">The name of the referred variable</param>
-    public class VariableRef(string name) : Reference
+    public class VariableRef(string name) : Expression, IReference
     {
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
-        public override void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
         {
             processor.AssignToVariable(this, rValue);
         }

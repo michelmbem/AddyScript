@@ -18,6 +18,8 @@ public sealed class Queue : DataItem
 
     public override Class Class => Class.Queue;
 
+    public override DataItem[] AsArray => [.. queue];
+
     public override List<DataItem> AsList => new(queue);
 
     public override HashSet<DataItem> AsHashSet => new(queue);

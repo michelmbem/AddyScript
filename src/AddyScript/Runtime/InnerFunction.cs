@@ -108,13 +108,15 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         InnerFunction[] dateProperties = [DateGetDate, DateGetTime, DateGetTicks];
         InnerFunction[] dateFunctions = [DateAdd, DateAddTicks, DateSubtract];
         InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
+        InnerFunction[] blobFunctions = [BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo];
+        InnerFunction[] tupleFunctions = [TupleIndexOf, TupleLastIndexOf];
         InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
         InnerFunction[] mapProperties = [MapSize, MapKeys, MapValues];
-        InnerFunction[] mapFunctions = [MapContainsKey, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
         InnerFunction[] setFunctions = [SetAdd, SetRemove, SetClear];
         InnerFunction[] queueFunctions = [QueueEnqueue, QueuePeek, QueueDequeue, QueueClear];
         InnerFunction[] stackFunctions = [StackPush, StackPeek, StackPop, StackClear];
-        
+        InnerFunction[] mapFunctions = [MapContainsKey, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
+
         foreach (InnerFunction function in commonFunctions)
             foreach (Class cls in Class.Predefined)
                 if (cls.SuperClass == null)
@@ -139,14 +141,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         foreach (InnerFunction function in stringFunctions)
             Class.String.RegisterMethod(function.ToInstanceMethod());
 
+        Class.Blob.RegisterProperty(BlobLength.ToInstanceProperty());
+        Class.Blob.RegisterMethod(BlobOf.ToStaticMethod());
+        foreach (InnerFunction function in blobFunctions)
+            Class.Blob.RegisterMethod(function.ToInstanceMethod());
+
+        Class.Tuple.RegisterProperty(TupleSize.ToInstanceProperty());
+        foreach (InnerFunction function in tupleFunctions)
+            Class.Tuple.RegisterMethod(function.ToInstanceMethod());
+
         Class.List.RegisterProperty(ListSize.ToInstanceProperty());
         foreach (InnerFunction function in listFunctions)
             Class.List.RegisterMethod(function.ToInstanceMethod());
-
-        foreach (InnerFunction function in mapProperties)
-            Class.Map.RegisterProperty(function.ToInstanceProperty());
-        foreach (InnerFunction function in mapFunctions)
-            Class.Map.RegisterMethod(function.ToInstanceMethod());
 
         Class.Set.RegisterProperty(SetSize.ToInstanceProperty());
         foreach (InnerFunction function in setFunctions)
@@ -161,6 +167,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         Class.Stack.RegisterMethod(StackOf.ToStaticMethod());
         foreach (InnerFunction function in stackFunctions)
             Class.Stack.RegisterMethod(function.ToInstanceMethod());
+
+        foreach (InnerFunction function in mapProperties)
+            Class.Map.RegisterProperty(function.ToInstanceProperty());
+        foreach (InnerFunction function in mapFunctions)
+            Class.Map.RegisterMethod(function.ToInstanceMethod());
     }
 
     #endregion
@@ -547,7 +558,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                         {
                             var tmpString = values[k++].ToString();
                             if (tmpString.Length > item.Count)
-                                tmpString = tmpString.Substring(0, item.Count);
+                                tmpString = tmpString[..item.Count];
                             else if (tmpString.Length < item.Count)
                                 tmpString = tmpString.PadRight(item.Count, '\0');
                             bf.Write(StringUtil.String2ByteArray(tmpString));
@@ -586,16 +597,16 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             bf.Flush();
         }
 
-        return new String(StringUtil.ByteArray2String(ms.ToArray()));
+        return new Blob(ms.ToArray());
     }
 
     private static DataItem UnPackLogic(DataItem[] arguments)
     {
         CheckArgType(arguments[0], Class.String, "unpack", 1);
-        CheckArgType(arguments[1], Class.String, "unpack", 2);
+        CheckArgType(arguments[1], Class.Blob, "unpack", 2);
 
         var format = PackFormat.Parse(arguments[0].ToString());
-        var bytes = StringUtil.String2ByteArray(arguments[1].ToString());
+        var bytes = arguments[1].AsByteArray;
         var list = new List<DataItem>();
 
         var ms = new MemoryStream(bytes);
@@ -1044,6 +1055,118 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
+    #region Blob specific methods
+
+    private static DataItem BlobOfLogic(DataItem[] arguments)
+    {
+        return new Blob(new byte[arguments[0].AsInt32]);
+    }
+
+    private static DataItem BlobLengthLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsByteArray.Length);
+    }
+
+    private static DataItem BlobIndexOfLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsByteArray;
+
+        var start = arguments[2].AsInt32;
+        while (start < 0) start += self.Length;
+
+        var length = arguments[3].AsInt32;
+        if (length <= 0) length = self.Length - start;
+
+        return new Integer(Array.IndexOf(self, (byte)arguments[1].AsInt32, start, length));
+    }
+
+    private static DataItem BlobLastIndexOfLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsByteArray;
+
+        int start = arguments[2].AsInt32;
+        while (start < 0) start += self.Length;
+
+        var length = arguments[3].AsInt32;
+        if (length <= 0) length = start + 1;
+
+        return new Integer(Array.LastIndexOf(self, (byte)arguments[1].AsInt32, start, length));
+    }
+
+    private static DataItem BlobFillLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsByteArray;
+        var fillByte = (byte)arguments[1].AsInt32;
+
+        int start = arguments[2].AsInt32;
+        while (start < 0) start += self.Length;
+
+        var length = arguments[3].AsInt32;
+        if (length <= 0) length = self.Length - start;
+
+        Array.Fill(self, fillByte, start, length);
+
+        return Void.Value;
+    }
+
+    private static DataItem BlobCopyToLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsByteArray;
+
+        CheckArgType(arguments[1], Class.Blob, "copyTo", 1);
+        var other = arguments[1].AsByteArray;
+
+        int sourceIndex = arguments[2].AsInt32;
+        while (sourceIndex < 0) sourceIndex += self.Length;
+
+        int destIndex = arguments[3].AsInt32;
+        while (destIndex < 0) destIndex += other.Length;
+
+        var length = arguments[4].AsInt32;
+        if (length <= 0) length = self.Length - sourceIndex;
+
+        Array.Copy(self, sourceIndex, other, destIndex, length);
+
+        return Void.Value;
+    }
+
+    #endregion
+
+    #region Tuple specific methods
+
+    private static DataItem TupleSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsArray.Length);
+    }
+
+    private static DataItem TupleIndexOfLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsArray;
+
+        var start = arguments[2].AsInt32;
+        while (start < 0) start += self.Length;
+
+        var count = arguments[3].AsInt32;
+        if (count <= 0) count = self.Length - start;
+
+        return new Integer(Array.IndexOf(self, arguments[1], start, count));
+    }
+
+    private static DataItem TupleLastIndexOfLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsArray;
+
+        var start = arguments[2].AsInt32;
+        while (start < 0) start += self.Length;
+
+        var count = arguments[3].AsInt32;
+        if (count <= 0) count = start + 1;
+
+        return new Integer(Array.LastIndexOf(self, arguments[1], start, count));
+    }
+
+    #endregion
+
     #region List specific methods
 
     private static DataItem ListSizeLogic(DataItem[] arguments)
@@ -1235,110 +1358,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
-    #region Map specific methods
-
-    private static DataItem MapSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsDictionary.Count);
-    }
-
-    private static DataItem MapContainsKeyLogic(DataItem[] arguments)
-    {
-        bool b = arguments[0].AsDictionary.ContainsKey(arguments[1]);
-        return Boolean.FromBool(b);
-    }
-
-    private static DataItem MapContainsValueLogic(DataItem[] arguments)
-    {
-        bool b = arguments[0].AsDictionary.ContainsValue(arguments[1]);
-        return Boolean.FromBool(b);
-    }
-
-    private static DataItem MapKeysLogic(DataItem[] arguments)
-    {
-        var keySet = new HashSet<DataItem>();
-        var keys = arguments[0].AsDictionary.Keys;
-        
-        foreach (DataItem key in keys)
-            keySet.Add(key);
-        
-        return new Set(keySet);
-    }
-
-    private static DataItem MapValuesLogic(DataItem[] arguments)
-    {
-        var valueSet = new HashSet<DataItem>();
-        var values = arguments[0].AsDictionary.Values;
-        
-        foreach (DataItem value in values)
-            if (!valueSet.Contains(value))
-                valueSet.Add(value);
-
-        return new Set(valueSet);
-    }
-
-    private static DataItem MapFrequencyOfLogic(DataItem[] arguments)
-    {
-        int frequency = 0;
-        var dict = arguments[0].AsDictionary;
-
-        foreach (KeyValuePair<DataItem, DataItem> pair in dict)
-            if (pair.Value.Equals(arguments[1]))
-                ++frequency;
-
-        return new Integer(frequency);
-    }
-
-    private static DataItem MapKeysOfLogic(DataItem[] arguments)
-    {
-        var keySet = new HashSet<DataItem>();
-        var map = arguments[0].AsDictionary;
-
-        foreach (KeyValuePair<DataItem, DataItem> pair in map)
-            if (pair.Value.Equals(arguments[1]))
-                keySet.Add(pair.Key);
-
-        return new Set(keySet);
-    }
-
-    private static DataItem MapInverseLogic(DataItem[] arguments)
-    {
-        var inverse = new Dictionary<DataItem, DataItem>();
-        var map = arguments[0].AsDictionary;
-
-        foreach (KeyValuePair<DataItem, DataItem> pair in map)
-            if (!inverse.ContainsKey(pair.Value))
-                inverse.Add(pair.Value, pair.Key);
-
-        return new Map(inverse);
-    }
-
-    private static DataItem MapRemoveLogic(DataItem[] arguments)
-    {
-        bool b = arguments[0].AsDictionary.Remove(arguments[1]);
-        return Boolean.FromBool(b);
-    }
-
-    private static DataItem MapRemoveAllLogic(DataItem[] arguments)
-    {
-        var self = arguments[0].AsDictionary;
-        int removed = 0;
-        
-        foreach (DataItem key in arguments[1].AsHashSet)
-            if (self.Remove(key))
-                ++removed;
-
-        return new Integer(removed);
-    }
-
-    private static DataItem MapClearLogic(DataItem[] arguments)
-    {
-        arguments[0].AsDictionary.Clear();
-        return Void.Value;
-    }
-
-    #endregion
-
     #region Set specific methods
 
     private static DataItem SetSizeLogic(DataItem[] arguments)
@@ -1438,13 +1457,117 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
+    #region Map specific methods
+
+    private static DataItem MapSizeLogic(DataItem[] arguments)
+    {
+        return new Integer(arguments[0].AsDictionary.Count);
+    }
+
+    private static DataItem MapContainsKeyLogic(DataItem[] arguments)
+    {
+        bool b = arguments[0].AsDictionary.ContainsKey(arguments[1]);
+        return Boolean.FromBool(b);
+    }
+
+    private static DataItem MapContainsValueLogic(DataItem[] arguments)
+    {
+        bool b = arguments[0].AsDictionary.ContainsValue(arguments[1]);
+        return Boolean.FromBool(b);
+    }
+
+    private static DataItem MapKeysLogic(DataItem[] arguments)
+    {
+        var keySet = new HashSet<DataItem>();
+        var keys = arguments[0].AsDictionary.Keys;
+
+        foreach (DataItem key in keys)
+            keySet.Add(key);
+
+        return new Set(keySet);
+    }
+
+    private static DataItem MapValuesLogic(DataItem[] arguments)
+    {
+        var valueSet = new HashSet<DataItem>();
+        var values = arguments[0].AsDictionary.Values;
+
+        foreach (DataItem value in values)
+            if (!valueSet.Contains(value))
+                valueSet.Add(value);
+
+        return new Set(valueSet);
+    }
+
+    private static DataItem MapFrequencyOfLogic(DataItem[] arguments)
+    {
+        int frequency = 0;
+        var dict = arguments[0].AsDictionary;
+
+        foreach (KeyValuePair<DataItem, DataItem> pair in dict)
+            if (pair.Value.Equals(arguments[1]))
+                ++frequency;
+
+        return new Integer(frequency);
+    }
+
+    private static DataItem MapKeysOfLogic(DataItem[] arguments)
+    {
+        var keySet = new HashSet<DataItem>();
+        var map = arguments[0].AsDictionary;
+
+        foreach (KeyValuePair<DataItem, DataItem> pair in map)
+            if (pair.Value.Equals(arguments[1]))
+                keySet.Add(pair.Key);
+
+        return new Set(keySet);
+    }
+
+    private static DataItem MapInverseLogic(DataItem[] arguments)
+    {
+        var inverse = new Dictionary<DataItem, DataItem>();
+        var map = arguments[0].AsDictionary;
+
+        foreach (KeyValuePair<DataItem, DataItem> pair in map)
+            if (!inverse.ContainsKey(pair.Value))
+                inverse.Add(pair.Value, pair.Key);
+
+        return new Map(inverse);
+    }
+
+    private static DataItem MapRemoveLogic(DataItem[] arguments)
+    {
+        bool b = arguments[0].AsDictionary.Remove(arguments[1]);
+        return Boolean.FromBool(b);
+    }
+
+    private static DataItem MapRemoveAllLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsDictionary;
+        int removed = 0;
+
+        foreach (DataItem key in arguments[1].AsHashSet)
+            if (self.Remove(key))
+                ++removed;
+
+        return new Integer(removed);
+    }
+
+    private static DataItem MapClearLogic(DataItem[] arguments)
+    {
+        arguments[0].AsDictionary.Clear();
+        return Void.Value;
+    }
+
+    #endregion
+
     #endregion
 
     #region Predefined instances
 
     #region Global functions
 
-   /// <summary>
+    /// <summary>
     /// Gets a character from its Unicode rank.
     /// </summary>
     public static readonly InnerFunction Char = new ("chr", [new Parameter("ascii")], CharLogic);
@@ -1836,6 +1959,59 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
+    #region Blob specific methods
+
+    /// <summary>
+    /// Determines the length of a string.
+    /// </summary>
+    public static readonly InnerFunction BlobLength = new("length", [new Parameter("self")], BlobLengthLogic);
+
+    /// <summary>
+    /// Creates a blob optionally filled with the given initial value.
+    /// </summary>
+    public static readonly InnerFunction BlobOf = new("of", [new Parameter("length")], BlobOfLogic);
+
+    /// <summary>
+    /// Searches for a string in another string.
+    /// </summary>
+    public static readonly InnerFunction BlobIndexOf = new("indexOf", [new Parameter("self"), new Parameter("value"), new Parameter("start", new Integer(0)), new Parameter("length", new Integer(0))], BlobIndexOfLogic);
+
+    /// <summary>
+    /// Reversely searches for a string in another string.
+    /// </summary>
+    public static readonly InnerFunction BlobLastIndexOf = new("lastIndexOf", [new Parameter("self"), new Parameter("value"), new Parameter("start", new Integer(-1)), new Parameter("length", new Integer(0))], BlobLastIndexOfLogic);
+
+    /// <summary>
+    /// Fills a blob with the given value.
+    /// </summary>
+    public static readonly InnerFunction BlobFill = new("fill", [new Parameter("self"), new Parameter("fillByte"), new Parameter("start", new Integer(0)), new Parameter("length", new Integer(0))], BlobFillLogic);
+
+    /// <summary>
+    /// Copies a blob to another.
+    /// </summary>
+    public static readonly InnerFunction BlobCopyTo = new("copyTo", [new Parameter("self"), new Parameter("other"), new Parameter("srcIndex", new Integer(0)), new Parameter("destIndex", new Integer(0)), new Parameter("length", new Integer(0))], BlobCopyToLogic);
+
+    #endregion
+
+    #region Tuple specific methods
+
+    /// <summary>
+    /// Gets the number of items in a list.
+    /// </summary>
+    public static readonly InnerFunction TupleSize = new("size", [new Parameter("self")], TupleSizeLogic);
+
+    /// <summary>
+    /// Gets the first index of an item in a list.
+    /// </summary>
+    public static readonly InnerFunction TupleIndexOf = new("indexOf", [new Parameter("self"), new Parameter("value"), new Parameter("start", new Integer(0)), new Parameter("count", new Integer(0))], TupleIndexOfLogic);
+
+    /// <summary>
+    /// Gets the last index of an item in a list.
+    /// </summary>
+    public static readonly InnerFunction TupleLastIndexOf = new("lastIndexOf", [new Parameter("self"), new Parameter("value"), new Parameter("start", new Integer(-1)), new Parameter("count", new Integer(0))], TupleLastIndexOfLogic);
+
+    #endregion
+
     #region List specific methods
 
     /// <summary>
@@ -1930,65 +2106,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
-    #region Map specific methods
-
-    /// <summary>
-    /// Gets the number of key-value pairs of a map.
-    /// </summary>
-    public static readonly InnerFunction MapSize = new("size", [new Parameter("self")], MapSizeLogic);
-
-    /// <summary>
-    /// Checks if a map contains some key.
-    /// </summary>
-    public static readonly InnerFunction MapContainsKey = new ("containsKey", [new Parameter("self"), new Parameter("key")], MapContainsKeyLogic);
-
-    /// <summary>
-    /// Checks if a map contains some value.
-    /// </summary>
-    public static readonly InnerFunction MapContainsValue = new ("containsValue", [new Parameter("self"), new Parameter("value")], MapContainsValueLogic);
-
-    /// <summary>
-    /// Gets the set of keys of a map.
-    /// </summary>
-    public static readonly InnerFunction MapKeys = new ("keys", [new Parameter("self")], MapKeysLogic);
-
-    /// <summary>
-    /// Gets the set of values of a map.
-    /// </summary>
-    public static readonly InnerFunction MapValues = new ("values", [new Parameter("self")], MapValuesLogic);
-
-    /// <summary>
-    /// Gets the number of occurences of a value in a map.
-    /// </summary>
-    public static readonly InnerFunction MapFrequencyOf = new ("frequencyOf", [new Parameter("self"), new Parameter("value")], MapFrequencyOfLogic);
-
-    /// <summary>
-    /// Gets the set of distinct keys to which a value is bound in a map.
-    /// </summary>
-    public static readonly InnerFunction MapKeysOf = new ("keysOf", [new Parameter("self"), new Parameter("value")], MapKeysOfLogic);
-
-    /// <summary>
-    /// Creates a new map from the given one where key-value pairs are reversed.
-    /// </summary>
-    public static readonly InnerFunction MapInverse = new ("inverse", [new Parameter("self")], MapInverseLogic);
-
-    /// <summary>
-    /// Remove a key-value pair from a map.
-    /// </summary>
-    public static readonly InnerFunction MapRemove = new ("remove", [new Parameter("self"), new Parameter("key")], MapRemoveLogic);
-
-    /// <summary>
-    /// Remove a set of key-value pairs from a map.
-    /// </summary>
-    public static readonly InnerFunction MapRemoveAll = new ("removeAll", [new Parameter("self"), new Parameter("keys")], MapRemoveAllLogic);
-
-    /// <summary>
-    /// Empties a map.
-    /// </summary>
-    public static readonly InnerFunction MapClear = new ("clear", [new Parameter("self")], MapClearLogic);
-
-    #endregion
-
     #region Set specific methods
 
     /// <summary>
@@ -2078,6 +2195,65 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Clears the content of a set.
     /// </summary>
     public static readonly InnerFunction StackClear = new ("clear", [new Parameter("self")], StackClearLogic);
+
+    #endregion
+
+    #region Map specific methods
+
+    /// <summary>
+    /// Gets the number of key-value pairs of a map.
+    /// </summary>
+    public static readonly InnerFunction MapSize = new("size", [new Parameter("self")], MapSizeLogic);
+
+    /// <summary>
+    /// Checks if a map contains some key.
+    /// </summary>
+    public static readonly InnerFunction MapContainsKey = new("containsKey", [new Parameter("self"), new Parameter("key")], MapContainsKeyLogic);
+
+    /// <summary>
+    /// Checks if a map contains some value.
+    /// </summary>
+    public static readonly InnerFunction MapContainsValue = new("containsValue", [new Parameter("self"), new Parameter("value")], MapContainsValueLogic);
+
+    /// <summary>
+    /// Gets the set of keys of a map.
+    /// </summary>
+    public static readonly InnerFunction MapKeys = new("keys", [new Parameter("self")], MapKeysLogic);
+
+    /// <summary>
+    /// Gets the set of values of a map.
+    /// </summary>
+    public static readonly InnerFunction MapValues = new("values", [new Parameter("self")], MapValuesLogic);
+
+    /// <summary>
+    /// Gets the number of occurences of a value in a map.
+    /// </summary>
+    public static readonly InnerFunction MapFrequencyOf = new("frequencyOf", [new Parameter("self"), new Parameter("value")], MapFrequencyOfLogic);
+
+    /// <summary>
+    /// Gets the set of distinct keys to which a value is bound in a map.
+    /// </summary>
+    public static readonly InnerFunction MapKeysOf = new("keysOf", [new Parameter("self"), new Parameter("value")], MapKeysOfLogic);
+
+    /// <summary>
+    /// Creates a new map from the given one where key-value pairs are reversed.
+    /// </summary>
+    public static readonly InnerFunction MapInverse = new("inverse", [new Parameter("self")], MapInverseLogic);
+
+    /// <summary>
+    /// Remove a key-value pair from a map.
+    /// </summary>
+    public static readonly InnerFunction MapRemove = new("remove", [new Parameter("self"), new Parameter("key")], MapRemoveLogic);
+
+    /// <summary>
+    /// Remove a set of key-value pairs from a map.
+    /// </summary>
+    public static readonly InnerFunction MapRemoveAll = new("removeAll", [new Parameter("self"), new Parameter("keys")], MapRemoveAllLogic);
+
+    /// <summary>
+    /// Empties a map.
+    /// </summary>
+    public static readonly InnerFunction MapClear = new("clear", [new Parameter("self")], MapClearLogic);
 
     #endregion
 

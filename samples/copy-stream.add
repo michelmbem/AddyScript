@@ -4,29 +4,32 @@ import System::IO::FileInfo;
 import System::IO::Path;
 import System::Console;
 
-const BLOCK_SIZE = 4096, EMPTY_BLOCK = '\0' * BLOCK_SIZE;
+const BLOCK_SIZE = 4096;
 
-file = new FileInfo(@"E:\Images\DCIM\Camera\20200902_143026.jpg");
-input = file.OpenRead();
-output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), file.Name));
-block = EMPTY_BLOCK;
+inputFile = new FileInfo(@"E:\Images\DCIM\Camera\20200902_143026.jpg");
+outputPath = Path::Combine(Environment::GetFolderPath('DesktopDirectory'), inputFile.Name);
+block = blob::of(BLOCK_SIZE);
 
-var m = 0, n;
-while (true) {
-	try {
-		n = input.Read(block, 0, BLOCK_SIZE);
-		if (n <= 0) break;
-		output.Write(block, 0, n);
+try (input = inputFile.OpenRead())
+{
+	try (output = File::Create(outputPath))
+	{
+		var m = 0, n;
 		
-		m += n;
-		Console::Clear();
-		println($'{m}/{file.Length} bytes written ({100.0*m/file.Length:0.##}%)');
-	} catch (e) {
-		println('Error (' + e.name + ') : ' + e.message);
-		readln();
-		break;
+		while (true)
+		{
+			n = input.Read(block, 0, BLOCK_SIZE);
+			if (n <= 0) break;
+			output.Write(block, 0, n);
+			
+			m += n;
+			Console::Clear();
+			println($'{m}/{inputFile.Length} bytes written ({100.0 * m / inputFile.Length:0.##}%)');
+		}
 	}
 }
-
-input.Close();
-output.Close();
+catch (e)
+{
+	println('Error (' + e.name + ') : ' + e.message);
+	readln();
+}

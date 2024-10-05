@@ -69,14 +69,19 @@ public class Class : IFrameItem
     public static readonly Class String = new (ClassID.String, "string", Modifier.Final);
 
     /// <summary>
+    /// Maps the <b>blob</b> primitive type.
+    /// </summary>
+    public static readonly Class Blob = new(ClassID.Blob, "blob", Modifier.Final);
+
+    /// <summary>
+    /// Maps the <b>tuple</b> primitive type.
+    /// </summary>
+    public static readonly Class Tuple = new(ClassID.Tuple, "tuple", Modifier.Final);
+
+    /// <summary>
     /// Maps the <b>list</b> primitive type.
     /// </summary>
     public static readonly Class List = new (ClassID.List, "list", Modifier.Final);
-
-    /// <summary>
-    /// Maps the <b>map</b> primitive type.
-    /// </summary>
-    public static readonly Class Map = new (ClassID.Map, "map", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>set</b> primitive type.
@@ -92,6 +97,11 @@ public class Class : IFrameItem
     /// Maps the <b>stack</b> primitive type.
     /// </summary>
     public static readonly Class Stack = new (ClassID.Stack, "stack", Modifier.Final);
+
+    /// <summary>
+    /// Maps the <b>map</b> primitive type.
+    /// </summary>
+    public static readonly Class Map = new(ClassID.Map, "map", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>object</b> primitive type. This is the base class of all user defined classes.
@@ -210,11 +220,13 @@ public class Class : IFrameItem
             Complex,
             Date,
             String,
+            Blob,
+            Tuple,
             List,
-            Map,
             Set,
             Queue,
             Stack,
+            Map,
             Object,
             Resource,
             Closure,
@@ -249,12 +261,14 @@ public class Class : IFrameItem
                                                   new Return(new SelfReference())));
 
         String.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
+        Blob.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
+        Tuple.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
         List.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
         Set.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
         Queue.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
         Stack.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
 
-        // Create the list::eachIndex methods
+        // Create the tuple::eachIndex and list::eachIndex methods
         var eachIndexFunction = new Function([new Parameter("__action")],
                                              new Block(new ForLoop([VariableDecl.Single("__index", new Literal(new Integer(0)))],
                                                                     new BinaryExpression(BinaryOperator.LessThan, new VariableRef("__index"), MethodCall.OfThis("count")),
@@ -262,6 +276,7 @@ public class Class : IFrameItem
                                                                     new FunctionCall("__action", new VariableRef("__index"))),
                                                        new Return(new SelfReference())));
 
+        Tuple.RegisterMethod(new ClassMethod("eachIndex", Scope.Public, Modifier.Final, eachIndexFunction));
         List.RegisterMethod(new ClassMethod("eachIndex", Scope.Public, Modifier.Final, eachIndexFunction));
 
         // Create the map::each method
@@ -318,7 +333,7 @@ public class Class : IFrameItem
 
         Set.RegisterMethod(new ClassMethod("where", Scope.Public, Modifier.Final, setWhereFunction));
 
-        // Create the list::all and set::all methods
+        // Create the tuple::all, list::all and set::all methods
         var allFunction = new Function([new Parameter("__predicate")],
                                        new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                  "__value",
@@ -327,10 +342,11 @@ public class Class : IFrameItem
                                                                             new Return(new Literal(DataItems.Boolean.False)))),
                                                  new Return(new Literal(DataItems.Boolean.True))));
 
+        Tuple.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
         List.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
         Set.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
 
-        // Create the list::any and set::any methods
+        // Create the tuple::any, list::any and set::any methods
         var anyFunction = new Function([new Parameter("__predicate")],
                                        new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                  "__value",
@@ -339,10 +355,11 @@ public class Class : IFrameItem
                                                                             new Return(new Literal(DataItems.Boolean.True)))),
                                                  new Return(new Literal(DataItems.Boolean.False))));
 
+        Tuple.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
         List.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
         Set.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
 
-        // Create the list::first and set::first methods
+        // Create the tuple::first, list::first and set::first methods
         var firstFunction = new Function([new Parameter("__predicate")],
                                          new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                    "__value",
@@ -351,10 +368,11 @@ public class Class : IFrameItem
                                                                               new Return(new VariableRef("__value")))),
                                                    new Return(new Literal())));
 
+        Tuple.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
         List.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
         Set.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
 
-        // Create the list::last method
+        // Create the tuple::last and list::last methods
         var lastFunction = new Function([new Parameter("__predicate")],
                                         new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
                                                                                                               PropertyRef.This("size"),
@@ -367,9 +385,10 @@ public class Class : IFrameItem
                                                                          new Return(ItemRef.This(new VariableRef("i"))))),
                                                   new Return(new Literal())));
 
+        Tuple.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
         List.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
 
-        // Create the list::findIndex method
+        // Create the tuple::findIndex and list::findIndex methods
         var findIndexFunction = new Function([new Parameter("__predicate")],
                                              new Block(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
                                                                    new BinaryExpression(BinaryOperator.LessThan,
@@ -380,9 +399,10 @@ public class Class : IFrameItem
                                                                               new Return(new VariableRef("i")))),
                                                        new Return(new Literal(new Integer(-1)))));
 
+        Tuple.RegisterMethod(new ClassMethod("findIndex", Scope.Public, Modifier.Final, findIndexFunction));
         List.RegisterMethod(new ClassMethod("findIndex", Scope.Public, Modifier.Final, findIndexFunction));
 
-        // Create the list::findLastIndex method
+        // Create the tuple::findLastIndex and list::findLastIndex methods
         var findLastIndexFunction = new Function([new Parameter("__predicate")],
                                                  new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
                                                                                                                        PropertyRef.This("size"),
@@ -395,6 +415,7 @@ public class Class : IFrameItem
                                                                                   new Return(new VariableRef("i")))),
                                                            new Return(new Literal(new Integer(-1)))));
 
+        Tuple.RegisterMethod(new ClassMethod("findLastIndex", Scope.Public, Modifier.Final, findLastIndexFunction));
         List.RegisterMethod(new ClassMethod("findLastIndex", Scope.Public, Modifier.Final, findLastIndexFunction));
 
         // Create the list::select method
@@ -423,7 +444,7 @@ public class Class : IFrameItem
 
         Set.RegisterMethod(new ClassMethod("select", Scope.Public, Modifier.Final, setSelectFunction));
 
-        // Create the list::aggregate and set::aggregate methods
+        // Create the tuple::aggregate, list::aggregate and set::aggregate methods
         var aggregateFunction = new Function([new Parameter("__seed"), new Parameter("__aggregator")],
                                              new Block(VariableDecl.Single("__accumulator", new VariableRef("__seed")),
                                                        new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
@@ -435,6 +456,7 @@ public class Class : IFrameItem
                                                                                                        new VariableRef("__value")))),
                                                        new Return(new VariableRef("__accumulator"))));
 
+        Tuple.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
         List.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
         Set.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
 

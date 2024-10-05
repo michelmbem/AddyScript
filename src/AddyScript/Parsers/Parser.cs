@@ -98,7 +98,6 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             TokenID.KW_Return => Return(),
             TokenID.KW_Throw => Throw(),
             TokenID.KW_Try => TryCatchFinally(),
-            TokenID.LeftParenthesis => GroupAssignment(),
             _ => ExpressionAsStatement(),
         };
     }
@@ -790,31 +789,6 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         var tcf = new TryCatchFinally(tryBlock, exceptionName, catchBlock, finallyBlock) { Resource = resource };
         tcf.SetLocation(first.Start, lastBlock.End);
         return tcf;
-    }
-
-    /// <summary>
-    /// Recognizes a group assignment.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Statements.GroupAssignment"/></returns>
-    protected GroupAssignment GroupAssignment()
-    {
-        Token first = Match(TokenID.LeftParenthesis);
-        var lValues = List(Expression, false, null);
-        Match(TokenID.RightParenthesis);
-
-        Token eqSign = Match(TokenID.Equal);
-
-        Match(TokenID.LeftParenthesis);
-        var rValues = List(ListItem, false, null);
-        Match(TokenID.RightParenthesis);
-
-        Token last = Match(TokenID.SemiColon);
-
-        if (lValues.Length <= 0) throw new ParseException(FileName, first, Resources.ListCantBeEmpty);
-
-        var assignment = new GroupAssignment(lValues, rValues);
-        assignment.SetLocation(first.Start, last.End);
-        return assignment;
     }
 
     /// <summary>
