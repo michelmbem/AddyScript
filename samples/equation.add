@@ -23,15 +23,15 @@ function equation(a, b, c)
 		{
 			x1 = (-b - sqrt(delta)) / (2 * a);
 			x2 = (-b + sqrt(delta)) / (2 * a);
-			println('a couple of solutions: {0}, {1}', x1, x2);
+			println('a couple of solutions: {0} and {1}', x1, x2);
 		}
 		else
 		{
 			r = -b / (2 * a);
 			i = sqrt(-delta) / (2 * a);
-			x1 = (r, i);
-			x2 = (r, -i);
-			println('complex conjugate solutions: {0}, {1}', x1, x2);
+			x1 = complex::of(r, i);
+			x2 = complex::of(r, -i);
+			println('complex conjugate solutions: {0} and {1}', x1, x2);
 		}
 	}
 }
@@ -39,10 +39,10 @@ function equation(a, b, c)
 var ans;
 do
 {
-    println('solving a*x**2 + b*x + c:');
-	a = (float) readln('a = ');
-	b = (float) readln('b = ');
-	c = (float) readln('c = ');
+    println('solving a*x**2 + b*x + c = 0:');
+	a = (float)readln('a = ');
+	b = (float)readln('b = ');
+	c = (float)readln('c = ');
 	
 	equation(a, b, c);
 	
