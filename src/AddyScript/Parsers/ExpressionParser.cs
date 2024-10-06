@@ -153,7 +153,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     }
 
                     if (!TryMatchAny(TokenID.TypeName, TokenID.Identifier))
-                        throw new ParseException(FileName, token, Resources.TypeNameExpected);
+                        throw new SyntaxError(FileName, token, Resources.TypeNameExpected);
 
                     Token typeName = token;
                     Consume(1);
@@ -476,7 +476,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     protected SelfReference SelfReference()
     {
         if (!CurrentFunction.IsMethod || CurrentFunction.IsStatic)
-            throw new ParseException(FileName, token, Resources.ThisUsedOutOfMethod);
+            throw new SyntaxError(FileName, token, Resources.ThisUsedOutOfMethod);
 
         var selfRef = new SelfReference();
         selfRef.CopyLocation(token);
@@ -497,7 +497,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Token first = Match(TokenID.KW_Super), last;
 
         if (!CurrentFunction.IsMethod)
-            throw new ParseException(FileName, first, Resources.SuperUsedOutOfMethod);
+            throw new SyntaxError(FileName, first, Resources.SuperUsedOutOfMethod);
 
         if (TryMatch(TokenID.DoubleColon))
         {
@@ -578,7 +578,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 }
                 break;
             default:
-                throw new ParseException(FileName, token, Resources.InvalidNewUsage);
+                throw new SyntaxError(FileName, token, Resources.InvalidNewUsage);
         }
 
         expr.SetLocation(first.Start, last.End);
@@ -596,7 +596,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Match(TokenID.LeftParenthesis);
 
         if (!TryMatchAny(TokenID.TypeName, TokenID.Identifier))
-            throw new ParseException(FileName, token, Resources.TypeNameExpected);
+            throw new SyntaxError(FileName, token, Resources.TypeNameExpected);
         
         string typeName = token.ToString();
         Consume(1);
@@ -709,7 +709,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         Token last = Match(TokenID.RightParenthesis);
 
-        if (listItems.Count <= 0) throw new ParseException(FileName, last);
+        if (listItems.Count <= 0) throw new SyntaxError(FileName, last);
 
         Expression expr;
         if (isTuple || listItems[0].Spread)
@@ -750,7 +750,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             if (TryMatch(TokenID.Arrow))
             {
-                if (firstItem.Spread) throw new ParseException(FileName, token);
+                if (firstItem.Spread) throw new SyntaxError(FileName, token);
 
                 Consume(1);
                 var value = RequiredExpression();
@@ -834,7 +834,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     counter += substitution.Length;
 
                     if (counter >= limit)
-                        throw new ScriptException(FileName, substitution, Resources.MissingClosingBrace);
+                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
 
                     ch = mutableString[counter];
 
@@ -844,13 +844,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         while (j < limit && mutableString[j] != '}') ++j;
 
                         if (j >= limit)
-                            throw new ScriptException(FileName, substitution, Resources.MissingClosingBrace);
+                            throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
 
                         patternBuffer.Append(mutableString[counter..j]);
                         counter = j;
                     }
                     else if (ch != '}')
-                        throw new ScriptException(FileName, substitution, Resources.MissingClosingBrace);
+                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
                 }
             }
             else
@@ -1051,7 +1051,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                         section = -1;
                 }
                 else if (positionalArgs.Count > 0)
-                    throw new ParseException(FileName, token, Resources.AbnormalListTermination);
+                    throw new SyntaxError(FileName, token, Resources.AbnormalListTermination);
                 else
                     section = -1;
             }
@@ -1068,7 +1068,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
             catch (ArgumentException ex)
             {
-                throw new ParseException(FileName, argName, ex);
+                throw new SyntaxError(FileName, argName, ex);
             }
 
             if (TryMatch(TokenID.Comma))
@@ -1205,7 +1205,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPattern(ref last));
                     break;
                 case TokenID.Plus or TokenID.Minus:
-                    if (!LookAhead(t => t.IsNumeric, out pos)) throw new ParseException(FileName, token);
+                    if (!LookAhead(t => t.IsNumeric, out pos)) throw new SyntaxError(FileName, token);
 
                     negative = token.TokenID == TokenID.Minus;
                     Consume(pos - 1);
@@ -1215,7 +1215,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     if (patterns.Count > 0)
                         Consume(1);
                     else
-                        throw new ParseException(FileName, token);
+                        throw new SyntaxError(FileName, token);
                     break;
                 default:
                     loop = false;

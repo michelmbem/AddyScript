@@ -4,16 +4,16 @@ using System;
 namespace AddyScript;
 
 
-public class ScriptException : ApplicationException
+public class ScriptError : ApplicationException
 {
-    public ScriptException(string fileName, ScriptElement element, Exception innerException)
+    public ScriptError(string fileName, ScriptElement element, Exception innerException)
         : base(innerException.Message, innerException)
     {
         FileName = fileName;
         Element = element;
     }
 
-    public ScriptException(string fileName, ScriptElement element, string message)
+    public ScriptError(string fileName, ScriptElement element, string message)
         : base(message)
     {
         FileName = fileName;

@@ -59,7 +59,7 @@ namespace AddyScript.Interactive
                 var result = RuntimeServices.Interpreter.ReturnedValue;
                 Console.WriteLine(RuntimeServices.ToString(result));
             }
-            catch (ScriptException sx)
+            catch (ScriptError sx)
             {
                 ShowError(sx, log);
                 Environment.Exit(2);
@@ -77,7 +77,7 @@ namespace AddyScript.Interactive
             {
                 ScriptEngine.ExecuteFile(path, context);
             }
-            catch (ScriptException sx)
+            catch (ScriptError sx)
             {
                 ShowError(sx, log);
                 WaitKey();
@@ -112,7 +112,7 @@ namespace AddyScript.Interactive
 
                     prompt = engine.Satisfied ? MAIN_PROMPT : CONTINUATION_PROMPT;
                 }
-                catch (ScriptException sx)
+                catch (ScriptError sx)
                 {
                     ShowError(sx, null);
                     prompt = MAIN_PROMPT;
@@ -151,7 +151,7 @@ namespace AddyScript.Interactive
             Console.ResetColor();
         }
 
-        private static void ShowError(ScriptException sx, string log)
+        private static void ShowError(ScriptError sx, string log)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(ERROR_MESSAGE_FORMAT,

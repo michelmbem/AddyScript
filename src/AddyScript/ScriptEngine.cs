@@ -50,9 +50,9 @@ public class ScriptEngine
     /// </summary>
     /// <param name="command">The command to execute</param>
     /// <returns>The value produced by the command if any</returns>
-    /// <exception cref="ParseException">Any syntax error encountered</exception>
-    /// <exception cref="RuntimeException">The command may be erroneous</exception>
-    /// <exception cref="ScriptException">There is something wrong either in the syntax or in the logic of the command</exception>
+    /// <exception cref="SyntaxError">Any syntax error encountered</exception>
+    /// <exception cref="RuntimeError">The command may be erroneous</exception>
+    /// <exception cref="ScriptError">There is something wrong either in the syntax or in the logic of the command</exception>
     public DataItem Execute(string command)
     {
         DataItem result = null;
@@ -78,7 +78,7 @@ public class ScriptEngine
             commandPrefix = string.Empty;
             satisfied = true;
         }
-        catch (ParseException px)
+        catch (SyntaxError px)
         {
             if (px.Token.TokenID == TokenID.EndOfFile)
             {

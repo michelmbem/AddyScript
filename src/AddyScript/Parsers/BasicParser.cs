@@ -113,7 +113,7 @@ public abstract class BasicParser
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to satisfy a particular <paramref name="predicate"/>.<br/>
-    /// Throws a <see cref="ParseException"/> if it doesn't.<br/>
+    /// Throws a <see cref="SyntaxError"/> if it doesn't.<br/>
     /// Consumes the <see cref="Token"/> otherwise.
     /// </summary>
     /// <param name="predicate">The <see cref="Predicate{Token}"/> that the next non-comment <see cref="Token"/> should satisfy</param>
@@ -122,7 +122,7 @@ public abstract class BasicParser
     {
         SkipComments();
 
-        if (!predicate.Invoke(token)) throw new ParseException(FileName, token);
+        if (!predicate.Invoke(token)) throw new SyntaxError(FileName, token);
 
         Token matched = token;
         Consume(1);
@@ -132,7 +132,7 @@ public abstract class BasicParser
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to have the required <see cref="TokenID"/>.<br/>
-    /// Throws a <see cref="ParseException"/> if it doesn't.<br/>
+    /// Throws a <see cref="SyntaxError"/> if it doesn't.<br/>
     /// Consumes the <see cref="Token"/> otherwise.
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> that the next non-comment <see cref="Token"/> should have</param>
@@ -144,7 +144,7 @@ public abstract class BasicParser
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to have one of the required <see cref="TokenID"/>s.<br/>
-    /// Throws a <see cref="ParseException"/> if it doesn't.<br/>
+    /// Throws a <see cref="SyntaxError"/> if it doesn't.<br/>
     /// Consumes the <see cref="Token"/> otherwise.
     /// </summary>
     /// <param name="requiredIDs">The set of <see cref="TokenID"/>s to search in</param>
@@ -224,7 +224,7 @@ public abstract class BasicParser
     /// <returns>A non-null instance of the desired type</returns>
     protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
-        return recognizer() ?? throw new ParseException(FileName, token, errorMessage);
+        return recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
     }
 
     /// <summary>
@@ -257,7 +257,7 @@ public abstract class BasicParser
     protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length <= 0) throw new ParseException(FileName, token, errorMessage);
+        if (elements.Length <= 0) throw new SyntaxError(FileName, token, errorMessage);
         return elements;
     }
 
@@ -282,7 +282,7 @@ public abstract class BasicParser
 
             element = Required(recognizer, Resources.AbnormalListTermination);
             if (checkUnicity && elements.Contains(element))
-                throw new ScriptException(FileName, element, errorMessage);
+                throw new ScriptError(FileName, element, errorMessage);
 
             elements.Add(element);
         }

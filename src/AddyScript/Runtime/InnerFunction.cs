@@ -489,7 +489,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                 command = command[statement.End.Offset..];
             }
         }
-        catch (ParseException)
+        catch (SyntaxError)
         {
             throw new ArgumentException(Resources.InvalidEvalParam);
         }

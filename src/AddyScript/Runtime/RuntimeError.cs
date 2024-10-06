@@ -9,19 +9,19 @@ using String = AddyScript.Runtime.DataItems.String;
 namespace AddyScript.Runtime;
 
 
-public class RuntimeException : ScriptException
+public class RuntimeError : ScriptError
 {
-    public RuntimeException(string fileName, AstNode astNode, Exception exception)
+    public RuntimeError(string fileName, AstNode astNode, Exception exception)
         : base(fileName, astNode, exception is TargetInvocationException ? exception.InnerException : exception)
     {
     }
 
-    public RuntimeException(string fileName, AstNode astNode, string message)
+    public RuntimeError(string fileName, AstNode astNode, string message)
         : base(fileName, astNode, message)
     {
     }
 
-    public RuntimeException(string fileName, AstNode astNode, DataItem thrown)
+    public RuntimeError(string fileName, AstNode astNode, DataItem thrown)
         : base(fileName, astNode, thrown.GetProperty("_message").ToString())
     {
         Thrown = thrown;
