@@ -46,9 +46,9 @@ public sealed class Queue : DataItem
 
     public override bool IsEmpty() => queue.Count <= 0;
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (DataItem item in queue)
-            yield return new KeyValuePair<DataItem, DataItem>(Void.Value, item);
+            yield return (Void.Value, item);
     }
 }

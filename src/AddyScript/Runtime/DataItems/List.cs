@@ -161,12 +161,10 @@ public sealed class List : DataItem
         list[n] = value;
     }
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
-        for (int i = 0; i < list.Count; ++i)
-        {
-            var key = new Integer(i);
-            yield return new KeyValuePair<DataItem, DataItem>(key, list[i]);
-        }
+        int i = 0;
+        foreach (DataItem item in list)
+            yield return (new Integer(i++), item);
     }
 }

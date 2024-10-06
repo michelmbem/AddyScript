@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 
@@ -84,6 +85,15 @@ public sealed class String(string value) : DataItem
 
     public override byte[] AsByteArray => StringUtil.String2ByteArray(value);
 
+    private IEnumerable<DataItem> Chars
+        => value.ToCharArray().Select(c => new String(c.ToString())).Cast<DataItem>();
+
+    public override DataItem[] AsArray => Chars.ToArray();
+
+    public override List<DataItem> AsList => Chars.ToList();
+
+    public override HashSet<DataItem> AsHashSet => Chars.ToHashSet();
+
     public override object AsNativeObject => value;
 
     public override object Clone() => new String(value);
@@ -155,13 +165,9 @@ public sealed class String(string value) : DataItem
     public override void SetItem(DataItem index, DataItem d)
         => throw new InvalidOperationException(Resources.StringsAreImmutable);
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         for (int i = 0; i < value.Length; ++i)
-        {
-            var key = new Integer(i);
-            var val = new String(value[i].ToString());
-            yield return new KeyValuePair<DataItem, DataItem>(key, val);
-        }
+            yield return (new Integer(i), new String(value[i].ToString()));
     }
 }

@@ -116,9 +116,9 @@ public sealed class Map : DataItem
 
     public override void SetItem(DataItem index, DataItem value) => dict[index] = value;
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (var entry in dict)
-            yield return entry;
+            yield return (entry.Key, entry.Value);
     }
 }

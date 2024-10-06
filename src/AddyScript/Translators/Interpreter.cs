@@ -1572,11 +1572,10 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         currentFrame.PushBlock();
 
-        var enumerable = GetEnumerable(forEach.Enumerated);
-        foreach (KeyValuePair<DataItem, DataItem> pair in enumerable)
+        foreach ((DataItem key, DataItem value) in GetEnumerable(forEach.Enumerated))
         {
-            RegisterVariable(forEach.KeyName, pair.Key);
-            RegisterVariable(forEach.ValueName, pair.Value);
+            RegisterVariable(forEach.KeyName, key);
+            RegisterVariable(forEach.ValueName, value);
 
             forEach.Action.AcceptTranslator(this);
 
@@ -2850,7 +2849,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// </summary>
     /// <param name="expr">The expression to iterate on</param>
     /// <returns>An <see cref="IEnumerable{T}"/></returns>
-    private IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable(Expression expr)
+    private IEnumerable<(DataItem, DataItem)> GetEnumerable(Expression expr)
     {
         try
         {
@@ -2877,7 +2876,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="value">The object to iterate on</param>
     /// <param name="expr">The expression from which <paramref name="value"/> is obtained</param>
     /// <returns>An <see cref="IEnumerable{T}"/></returns>
-    private IEnumerable<KeyValuePair<DataItem, DataItem>> GetProgrammaticEnumerable(DataItem value, Expression expr)
+    private IEnumerable<(DataItem, DataItem)> GetProgrammaticEnumerable(DataItem value, Expression expr)
     {
         Class klass = value.Class;
         ClassMethod iteratorMethod = klass.GetMethod("iterator");
@@ -2889,7 +2888,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             Invoke(iteratorMethod.Function, iteratorMethod.Name, iteratorMethod.Holder, value);
 
             foreach (DataItem item in yieldedValues)
-                yield return new KeyValuePair<DataItem, DataItem>(new Integer(counter++), item);
+                yield return (new Integer(counter++), item);
 
             yieldedValues.Clear();
         }
@@ -2913,7 +2912,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             while (returnedValue.AsBoolean)
             {
                 Invoke(moveNextMethod.Function, moveNextMethod.Name, moveNextMethod.Holder, value);
-                yield return new KeyValuePair<DataItem, DataItem>(new Integer(counter++), returnedValue);
+                yield return (new Integer(counter++), returnedValue);
 
                 Invoke(hasNextMethod.Function, hasNextMethod.Name, hasNextMethod.Holder, value);
             }

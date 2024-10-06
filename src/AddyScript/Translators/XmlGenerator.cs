@@ -940,7 +940,7 @@ public class XmlGenerator : ITranslator
         XmlElement previousElement = currentElement;
 
         currentElement = document.CreateElement("Expression");
-        previousElement.AppendChild(currentElement);
+        tmpElement.AppendChild(currentElement);
         initializer.Expression.AcceptTranslator(this);
 
         currentElement = previousElement;

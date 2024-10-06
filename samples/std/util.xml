@@ -1,0 +1,892 @@
+<?xml version="1.0"?>
+<Program>
+  <Labels />
+  <FunctionDecl Name="compare">
+    <Parameters>
+      <ParameterDecl Name="a" ByRef="False" VaList="False" CanBeEmpty="True" />
+      <ParameterDecl Name="b" ByRef="False" VaList="False" CanBeEmpty="True" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <Return>
+        <FunctionCall FunctionName="sign">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Minus">
+                  <LeftOperand>
+                    <VariableRef Name="a" />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="b" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <FunctionDecl Name="swap">
+    <Parameters>
+      <ParameterDecl Name="a" ByRef="True" VaList="False" CanBeEmpty="True" />
+      <ParameterDecl Name="b" ByRef="True" VaList="False" CanBeEmpty="True" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <Assignment Operator="None">
+        <LeftOperand>
+          <TupleInitializer>
+            <Item Spread="False">
+              <Expression>
+                <VariableRef Name="a" />
+              </Expression>
+            </Item>
+            <Item Spread="False">
+              <Expression>
+                <VariableRef Name="b" />
+              </Expression>
+            </Item>
+          </TupleInitializer>
+        </LeftOperand>
+        <RightOperand>
+          <TupleInitializer>
+            <Item Spread="False">
+              <Expression>
+                <VariableRef Name="b" />
+              </Expression>
+            </Item>
+            <Item Spread="False">
+              <Expression>
+                <VariableRef Name="a" />
+              </Expression>
+            </Item>
+          </TupleInitializer>
+        </RightOperand>
+      </Assignment>
+    </Body>
+  </FunctionDecl>
+  <FunctionDecl Name="range">
+    <Parameters>
+      <ParameterDecl Name="begin" ByRef="False" VaList="False" CanBeEmpty="True" />
+      <ParameterDecl Name="end" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="0" />
+      <ParameterDecl Name="incr" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="1" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <IfElse>
+        <Condition>
+          <BinaryExpression Operator="LessThanOrEqual">
+            <LeftOperand>
+              <VariableRef Name="incr" />
+            </LeftOperand>
+            <RightOperand>
+              <Literal Type="int" Value="0" />
+            </RightOperand>
+          </BinaryExpression>
+        </Condition>
+        <PositiveAction>
+          <Throw>
+            <Literal Type="string" Value="the increment must be positive" />
+          </Throw>
+        </PositiveAction>
+      </IfElse>
+      <IfElse>
+        <Condition>
+          <BinaryExpression Operator="GreaterThan">
+            <LeftOperand>
+              <VariableRef Name="begin" />
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="end" />
+            </RightOperand>
+          </BinaryExpression>
+        </Condition>
+        <PositiveAction>
+          <FunctionCall FunctionName="swap">
+            <Arguments>
+              <Item Spread="False">
+                <Expression>
+                  <VariableRef Name="begin" />
+                </Expression>
+              </Item>
+              <Item Spread="False">
+                <Expression>
+                  <VariableRef Name="end" />
+                </Expression>
+              </Item>
+            </Arguments>
+            <NamedArgs />
+          </FunctionCall>
+        </PositiveAction>
+      </IfElse>
+      <VariableDecl>
+        <PropertyInitializer Name="i">
+          <Value>
+            <VariableRef Name="begin" />
+          </Value>
+        </PropertyInitializer>
+        <PropertyInitializer Name="l">
+          <Value>
+            <ListInitializer />
+          </Value>
+        </PropertyInitializer>
+      </VariableDecl>
+      <ForLoop>
+        <Initializers />
+        <Guard>
+          <BinaryExpression Operator="LessThan">
+            <LeftOperand>
+              <VariableRef Name="i" />
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="end" />
+            </RightOperand>
+          </BinaryExpression>
+        </Guard>
+        <Updaters>
+          <Assignment Operator="Plus">
+            <LeftOperand>
+              <VariableRef Name="i" />
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="incr" />
+            </RightOperand>
+          </Assignment>
+        </Updaters>
+        <Action>
+          <MethodCall FunctionName="add" Optional="False">
+            <Target>
+              <VariableRef Name="l" />
+            </Target>
+            <Arguments>
+              <Item Spread="False">
+                <Expression>
+                  <VariableRef Name="i" />
+                </Expression>
+              </Item>
+            </Arguments>
+            <NamedArgs />
+          </MethodCall>
+        </Action>
+      </ForLoop>
+      <Return>
+        <VariableRef Name="l" />
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <FunctionDecl Name="randlst">
+    <Parameters>
+      <ParameterDecl Name="size" ByRef="False" VaList="False" CanBeEmpty="True" />
+      <ParameterDecl Name="minimum" ByRef="False" VaList="False" CanBeEmpty="True" />
+      <ParameterDecl Name="maximum" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="0" />
+      <ParameterDecl Name="rounding" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="0" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <IfElse>
+        <Condition>
+          <BinaryExpression Operator="GreaterThan">
+            <LeftOperand>
+              <VariableRef Name="minimum" />
+            </LeftOperand>
+            <RightOperand>
+              <VariableRef Name="maximum" />
+            </RightOperand>
+          </BinaryExpression>
+        </Condition>
+        <PositiveAction>
+          <FunctionCall FunctionName="swap">
+            <Arguments>
+              <Item Spread="False">
+                <Expression>
+                  <VariableRef Name="minimum" />
+                </Expression>
+              </Item>
+              <Item Spread="False">
+                <Expression>
+                  <VariableRef Name="maximum" />
+                </Expression>
+              </Item>
+            </Arguments>
+            <NamedArgs />
+          </FunctionCall>
+        </PositiveAction>
+      </IfElse>
+      <VariableDecl>
+        <PropertyInitializer Name="l">
+          <Value>
+            <ListInitializer />
+          </Value>
+        </PropertyInitializer>
+        <PropertyInitializer Name="extent">
+          <Value>
+            <BinaryExpression Operator="Minus">
+              <LeftOperand>
+                <VariableRef Name="maximum" />
+              </LeftOperand>
+              <RightOperand>
+                <VariableRef Name="minimum" />
+              </RightOperand>
+            </BinaryExpression>
+          </Value>
+        </PropertyInitializer>
+      </VariableDecl>
+      <MethodCall FunctionName="times" Optional="False">
+        <Target>
+          <VariableRef Name="size" />
+        </Target>
+        <Arguments>
+          <Item Spread="False">
+            <Expression>
+              <InlineFunction>
+                <Parameters>
+                  <ParameterDecl Name="_" ByRef="False" VaList="False" CanBeEmpty="True" />
+                </Parameters>
+                <Body>
+                  <Labels />
+                  <Return>
+                    <MethodCall FunctionName="add" Optional="False">
+                      <Target>
+                        <VariableRef Name="l" />
+                      </Target>
+                      <Arguments>
+                        <Item Spread="False">
+                          <Expression>
+                            <FunctionCall FunctionName="round">
+                              <Arguments>
+                                <Item Spread="False">
+                                  <Expression>
+                                    <BinaryExpression Operator="Plus">
+                                      <LeftOperand>
+                                        <VariableRef Name="minimum" />
+                                      </LeftOperand>
+                                      <RightOperand>
+                                        <BinaryExpression Operator="Times">
+                                          <LeftOperand>
+                                            <VariableRef Name="extent" />
+                                          </LeftOperand>
+                                          <RightOperand>
+                                            <FunctionCall FunctionName="rand">
+                                              <Arguments />
+                                              <NamedArgs />
+                                            </FunctionCall>
+                                          </RightOperand>
+                                        </BinaryExpression>
+                                      </RightOperand>
+                                    </BinaryExpression>
+                                  </Expression>
+                                </Item>
+                                <Item Spread="False">
+                                  <Expression>
+                                    <VariableRef Name="rounding" />
+                                  </Expression>
+                                </Item>
+                              </Arguments>
+                              <NamedArgs />
+                            </FunctionCall>
+                          </Expression>
+                        </Item>
+                      </Arguments>
+                      <NamedArgs />
+                    </MethodCall>
+                  </Return>
+                </Body>
+              </InlineFunction>
+            </Expression>
+          </Item>
+        </Arguments>
+        <NamedArgs />
+      </MethodCall>
+      <Return>
+        <VariableRef Name="l" />
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <FunctionDecl Name="randstr">
+    <Parameters>
+      <ParameterDecl Name="len" ByRef="False" VaList="False" CanBeEmpty="True" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <ConstantDecl>
+        <PropertyInitializer Name="alphabet">
+          <Value>
+            <Literal Type="string" Value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" />
+          </Value>
+        </PropertyInitializer>
+      </ConstantDecl>
+      <VariableDecl>
+        <PropertyInitializer Name="s">
+          <Value>
+            <ConstructorCall ClassName="System::Text::StringBuilder">
+              <Arguments />
+              <NamedArgs />
+            </ConstructorCall>
+          </Value>
+        </PropertyInitializer>
+        <PropertyInitializer Name="n">
+          <Value>
+            <PropertyRef PropertyName="length" Optional="False">
+              <Owner>
+                <VariableRef Name="alphabet" />
+              </Owner>
+            </PropertyRef>
+          </Value>
+        </PropertyInitializer>
+      </VariableDecl>
+      <MethodCall FunctionName="times" Optional="False">
+        <Target>
+          <VariableRef Name="len" />
+        </Target>
+        <Arguments>
+          <Item Spread="False">
+            <Expression>
+              <InlineFunction>
+                <Parameters>
+                  <ParameterDecl Name="i" ByRef="False" VaList="False" CanBeEmpty="True" />
+                </Parameters>
+                <Body>
+                  <Labels />
+                  <Return>
+                    <MethodCall FunctionName="Append" Optional="False">
+                      <Target>
+                        <VariableRef Name="s" />
+                      </Target>
+                      <Arguments>
+                        <Item Spread="False">
+                          <Expression>
+                            <ItemRef Optional="False">
+                              <Owner>
+                                <VariableRef Name="alphabet" />
+                              </Owner>
+                              <Index>
+                                <FunctionCall FunctionName="randint">
+                                  <Arguments>
+                                    <Item Spread="False">
+                                      <Expression>
+                                        <VariableRef Name="n" />
+                                      </Expression>
+                                    </Item>
+                                  </Arguments>
+                                  <NamedArgs />
+                                </FunctionCall>
+                              </Index>
+                            </ItemRef>
+                          </Expression>
+                        </Item>
+                      </Arguments>
+                      <NamedArgs />
+                    </MethodCall>
+                  </Return>
+                </Body>
+              </InlineFunction>
+            </Expression>
+          </Item>
+        </Arguments>
+        <NamedArgs />
+      </MethodCall>
+      <Return>
+        <MethodCall FunctionName="ToString" Optional="False">
+          <Target>
+            <VariableRef Name="s" />
+          </Target>
+          <Arguments />
+          <NamedArgs />
+        </MethodCall>
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <FunctionDecl Name="readlst">
+    <Parameters>
+      <ParameterDecl Name="prompt" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="values : " />
+      <ParameterDecl Name="separator" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="\s+" />
+      <ParameterDecl Name="converter" ByRef="False" VaList="False" CanBeEmpty="True" DefaultValue="" />
+    </Parameters>
+    <Body>
+      <Labels />
+      <Return>
+        <MethodCall FunctionName="select" Optional="False">
+          <Target>
+            <MethodCall FunctionName="where" Optional="False">
+              <Target>
+                <MethodCall FunctionName="split" Optional="False">
+                  <Target>
+                    <FunctionCall FunctionName="readln">
+                      <Arguments>
+                        <Item Spread="False">
+                          <Expression>
+                            <VariableRef Name="prompt" />
+                          </Expression>
+                        </Item>
+                      </Arguments>
+                      <NamedArgs />
+                    </FunctionCall>
+                  </Target>
+                  <Arguments>
+                    <Item Spread="False">
+                      <Expression>
+                        <VariableRef Name="separator" />
+                      </Expression>
+                    </Item>
+                  </Arguments>
+                  <NamedArgs />
+                </MethodCall>
+              </Target>
+              <Arguments>
+                <Item Spread="False">
+                  <Expression>
+                    <InlineFunction>
+                      <Parameters>
+                        <ParameterDecl Name="x" ByRef="False" VaList="False" CanBeEmpty="True" />
+                      </Parameters>
+                      <Body>
+                        <Labels />
+                        <Return>
+                          <BinaryExpression Operator="GreaterThan">
+                            <LeftOperand>
+                              <PropertyRef PropertyName="length" Optional="False">
+                                <Owner>
+                                  <VariableRef Name="x" />
+                                </Owner>
+                              </PropertyRef>
+                            </LeftOperand>
+                            <RightOperand>
+                              <Literal Type="int" Value="0" />
+                            </RightOperand>
+                          </BinaryExpression>
+                        </Return>
+                      </Body>
+                    </InlineFunction>
+                  </Expression>
+                </Item>
+              </Arguments>
+              <NamedArgs />
+            </MethodCall>
+          </Target>
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="IfEmpty">
+                  <LeftOperand>
+                    <VariableRef Name="converter" />
+                  </LeftOperand>
+                  <RightOperand>
+                    <InlineFunction>
+                      <Parameters>
+                        <ParameterDecl Name="x" ByRef="False" VaList="False" CanBeEmpty="True" />
+                      </Parameters>
+                      <Body>
+                        <Labels />
+                        <Return>
+                          <VariableRef Name="x" />
+                        </Return>
+                      </Body>
+                    </InlineFunction>
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </MethodCall>
+      </Return>
+    </Body>
+  </FunctionDecl>
+  <IfElse>
+    <Condition>
+      <BinaryExpression Operator="Equal">
+        <LeftOperand>
+          <VariableRef Name="__name" />
+        </LeftOperand>
+        <RightOperand>
+          <Literal Type="string" Value="main" />
+        </RightOperand>
+      </BinaryExpression>
+    </Condition>
+    <PositiveAction>
+      <Block>
+        <Labels />
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="l" />
+          </LeftOperand>
+          <RightOperand>
+            <BinaryExpression Operator="IfEmpty">
+              <LeftOperand>
+                <FunctionCall FunctionName="readlst">
+                  <Arguments />
+                  <NamedArgs>
+                    <Arg Name="converter">
+                      <InlineFunction>
+                        <Parameters>
+                          <ParameterDecl Name="x" ByRef="False" VaList="False" CanBeEmpty="True" />
+                        </Parameters>
+                        <Body>
+                          <Labels />
+                          <Return>
+                            <Conversion TypeName="float">
+                              <Expression>
+                                <VariableRef Name="x" />
+                              </Expression>
+                            </Conversion>
+                          </Return>
+                        </Body>
+                      </InlineFunction>
+                    </Arg>
+                  </NamedArgs>
+                </FunctionCall>
+              </LeftOperand>
+              <RightOperand>
+                <FunctionCall FunctionName="randlst">
+                  <Arguments>
+                    <Item Spread="False">
+                      <Expression>
+                        <FunctionCall FunctionName="randint">
+                          <Arguments>
+                            <Item Spread="False">
+                              <Expression>
+                                <Literal Type="int" Value="20" />
+                              </Expression>
+                            </Item>
+                          </Arguments>
+                          <NamedArgs />
+                        </FunctionCall>
+                      </Expression>
+                    </Item>
+                    <Item Spread="False">
+                      <Expression>
+                        <Literal Type="int" Value="100" />
+                      </Expression>
+                    </Item>
+                  </Arguments>
+                  <NamedArgs />
+                </FunctionCall>
+              </RightOperand>
+            </BinaryExpression>
+          </RightOperand>
+        </Assignment>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="s" />
+          </LeftOperand>
+          <RightOperand>
+            <MethodCall FunctionName="aggregate" Optional="False">
+              <Target>
+                <VariableRef Name="l" />
+              </Target>
+              <Arguments>
+                <Item Spread="False">
+                  <Expression>
+                    <Literal Type="float" Value="0" />
+                  </Expression>
+                </Item>
+                <Item Spread="False">
+                  <Expression>
+                    <InlineFunction>
+                      <Parameters>
+                        <ParameterDecl Name="x" ByRef="False" VaList="False" CanBeEmpty="True" />
+                        <ParameterDecl Name="i" ByRef="False" VaList="False" CanBeEmpty="True" />
+                      </Parameters>
+                      <Body>
+                        <Labels />
+                        <Return>
+                          <Assignment Operator="Plus">
+                            <LeftOperand>
+                              <VariableRef Name="x" />
+                            </LeftOperand>
+                            <RightOperand>
+                              <VariableRef Name="i" />
+                            </RightOperand>
+                          </Assignment>
+                        </Return>
+                      </Body>
+                    </InlineFunction>
+                  </Expression>
+                </Item>
+              </Arguments>
+              <NamedArgs />
+            </MethodCall>
+          </RightOperand>
+        </Assignment>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="m" />
+          </LeftOperand>
+          <RightOperand>
+            <BinaryExpression Operator="Divide">
+              <LeftOperand>
+                <VariableRef Name="s" />
+              </LeftOperand>
+              <RightOperand>
+                <PropertyRef PropertyName="size" Optional="False">
+                  <Owner>
+                    <VariableRef Name="l" />
+                  </Owner>
+                </PropertyRef>
+              </RightOperand>
+            </BinaryExpression>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="l = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="l" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="sum(l) = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="s" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="avg(l) = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="m" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="l" />
+          </LeftOperand>
+          <RightOperand>
+            <ListInitializer />
+          </RightOperand>
+        </Assignment>
+        <MethodCall FunctionName="times" Optional="False">
+          <Target>
+            <Literal Type="int" Value="10" />
+          </Target>
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <InlineFunction>
+                  <Parameters>
+                    <ParameterDecl Name="i" ByRef="False" VaList="False" CanBeEmpty="True" />
+                  </Parameters>
+                  <Body>
+                    <Labels />
+                    <Return>
+                      <MethodCall FunctionName="add" Optional="False">
+                        <Target>
+                          <VariableRef Name="l" />
+                        </Target>
+                        <Arguments>
+                          <Item Spread="False">
+                            <Expression>
+                              <FunctionCall FunctionName="randstr">
+                                <Arguments>
+                                  <Item Spread="False">
+                                    <Expression>
+                                      <BinaryExpression Operator="Plus">
+                                        <LeftOperand>
+                                          <VariableRef Name="i" />
+                                        </LeftOperand>
+                                        <RightOperand>
+                                          <Literal Type="int" Value="1" />
+                                        </RightOperand>
+                                      </BinaryExpression>
+                                    </Expression>
+                                  </Item>
+                                </Arguments>
+                                <NamedArgs />
+                              </FunctionCall>
+                            </Expression>
+                          </Item>
+                        </Arguments>
+                        <NamedArgs />
+                      </MethodCall>
+                    </Return>
+                  </Body>
+                </InlineFunction>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </MethodCall>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="s" />
+          </LeftOperand>
+          <RightOperand>
+            <MethodCall FunctionName="substring" Optional="False">
+              <Target>
+                <MethodCall FunctionName="aggregate" Optional="False">
+                  <Target>
+                    <VariableRef Name="l" />
+                  </Target>
+                  <Arguments>
+                    <Item Spread="False">
+                      <Expression>
+                        <Literal Type="string" Value="" />
+                      </Expression>
+                    </Item>
+                    <Item Spread="False">
+                      <Expression>
+                        <InlineFunction>
+                          <Parameters>
+                            <ParameterDecl Name="x" ByRef="False" VaList="False" CanBeEmpty="True" />
+                            <ParameterDecl Name="i" ByRef="False" VaList="False" CanBeEmpty="True" />
+                          </Parameters>
+                          <Body>
+                            <Labels />
+                            <Return>
+                              <Assignment Operator="Plus">
+                                <LeftOperand>
+                                  <VariableRef Name="x" />
+                                </LeftOperand>
+                                <RightOperand>
+                                  <BinaryExpression Operator="Plus">
+                                    <LeftOperand>
+                                      <Literal Type="string" Value="-" />
+                                    </LeftOperand>
+                                    <RightOperand>
+                                      <VariableRef Name="i" />
+                                    </RightOperand>
+                                  </BinaryExpression>
+                                </RightOperand>
+                              </Assignment>
+                            </Return>
+                          </Body>
+                        </InlineFunction>
+                      </Expression>
+                    </Item>
+                  </Arguments>
+                  <NamedArgs />
+                </MethodCall>
+              </Target>
+              <Arguments>
+                <Item Spread="False">
+                  <Expression>
+                    <Literal Type="int" Value="1" />
+                  </Expression>
+                </Item>
+              </Arguments>
+              <NamedArgs />
+            </MethodCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="l = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="l" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="join(l, &quot;-&quot;) = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="s" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="println">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+        <Assignment Operator="None">
+          <LeftOperand>
+            <VariableRef Name="l" />
+          </LeftOperand>
+          <RightOperand>
+            <FunctionCall FunctionName="range">
+              <Arguments>
+                <Item Spread="False">
+                  <Expression>
+                    <Literal Type="int" Value="12" />
+                  </Expression>
+                </Item>
+              </Arguments>
+              <NamedArgs>
+                <Arg Name="incr">
+                  <Literal Type="int" Value="2" />
+                </Arg>
+              </NamedArgs>
+            </FunctionCall>
+          </RightOperand>
+        </Assignment>
+        <FunctionCall FunctionName="println">
+          <Arguments>
+            <Item Spread="False">
+              <Expression>
+                <BinaryExpression Operator="Plus">
+                  <LeftOperand>
+                    <Literal Type="string" Value="range(12, step: 2) = " />
+                  </LeftOperand>
+                  <RightOperand>
+                    <VariableRef Name="l" />
+                  </RightOperand>
+                </BinaryExpression>
+              </Expression>
+            </Item>
+          </Arguments>
+          <NamedArgs />
+        </FunctionCall>
+        <FunctionCall FunctionName="readln">
+          <Arguments />
+          <NamedArgs />
+        </FunctionCall>
+      </Block>
+    </PositiveAction>
+  </IfElse>
+</Program>

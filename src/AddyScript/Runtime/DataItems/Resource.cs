@@ -71,23 +71,19 @@ public sealed class Resource(object handle) : DataItem
 
     public override void SetItem(DataItem index, DataItem value) => Reflector.SetItem(handle, index, value);
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         if (handle is IDictionary dictionary)
         {
             foreach (DictionaryEntry entry in dictionary)
-                yield return new KeyValuePair<DataItem, DataItem>(
-                    DataItemFactory.CreateDataItem(entry.Key),
-                    DataItemFactory.CreateDataItem(entry.Value));
+                yield return (DataItemFactory.CreateDataItem(entry.Key),
+                              DataItemFactory.CreateDataItem(entry.Value));
         }
         else if (handle is IEnumerable enumerable)
         {
-            int index = 0;
-
+            int i = 0;
             foreach (object item in enumerable)
-                yield return new KeyValuePair<DataItem, DataItem>(
-                    new Integer(index++),
-                    DataItemFactory.CreateDataItem(item));
+                yield return (new Integer(i++), DataItemFactory.CreateDataItem(item));
         }
         else
             throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, handle.GetType().FullName));

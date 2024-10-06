@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
@@ -15,6 +16,15 @@ public sealed class Blob(byte[] buffer) : DataItem
     public override Class Class => Class.Blob;
 
     public override byte[] AsByteArray => buffer;
+
+    private IEnumerable<DataItem> Items
+        => buffer.Select(b => new String(b.ToString())).Cast<DataItem>();
+
+    public override DataItem[] AsArray => Items.ToArray();
+
+    public override List<DataItem> AsList => Items.ToList();
+
+    public override HashSet<DataItem> AsHashSet => Items.ToHashSet();
 
     public override object AsNativeObject => buffer;
 
@@ -102,13 +112,9 @@ public sealed class Blob(byte[] buffer) : DataItem
         buffer[n] = (byte)value.AsInt32;
     }
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         for (int i = 0; i < buffer.Length; ++i)
-        {
-            var key = new Integer(i);
-            var val = new Integer(buffer[i]);
-            yield return new KeyValuePair<DataItem, DataItem>(key, val);
-        }
+            yield return (new Integer(i), new Integer(buffer[i]));
     }
 }

@@ -46,9 +46,9 @@ public sealed class Stack : DataItem
 
     public override bool IsEmpty() => stack.Count <= 0;
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (DataItem item in stack)
-            yield return new KeyValuePair<DataItem, DataItem>(Void.Value, item);
+            yield return (Void.Value, item);
     }
 }

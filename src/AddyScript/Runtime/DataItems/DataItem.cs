@@ -221,6 +221,6 @@ public abstract class DataItem
     public virtual void SetItem(DataItem index, DataItem value)
         => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexWriter, Class.Name));
 
-    public virtual IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public virtual IEnumerable<(DataItem, DataItem)> GetEnumerable()
         => throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
 }

@@ -2309,11 +2309,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <returns>A <see cref="Function"/></returns>
     public Function ToFunction()
     {
-        var arguments = new Expression[Parameters.Length];
-
-        for (int i = 0; i < Parameters.Length; ++i)
-            arguments[i] = new VariableRef(Parameters[i].Name);
-
+        var arguments = Parameters.Select(p => new VariableRef(p.Name)).ToArray();
         return new Function(Parameters, Block.Return(new InnerFunctionCall(this, arguments)));
     }
 
@@ -2324,16 +2320,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <returns>A <see cref="Function"/></returns>
     public Function ToMethodFunction()
     {
-        var arguments = new Expression[Parameters.Length];
-        arguments[0] = new SelfReference();
+        var arguments = Parameters.Skip(1)
+                                  .Select(p => (Expression)new VariableRef(p.Name))
+                                  .Prepend(new SelfReference())
+                                  .ToArray();
 
-        for (int i = 1; i < Parameters.Length; ++i)
-            arguments[i] = new VariableRef(Parameters[i].Name);
-
-        var parameters = new List<Parameter>(Parameters);
-        parameters.RemoveAt(0);
-
-        return new Function([.. parameters], Block.Return(new InnerFunctionCall(this, arguments)));
+        return new Function(Parameters[1..], Block.Return(new InnerFunctionCall(this, arguments)));
     }
 
     /// <summary>

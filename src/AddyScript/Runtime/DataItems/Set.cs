@@ -118,9 +118,9 @@ public sealed class Set : DataItem
         }
     }
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (DataItem element in hashSet)
-            yield return new KeyValuePair<DataItem, DataItem>(element, element);
+            yield return (element, element);
     }
 }

@@ -150,12 +150,10 @@ public sealed class Tuple(DataItem[] items) : DataItem
     public override void SetItem(DataItem index, DataItem value)
         => throw new InvalidOperationException(Resources.TuplesAreImmutable);
 
-    public override IEnumerable<KeyValuePair<DataItem, DataItem>> GetEnumerable()
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
-        for (int i = 0; i < items.Length; ++i)
-        {
-            var key = new Integer(i);
-            yield return new KeyValuePair<DataItem, DataItem>(key, items[i]);
-        }
+        int i = 0;
+        foreach (DataItem item in items)
+            yield return (new Integer(i++), item);
     }
 }
