@@ -538,4 +538,10 @@ It requires some initialization to support the expected operation.</value>
   <data name="CannotCreateEmptyTuple" xml:space="preserve">
     <value>Could not create an empty tuple</value>
   </data>
+  <data name="ClassHasNoRangeReader" xml:space="preserve">
+    <value>Type {0} has no support for slice extraction</value>
+  </data>
+  <data name="ClassHasNoRangeWriter" xml:space="preserve">
+    <value>Type {0} has no support for slice replacement</value>
+  </data>
 </root>

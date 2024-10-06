@@ -1,4 +1,5 @@
-﻿using AddyScript.Translators;
+﻿using AddyScript.Runtime.DataItems;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Ast.Expressions
@@ -12,7 +13,7 @@ namespace AddyScript.Ast.Expressions
     /// <param name="owner">The collection to which this item belongs</param>
     /// <param name="lowerBound">The lower bound of the items range</param>
     /// <param name="upperBound">The upper bound of the items range</param>
-    public class SliceRef(Expression owner, Expression lowerBound, Expression upperBound) : Expression
+    public class SliceRef(Expression owner, Expression lowerBound, Expression upperBound) : Expression, IReference
     {
 
         /// <summary>
@@ -44,6 +45,17 @@ namespace AddyScript.Ast.Expressions
         public static Expression This(Expression lowerBound, Expression upperBound)
         {
             return new SliceRef(new SelfReference(), lowerBound, upperBound);
+        }
+
+
+        /// <summary>
+        /// Operates assignment to this reference.
+        /// </summary>
+        /// <param name="processor">The assignment processor to use</param>
+        /// <param name="rValue">The value that should be assigned to this reference</param>
+        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
+        {
+            processor.AssignToSlice(this, rValue);
         }
 
         /// <summary>

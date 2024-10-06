@@ -313,6 +313,24 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type {0} has no support for slice extraction.
+        /// </summary>
+        internal static string ClassHasNoRangeReader {
+            get {
+                return ResourceManager.GetString("ClassHasNoRangeReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type {0} has no support for slice replacement.
+        /// </summary>
+        internal static string ClassHasNoRangeWriter {
+            get {
+                return ResourceManager.GetString("ClassHasNoRangeWriter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à A constant field should be initialized upon declaration.
         /// </summary>
         internal static string ConstantFieldShouldBeInitialized {

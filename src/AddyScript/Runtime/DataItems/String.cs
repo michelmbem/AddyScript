@@ -162,7 +162,16 @@ public sealed class String(string value) : DataItem
         return new String(value[n].ToString());
     }
 
-    public override void SetItem(DataItem index, DataItem d)
+    public override void SetItem(DataItem index, DataItem value)
+        => throw new InvalidOperationException(Resources.StringsAreImmutable);
+
+    public override DataItem GetItemRange(int lBound, int uBound)
+    {
+        AdjustBounds(value.Length, ref lBound, ref uBound);
+        return new String(value[lBound..uBound]);
+    }
+
+    public override void SetItemRange(int lBound, int uBound, DataItem value)
         => throw new InvalidOperationException(Resources.StringsAreImmutable);
 
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()

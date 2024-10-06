@@ -221,6 +221,18 @@ public abstract class DataItem
     public virtual void SetItem(DataItem index, DataItem value)
         => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexWriter, Class.Name));
 
+    public virtual DataItem GetItemRange(int lBound, int uBound)
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeReader, Class.Name));
+
+    public virtual void SetItemRange(int lBound, int uBound, DataItem value)
+        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeWriter, Class.Name));
+
     public virtual IEnumerable<(DataItem, DataItem)> GetEnumerable()
         => throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
+
+    protected static void AdjustBounds(int size, ref int lower, ref int upper)
+    {
+        while (lower < 0) lower += size;
+        while (upper <= 0) upper += size;
+    }
 }

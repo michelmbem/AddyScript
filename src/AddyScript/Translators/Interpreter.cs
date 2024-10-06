@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
@@ -882,66 +881,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         try
         {
-            int lBound = 0, uBound = 0;
-
-            if (sliceRef.LowerBound != null)
-            {
-                sliceRef.LowerBound.AcceptTranslator(this);
-                lBound = returnedValue.AsInt32;
-            }
-
-            if (sliceRef.UpperBound != null)
-            {
-                sliceRef.UpperBound.AcceptTranslator(this);
-                uBound = returnedValue.AsInt32;
-            }
-
-            sliceRef.Owner.AcceptTranslator(this);
-            DataItem owner = returnedValue;
-
-            switch (owner.Class.ClassID)
-            {
-                case ClassID.Void:
-                    if (!sliceRef.Optional) goto default;
-                    returnedValue = Void.Value;
-                    break;
-                case ClassID.String:
-                    {
-                        string str = owner.ToString();
-                        while (lBound < 0) lBound += str.Length;
-                        while (uBound <= 0) uBound += str.Length;
-                        returnedValue = new String(str[lBound..uBound]);
-                    }
-                    break;
-                case ClassID.Blob:
-                    {
-                        byte[] bytes = owner.AsByteArray;
-                        while (lBound < 0) lBound += bytes.Length;
-                        while (uBound <= 0) uBound += bytes.Length;
-                        returnedValue = new Blob(bytes[lBound..uBound]);
-                    }
-                    break;
-                case ClassID.Tuple:
-                    {
-                        DataItem[] items = owner.AsArray;
-                        while (lBound < 0) lBound += items.Length;
-                        while (uBound <= 0) uBound += items.Length;
-                        if (lBound >= uBound) throw new ArgumentOutOfRangeException(Resources.CannotCreateEmptyTuple);
-                        returnedValue = new Tuple(items[lBound..uBound]);
-                    }
-                    break;
-                case ClassID.List:
-                    {
-                        List<DataItem> lst = owner.AsList;
-                        while (lBound < 0) lBound += lst.Count;
-                        while (uBound <= 0) uBound += lst.Count;
-                        returnedValue = new List(lst[lBound..uBound]);
-                    }
-                    break;
-                default:
-                    throw new RuntimeException(fileName, sliceRef,
-                        string.Format(Resources.SlicingNotSupported, owner.Class.Name));
-            }
+            ResolveSliceRef(sliceRef, out DataItem owner, out int lBound, out int uBound);
+            returnedValue = owner.GetItemRange(lBound, uBound);
         }
         catch (ScriptException)
         {
@@ -1866,6 +1807,12 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             CheckAccess(indexer.Writer, itemRef);
             Invoke(indexer.Writer.Function, indexer.Name, indexer.Holder, owner, new Literal(index), new Literal(rValue));
         }
+    }
+
+    public void AssignToSlice(SliceRef sliceRef, DataItem rValue)
+    {
+        ResolveSliceRef(sliceRef, out DataItem owner, out int lBound, out int uBound);
+        owner.SetItemRange(lBound, uBound, rValue);
     }
 
     public void AssignToProperty(PropertyRef propertyRef, DataItem rValue)
@@ -3131,7 +3078,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     /// <summary>
     /// Evaluates the <i>Owner</i> and <i>Index</i> members of an ItemRef expression and
-    /// returns the corresponding variables. May create the owner if requested.
+    /// returns the corresponding variables.
     /// </summary>
     /// <param name="itemRef">An <see cref="ItemRef"/></param>
     /// <param name="owner">Will contain the owner upon completion</param>
@@ -3154,8 +3101,36 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
+    /// Evaluates the <i>Owner</i>, <i>LowerBound</i>, and <i>UpperBound</i> members of a SliceRef expression and
+    /// returns the corresponding variables.
+    /// </summary>
+    /// <param name="sliceRef"></param>
+    /// <param name="owner">Will contain the owner upon completion</param>
+    /// <param name="lBound">Will contain the range's lower bound upon completion</param>
+    /// <param name="uBound">Will contain the range's upper bound upon completion</param>
+    private void ResolveSliceRef(SliceRef sliceRef, out DataItem owner, out int lBound, out int uBound)
+    {
+        lBound = uBound = 0;
+
+        if (sliceRef.LowerBound != null)
+        {
+            sliceRef.LowerBound.AcceptTranslator(this);
+            lBound = returnedValue.AsInt32;
+        }
+
+        if (sliceRef.UpperBound != null)
+        {
+            sliceRef.UpperBound.AcceptTranslator(this);
+            uBound = returnedValue.AsInt32;
+        }
+
+        sliceRef.Owner.AcceptTranslator(this);
+        owner = returnedValue;
+    }
+
+    /// <summary>
     /// Evaluates the <i>Owner</i> member of a PropertyRef expression and
-    /// returns the corresponding variable. May create the owner if requested.
+    /// returns the corresponding variable.
     /// </summary>
     /// <param name="propertyRef">A <see cref="PropertyRef"/></param>
     /// <param name="owner">Will contain the owner upon completion</param>

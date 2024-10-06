@@ -10,7 +10,8 @@ public interface IAssignmentProcessor
     void AssignToVariable(VariableRef varRef, DataItem rValue);
     
     void AssignToItem(ItemRef itemRef, DataItem rValue);
-    
+    void AssignToSlice(SliceRef sliceRef, DataItem rValue);
+
     void AssignToProperty(PropertyRef propertyRef, DataItem rValue);
 
     void AssignToStaticProperty(StaticPropertyRef staticRef, DataItem rValue);

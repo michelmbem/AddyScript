@@ -179,13 +179,13 @@ In addition to those operators, the **string** class exposes the following membe
 
 ### Blobs
 
-A **blob** is the abstraction that AddyScript makes of a byte array. Blobs are particularly useful when dealing with methods of .Net classes that expect an array of bytes as an argument (like the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, blobs are not immutable: their content is meant to be changed.
+A **blob** is AddyScript's abstraction of a byte array. Blobs are especially useful when it comes to using methods in .Net classes that take a byte array as an argument (such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
 
-There are several ways of obtaining blobs, like using a blob literal value (which is a literal string preceded with a 'b' or 'B'), or invoking the static _blob::of_ method (which expects the desired length in bytes as an argument), or invoking one the other static methods of the **blob** class, _fromHexString_ and _fromBase64String_ which as the name indicates convert strings to blob using the base 16 or base 64 encoding. You can also cast a string to blob, which will lead to each character being converted to a byte.
+There are several ways to get blobs, such as using a blob literal value (a string literal preceded by a "b" or "B"), or invoking the static method _blob::of_ (which expects the desired length in bytes as an argument), or invoking one of the other static methods "fromHexString" and "fromBase64String" of the blob class which as their name suggests, convert strings to blobs using base-16 or base-64 encoding. You can also convert a string to a blob, which will convert each of its characters to a byte.
 
-Once a blob is created you can individually access to its bytes in read and write mode, you can get its length by reading the "length" property, you can fill it partially or entirely with a byte of your choice, you can also copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
+Once a blob is created, you can access each of its bytes individually for reading or writing, you can get its length by reading the "length" property, you can fill it partially or completely with a byte of your choice, you can also copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
 
-Here is an example of a script that manipulates blobs:
+Here is an example script that manipulates blobs:
 
 ```JS
 b1 = b'Hello friends!';
@@ -193,23 +193,29 @@ b2 = blob::of(24);
 println($'b1 = {b1}, b1.length = {b1.length}');
 println($'b2 = {b2}, b2.length = {b2.length}');
 println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+println();
+
 b2.fill(ord('a'), 0, 8);
 b2.fill(ord('b'), 8, 8);
 b2.fill(ord('c'), 16, 8);
-println($'b2 = {b2}, b2.length = {b2.length}');
-println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+println($'b2 = {b2}, b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+println();
+
 b1.copyTo(b2);
-println($'b2 = {b2}, b2.length = {b2.length}');
-println($'b1 == b2? {b1 == b2}');
+println($'b2 = {b2}, b1 == b2 ? {b1 == b2}');
+println();
+
 b2 = b2[..b1.length];
-println($'b2 = {b2}, b2.length = {b2.length}');
-println($'b1 == b2? {b1 == b2}');
-b2 = blob::fromHexString(b1.toHexString());
-println($'b2 = {b2}, b2.length = {b2.length}');
-println($'b1 == b2? {b1 == b2}');
-b1 = blob::fromBase64String(b2.toBase64String());
-println($'b1 = {b1}, b1.length = {b1.length}');
-println($'b1 == b2? {b1 == b2}');
+println($'b2 = {b2}, b2.length = {b2.length}, b1 == b2 ? {b1 == b2}');
+println();
+
+b2 = blob::fromHexString('48656C6C6F20667269656E647321');
+println($'b2 in base-16 = {b2.toHexString()}, b2.length = {b2.length}, b1 == b2 ? {b1 == b2}');
+println();
+
+b1 = blob::fromBase64String('SGVsbG8gZnJpZW5kcyE=');
+println($'b1 in base-64 = {b1.toBase64String()}, b1.length = {b1.length}, b1 == b2? {b1 == b2}');
+println();
 ```
 
 #### Blob API

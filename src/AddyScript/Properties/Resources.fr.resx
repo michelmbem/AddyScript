@@ -538,4 +538,10 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="CannotCreateEmptyTuple" xml:space="preserve">
     <value>Impossible de créer un tuple vide</value>
   </data>
+  <data name="ClassHasNoRangeReader" xml:space="preserve">
+    <value>Le type {0} ne supporte pas l'extraction de tranches</value>
+  </data>
+  <data name="ClassHasNoRangeWriter" xml:space="preserve">
+    <value>Le type {0} ne supporte pas la mise à jour de tranches</value>
+  </data>
 </root>

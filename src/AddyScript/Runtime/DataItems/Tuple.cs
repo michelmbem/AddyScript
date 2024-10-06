@@ -150,6 +150,15 @@ public sealed class Tuple(DataItem[] items) : DataItem
     public override void SetItem(DataItem index, DataItem value)
         => throw new InvalidOperationException(Resources.TuplesAreImmutable);
 
+    public override DataItem GetItemRange(int lBound, int uBound)
+    {
+        AdjustBounds(items.Length, ref lBound, ref uBound);
+        return new Tuple(items[lBound..uBound]);
+    }
+
+    public override void SetItemRange(int lBound, int uBound, DataItem value)
+        => throw new InvalidOperationException(Resources.TuplesAreImmutable);
+
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         int i = 0;

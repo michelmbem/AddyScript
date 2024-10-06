@@ -161,6 +161,19 @@ public sealed class List : DataItem
         list[n] = value;
     }
 
+    public override DataItem GetItemRange(int lBound, int uBound)
+    {
+        AdjustBounds(list.Count, ref lBound, ref uBound);
+        return new List(list[lBound..uBound]);
+    }
+
+    public override void SetItemRange(int lBound, int uBound, DataItem value)
+    {
+        AdjustBounds(list.Count, ref lBound, ref uBound);
+        list.RemoveRange(lBound, uBound - lBound);
+        list.InsertRange(lBound, value.AsList);
+    }
+
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         int i = 0;
