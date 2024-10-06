@@ -242,23 +242,25 @@ public class Class : IFrameItem
         ];
 
         // Create the int::times and long::times method
-        var timesFunction = new Function([new Parameter("__action")],
-                                         new Block(new ForLoop([VariableDecl.Single("__index", new Literal(new Integer(0)))],
-                                                               new BinaryExpression(BinaryOperator.LessThan, new VariableRef("__index"), new SelfReference()),
-                                                               [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("__index"))],
-                                                               new FunctionCall("__action", new VariableRef("__index"))),
-                                                   new Return(new SelfReference())));
+        var timesFunction = new Function([new("action")],
+                                         new(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
+                                                         new BinaryExpression(BinaryOperator.LessThan, new VariableRef("i"), new SelfReference()),
+                                                         [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
+                                                         new FunctionCall("action", new VariableRef("i"))),
+                                             new Return(new SelfReference())));
 
         Integer.RegisterMethod(new ClassMethod("times", Scope.Public, Modifier.Final, timesFunction));
         Long.RegisterMethod(new ClassMethod("times", Scope.Public, Modifier.Final, timesFunction));
 
         // Create the string::each, list::each, set::each, queue::each and stack::each methods
-        var eachFunction = new Function([new Parameter("__action")],
-                                        new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                  "__value",
-                                                                  new SelfReference(),
-                                                                  new FunctionCall("__action", new VariableRef("__value"))),
-                                                  new Return(new SelfReference())));
+        var eachFunction = new Function([new("action")],
+                                        new(new Assignment(new VariableRef("action"),
+                                                           new MethodCall(new VariableRef("action"), "bind", new Literal(new String("__index")), new Literal())),
+                                        new ForEachLoop("__index",
+                                                        "__value",
+                                                        new SelfReference(),
+                                                        new FunctionCall("action", new VariableRef("__value"), new VariableRef("__index"))),
+                                            new Return(new SelfReference())));
 
         String.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
         Blob.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
@@ -269,212 +271,234 @@ public class Class : IFrameItem
         Stack.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
 
         // Create the tuple::eachIndex and list::eachIndex methods
-        var eachIndexFunction = new Function([new Parameter("__action")],
-                                             new Block(new ForLoop([VariableDecl.Single("__index", new Literal(new Integer(0)))],
-                                                                    new BinaryExpression(BinaryOperator.LessThan, new VariableRef("__index"), MethodCall.OfThis("count")),
-                                                                    [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("__index"))],
-                                                                    new FunctionCall("__action", new VariableRef("__index"))),
-                                                       new Return(new SelfReference())));
+        var eachIndexFunction = new Function([new("action")],
+                                             new(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
+                                                             new BinaryExpression(BinaryOperator.LessThan, new VariableRef("i"), PropertyRef.This("size")),
+                                                             [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
+                                                             new FunctionCall("action", new VariableRef("i"))),
+                                                 new Return(new SelfReference())));
 
         Tuple.RegisterMethod(new ClassMethod("eachIndex", Scope.Public, Modifier.Final, eachIndexFunction));
         List.RegisterMethod(new ClassMethod("eachIndex", Scope.Public, Modifier.Final, eachIndexFunction));
 
         // Create the map::each method
-        var mapEachFunction = new Function([new Parameter("__action")],
-                                           new Block(new ForEachLoop("__key",
-                                                                     "__value",
-                                                                     new SelfReference(),
-                                                                     new FunctionCall("__action", new VariableRef("__key"), new VariableRef("__value"))),
-                                                     new Return(new SelfReference())));
+        var mapEachFunction = new Function([new("action")],
+                                           new(new ForEachLoop("__key",
+                                                               "__value",
+                                                               new SelfReference(),
+                                                               new FunctionCall("action", new VariableRef("__key"), new VariableRef("__value"))),
+                                               new Return(new SelfReference())));
 
         Map.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, mapEachFunction));
 
         // Create the map::eachKey method
-        var mapEachKeyFunction = new Function([new Parameter("__action")],
-                                              new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                        "__value",
-                                                                        PropertyRef.This("keys"),
-                                                                        new FunctionCall("__action", new VariableRef("__value"))),
-                                                        new Return(new SelfReference())));
+        var mapEachKeyFunction = new Function([new("action")],
+                                              new(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+                                                                  "__value",
+                                                                  PropertyRef.This("keys"),
+                                                                  new FunctionCall("action", new VariableRef("__value"))),
+                                                  new Return(new SelfReference())));
 
         Map.RegisterMethod(new ClassMethod("eachKey", Scope.Public, Modifier.Final, mapEachKeyFunction));
 
         // Create the map::eachValue method
-        var mapEachValueFunction = new Function([new Parameter("__action")],
-                                                new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                          "__value",
-                                                                          PropertyRef.This("values"),
-                                                                          new FunctionCall("__action", new VariableRef("__value"))),
-                                                          new Return(new SelfReference())));
+        var mapEachValueFunction = new Function([new("action")],
+                                                new(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+                                                                    "__value",
+                                                                    PropertyRef.This("values"),
+                                                                    new FunctionCall("action", new VariableRef("__value"))),
+                                                    new Return(new SelfReference())));
 
         Map.RegisterMethod(new ClassMethod("eachValue", Scope.Public, Modifier.Final, mapEachValueFunction));
 
         // Create the list::where method
-        var lstWhereFunction = new Function([new Parameter("__predicate")],
-                                            new Block(VariableDecl.Single("l", new ListInitializer()),
-                                                      new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                      "__value",
-                                                                      new SelfReference(),
-                                                                      new IfElse(new FunctionCall("__predicate", new VariableRef("__value")),
-                                                                                 new MethodCall(new VariableRef("l"), "add", new VariableRef("__value")))),
-                                                      new Return(new VariableRef("l"))));
+        var lstWhereFunction = new Function([new("predicate")],
+                                            new(VariableDecl.Single("l", new ListInitializer()),
+                                                new Assignment(new VariableRef("predicate"),
+                                                               new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                                new ForEachLoop("__index",
+                                                                "__value",
+                                                                new SelfReference(),
+                                                                new IfElse(new FunctionCall("predicate", new VariableRef("__value"), new VariableRef("__index")),
+                                                                           new MethodCall(new VariableRef("l"), "add", new VariableRef("__value")))),
+                                                new Return(new VariableRef("l"))));
 
         List.RegisterMethod(new ClassMethod("where", Scope.Public, Modifier.Final, lstWhereFunction));
 
         // Create the set::where method
-        var setWhereFunction = new Function([new Parameter("__predicate")],
-                                            new Block(VariableDecl.Single("s", new SetInitializer()),
-                                                      new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                      "__value",
-                                                                      new SelfReference(),
-                                                                      new IfElse(new FunctionCall("__predicate", new VariableRef("__value")),
-                                                                                 new MethodCall(new VariableRef("s"), "add", new VariableRef("__value")))),
-                                                      new Return(new VariableRef("s"))));
+        var setWhereFunction = new Function([new("predicate")],
+                                            new(VariableDecl.Single("s", new SetInitializer()),
+                                                new Assignment(new VariableRef("selector"),
+                                                               new MethodCall(new VariableRef("selector"), "bind", new Literal(new String("__index")), new Literal())),
+                                                new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+                                                                "__value",
+                                                                new SelfReference(),
+                                                                new IfElse(new FunctionCall("predicate", new VariableRef("__value"), new VariableRef("__index")),
+                                                                           new MethodCall(new VariableRef("s"), "add", new VariableRef("__value")))),
+                                                new Return(new VariableRef("s"))));
 
         Set.RegisterMethod(new ClassMethod("where", Scope.Public, Modifier.Final, setWhereFunction));
 
         // Create the tuple::all, list::all and set::all methods
-        var allFunction = new Function([new Parameter("__predicate")],
-                                       new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                 "__value",
-                                                                 new SelfReference(),
-                                                                 new IfElse(new UnaryExpression(UnaryOperator.Not, new FunctionCall("__predicate", new VariableRef("__value"))),
-                                                                            new Return(new Literal(DataItems.Boolean.False)))),
-                                                 new Return(new Literal(DataItems.Boolean.True))));
+        var allFunction = new Function([new("predicate")],
+                                       new(new Assignment(new VariableRef("predicate"),
+                                                          new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                           new ForEachLoop("__index",
+                                                           "__value",
+                                                           new SelfReference(),
+                                                           new IfElse(new UnaryExpression(UnaryOperator.Not, new FunctionCall("predicate", new VariableRef("__value"), new VariableRef("__index"))),
+                                                                      new Return(new Literal(DataItems.Boolean.False)))),
+                                           new Return(new Literal(DataItems.Boolean.True))));
 
         Tuple.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
         List.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
         Set.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
 
         // Create the tuple::any, list::any and set::any methods
-        var anyFunction = new Function([new Parameter("__predicate")],
-                                       new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                 "__value",
-                                                                 new SelfReference(),
-                                                                 new IfElse(new FunctionCall("__predicate", new VariableRef("__value")),
-                                                                            new Return(new Literal(DataItems.Boolean.True)))),
-                                                 new Return(new Literal(DataItems.Boolean.False))));
+        var anyFunction = new Function([new("predicate")],
+                                       new(new Assignment(new VariableRef("predicate"),
+                                                          new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                           new ForEachLoop("__index",
+                                                           "__value",
+                                                           new SelfReference(),
+                                                           new IfElse(new FunctionCall("predicate", new VariableRef("__value"), new VariableRef("__index")),
+                                                                      new Return(new Literal(DataItems.Boolean.True)))),
+                                           new Return(new Literal(DataItems.Boolean.False))));
 
         Tuple.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
         List.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
         Set.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
 
         // Create the tuple::first, list::first and set::first methods
-        var firstFunction = new Function([new Parameter("__predicate")],
-                                         new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                   "__value",
-                                                                   new SelfReference(),
-                                                                   new IfElse(new FunctionCall("__predicate", new VariableRef("__value")),
-                                                                              new Return(new VariableRef("__value")))),
-                                                   new Return(new Literal())));
+        var firstFunction = new Function([new("predicate")],
+                                         new(new Assignment(new VariableRef("predicate"),
+                                                            new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                             new ForEachLoop("__index",
+                                                             "__value",
+                                                             new SelfReference(),
+                                                             new IfElse(new FunctionCall("predicate", new VariableRef("__value"), new VariableRef("__index")),
+                                                                        new Return(new VariableRef("__value")))),
+                                             new Return(new Literal())));
 
         Tuple.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
         List.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
         Set.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
 
         // Create the tuple::last and list::last methods
-        var lastFunction = new Function([new Parameter("__predicate")],
-                                        new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                              PropertyRef.This("size"),
-                                                                                                              new Literal(new Integer(1)))) ],
-                                                              new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
-                                                                                   new VariableRef("i"),
-                                                                                   new Literal(new Integer(0))),
-                                                              [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))], 
-                                                              new IfElse(new FunctionCall("__predicate", ItemRef.This(new VariableRef("i"))),
-                                                                         new Return(ItemRef.This(new VariableRef("i"))))),
-                                                  new Return(new Literal())));
+        var lastFunction = new Function([new("predicate")],
+                                        new(new Assignment(new VariableRef("predicate"),
+                                                           new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                            new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
+                                                                                                        PropertyRef.This("size"),
+                                                                                                        new Literal(new Integer(1)))) ],
+                                                        new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
+                                                                            new VariableRef("i"),
+                                                                            new Literal(new Integer(0))),
+                                                        [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))], 
+                                                        new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
+                                                                   new Return(ItemRef.This(new VariableRef("i"))))),
+                                            new Return(new Literal())));
 
         Tuple.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
         List.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
 
         // Create the tuple::findIndex and list::findIndex methods
-        var findIndexFunction = new Function([new Parameter("__predicate")],
-                                             new Block(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
-                                                                   new BinaryExpression(BinaryOperator.LessThan,
-                                                                                        new VariableRef("i"),
-                                                                                        PropertyRef.This("size")),
-                                                                   [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
-                                                                   new IfElse(new FunctionCall("__predicate", ItemRef.This(new VariableRef("i"))),
-                                                                              new Return(new VariableRef("i")))),
-                                                       new Return(new Literal(new Integer(-1)))));
+        var findIndexFunction = new Function([new("predicate")],
+                                             new(new Assignment(new VariableRef("predicate"),
+                                                                new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                                 new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
+                                                             new BinaryExpression(BinaryOperator.LessThan,
+                                                                                  new VariableRef("i"),
+                                                                                  PropertyRef.This("size")),
+                                                             [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
+                                                             new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
+                                                                        new Return(new VariableRef("i")))),
+                                                 new Return(new Literal(new Integer(-1)))));
 
         Tuple.RegisterMethod(new ClassMethod("findIndex", Scope.Public, Modifier.Final, findIndexFunction));
         List.RegisterMethod(new ClassMethod("findIndex", Scope.Public, Modifier.Final, findIndexFunction));
 
         // Create the tuple::findLastIndex and list::findLastIndex methods
-        var findLastIndexFunction = new Function([new Parameter("__predicate")],
-                                                 new Block(new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                                       PropertyRef.This("size"),
-                                                                                                                       new Literal(new Integer(1)))) ],
-                                                                       new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
-                                                                                            new VariableRef("i"),
-                                                                                            new Literal(new Integer(0))),
-                                                                       [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))],
-                                                                       new IfElse(new FunctionCall("__predicate", ItemRef.This(new VariableRef("i"))),
-                                                                                  new Return(new VariableRef("i")))),
-                                                           new Return(new Literal(new Integer(-1)))));
+        var findLastIndexFunction = new Function([new("predicate")],
+                                                 new(new Assignment(new VariableRef("predicate"),
+                                                                    new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
+                                                     new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
+                                                                                                                 PropertyRef.This("size"),
+                                                                                                                 new Literal(new Integer(1)))) ],
+                                                                 new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
+                                                                                     new VariableRef("i"),
+                                                                                     new Literal(new Integer(0))),
+                                                                 [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))],
+                                                                 new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
+                                                                            new Return(new VariableRef("i")))),
+                                                     new Return(new Literal(new Integer(-1)))));
 
         Tuple.RegisterMethod(new ClassMethod("findLastIndex", Scope.Public, Modifier.Final, findLastIndexFunction));
         List.RegisterMethod(new ClassMethod("findLastIndex", Scope.Public, Modifier.Final, findLastIndexFunction));
 
         // Create the list::select method
-        var lstSelectFunction = new Function([new Parameter("__selector")],
-                                             new Block(VariableDecl.Single("l", new ListInitializer()),
-                                                       new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                       "__value",
-                                                                       new SelfReference(),
-                                                                       new MethodCall(new VariableRef("l"),
-                                                                                      "add",
-                                                                                      new FunctionCall("__selector", new VariableRef("__value")))),
-                                                       new Return(new VariableRef("l"))));
+        var lstSelectFunction = new Function([new("selector")],
+                                             new(VariableDecl.Single("l", new ListInitializer()),
+                                                 new Assignment(new VariableRef("selector"),
+                                                                new MethodCall(new VariableRef("selector"), "bind", new Literal(new String("__index")), new Literal())),
+                                                 new ForEachLoop("__index",
+                                                                 "__value",
+                                                                 new SelfReference(),
+                                                                 new MethodCall(new VariableRef("l"),
+                                                                                "add",
+                                                                                new FunctionCall("selector", new VariableRef("__value"), new VariableRef("__index")))),
+                                                 new Return(new VariableRef("l"))));
 
         List.RegisterMethod(new ClassMethod("select", Scope.Public, Modifier.Final, lstSelectFunction));
 
         // Create the set::select method
-        var setSelectFunction = new Function([new Parameter("__selector")],
-                                             new Block(VariableDecl.Single("s", new SetInitializer()),
-                                                       new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                       "__value",
-                                                                       new SelfReference(),
-                                                                       new MethodCall(new VariableRef("s"),
-                                                                                      "add",
-                                                                                      new FunctionCall("__selector", new VariableRef("__value")))),
-                                                       new Return(new VariableRef("s"))));
+        var setSelectFunction = new Function([new("selector")],
+                                             new(VariableDecl.Single("s", new SetInitializer()),
+                                                 new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+                                                                 "__value",
+                                                                 new SelfReference(),
+                                                                 new MethodCall(new VariableRef("s"),
+                                                                                "add",
+                                                                                new FunctionCall("selector", new VariableRef("__value")))),
+                                                 new Return(new VariableRef("s"))));
 
         Set.RegisterMethod(new ClassMethod("select", Scope.Public, Modifier.Final, setSelectFunction));
 
         // Create the tuple::aggregate, list::aggregate and set::aggregate methods
-        var aggregateFunction = new Function([new Parameter("__seed"), new Parameter("__aggregator")],
-                                             new Block(VariableDecl.Single("__accumulator", new VariableRef("__seed")),
-                                                       new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                       "__value",
-                                                                       new SelfReference(),
-                                                                       new Assignment(new VariableRef("__accumulator"),
-                                                                                      new FunctionCall("__aggregator",
-                                                                                                       new VariableRef("__accumulator"),
-                                                                                                       new VariableRef("__value")))),
-                                                       new Return(new VariableRef("__accumulator"))));
+        var aggregateFunction = new Function([new("seed"), new("aggregator")],
+                                             new(VariableDecl.Single("accumulator", new VariableRef("seed")),
+                                                 new Assignment(new VariableRef("aggregator"),
+                                                                new MethodCall(new VariableRef("aggregator"), "bind", new Literal(new String("__index")), new Literal())),
+                                                 new ForEachLoop("__index",
+                                                                 "__value",
+                                                                 new SelfReference(),
+                                                                 new Assignment(new VariableRef("accumulator"),
+                                                                                new FunctionCall("aggregator",
+                                                                                                 new VariableRef("accumulator"),
+                                                                                                 new VariableRef("__value"),
+                                                                                                 new VariableRef("__index")))),
+                                                 new Return(new VariableRef("accumulator"))));
 
         Tuple.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
         List.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
         Set.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
 
         // Create the list::groupBy method
-        var groupByFunction = new Function([new Parameter("__func")],
-                                           new Block(VariableDecl.Single("__groups", new MapInitializer()),
-                                                     new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
-                                                                     "__value",
-                                                                     new SelfReference(),
-                                                                     new Block(VariableDecl.Single("__group_id", new FunctionCall("__func", new VariableRef("__value"))),
-                                                                               new IfElse(new MethodCall(new VariableRef("__groups"), "containsKey", new VariableRef("__group_id")),
-                                                                                          new MethodCall(new ItemRef(new VariableRef("__groups"), new VariableRef("__group_id")),
-                                                                                                         "add",
-                                                                                                         new VariableRef("__value")),
-                                                                                          new Assignment(new ItemRef(new VariableRef("__groups"), new VariableRef("__group_id")),
-                                                                                                         new ListInitializer(new ListItem(new VariableRef("__value"),
-                                                                                                                             false)))))),
-                                                     new Return(new VariableRef("__groups"))));
+        var groupByFunction = new Function([new("groupFunc")],
+                                           new(VariableDecl.Single("groups", new MapInitializer()),
+                                               new Assignment(new VariableRef("groupFunc"),
+                                                              new MethodCall(new VariableRef("groupFunc"), "bind", new Literal(new String("__index")), new Literal())),
+                                               new ForEachLoop("__index",
+                                                               "__value",
+                                                               new SelfReference(),
+                                                               new Block(VariableDecl.Single("groupId", new FunctionCall("groupFunc", new VariableRef("__value"), new VariableRef("__index"))),
+                                                                         new IfElse(new MethodCall(new VariableRef("groups"), "containsKey", new VariableRef("groupId")),
+                                                                                    new MethodCall(new ItemRef(new VariableRef("groups"), new VariableRef("groupId")),
+                                                                                                   "add",
+                                                                                                   new VariableRef("__value")),
+                                                                                    new Assignment(new ItemRef(new VariableRef("groups"), new VariableRef("groupId")),
+                                                                                                   new ListInitializer(new ListItem(new VariableRef("__value"))))))),
+                                               new Return(new VariableRef("groups"))));
 
         List.RegisterMethod(new ClassMethod("groupBy", Scope.Public, Modifier.Final, groupByFunction));
     }

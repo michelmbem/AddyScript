@@ -175,6 +175,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             Class.Map.RegisterProperty(function.ToInstanceProperty());
         foreach (InnerFunction function in mapFunctions)
             Class.Map.RegisterMethod(function.ToInstanceMethod());
+
+        Class.Closure.RegisterMethod(ClosureBind.ToInstanceMethod());
     }
 
     #endregion
@@ -1595,6 +1597,39 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #endregion
 
+    #region Closure specific methods
+
+    private static DataItem ClosureBindLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].AsFunction;
+
+        var nameArg = arguments[1];
+        CheckArgType(nameArg, Class.String, "bind", 1);
+
+        Block body = new Block(self.Body.Statements);
+        body.CopyLocation(self.Body);
+        
+        int paramIndex = Array.FindIndex(self.Parameters, p => p.Name == nameArg.ToString());
+        Parameter[] parameters;
+
+        if (paramIndex < 0)
+        {
+            int uBound = self.Parameters.Length;
+            if (self.Parameters[^1].VaList) --uBound;
+
+            parameters = [.. self.Parameters[0..uBound], new(nameArg.ToString(), arguments[2]), .. self.Parameters[uBound..]];
+        }
+        else
+        {
+            parameters = [.. self.Parameters[0..paramIndex], .. self.Parameters[(paramIndex + 1)..]];
+            body.Insert(0, VariableDecl.Single(nameArg.ToString(), new Literal(arguments[2])));
+        }
+
+        return new Closure(new Function(parameters, body));
+    }
+
+    #endregion
+
     #endregion
 
     #region Predefined instances
@@ -2318,6 +2353,15 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Empties a map.
     /// </summary>
     public static readonly InnerFunction MapClear = new("clear", [new("self")], MapClearLogic);
+
+    #endregion
+
+    #region Closure specific methods
+
+    /// <summary>
+    /// Binds an optional parameter to a function.
+    /// </summary>
+    public static readonly InnerFunction ClosureBind = new("bind", [new("self"), new("parameterName"), new("defaultValue")], ClosureBindLogic);
 
     #endregion
 

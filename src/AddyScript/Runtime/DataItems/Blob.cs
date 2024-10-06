@@ -175,15 +175,7 @@ public sealed class Blob(byte[] buffer) : DataItem
     public override void SetItemRange(int lBound, int uBound, DataItem value)
     {
         AdjustBounds(buffer.Length, ref lBound, ref uBound);
-
-        var otherBuffer = value.AsByteArray;
-        var newBuffer = new byte[buffer.Length - uBound + lBound + otherBuffer.Length];
-        
-        Array.Copy(buffer, 0, newBuffer, 0, lBound);
-        Array.Copy(otherBuffer, 0, newBuffer, lBound, otherBuffer.Length);
-        Array.Copy(buffer, uBound, newBuffer, lBound + otherBuffer.Length, buffer.Length - uBound);
-
-        buffer = newBuffer;
+        buffer = [..buffer[..lBound], ..value.AsByteArray, ..buffer[uBound..]];
     }
 
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
