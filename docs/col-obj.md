@@ -2,11 +2,55 @@
 
 ### Collections
 
-Collections are ways to store multiple values ​​in a single variable. AddyScript offers 5 different types of collections: lists, maps, sets, queues, and stacks. Each of these types has a unique set of features and is suited for a particular usage scenario.
+Collections are ways to store multiple values ​​in a single variable. AddyScript offers 6 different types of collections: tuples, lists, sets, queues, stacks, and , maps. Each of these types has a unique set of features and is suited for a particular usage scenario.
+
+### Tuples
+
+A tuple is a collection in which items are accessed by index. You typically create a tuple using a tuple initializer. Once created, the contents of the tuple do not change, meaning that tuples are immutable. Items cannot be added, updated, or deleted, and the size of the tuple does not change during its lifetime. You can search for an item in a tuple using the **contains** operator or the "indexOf" and "lastIndexOf" methods. You can read the "size" property to get the number of items stored in the tuple. Here is an example of using a tuple in AddyScript.
+
+Example:
+
+```JS
+t = ('John Doe', 19, 'New York');
+
+println($'t.size = {t.size}');
+println('contents:');
+
+for (var i = 0; i < t.size; ++i)
+    println($'t[{i}] = {t[i]}');
+
+println($'19 is at index {t.indexOf(19)}');
+println($'Does t contain "New York"? {t contains "New York"}');
+println($'Does t contain "Tokyo"? {t contains "Tokyo"}');
+```
+
+#### Tuple API
+
+The following tables summarize all the operators, properties and methods provided by the AddyScript tuple API.
+
+The **tuple** class supports the following operators:
+
+|Operator|Operands|Description|
+|:-:|-|-|
+|[index]|an integer|Gets the value of an item in the tuple. Negative indices are processed modulo the length of the tuple.|
+|[lbound..ubound]|2 integers|Gets a slice (i.e. a sub-tuple) of the target tuple. Either "lbound" or "ubound" can be omitted. When "lbound" is omitted it's replaced with 0, a missing "ubound" will be replaced with the length of the tuple.|
+|\+|2 tuples|Concatenates two tuples.|
+|\*|A tuple on one side and an integer on the other side|Concatenates a tuple with itself the given number of times.|
+|**contains**|a tuple to the left and anything to the right|Checks if the tuple contains the given value.|
+|==|2 tuples|Checks that both tuples have the same length and contain equal items at each position.|
+|!=|2 tuples|Checks that both tuples have different lengths or contain different items at least at one position.|
+
+In addition to the above operators, the **tuple** class exposes the following members:
+
+|Member|Nature|Description|
+|-|-|-|
+|`int size { read; }`|property|Gets the number of items currently stored in the tuple.|
+|`int indexOf(any value, int start = 0, int count = 0)`|method|Gets the position of the first occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
+|`int lastIndexOf(any value, int start = -1, int count = 0)`|method|Gets the position of the last occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
 
 ### Lists
 
-A list is a collection in which items are accessed by index. It is a kind of dynamically sized array. You typically create a list using a list initializer. After creating a list, you can add new items to it using the "add" or "insert" methods. You can remove existing items from it using the "remove" and "removeAt" methods. A list is searched using the **contains** operator or the "indexOf" and "lastIndexOf" methods. The contents of the list can be sorted using the "sort" method. The "inverse" method returns a list with the same contents but with the items ordered in reverse order. To get the number of items currently stored in the list, simply read the "size" property and finally, to empty the list, call the "clear" method. Here is an example of using a list in AddyScript.
+Like a tuple, a list is a collection in which items are accessed by index. But on contrary of tuples, lists are not immutable. A list is a kind of dynamically sized array. You typically create a list using a list initializer. After creating a list, you can add new items to it using the "add" or "insert" methods. You can remove existing items from it using the "remove" and "removeAt" methods. You can search for an item in a list using the **contains** operator or the "indexOf" and "lastIndexOf" methods. The contents of the list can be sorted using the "sort" method. The "inverse" method returns a list with the same contents but with the items ordered in reverse order. To get the number of items currently stored in the list, simply read the "size" property and finally, to empty the list, call the "clear" method. Here is an example of using a list in AddyScript.
 
 Example:
 
@@ -95,86 +139,6 @@ In addition to the above operators, the **list** class exposes the following mem
 |`list unique()`|method|Gets a clone of the calling list in which each item is unique.|
 |`map mapTo(list other)`|method|Creates and returns a map using the items of the calling list as keys and those of the other list as values. Both lists must have the same length.|
 |`string join(string separator = ' ')`|method|Creates a string by concatenating the list items. An optional separator can be provided; by default, the whitespace is used as a separator.|
-
-### Maps
-
-A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indexes are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "size" property. The "containsKey" and "containsValue" methods are used to check the existence of a particular pair in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map, the collection returned by "getValues" will contain only one copy of it. To get all the keys related to a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is related to. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).size`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
-
-Example:
-
-```JS
-tom = {'name' => 'Tom Berenger', 'job' => 'Lawyer', 'age' => 38};
-tom['company'] = 'Holy Lawyers & co.';
-tom['hire date'] = `2004-05-18`;
-tom['salary'] = 3600D;
-
-foreach (prop => value in tom)
-    println('{0} : {1}', prop, value);
-
-someProperty = readln('Type the name of a property: ');
-
-if (tom.containsKey(someProperty))
-    println('Property ' + someProperty + ' is already defined for tom!');
-else
-{
-    tom[someProperty] = readln('Enter a value for ' + someProperty + ': ');
-    println('After adding that property:');
-    foreach (prop in tom.keys)
-        println('{0} : {1}', prop, tom[prop]);
-}
-
-someProperty = readln('Type the name of another property: ');
-
-if (tom.remove(someProperty))
-{
-    println('After removal of ' + someProperty + ':');
-    foreach (value in tom)
-        println('{0} : {1}', __key, value);
-}
-else
-    println('Property ' + someProperty + ' is not defined for tom!');
-
-someValue = readln('Type any value: ');
-
-if (tom.containsValue(someValue))
-{
-    println(someValue + ' is the value of ' + tom.frequencyOf(someValue) + ' properties of tom');
-    print('Those are :');
-    foreach (prop in tom.keysOf(someValue))
-        print(prop);
-    println();
-}
-else
-    println('No property of tom has value ' + someValue);
-```
-
-#### Map API
-
-The following tables summarize all the operators, properties and methods provided by the AddyScript map API.
-
-The map class supports the following operators:
-
-|Operator|Operands|Description|
-|:-:|-|-|
-|[key]|a value of any type|Gets or sets the value attached to the given key in the map.|
-|\+|2 maps|Merges both map in a single one. It fails if both maps have a key in common.|
-|==|2 maps|Checks that both maps contain equal key-value pairs.|
-|!=|2 lists|Checks that one of the maps has at least one key-value pairs that the other map does not have.|
-
-In addition to the above operators, the **map** class exposes the following members:
-
-|Member|Nature|Description|
-|-|-|-|
-|`int size { read; }`|property|Gets the number of key-value pairs currently stored in the map.|
-|`set keys { read; }`|property|Gets a set of all the keys of a map.|
-|`set values { read; }`|property|Gets a set of all the distinct values of a map.|
-|`bool containsKey(any key)`|method|Checks if the map contains the given key.|
-|`bool containsValue(any value)`|method|Checks if the map contains the given value.|
-|`set keysOf(any value)`|method|Gets a set of all the keys of a map that are bound to a particular value.|
-|`int frequencyOf(any value)`|method|Gets the number of all the keys of a map that are bound to a particular value.<br>This is also the number of occurrences of a value in the map.|
-|`bool remove(any key)`|method|Tries to remove a key-value pair from a map (the one that has the given key if any). Returns true on success, false otherwise.|
-|`void clear()`|method|Empties a map.|
-|`map inverse()`|method|Creates and returns a map in which key-value pairs are inverse of those of the calling one.|
 
 ### Sets
 
@@ -267,6 +231,86 @@ The following table summarizes all the properties and methods provided by the Ad
 |`any pop()`|method|Pops a value from the stack.|
 |`any peek()`|method|Peeks the value that's on top the stack without removing it.|
 |`void clear()`|method|Empties a stack.|
+
+### Maps
+
+A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indexes are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "size" property. The "containsKey" and "containsValue" methods are used to check the existence of a particular pair in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map, the collection returned by "getValues" will contain only one copy of it. To get all the keys related to a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is related to. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).size`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
+
+Example:
+
+```JS
+tom = {'name' => 'Tom Berenger', 'job' => 'Lawyer', 'age' => 38};
+tom['company'] = 'Holy Lawyers & co.';
+tom['hire date'] = `2004-05-18`;
+tom['salary'] = 3600D;
+
+foreach (prop => value in tom)
+    println('{0} : {1}', prop, value);
+
+someProperty = readln('Type the name of a property: ');
+
+if (tom.containsKey(someProperty))
+    println('Property ' + someProperty + ' is already defined for tom!');
+else
+{
+    tom[someProperty] = readln('Enter a value for ' + someProperty + ': ');
+    println('After adding that property:');
+    foreach (prop in tom.keys)
+        println('{0} : {1}', prop, tom[prop]);
+}
+
+someProperty = readln('Type the name of another property: ');
+
+if (tom.remove(someProperty))
+{
+    println('After removal of ' + someProperty + ':');
+    foreach (value in tom)
+        println('{0} : {1}', __key, value);
+}
+else
+    println('Property ' + someProperty + ' is not defined for tom!');
+
+someValue = readln('Type any value: ');
+
+if (tom.containsValue(someValue))
+{
+    println(someValue + ' is the value of ' + tom.frequencyOf(someValue) + ' properties of tom');
+    print('Those are :');
+    foreach (prop in tom.keysOf(someValue))
+        print(prop);
+    println();
+}
+else
+    println('No property of tom has value ' + someValue);
+```
+
+#### Map API
+
+The following tables summarize all the operators, properties and methods provided by the AddyScript map API.
+
+The map class supports the following operators:
+
+|Operator|Operands|Description|
+|:-:|-|-|
+|[key]|a value of any type|Gets or sets the value attached to the given key in the map.|
+|\+|2 maps|Merges both map in a single one. It fails if both maps have a key in common.|
+|==|2 maps|Checks that both maps contain equal key-value pairs.|
+|!=|2 lists|Checks that one of the maps has at least one key-value pairs that the other map does not have.|
+
+In addition to the above operators, the **map** class exposes the following members:
+
+|Member|Nature|Description|
+|-|-|-|
+|`int size { read; }`|property|Gets the number of key-value pairs currently stored in the map.|
+|`set keys { read; }`|property|Gets a set of all the keys of a map.|
+|`set values { read; }`|property|Gets a set of all the distinct values of a map.|
+|`bool containsKey(any key)`|method|Checks if the map contains the given key.|
+|`bool containsValue(any value)`|method|Checks if the map contains the given value.|
+|`set keysOf(any value)`|method|Gets a set of all the keys of a map that are bound to a particular value.|
+|`int frequencyOf(any value)`|method|Gets the number of all the keys of a map that are bound to a particular value.<br>This is also the number of occurrences of a value in the map.|
+|`bool remove(any key)`|method|Tries to remove a key-value pair from a map (the one that has the given key if any). Returns true on success, false otherwise.|
+|`void clear()`|method|Empties a map.|
+|`map inverse()`|method|Creates and returns a map in which key-value pairs are inverse of those of the calling one.|
 
 ### Objects
 

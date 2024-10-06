@@ -1,0 +1,24 @@
+b1 = b'Hello friends!';
+b2 = blob::of(24);
+println($'b1 = {b1}, b1.length = {b1.length}');
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+b2.fill(ord('a'), 0, 8);
+b2.fill(ord('b'), 8, 8);
+b2.fill(ord('c'), 16, 8);
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+b1.copyTo(b2);
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b2 = b2[..b1.length];
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b2 = blob::fromHexString(b1.toHexString());
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b1 = blob::fromBase64String(b2.toBase64String());
+println($'b1 = {b1}, b1.length = {b1.length}');
+println($'b1 == b2? {b1 == b2}');
+
+readln();

@@ -80,14 +80,13 @@ MAX_ITEMS = 100;
 |NINFINITY|(None)|A symbolic representation of the negative infinity.|
 |PINFINITY|(None)|A symbolic representation of the positive infinity.|
 |NAN|(None)|A value indicating that a floating-point number is in an invalid state.|
-|I|Well, **i** itself|The imaginary one complex number.|
 |MINDATE|0001-01-01 00:00:00|The minimum value for the **date** type.|
 |MAXDATE|9999-12-31 23:59:59|The maximum value for the **date** type.|
 |NEWLINE|"\r\n" on Windows, "\n" on Unix based systems|The sequence of characters used to mark the end of a line by the underlying platform.|
 
 ### Data types
 
-Even if you don't have to explicitly define the type of your variables in AddyScript, they still have a type. In fact, AddyScript recognizes a set of 27 predefined data types. In addition to that, you can create your own classes and add them to the set of existing data types. Below are listed the AddyScript's built-in types and their meaning:
+Even if you don't have to explicitly define the type of your variables in AddyScript, they still have a type. In fact, AddyScript recognizes a set of 29 predefined data types. In addition to that, you can create your own classes and add them to the set of existing data types. Below are listed the AddyScript's built-in types and their meaning:
 
 |Type|Description|.Net equivalent|
 |:-:|-|-|
@@ -101,11 +100,13 @@ Even if you don't have to explicitly define the type of your variables in AddySc
 |complex|A double precision complex number.|System.Numerics.Complex|
 |date|A date and/or time value.|System.DateTime|
 |string|An immutable sequence of unicode characters.|System.String|
+|blob|An abstraction of a byte array.|System.Byte[]|
+|tuple|An immutable sequence of data items accessible by index in read-only mode|System.Tuple&lt;T&gt;, System.ValueTuple&lt;T&gt;|
 |list|A dynamically sized sequence of data items accessible by index in read and write mode|System.Collections.ArrayList, System.Collections.Generic.List&lt;T&gt;|
-|map|A set of key-value pairs. Each value is accessible in read and write mode by its key.|System.Collections.HashTable, System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;|
 |set|An emulation of the mathematical concept of a set.|System.Collections.Generic.HashSet&lt;T&gt;|
 |queue|A _first-in-first-out_ type of collection.|System.Collections.Queue, System.Collections.Generic.Queue&lt;T&gt;|
 |stack|A _last-in-first-out_ type of collection.|System.Collections.Stack, System.Collections.Generic.Stack&lt;T&gt;|
+|map|A set of key-value pairs. Each value is accessible in read and write mode by its key.|System.Collections.HashTable, System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;|
 |object|An object in with dynamic fields. Fields are dynamic in number and type.|System.Object (but more like System.Collections.Generic.Dictionary&lt;System.String, System.Object&gt;)|
 |resource|A reference to an imported .Net or COM object|System.Object|
 |closure|A reference to a function or method, a callback.|System.Delegate|
@@ -135,6 +136,8 @@ Depending on their type, literal values have the following forms:
 
 * **Decimal number**: just like floating-point numbers with a mandatory 'd' or 'D' suffix.
 
+* **Complex number**: Any literal numeric value that has the suffix "i" or "I" is considered the imaginary part of a complex number. This makes AddyScript have a very natural syntax for representing complex numbers, as in "2 - 5i" or "1 + 2i". When the imaginary part is 1, it should be represented as "1i" or "1I". Simply typing "i" or "I" will cause the AddyScript interpreter to look for a variable with that name. 
+
 * **Date**: any valid date between backticks (**e.g.**: \``2008-04-11`\`, \``2:30 PM`\`, \``05/18/2009 13:04`\`).
 
 * **String**: a sequence of unicode characters between single or double quotes. When a backslash (\\) appears in a string, it alters the meaning of the following characters. Combinations of backslash and its followers are called **escape sequences** and have the following meaning:
@@ -154,6 +157,8 @@ Depending on their type, literal values have the following forms:
 
     **e.g.**: `'Hello World!'`, `"Joe's dog's bell"`, `"C:\\Documents and Settings\\Addy"`, `'Living\r\nLa vida\tloca'`.
 
+* **Blob**: A literal string value prefixed with the letter 'b' or 'B'. Each character in the string represents a single byte (**e.g.**: `b"Initial content of my buffer"`, `B'Another large binary object\xff\x7c'`).
+
     **Notes**:
 
     1. In literal numeric values represented with decimal digits, underscores (_) can be inserted between the digits to group them (in thousands for example) and make the number more human readable. There is no particular rule on how to group them but it will typically be 3-by-3 (**e.g.**: `21_345_986`, `9_876_544_785`, `6_438.59e+33`).
@@ -164,15 +169,17 @@ Depending on their type, literal values have the following forms:
 
 ### Initializers
 
-Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: complex numbers, lists, maps and sets. Depending on their type, initializers have the following forms:
+Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps and sets. Depending on their type, initializers have the following forms:
 
-* **Complex number**: a pair of floating point numbers in parentheses; the first number in the pair represents the real part of the complex number while the second represents the imaginary part. **e.g.**: `(2, -1)` means 2-i; `(1, 3)` means 1+3i.
+* **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e. another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` **Output**: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
 
-* **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. If a list item is a sequential collection (i.e. a **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
+    **Note**: Tuples are a new data type in AddyScript. The syntax used to represent tuple initializers was formerly used for complex initializers (with two items between the parentheses only respectively representing the real and the imaginary parts). AddyScript doesn't need complex initializers anymore as it has a built-in support for complex literals.
+
+* **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. Just like with tuples, if a list item is a sequential collection (i.e. a **tuple**, another **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
+
+* **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with tuple and list initializers the spread operator can be used to include the contents of another sequential collection.
 
 * **Map**: a sequence of key-value pairs between curly braces separated by commas. Each pair has the form: `key => value` where key and value are both expressions. **e.g.**: `{'name' => 'joe', 'age' => 18, 'job' => 'student'}`.
-
-* **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with list initializers the spread operator can be used to include the contents of another collection.
 
     **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
 
@@ -323,11 +330,10 @@ Sometimes you need to assign values ​​to multiple variables. You can do this
 
 **Notes**:
 
-* Only the equal sign (=) is supported for this type of assignment. Combined operators are not.
 * Both tuples must have exactly the same number of elements.
 * Neither tuple must be empty.
-* Each element of the left tuple must be a valid reference (such as a variable, a list item, or an object property).
-* The right tuple can contain elements of type **list** or **set** preceded by the spread operator (..). In this case, the contents of the collection replace the collection itself in the tuple. This is very convenient for assigning values ​​to several variables at once from elements of a collection.
+* Each element of the left tuple must be a valid reference (such as a variable, a list item, an object property, or another tuple).
+* The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the spread operator (..). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values ​​to several variables at once from elements of a collection.
     
     Example:
 

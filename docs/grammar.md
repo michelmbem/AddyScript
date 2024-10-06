@@ -55,7 +55,6 @@ Statement ::= ImportDirective
             | Return
             | Throw
             | TryCatchFinally
-            | GroupAssignment
             | Expression ';'
 ```
 
@@ -165,8 +164,10 @@ Literal  ::= 'null'
            | BIG_INTEGER
            | FLOAT
            | BIG_DECIMAL
+           | COMPLEX
            | DATE
            | STRING
+           | BLOB
 ```
 
 **FieldSpec:**
@@ -433,31 +434,6 @@ Throw ::= 'throw' Expression ';'
 TryCatchFinally ::= 'try' ( '(' Expression ')' )? Block ( 'catch' '(' IDENTIFIER ')' Block )? ( 'finally' Block )?
 ```
 
-**GroupAssignment:**
-
-![GroupAssignment](diagram/GroupAssignment.svg)
-
-```
-GroupAssignment ::= '(' ExpressionList ')' '=' '(' ListItems ')' ';'
-```
-
-**ListItems:**
-
-![ListItems](diagram/ListItems.svg)
-
-```
-ListItems
-         ::= ListItem ( ',' ListItem )*
-```
-
-**ListItem:**
-
-![ListItem](diagram/ListItem.svg)
-
-```
-ListItem ::= '..'? Expression
-```
-
 **Expression:**
 
 ![Expression](diagram/Expression.svg)
@@ -604,6 +580,22 @@ Composite ::= Atom ( '[' ( Expression | Expression? '..' Expression? ) ']' | '.'
 
 ```
 ArgumentList ::= '(' ( ListItems ( ',' NamedArgList )? | NamedArgList )? ')'
+```
+
+**ListItems:**
+
+![ListItems](diagram/ListItems.svg)
+
+```
+ListItems ::= ListItem ( ',' ListItem )*
+```
+
+**ListItem:**
+
+![ListItem](diagram/ListItem.svg)
+
+```
+ListItem ::= '..'? Expression
 ```
 
 **NamedArgList:**
@@ -768,7 +760,7 @@ ConstructorCall ::= 'new' QualifiedName ( ArgumentList ( '{' PropertyInitializer
 ![AtomStartingWithLParen](diagram/AtomStartingWithLParen.svg)
 
 ```
-AtomStartingWithLParen ::= Conversion | ComplexInitializer | ParenthesizedExpression
+AtomStartingWithLParen ::= Conversion | TupleInitializer | ParenthesizedExpression
 ```
 
 **Conversion:**
@@ -779,12 +771,12 @@ AtomStartingWithLParen ::= Conversion | ComplexInitializer | ParenthesizedExpres
 Conversion ::= '(' TYPE_NAME ')' Expression
 ```
 
-**ComplexInitializer:**
+**TupleInitializer:**
 
-![ComplexInitializer](diagram/ComplexInitializer.svg)
+![TupleInitializer](diagram/TupleInitializer.svg)
 
 ```
-ComplexInitializer ::= '(' Expression ',' Expression ')'
+TupleInitializer ::= '(' ListItems ','? ')'
 ```
 
 **ParenthesizedExpression:**
@@ -1002,6 +994,14 @@ FLOAT ::= REAL [Ff]?
 BIG_DECIMAL ::= REAL [Dd]
 ```
 
+**COMPLEX:**
+
+![COMPLEX](diagram/COMPLEX.svg)
+
+```
+COMPLEX ::= REAL [iI]
+```
+
 **DATE:**
 
 ![DATE](diagram/DATE.svg)
@@ -1016,6 +1016,14 @@ DATE ::= '`' [^`]* '`'
 
 ```
 STRING ::= ( '$' '@'? )? ( SINGLE_QUOTED | DOUBLE_QUOTED )
+```
+
+**BLOB:**
+
+![BLOB](diagram/BLOB.svg)
+
+```
+BLOB ::= [bB] ( SINGLE_QUOTED | DOUBLE_QUOTED )
 ```
 
 **SINGLE_QUOTED:**

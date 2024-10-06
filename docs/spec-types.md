@@ -58,7 +58,7 @@ println('abs({0}) = {1}', a, abs(a));
 
 #### Complex Number API
 
-The following table summarizes the members of the complex class and their usage:
+The following table summarizes the members of the **complex** class and their usage:
 
 |Member|Nature|Description|
 |-|-|-|
@@ -85,7 +85,7 @@ println("it's happened since {0} days", today - d);
 
 #### Date API
 
-The date class supports the following operators:
+The **date** class supports the following operators:
 
 |Operator|Operands|Description|
 |:-:|-|-|
@@ -140,7 +140,7 @@ for (i = 0; i < s.length - 1; ++i)
 
 #### String API
 
-The string class supports the following operators:
+The **string** class supports the following operators:
 
 |Operator|Operands|Description|
 |:-:|-|-|
@@ -153,7 +153,7 @@ The string class supports the following operators:
 |\[int\]|A string to the left and an integer between brackets (called the **index**)|Gets a single character from the target string (the character is returned as a one-character string).<br>A negative index indicates that the character should be searched from the end of the string back to the beginning.|
 |\[int..int\]|A string to the left and a pair of integers separated by a double-dot (..) between brackets (representing a range, the first integer is the range **lower bound**, the second is the range **upper bound**)|Gets a slice (or substring) of the target string.<br>Negative bounds are evaluated relative to the length of the string.<br>Both bounds are optional.<br>If the lower bound is omitted, it's automatically replaced with 0.<br>A missing upper bound will be replaced by the length of the string.<br>If both bounds are omitted, the entire target string is returned.|
 
-In addition to those operators, the string class exposes the following members:
+In addition to those operators, the **string** class exposes the following members:
 
 |Member|Nature|Description|
 |-|-|-|
@@ -174,9 +174,69 @@ In addition to those operators, the string class exposes the following members:
 |`string lpad(int width, string padding = " ")`|method|Repeatedly adds the given character to the left of the target string until it reaches the length specified by "width".|
 |`string rpad(int width, string padding = " ")`|method|Repeatedly adds the given character to the right of the target string until it reaches the length specified by "width".|
 |`list split(string pattern = @"\s+")`|method|Creates a list of substrings of the target string separated by the given separator. The separator must be a regular expression.|
-|``|||
-|``|||
 
 **Note**: none of the above methods alters the target string. They simply create a modified copy of it return that copy. The original string remains unchanged.
+
+### Blobs
+
+A **blob** is the abstraction that AddyScript makes of a byte array. Blobs are particularly useful when dealing with methods of .Net classes that expect an array of bytes as an argument (like the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, blobs are not immutable: their content is meant to be changed.
+
+There are several ways of obtaining blobs, like using a blob literal value (which is a literal string preceded with a 'b' or 'B'), or invoking the static _blob::of_ method (which expects the desired length in bytes as an argument), or invoking one the other static methods of the **blob** class, _fromHexString_ and _fromBase64String_ which as the name indicates convert strings to blob using the base 16 or base 64 encoding. You can also cast a string to blob, which will lead to each character being converted to a byte.
+
+Once a blob is created you can individually access to its bytes in read and write mode, you can get its length by reading the "length" property, you can fill it partially or entirely with a byte of your choice, you can also copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
+
+Here is an example of a script that manipulates blobs:
+
+```JS
+b1 = b'Hello friends!';
+b2 = blob::of(24);
+println($'b1 = {b1}, b1.length = {b1.length}');
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+b2.fill(ord('a'), 0, 8);
+b2.fill(ord('b'), 8, 8);
+b2.fill(ord('c'), 16, 8);
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b2[0] = {b2[0]}, b2[-1] = {b2[-1]}');
+b1.copyTo(b2);
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b2 = b2[..b1.length];
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b2 = blob::fromHexString(b1.toHexString());
+println($'b2 = {b2}, b2.length = {b2.length}');
+println($'b1 == b2? {b1 == b2}');
+b1 = blob::fromBase64String(b2.toBase64String());
+println($'b1 = {b1}, b1.length = {b1.length}');
+println($'b1 == b2? {b1 == b2}');
+```
+
+#### Blob API
+
+The **blob** class supports the following operators:
+
+|Operator|Operands|Description|
+|:-:|-|-|
+|\+|Two blobs|Concatenates two blobs.|
+|\*|A blob on one side and an integer on the other side|Concatenates a blob to itself the given number of times.|
+|contains|A blob to the left and an integer to the right|Returns **true** if the blob contains the given byte at any index.<br>Returns **false** otherwise.|
+|\[int\]|A blob to the left and an integer between brackets (called the **index**)|Gets a single byte from the target blob (the byte is returned as an integer).<br>A negative index indicates that the byte should be searched from the end of the blob back to the beginning.|
+|\[int..int\]|A blob to the left and a pair of integers separated by a double-dot (..) between brackets (representing a range, the first integer is the range **lower bound**, the second is the range **upper bound**)|Gets a slice of the target blob.<br>Negative bounds are evaluated relative to the length of the blob.<br>Both bounds are optional.<br>If the lower bound is omitted, it's automatically replaced with 0.<br>A missing upper bound will be replaced by the length of the blob.<br>If both bounds are omitted, the entire target blob is returned.|
+
+In addition to those operators, the **blob** class exposes the following members:
+
+|Member|Nature|Description|
+|-|-|-|
+|`int length { read; }`|property|Gets the length of the blob.|
+|`blob of(int length)`|static method|Creates a blob with the desired length. The returned blob is initially filled with zeros.|
+|`blob fromHexString(string hexString)`|static method|Creates a blob by converting the given string to a byte array. The string should be made of hexadecimal digits in odd number|
+|`string toHexString()`|method|Gets a string that represents the target blob as a large hexadecimal integer|
+|`blob fromBase64String(string base64String)`|static method|Creates a blob by converting the given string to a byte array. The string should be made of base 64 digits|
+|`string toBase64String()`|method|Gets a string that represents the target blob as a large base 64 integer|
+|`int indexOf(int byteValue, int start = 0, int length = 0)`|method|Searches for a byte and returns its position in the target blob if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the blob to search. if "start" is negative, it will be evaluated modulo the total length of the target blob. if "length" is negative or zero, it will be ignored.|
+|`int lastIndexOf(int byteValue, int start = -1, int length = 0)`|method|Searches for a byte backward and returns its position in the target blob if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the blob to search. if "start" is negative, it will be evaluated modulo the total length of the target blob. if "length" is negative or zero, it will be ignored.|
+|`void fill(int byteVale, int start = 0, int length = 0)`|method|Fills a blob with the given byte starting at position "start" and stopping at position "start" + "length". Both "start" and "length" are evaluated modulo the length of the blob. If "length" is negative, it is replaced with target.length - "start", where target is the blob on which the method is invoked|
+|`void copyTo(blob other, int srcIndex = 0, int destIndex = 0, int length = 0)`|method|Copies one blob to another. The portion of the source blob to be copied is between the indices "srcIndex" and "srcIndex" + "length". The portion of the destination blob that will be affected is between the indices "destIndex" and "destIndex" + "length". Both blobs must be sufficiently long, otherwise an exception will be thrown.|
 
 [Home](README.md) | [Previous](flow-control.md) | [Next](col-obj.md)

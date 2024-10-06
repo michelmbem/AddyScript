@@ -4,7 +4,27 @@ StatementWithLabels ::= Label* Statement
 
 Label ::= IDENTIFIER ':'
 
-Statement ::= ImportDirective | ClassDefinition | FunctionDecl | ExternalFunctionDecl | ConstantDecl | VariableDecl | Block | IfElse | SwitchBlock | ForLoop | ForEachLoop | WhileLoop | DoLoop | Continue | Break | Goto | Yield | Return | Throw | TryCatchFinally | GroupAssignment | (Expression ';')
+Statement ::= ImportDirective
+            | ClassDefinition
+            | FunctionDecl
+            | ExternalFunctionDecl
+            | ConstantDecl
+            | VariableDecl
+            | Block
+            | IfElse
+            | SwitchBlock
+            | ForLoop
+            | ForEachLoop
+            | WhileLoop
+            | DoLoop
+            | Continue
+            | Break
+            | Goto
+            | Yield
+            | Return
+            | Throw
+            | TryCatchFinally
+            | (Expression ';')
 
 ImportDirective ::= 'import' QualifiedName ('as' IDENTIFIER)? ';'
 
@@ -28,7 +48,7 @@ ParameterList ::= '(' (Parameter (',' Parameter)*)? ')'
 
 Parameter ::= (((Attributes ('&' | '..')?) | (('&' | '..') Attributes?)) IDENTIFIER '!'?) | (Attributes? IDENTIFIER '!'? ('=' Literal)?)
 
-Literal ::= 'null' | BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | DATE | STRING
+Literal ::= 'null' | BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | COMPLEX | DATE | STRING | BLOB
 
 FieldSpec ::= IDENTIFIER ('=' Expression)? ';'
 
@@ -90,12 +110,6 @@ Throw ::= 'throw' Expression ';'
 
 TryCatchFinally ::= 'try' ('(' Expression ')')? Block ('catch' '(' IDENTIFIER ')' Block)? ('finally' Block)?
 
-GroupAssignment ::= '(' ExpressionList ')' '=' '(' ListItems ')' ';'
-
-ListItems ::= ListItem (',' ListItem)*
-
-ListItem ::= '..'? Expression
-
 Expression ::= Assignment
 
 Assignment ::= TernaryExpression (AssignmentOperator Assignment)*
@@ -125,6 +139,10 @@ PrefixUnaryExpression ::= ('+' | '-' | '~' | '!' | '++' | '--')* Composite
 Composite ::= Atom (('[' (Expression | (Expression? '..' Expression?)) ']') | ('.' IDENTIFIER ArgumentList?) | ArgumentList | ('switch' '{' MatchCaseList '}') | ('with' '{' PropertyInitializerList '}'))*
 
 ArgumentList ::= '(' (ListItems (',' NamedArgList)? | NamedArgList)? ')'
+
+ListItems ::= ListItem (',' ListItem)*
+
+ListItem ::= '..'? Expression
 
 NamedArgList ::= NamedArg (',' NamedArg)*
 
@@ -160,11 +178,11 @@ ObjectInitializer ::= 'new' '{' PropertyInitializerList? '}'
 
 ConstructorCall ::= 'new' QualifiedName ((ArgumentList ('{' PropertyInitializerList? '}')?) | ('{' PropertyInitializerList? '}'))
 
-AtomStartingWithLParen ::= Conversion | ComplexInitializer | ParenthesizedExpression
+AtomStartingWithLParen ::= Conversion | TupleInitializer | ParenthesizedExpression
 
 Conversion ::= '(' TYPE_NAME ')' Expression
 
-ComplexInitializer ::= '(' Expression ',' Expression ')'
+TupleInitializer ::= '(' ListItems ','? ')'
 
 ParenthesizedExpression ::= '(' Expression ')'
 
@@ -216,9 +234,13 @@ FLOAT ::= REAL [Ff]?
 
 BIG_DECIMAL ::= REAL [Dd]
 
+COMPLEX ::= REAL [iI]
+
 DATE ::= '`' [^`]* '`'
 
 STRING ::= ('$''@'?)? (SINGLE_QUOTED | DOUBLE_QUOTED)
+
+BLOB ::= [bB](SINGLE_QUOTED | DOUBLE_QUOTED)
 
 SINGLE_QUOTED ::= "'" ( [^'] | ESCAPE_SEQ)* "'"
 
