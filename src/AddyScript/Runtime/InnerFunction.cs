@@ -125,7 +125,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         Class.Rational.RegisterProperty(RationalNum.ToInstanceProperty());
         Class.Rational.RegisterProperty(RationalDen.ToInstanceProperty());
-        Class.Rational.RegisterMethod(RationalOf.ToStaticMethod());
         Class.Rational.RegisterMethod(RationalInverse.ToInstanceMethod());
 
         Class.Complex.RegisterProperty(ComplexReal.ToInstanceProperty());
@@ -735,11 +734,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region Rational specific methods
-
-    private static DataItem RationalOfLogic(DataItem[] arguments)
-    {
-        return new Rational(arguments[0].AsInt32, arguments[1].AsInt32);
-    }
 
     private static DataItem RationalNumLogic(DataItem[] arguments)
     {
@@ -1829,11 +1823,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region Rational specific methods
-
-    /// <summary>
-    /// Creates a rational number.
-    /// </summary>
-    public static readonly InnerFunction RationalOf = new("of", [new("num"), new("den")], RationalOfLogic);
 
     /// <summary>
     /// Extracts the numerator of a rational number.
