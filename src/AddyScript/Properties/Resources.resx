@@ -544,4 +544,7 @@ It requires some initialization to support the expected operation.</value>
   <data name="ClassHasNoRangeWriter" xml:space="preserve">
     <value>Type {0} has no support for slice replacement</value>
   </data>
+  <data name="CannotComputeGcdForNegative" xml:space="preserve">
+    <value>Cannot compute the Gcd of negative numbers</value>
+  </data>
 </root>

@@ -68,8 +68,8 @@ namespace AddyScript.Gui.CallTips
         public ParameterInfo ActiveParameter
         {
             get => 0 <= parameterIndex && parameterIndex < parameters.Count
-                ? parameters[parameterIndex]
-                : null;
+                 ? parameters[parameterIndex]
+                 : null;
         }
 
         public void Reset()

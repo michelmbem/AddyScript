@@ -160,6 +160,15 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cannot compute the Gcd of negative numbers.
+        /// </summary>
+        internal static string CannotComputeGcdForNegative {
+            get {
+                return ResourceManager.GetString("CannotComputeGcdForNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Cannot convert from {0} to {1}.
         /// </summary>
         internal static string CannotConvert {

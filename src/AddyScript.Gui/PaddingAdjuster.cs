@@ -3,22 +3,14 @@
 
 namespace AddyScript.Gui
 {
-    public class PaddingAdjuster
+    public class PaddingAdjuster(Control target)
     {
-        private readonly float leftRatio;
-        private readonly float topRatio;
-        private readonly float rightRatio;
-        private readonly float bottomRatio;
+        private readonly float leftRatio = (float)target.Padding.Left / target.Width;
+        private readonly float topRatio = (float)target.Padding.Top / target.Height;
+        private readonly float rightRatio = (float)target.Padding.Right / target.Width;
+        private readonly float bottomRatio = (float)target.Padding.Bottom / target.Height;
 
-        public PaddingAdjuster(Control target)
-        {
-            leftRatio = (float)target.Padding.Left / target.Width;
-            topRatio = (float)target.Padding.Top / target.Height;
-            rightRatio = (float)target.Padding.Right / target.Width;
-            bottomRatio = (float)target.Padding.Bottom / target.Height;
-        }
-
-        public Padding Adjust(Control target) => new Padding(
+        public Padding Adjust(Control target) => new(
             (int)(target.Width * leftRatio),
             (int)(target.Height * topRatio),
             (int)(target.Width * rightRatio),

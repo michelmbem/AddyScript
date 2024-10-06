@@ -544,4 +544,7 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="ClassHasNoRangeWriter" xml:space="preserve">
     <value>Le type {0} ne supporte pas la mise à jour de tranches</value>
   </data>
+  <data name="CannotComputeGcdForNegative" xml:space="preserve">
+    <value>Impossible de calculer le PGDC de nombres négatifs</value>
+  </data>
 </root>

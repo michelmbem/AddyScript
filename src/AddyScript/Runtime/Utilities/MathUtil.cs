@@ -1,5 +1,7 @@
 ﻿using System;
 
+using AddyScript.Properties;
+
 
 namespace AddyScript.Runtime.Utilities;
 
@@ -17,8 +19,7 @@ public static class MathUtil
 
         while (exp != 0)
         {
-            if ((exp & 1) != 0)
-                result = checked(result * factor);
+            if ((exp & 1) != 0) result = checked(result * factor);
             if (exp == 1) break;
             factor = checked(factor * factor);
             exp >>= 1;
@@ -29,8 +30,8 @@ public static class MathUtil
 
     public static int Gcd(int a, int b)
     {
-        if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), "Cannot compute the Gcd of negative numbers");
-        if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), "Cannot compute the Gcd of negative numbers");
+        if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), Resources.CannotComputeGcdForNegative);
+        if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), Resources.CannotComputeGcdForNegative);
 
         while (b > 0)
         {

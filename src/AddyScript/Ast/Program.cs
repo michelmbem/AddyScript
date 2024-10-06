@@ -38,9 +38,7 @@ namespace AddyScript.Ast
         /// <param name="statement">The statement to append</param>
         public Program Append(Statement statement)
         {
-            var statements = new List<Statement>(Statements) { statement };
-            Statements = [.. statements];
-
+            Statements = [..Statements, statement];
             return this;
         }
 
@@ -51,10 +49,7 @@ namespace AddyScript.Ast
         /// <param name="statement">The statement to be inserted</param>
         public Program Insert(int index, Statement statement)
         {
-            var statements = new List<Statement>(Statements);
-            statements.Insert(index, statement);
-            Statements = [.. statements];
-
+            Statements = [..Statements[..index], statement, ..Statements[index..]];
             return this;
         }
 

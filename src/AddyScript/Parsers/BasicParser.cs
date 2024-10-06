@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-using AddyScript.Ast;
 using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.OOP;
@@ -107,8 +106,7 @@ public abstract class BasicParser
     /// </summary>
     protected void SkipComments()
     {
-        while (token.IsComment)
-            Consume(1);
+        while (token.IsComment) Consume(1);
     }
 
     /// <summary>
