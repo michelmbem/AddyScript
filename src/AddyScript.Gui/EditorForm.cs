@@ -56,6 +56,7 @@ namespace AddyScript.Gui
         private bool saved;
 
         private CallTipInfo callTipInfo;
+        private int caretPosition;
         private int scriptLength;
         private string errorMessage;
         private string dndFilePath;
@@ -486,7 +487,7 @@ namespace AddyScript.Gui
 
             caretStatusLabel.Text = string.Format(Resources.CaretStatus,
                                                   scintilla.CurrentLine + 1,
-                                                  scintilla.GetColumn(scintilla.CurrentPosition) + 1,
+                                                  scintilla.GetColumn(caretPosition) + 1,
                                                   scintilla.SelectedText.Length);
         }
 
@@ -572,7 +573,7 @@ namespace AddyScript.Gui
         /// <returns>A string</returns>
         public string GetCurrentWord()
         {
-            return scintilla.GetWordFromPosition(scintilla.CurrentPosition);
+            return scintilla.GetWordFromPosition(caretPosition);
         }
 
         /// <summary>
@@ -581,7 +582,7 @@ namespace AddyScript.Gui
         /// <returns>A string</returns>
         private string GetWordAtLeft()
         {
-            int wordStart = scintilla.WordStartPosition(scintilla.CurrentPosition, true);
+            int wordStart = scintilla.WordStartPosition(caretPosition, true);
             int prevWordStart = scintilla.WordStartPosition(wordStart - 1, true);
             return scintilla.GetWordFromPosition(prevWordStart);
         }
@@ -601,7 +602,7 @@ namespace AddyScript.Gui
         /// </summary>
         private void ShowCallTip()
         {
-            scintilla.CallTipShow(scintilla.CurrentPosition, callTipInfo.Text);
+            scintilla.CallTipShow(caretPosition, callTipInfo.Text);
             if (callTipInfo.ActiveParameter == null) return;
             scintilla.CallTipSetHlt(callTipInfo.ActiveParameter.Start, callTipInfo.ActiveParameter.End);
         }
@@ -665,13 +666,13 @@ namespace AddyScript.Gui
         private void HighlightMatchingBraces()
         {
             // Has the caret changed position?
-            int caretPos = scintilla.CurrentPosition, bracePos1 = -1;
+            int bracePos1 = -1;
 
             // Is there a brace to the left or right?
-            if (caretPos > 0 && IsBrace(scintilla.GetCharAt(caretPos - 1)))
-                bracePos1 = caretPos - 1;
-            else if (IsBrace(scintilla.GetCharAt(caretPos)))
-                bracePos1 = caretPos;
+            if (caretPosition > 0 && IsBrace(scintilla.GetCharAt(caretPosition - 1)))
+                bracePos1 = caretPosition - 1;
+            else if (IsBrace(scintilla.GetCharAt(caretPosition)))
+                bracePos1 = caretPosition;
 
             if (bracePos1 >= 0)
             {
@@ -743,8 +744,10 @@ namespace AddyScript.Gui
                 Settings.Default.WindowSettings.TryGetValue(filePath, out WindowSettings ws))
             {
                 scintilla.Zoom = ws.Zoom;
-                scintilla.SetSelection(ws.PositionInText, ws.PositionInText);
+                caretPosition = ws.PositionInText;
+                scintilla.SetSelection(caretPosition, caretPosition);
                 scintilla.ScrollCaret();
+                HighlightMatchingBraces();
 
                 WindowState = ws.WindowState;
                 if (WindowState == FormWindowState.Normal)
@@ -766,11 +769,10 @@ namespace AddyScript.Gui
             if (!string.IsNullOrEmpty(filePath) &&
                 WindowState != FormWindowState.Minimized)
             {
-                if (Settings.Default.WindowSettings == null)
-                    Settings.Default.WindowSettings = new WindowSettingsDictionary();
+                if (Settings.Default.WindowSettings == null) Settings.Default.WindowSettings = [];
                 
                 Settings.Default.WindowSettings[filePath] =
-                    new WindowSettings(WindowState, Location, Size, scintilla.Zoom, scintilla.CurrentPosition);
+                    new WindowSettings(WindowState, Location, Size, scintilla.Zoom, caretPosition);
                 
                 Settings.Default.Save();
             }
@@ -1144,8 +1146,14 @@ namespace AddyScript.Gui
 
         private void scintilla_UpdateUI(object sender, UpdateUIEventArgs e)
         {
-            if (e.Change == UpdateChange.Selection) UpdateCutCopyCaretInfo();
-            HighlightMatchingBraces();
+            int newCaretPosition = scintilla.CurrentPosition;
+
+            if (newCaretPosition != caretPosition)
+            {
+                caretPosition = newCaretPosition;
+                UpdateCutCopyCaretInfo();
+                HighlightMatchingBraces();
+            }
         }
 
         private void scintilla_CharAdded(object sender, CharAddedEventArgs e)
@@ -1153,7 +1161,7 @@ namespace AddyScript.Gui
             /****************************************************************************
              * Tries to popup an keywordMenu menu or to display a calltip
              * *************************************************************************/
-            if (InCommentOrString(scintilla.CurrentPosition)) return;
+            if (InCommentOrString(caretPosition)) return;
 
             if (char.IsLetterOrDigit((char)e.Char))
             {

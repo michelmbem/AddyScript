@@ -3,6 +3,7 @@ using System.IO;
 
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Interactive
@@ -139,7 +140,8 @@ namespace AddyScript.Interactive
 
         private static void ShowResult(DataItem result)
         {
-            string resultStr = RuntimeServices.ToString(result);
+            string resultStr = CodeGenerator.EscapedString(RuntimeServices.ToString(result), false);
+
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(SUCCESS_MESSAGE_FORMAT, resultStr);
             Console.ResetColor();
