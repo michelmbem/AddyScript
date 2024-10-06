@@ -12,6 +12,10 @@ function to_map(reader!) {
 	return result;
 }
 
+function to_tuple(reader!) {
+	return (tuple)to_list(result);
+}
+
 function to_object(reader!) {
-	return (object) to_map(reader);
+	return (object)to_map(reader);
 }
