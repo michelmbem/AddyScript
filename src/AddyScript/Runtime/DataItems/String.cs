@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Properties;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -100,23 +100,11 @@ public sealed class String(string value) : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        switch (format)
+        return format switch
         {
-            case "x" or "X":
-                {
-                    var sb = new StringBuilder();
-
-                    foreach (char c in value)
-                        if (32 <= c && c < 127)
-                            sb.Append(c);
-                        else
-                            sb.AppendFormat("\\u{0:x4}", (int)c);
-
-                    return sb.ToString();
-                }
-            default:
-                return value.ToString(formatProvider);
-        }
+            "x" or "X" => CodeGenerator.EscapedString(value, false),
+            _ => value,
+        };
     }
 
     protected override bool UnsafeEquals(DataItem other) => value == other.ToString();

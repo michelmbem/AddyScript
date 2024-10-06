@@ -6,6 +6,7 @@ using System.Linq;
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -36,7 +37,14 @@ public sealed class Blob(byte[] buffer) : DataItem
     }
 
     public override string ToString(string format, IFormatProvider formatProvider)
-        => StringUtil.ByteArray2String(buffer);
+    {
+        string str = StringUtil.ByteArray2String(buffer);
+        return format switch
+        {
+            "x" or "X" => CodeGenerator.EscapedString(str, false),
+            _ => str,
+        };
+    }
 
     protected override bool UnsafeEquals(DataItem other)
     {

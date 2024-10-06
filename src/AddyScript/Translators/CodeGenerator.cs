@@ -1274,18 +1274,52 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public static string EscapedString(string original, bool duplicateBraces)
     {
-        string escaped = original.Replace("\\", "\\\\").
-                                  Replace("'", "\\'").
-                                  Replace("\"", "\\\"").
-                                  Replace("\a", "\\a").
-                                  Replace("\b", "\\b").
-                                  Replace("\r", "\\r").
-                                  Replace("\n", "\\n").
-                                  Replace("\t", "\\t").
-                                  Replace("\v", "\\v").
-                                  Replace("\f", "\\f");
+        var sb = new StringBuilder();
 
-        return duplicateBraces ? escaped.Replace("{", "{{").Replace("}", "}}") : escaped;
+        foreach (char c in original)
+            switch (c)
+            {
+                case '\\' or '\'' or '"':
+                    sb.Append('\\').Append(c);
+                    break;
+                case '\a':
+                    sb.Append("\\a");
+                    break;
+                case '\b':
+                    sb.Append("\\b");
+                    break;
+                case '\f':
+                    sb.Append("\\f");
+                    break;
+                case '\n':
+                    sb.Append("\\n");
+                    break;
+                case '\r':
+                    sb.Append("\\r");
+                    break;
+                case '\t':
+                    sb.Append("\\t");
+                    break;
+                case '\v':
+                    sb.Append("\\v");
+                    break;
+                case '{':
+                    sb.Append(duplicateBraces ? "{{" : "{");
+                    break;
+                case '}':
+                    sb.Append(duplicateBraces ? "}}" : "}");
+                    break;
+                default:
+                    if (32 <= c && c < 127)
+                        sb.Append(c);
+                    else if (c <= 255)
+                        sb.AppendFormat("\\x{0:x2}", (int)c);
+                    else
+                        sb.AppendFormat("\\u{0:x4}", (int)c);
+                    break;
+            }
+
+        return sb.ToString();
     }
 
     public static string SafeTypeName(string name)
