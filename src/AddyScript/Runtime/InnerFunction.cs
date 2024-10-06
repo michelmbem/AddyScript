@@ -109,7 +109,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         InnerFunction[] dateFunctions = [DateAdd, DateAddTicks, DateSubtract];
         InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
         InnerFunction[] blobStaticFunctions = [BlobOf, BlobFromHexString, BlobFromBase64String];
-        InnerFunction[] blobFunctions = [BlobToHexString, BlobToBase64String, BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo];
+        InnerFunction[] blobFunctions = [BlobToHexString, BlobToBase64String, BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo, BlobResize];
         InnerFunction[] tupleFunctions = [TupleIndexOf, TupleLastIndexOf];
         InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
         InnerFunction[] mapProperties = [MapSize, MapKeys, MapValues];
@@ -1152,6 +1152,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
+    private static DataItem BlobResizeLogic(DataItem[] arguments)
+    {
+        ((Blob)arguments[0]).Resize(arguments[1].AsInt32);
+        return Void.Value;
+    }
+
     #endregion
 
     #region Tuple specific methods
@@ -2032,6 +2038,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Copies a blob to another.
     /// </summary>
     public static readonly InnerFunction BlobCopyTo = new("copyTo", [new Parameter("self"), new Parameter("other"), new Parameter("srcIndex", new Integer(0)), new Parameter("destIndex", new Integer(0)), new Parameter("length", new Integer(0))], BlobCopyToLogic);
+
+    /// <summary>
+    /// Resizes a blob preserving its content.
+    /// </summary>
+    public static readonly InnerFunction BlobResize = new("resize", [new Parameter("self"), new Parameter("newSize")], BlobResizeLogic);
 
     #endregion
 

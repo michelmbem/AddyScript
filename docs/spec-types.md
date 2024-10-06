@@ -183,7 +183,7 @@ A **blob** is AddyScript's abstraction of a byte array. Blobs are especially use
 
 There are several ways to get blobs, such as using a blob literal value (a string literal preceded by a "b" or "B"), or invoking the static method _blob::of_ (which expects the desired length in bytes as an argument), or invoking one of the other static methods "fromHexString" and "fromBase64String" of the blob class which as their name suggests, convert strings to blobs using base-16 or base-64 encoding. You can also convert a string to a blob, which will convert each of its characters to a byte.
 
-Once a blob is created, you can access each of its bytes individually for reading or writing, you can get its length by reading the "length" property, you can fill it partially or completely with a byte of your choice, you can also copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
+Once a blob is created, you can access each of its bytes individually for reading or writing, you can get its length by reading the "length" property, you can fill it partially or completely with a byte of your choice, you can resize it or copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
 
 Here is an example script that manipulates blobs:
 
@@ -244,5 +244,6 @@ In addition to those operators, the **blob** class exposes the following members
 |`int lastIndexOf(int byteValue, int start = -1, int length = 0)`|method|Searches for a byte backward and returns its position in the target blob if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the blob to search. if "start" is negative, it will be evaluated modulo the total length of the target blob. if "length" is negative or zero, it will be ignored.|
 |`void fill(int byteVale, int start = 0, int length = 0)`|method|Fills a blob with the given byte starting at position "start" and stopping at position "start" + "length". Both "start" and "length" are evaluated modulo the length of the blob. If "length" is negative, it is replaced with target.length - "start", where target is the blob on which the method is invoked|
 |`void copyTo(blob other, int srcIndex = 0, int destIndex = 0, int length = 0)`|method|Copies one blob to another. The portion of the source blob to be copied is between the indices "srcIndex" and "srcIndex" + "length". The portion of the destination blob that will be affected is between the indices "destIndex" and "destIndex" + "length". Both blobs must be sufficiently long, otherwise an exception will be thrown.|
+|`void resize(int newLength)`|method|Resizes a blob preserving its current content (as much as possible).|
 
 [Home](README.md) | [Previous](flow-control.md) | [Next](col-obj.md)

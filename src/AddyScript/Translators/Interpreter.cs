@@ -3110,15 +3110,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="uBound">Will contain the range's upper bound upon completion</param>
     private void ResolveSliceRef(SliceRef sliceRef, out DataItem owner, out int lBound, out int uBound)
     {
-        lBound = uBound = 0;
-
-        if (sliceRef.LowerBound != null)
+        if (sliceRef.LowerBound == null)
+            lBound = 0;
+        else
         {
             sliceRef.LowerBound.AcceptTranslator(this);
             lBound = returnedValue.AsInt32;
         }
 
-        if (sliceRef.UpperBound != null)
+        if (sliceRef.UpperBound == null)
+            uBound = int.MaxValue;
+        else
         {
             sliceRef.UpperBound.AcceptTranslator(this);
             uBound = returnedValue.AsInt32;

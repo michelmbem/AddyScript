@@ -137,4 +137,11 @@ public sealed class Blob(byte[] buffer) : DataItem
         for (int i = 0; i < buffer.Length; ++i)
             yield return (new Integer(i), new Integer(buffer[i]));
     }
+
+    public void Resize(int newLength)
+    {
+        var newBuffer = new byte[newLength];
+        Array.Copy(buffer, 0, newBuffer, 0, Math.Min(buffer.Length, newLength));
+        buffer = newBuffer;
+    }
 }

@@ -233,6 +233,7 @@ public abstract class DataItem
     protected static void AdjustBounds(int size, ref int lower, ref int upper)
     {
         while (lower < 0) lower += size;
-        while (upper <= 0) upper += size;
+        while (upper < 0) upper += size;
+        upper = Math.Min(upper, size);
     }
 }
