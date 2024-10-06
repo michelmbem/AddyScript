@@ -1144,11 +1144,8 @@ namespace AddyScript.Gui
 
         private void scintilla_UpdateUI(object sender, UpdateUIEventArgs e)
         {
-            if (e.Change == UpdateChange.Selection)
-            {
-                UpdateCutCopyCaretInfo();
-                HighlightMatchingBraces();
-            }
+            if (e.Change == UpdateChange.Selection) UpdateCutCopyCaretInfo();
+            HighlightMatchingBraces();
         }
 
         private void scintilla_CharAdded(object sender, CharAddedEventArgs e)
