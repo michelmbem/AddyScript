@@ -12,9 +12,10 @@ namespace AddyScript.Ast.Statements
     /// </remarks>
     /// <param name="keyName">The variable used to iterate through keys</param>
     /// <param name="valueName">The variable used to iterate through values</param>
-    /// <param name="enumerated">The collection on which enumeration is done</param>
+    /// <param name="test">The collection on which enumeration is done</param>
     /// <param name="action">The body of the loop</param>
-    public class ForEachLoop(string keyName, string valueName, Expression enumerated, Statement action) : Statement
+    public class ForEachLoop(string keyName, string valueName, Expression test, Statement action)
+        : FlowControlStatement(test, action)
     {
         /// <summary>
         /// The default value of <see cref="KeyName"/>
@@ -30,16 +31,6 @@ namespace AddyScript.Ast.Statements
         /// The variable used to iterate through values.
         /// </summary>
         public string ValueName { get; private set; } = valueName;
-
-        /// <summary>
-        /// The collection on witch enumeration is done.
-        /// </summary>
-        public Expression Enumerated { get; private set; } = enumerated;
-
-        /// <summary>
-        /// Represents the body of the loop
-        /// </summary>
-        public Statement Action { get; private set; } = action;
 
         /// <summary>
         /// Translates this node.

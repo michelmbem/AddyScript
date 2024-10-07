@@ -1418,15 +1418,15 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateIfElse(IfElse ifElse)
     {
-        if (IsTrue(ifElse.Condition))
-            ifElse.PositiveAction.AcceptTranslator(this);
+        if (IsTrue(ifElse.Test))
+            ifElse.Action.AcceptTranslator(this);
         else
-            ifElse.NegativeAction?.AcceptTranslator(this);
+            ifElse.AlternativeAction?.AcceptTranslator(this);
     }
 
     public void TranslateSwitchBlock(SwitchBlock switchBlock)
     {
-        switchBlock.Expression.AcceptTranslator(this);
+        switchBlock.Test.AcceptTranslator(this);
         int hashCode = returnedValue.GetHashCode();
 
         int counter = switchBlock.DefaultCase;
@@ -1485,7 +1485,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         foreach (Statement initializer in forLoop.Initializers)
             initializer.AcceptTranslator(this);
 
-        Expression condition = forLoop.Guard ?? new Literal(Boolean.True);
+        Expression condition = forLoop.Test ?? new Literal(Boolean.True);
         while (IsTrue(condition))
         {
             forLoop.Action.AcceptTranslator(this);
@@ -1513,7 +1513,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         currentFrame.PushBlock();
 
-        foreach ((DataItem key, DataItem value) in GetEnumerable(forEach.Enumerated))
+        foreach ((DataItem key, DataItem value) in GetEnumerable(forEach.Test))
         {
             RegisterVariable(forEach.KeyName, key);
             RegisterVariable(forEach.ValueName, value);
@@ -1539,7 +1539,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateWhileLoop(WhileLoop whileLoop)
     {
-        while (IsTrue(whileLoop.Guard))
+        while (IsTrue(whileLoop.Test))
         {
             whileLoop.Action.AcceptTranslator(this);
 
@@ -1574,7 +1574,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 case JumpCode.Goto or JumpCode.Return:
                     return;
             }
-        } while (IsTrue(doLoop.Guard));
+        } while (IsTrue(doLoop.Test));
     }
 
     public void TranslateContinue(Continue _continue)

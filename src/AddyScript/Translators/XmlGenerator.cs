@@ -566,19 +566,19 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
 
-        currentElement = document.CreateElement("Condition");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        ifElse.Condition.AcceptTranslator(this);
+        ifElse.Test.AcceptTranslator(this);
 
-        currentElement = document.CreateElement("PositiveAction");
+        currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
-        ifElse.PositiveAction.AcceptTranslator(this);
+        ifElse.Action.AcceptTranslator(this);
 
-        if (ifElse.NegativeAction != null)
+        if (ifElse.AlternativeAction != null)
         {
-            currentElement = document.CreateElement("NegativeAction");
+            currentElement = document.CreateElement("AlternativeAction");
             tmpElement.AppendChild(currentElement);
-            ifElse.NegativeAction.AcceptTranslator(this);
+            ifElse.AlternativeAction.AcceptTranslator(this);
         }
 
         currentElement = previousElement;
@@ -594,9 +594,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
         
-        currentElement = document.CreateElement("Expression");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        switchBlock.Expression.AcceptTranslator(this);
+        switchBlock.Test.AcceptTranslator(this);
 
         if (switchBlock.Cases.Length > 0)
         {
@@ -628,9 +628,9 @@ public class XmlGenerator : ITranslator
         foreach (Statement initializer in forLoop.Initializers)
             initializer.AcceptTranslator(this);
 
-        currentElement = document.CreateElement("Guard");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        forLoop.Guard?.AcceptTranslator(this);
+        forLoop.Test?.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Updaters");
         tmpElement.AppendChild(currentElement);
@@ -655,9 +655,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
         
-        currentElement = document.CreateElement("Enumerated");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        forEach.Enumerated.AcceptTranslator(this);
+        forEach.Test.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -673,9 +673,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
 
-        currentElement = document.CreateElement("Guard");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        whileLoop.Guard.AcceptTranslator(this);
+        whileLoop.Test.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -691,9 +691,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
         
-        currentElement = document.CreateElement("Guard");
+        currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
-        doLoop.Guard.AcceptTranslator(this);
+        doLoop.Test.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);

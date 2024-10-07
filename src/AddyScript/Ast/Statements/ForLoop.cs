@@ -11,10 +11,11 @@ namespace AddyScript.Ast.Statements
     /// Initializes a new instance of ForLoop
     /// </remarks>
     /// <param name="initializers">The set of statements that run before enterring the loop</param>
-    /// <param name="guard">The condition</param>
+    /// <param name="test">The condition of the loop</param>
     /// <param name="updaters">The set of statements that run at the end of each iteration</param>
     /// <param name="action">The body of the loop</param>
-    public class ForLoop(Statement[] initializers, Expression guard, Expression[] updaters, Statement action) : Statement
+    public class ForLoop(Statement[] initializers, Expression test, Expression[] updaters, Statement action)
+        : FlowControlStatement(test, action)
     {
 
         /// <summary>
@@ -23,19 +24,10 @@ namespace AddyScript.Ast.Statements
         public Statement[] Initializers { get; private set; } = initializers;
 
         /// <summary>
-        /// Represents the condition of the loop.
-        /// </summary>
-        public Expression Guard { get; private set; } = guard;
-
-        /// <summary>
         /// Represents the set of statements that run at the end of each iteration.
         /// </summary>
         public Expression[] Updaters { get; private set; } = updaters;
 
-        /// <summary>
-        /// Represents the body of the loop.
-        /// </summary>
-        public Statement Action { get; private set; } = action;
 
         /// <summary>
         /// Translates this node.

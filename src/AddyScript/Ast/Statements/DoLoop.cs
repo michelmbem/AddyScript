@@ -10,9 +10,9 @@ namespace AddyScript.Ast.Statements
     /// <remarks>
     /// Initializes a new instance of DoLoop
     /// </remarks>
-    /// <param name="guard">The condition of the loop</param>
+    /// <param name="test">The condition of the loop</param>
     /// <param name="action">The body of the loop</param>
-    public class DoLoop(Expression guard, Statement action) : WhileLoop(guard, action)
+    public class DoLoop(Expression test, Statement action) : FlowControlStatement(test, action)
     {
 
         /// <summary>

@@ -458,29 +458,29 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateIfElse(IfElse ifElse)
     {
         textWriter.Write("if (");
-        ifElse.Condition.AcceptTranslator(this);
+        ifElse.Test.AcceptTranslator(this);
         textWriter.WriteLine(')');
 
-        MayBeIndent(ifElse.PositiveAction);
+        MayBeIndent(ifElse.Action);
 
-        if (ifElse.NegativeAction == null) return;
+        if (ifElse.AlternativeAction == null) return;
 
-        if (ifElse.NegativeAction is IfElse)
+        if (ifElse.AlternativeAction is IfElse)
         {
             textWriter.Write("else ");
-            ifElse.NegativeAction.AcceptTranslator(this);
+            ifElse.AlternativeAction.AcceptTranslator(this);
         }
         else
         {
             textWriter.WriteLine("else");
-            MayBeIndent(ifElse.NegativeAction);
+            MayBeIndent(ifElse.AlternativeAction);
         }
     }
 
     public void TranslateSwitchBlock(SwitchBlock switchBlock)
     {
         textWriter.Write("switch (");
-        switchBlock.Expression.AcceptTranslator(this);
+        switchBlock.Test.AcceptTranslator(this);
         textWriter.WriteLine(')');
 
         textWriter.WriteLine('{');
@@ -541,7 +541,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
 
         textWriter.Write("; ");
-        forLoop.Guard?.AcceptTranslator(this);
+        forLoop.Test?.AcceptTranslator(this);
         textWriter.Write("; ");
 
         bool comma2 = false;
@@ -562,7 +562,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         if (forEach.KeyName != ForEachLoop.DEFAULT_KEY_NAME)
             textWriter.Write("{0} => ", SafeName(forEach.KeyName));
         textWriter.Write("{0} in ", SafeName(forEach.ValueName));
-        forEach.Enumerated.AcceptTranslator(this);
+        forEach.Test.AcceptTranslator(this);
         textWriter.WriteLine(')');
         MayBeIndent(forEach.Action);
     }
@@ -570,7 +570,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateWhileLoop(WhileLoop whileLoop)
     {
         textWriter.Write("while (");
-        whileLoop.Guard.AcceptTranslator(this);
+        whileLoop.Test.AcceptTranslator(this);
         textWriter.WriteLine(')');
         MayBeIndent(whileLoop.Action);
     }
@@ -580,7 +580,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.WriteLine("do ");
         MayBeIndent(doLoop.Action);
         textWriter.Write("while (");
-        doLoop.Guard.AcceptTranslator(this);
+        doLoop.Test.AcceptTranslator(this);
         textWriter.WriteLine(");");
     }
 

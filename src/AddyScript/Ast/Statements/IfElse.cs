@@ -7,46 +7,32 @@ namespace AddyScript.Ast.Statements
     /// <summary>
     /// Represents an <b>if-else</b> statement.
     /// </summary>
-    public class IfElse : Statement
+    public class IfElse : FlowControlStatement
     {
         /// <summary>
         /// Initializes a new instance of IfElse
         /// </summary>
-        /// <param name="condition">The test expression</param>
-        /// <param name="positiveAction">The statement to be executed if <paramref name="condition"/> returns true</param>
-        /// <param name="negativeAction">The statement to be executed if <paramref name="condition"/> returns false</param>
-        public IfElse(Expression condition, Statement positiveAction, Statement negativeAction)
+        /// <param name="test">The test expression</param>
+        /// <param name="action">The statement to be executed if <paramref name="test"/> returns true</param>
+        /// <param name="altAction">The statement to be executed if <paramref name="test"/> returns false</param>
+        public IfElse(Expression test, Statement action, Statement altAction) : base(test, action)
         {
-            Condition = condition;
-            PositiveAction = positiveAction;
-            NegativeAction = negativeAction;
+            AlternativeAction = altAction;
         }
 
         /// <summary>
         /// Initializes a new instance of IfThenElse
         /// </summary>
-        /// <param name="condition">The test expression</param>
-        /// <param name="positiveAction">The statement to be executed if <paramref name="condition"/> returns true</param>
-        public IfElse(Expression condition, Statement positiveAction)
+        /// <param name="test">The test expression</param>
+        /// <param name="action">The statement to be executed if <paramref name="test"/> returns true</param>
+        public IfElse(Expression test, Statement action) : base(test, action)
         {
-            Condition = condition;
-            PositiveAction = positiveAction;
         }
 
         /// <summary>
-        /// The test expression
+        /// The statement to be executed if <i>Test</i> returns <b>false</b>.
         /// </summary>
-        public Expression Condition { get; private set; }
-
-        /// <summary>
-        /// The statement to be executed if <see cref="Condition"/> evaluates to true
-        /// </summary>
-        public Statement PositiveAction { get; private set; }
-
-        /// <summary>
-        /// The statement to be executed if <see cref="Condition"/> evaluates to false
-        /// </summary>
-        public Statement NegativeAction { get; private set; }
+        public Statement AlternativeAction { get; private set; }
 
         /// <summary>
         /// Translates this node.

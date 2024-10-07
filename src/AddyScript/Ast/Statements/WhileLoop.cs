@@ -10,21 +10,10 @@ namespace AddyScript.Ast.Statements
     /// <remarks>
     /// Initializes a new instance of WhileLoop
     /// </remarks>
-    /// <param name="guard">The loop condition</param>
+    /// <param name="test">The condition of the loop</param>
     /// <param name="action">The body of the loop</param>
-    public class WhileLoop(Expression guard, Statement action) : Statement
+    public class WhileLoop(Expression test, Statement action) : FlowControlStatement(test, action)
     {
-
-        /// <summary>
-        /// The loop condition
-        /// </summary>
-        public Expression Guard { get; private set; } = guard;
-
-        /// <summary>
-        /// The body of the loop
-        /// </summary>
-        public Statement Action { get; private set; } = action;
-
         /// <summary>
         /// Translates this node.
         /// </summary>

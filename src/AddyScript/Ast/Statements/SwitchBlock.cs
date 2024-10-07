@@ -10,18 +10,18 @@ namespace AddyScript.Ast.Statements
     /// <remarks>
     /// Initializes a new instance of SwitchBlock
     /// </remarks>
-    /// <param name="expr">The test expression.</param>
+    /// <param name="test">The test expression.</param>
     /// <param name="cases">The case labels</param>
     /// <param name="defCase">The default case label</param>
     /// <param name="stmts">The switch statements.</param>
-    public class SwitchBlock(Expression expr, CaseLabel[] cases, int defCase, Statement[] stmts)
+    public class SwitchBlock(Expression test, CaseLabel[] cases, int defCase, Statement[] stmts)
         : Block(stmts)
     {
 
         /// <summary>
         /// The test expression.
         /// </summary>
-        public Expression Expression { get; private set; } = expr;
+        public Expression Test { get; private set; } = test;
 
         /// <summary>
         /// The case labels.
