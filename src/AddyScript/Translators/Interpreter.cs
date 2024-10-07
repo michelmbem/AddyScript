@@ -110,29 +110,12 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         try
         {
-            int counter = 0;
-            while (counter < program.Statements.Length)
-            {
-                program.Statements[counter].AcceptTranslator(this);
-                switch (jumpCode)
-                {
-                    case JumpCode.None:
-                        ++counter;
-                        break;
-                    case JumpCode.Goto:
-                        if (program.Labels.TryGetValue(lastGoto.LabelName, out Label label))
-                        {
-                            counter = label.Address;
-                            jumpCode = JumpCode.None;
-                            break;
-                        }
+            int address = 0;
 
-                        throw new RuntimeError(fileName, lastGoto,
-                            string.Format(Resources.MissingLabel, lastGoto.LabelName));
-                    default:
-                        counter = int.MaxValue;
-                        break;
-                }
+            while (address < program.Statements.Length)
+            {
+                program.Statements[address].AcceptTranslator(this);
+                address = NextAddress(address, program.Labels, false, false);
             }
         }
         finally
@@ -508,30 +491,12 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         try
         {
-            int counter = 0;
+            int address = 0;
 
-            while (counter < block.Statements.Length)
+            while (address < block.Statements.Length)
             {
-                block.Statements[counter].AcceptTranslator(this);
-
-                switch (jumpCode)
-                {
-                    case JumpCode.None:
-                        ++counter;
-                        break;
-                    case JumpCode.Goto:
-                        if (block.Labels.TryGetValue(lastGoto.LabelName, out Label value))
-                        {
-                            counter = value.Address;
-                            jumpCode = JumpCode.None;
-                        }
-                        else
-                            counter = int.MaxValue;
-                        break;
-                    default:
-                        counter = int.MaxValue;
-                        break;
-                }
+                block.Statements[address].AcceptTranslator(this);
+                address = NextAddress(address, block.Labels, true, false);
             }
         }
         finally
@@ -1256,7 +1221,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             Class superClass = currentFrame.Context.MethodHolder.SuperClass;
             ClassMember member = superClass.GetMember(ppr.PropertyName, MemberKind.Property | MemberKind.Method) ??
                 throw new RuntimeError(fileName, ppr, string.Format(Resources.PropertyNotFoundInClass,
-                                                                        ppr.PropertyName, superClass.Name));
+                                                                    ppr.PropertyName, superClass.Name));
 
             if (member.Modifier == Modifier.Abstract)
                 throw new RuntimeError(fileName, ppr, string.Format(Resources.CannotInvokeAbstractMember, member.FullName));
@@ -1390,19 +1355,16 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         try
         {
             conversion.Expression.AcceptTranslator(this);
-
             DataItem converted = returnedValue;
+
             if (converted.Class.Inherits(Class.Object))
-                throw new RuntimeError(fileName, conversion.Expression,
-                    string.Format(Resources.CannotConvertFrom, converted.Class.Name));
+                throw new RuntimeError(fileName, conversion.Expression, string.Format(Resources.CannotConvertFrom, converted.Class.Name));
 
             if (rootFrame.GetItem(conversion.TypeName) is not Class klass)
-                throw new RuntimeError(fileName, conversion,
-                    string.Format(Resources.UndefinedType, conversion.TypeName));
+                throw new RuntimeError(fileName, conversion, string.Format(Resources.UndefinedType, conversion.TypeName));
             
             if (klass.ClassID < ClassID.Boolean || klass.ClassID > ClassID.Object)
-                throw new RuntimeError(fileName, conversion,
-                    string.Format(Resources.CannotConvertTo, conversion.TypeName));
+                throw new RuntimeError(fileName, conversion, string.Format(Resources.CannotConvertTo, conversion.TypeName));
 
             returnedValue = converted.ConvertTo(klass);
         }
@@ -1429,11 +1391,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         switchBlock.Test.AcceptTranslator(this);
         int hashCode = returnedValue.GetHashCode();
 
-        int counter = switchBlock.DefaultCase;
+        int address = switchBlock.DefaultCase;
         foreach (CaseLabel caseLabel in switchBlock.Cases)
             if (caseLabel.GetHashCode() == hashCode)
             {
-                counter = caseLabel.Address;
+                address = caseLabel.Address;
                 break;
             }
 
@@ -1444,32 +1406,10 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         try
         {
-            while (counter < switchBlock.Statements.Length)
+            while (address < switchBlock.Statements.Length)
             {
-                switchBlock.Statements[counter].AcceptTranslator(this);
-
-                switch (jumpCode)
-                {
-                    case JumpCode.None:
-                        ++counter;
-                        break;
-                    case JumpCode.Break:
-                        jumpCode = JumpCode.None;
-                        counter = int.MaxValue;
-                        break;
-                    case JumpCode.Goto:
-                        if (switchBlock.Labels.TryGetValue(lastGoto.LabelName, out Label label))
-                        {
-                            counter = label.Address;
-                            jumpCode = JumpCode.None;
-                        }
-                        else
-                            counter = int.MaxValue;
-                        break;
-                    default:
-                        counter = int.MaxValue;
-                        break;
-                }
+                switchBlock.Statements[address].AcceptTranslator(this);
+                address = NextAddress(address, switchBlock.Labels, true, true);
             }
         }
         finally
@@ -1485,10 +1425,12 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         foreach (Statement initializer in forLoop.Initializers)
             initializer.AcceptTranslator(this);
 
-        Expression condition = forLoop.Test ?? new Literal(Boolean.True);
-        while (IsTrue(condition))
+        Expression test = forLoop.Test ?? new Literal(Boolean.True);
+
+        while (IsTrue(test))
         {
             forLoop.Action.AcceptTranslator(this);
+
             switch (jumpCode)
             {
                 case JumpCode.Continue:
@@ -1680,9 +1622,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 }
             }
 
-            if (resource != null)
-                new MethodCall(new Literal(resource), "dispose").AcceptTranslator(this);
-
+            resource?.Dispose();
             currentFrame.PopBlock();
 
             if (finalException != null) throw finalException;
@@ -2775,18 +2715,51 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <summary>
     /// Evaluates an expression and gets if the returned value is true.
     /// </summary>
-    /// <param name="condition">The expression to evaluate</param>
+    /// <param name="test">The expression to evaluate</param>
     /// <returns>A boolean value</returns>
-    private bool IsTrue(Expression condition)
+    private bool IsTrue(Expression test)
     {
         try
         {
-            condition.AcceptTranslator(this);
+            test.AcceptTranslator(this);
             return returnedValue.AsBoolean;
         }
         catch (InvalidCastException ex)
         {
-            throw new RuntimeError(fileName, condition, ex);
+            throw new RuntimeError(fileName, test, ex);
+        }
+    }
+
+    /// <summary>
+    /// Returns the position of the next statement to be executed in a program or a block according to jumpCode.
+    /// </summary>
+    /// <param name="address">The position of the current statement</param>
+    /// <param name="labels">The set of labels declared in the current program of block</param>
+    /// <param name="canJumpOut">Tells if a goto statement can jump out of the current block or not</param>
+    /// <param name="handleBreak">Tells if jumpCode should restored on breaks</param>
+    /// <returns>An integer</returns>
+    /// <exception cref="RuntimeError">The code is trying to jump out of a program</exception>
+    private int NextAddress(int address, Dictionary<string, Label> labels, bool canJumpOut, bool handleBreak)
+    {
+        switch (jumpCode)
+        {
+            case JumpCode.None:
+                return address + 1;
+            case JumpCode.Break:
+                if (handleBreak) jumpCode = JumpCode.None;
+                return int.MaxValue;
+            case JumpCode.Goto:
+                if (labels.TryGetValue(lastGoto.LabelName, out Label label))
+                {
+                    jumpCode = JumpCode.None;
+                    return label.Address;
+                }
+
+                if (canJumpOut) return int.MaxValue;
+
+                throw new RuntimeError(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
+            default:
+                return int.MaxValue;
         }
     }
 
