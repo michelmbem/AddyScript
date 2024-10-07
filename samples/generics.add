@@ -24,6 +24,6 @@ println('\n');
 println('System::Tuple{3}:');
 println('-----------------');
 t = new System::Tuple{3}('Jason Donovan', 32, `2010-03-15`);
-println($"{t.Item1} is {t.Item2} years old, he works for us since {t.Item3:d}.");
+println($"{t[0]} is {t[1]} years old, he works for us since {t[2]:d}.");
 
 readln();

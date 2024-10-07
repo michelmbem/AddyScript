@@ -383,7 +383,7 @@ namespace AddyScript.Gui
         {
             return c switch
             {
-                '(' or ')' or '[' or ']' or '{' or '}' or '<' or '>' => true,
+                '(' or ')' or '[' or ']' or '{' or '}' => true,
                 _ => false,
             };
         }
@@ -547,11 +547,9 @@ namespace AddyScript.Gui
 
             switch (style)
             {
-                case Style.Cpp.Comment:
-                case Style.Cpp.CommentDoc:
+                case Style.Cpp.Comment or Style.Cpp.CommentDoc:
                     return ch != '/' || prevCh != '*';
-                case Style.Cpp.CommentLine:
-                case Style.Cpp.CommentLineDoc:
+                case Style.Cpp.CommentLine or Style.Cpp.CommentLineDoc:
                     return ch != '\n';
                 case Style.Cpp.Character:
                     return ch != '\'' || prevStyle != style || prevCh == '\\';

@@ -1606,7 +1606,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         var nameArg = arguments[1];
         CheckArgType(nameArg, Class.String, "bind", 1);
 
-        Block body = new Block(self.Body.Statements);
+        var body = new Block(self.Body.Statements);
         body.CopyLocation(self.Body);
         
         int paramIndex = Array.FindIndex(self.Parameters, p => p.Name == nameArg.ToString());
@@ -1625,7 +1625,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             body.Insert(0, VariableDecl.Single(nameArg.ToString(), new Literal(arguments[2])));
         }
 
-        return new Closure(new Function(parameters, body));
+        return new Closure(new Function(parameters, body) { DeclaringFrame = self.DeclaringFrame });
     }
 
     #endregion

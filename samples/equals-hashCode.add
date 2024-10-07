@@ -46,12 +46,10 @@ println('items in the set:');
 println(((list)s).join(NEWLINE));
 println();
 
-distincts = products.aggregate([], function (acc, val)
-                                   {
-	                                   if (!(acc contains val))
-		                                   acc.add(val);
-	                                   return acc;
-                                   });
+distincts = products.aggregate([], |acc, val| => {
+	acc contains val || acc.add(val);
+	return acc;
+});
 
 println('distinct items:');
 println(distincts.join(NEWLINE));

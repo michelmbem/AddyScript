@@ -22,7 +22,7 @@ public class Lexer
 
     private readonly TextReader input;
     private readonly string fileName;
-    private readonly StringBuilder buffer = new StringBuilder();
+    private readonly StringBuilder buffer = new();
     private int charIndex, offset, lineOffset, lineNumber;
     private int startOffset, startLineOffset, startLineNumber;
 
@@ -964,10 +964,8 @@ public class Lexer
 
         if (ch == '\'' || ch == '"')
         {
-            var start = new ScriptLocation(startOffset, startLineOffset, startLineNumber);
             Consume(1);
-            Token str = LiteralString();
-            return new Token(TokenID.LT_Blob, StringUtil.String2ByteArray(str.Value.ToString()), start, str.End);
+            return Token(TokenID.LT_Blob, StringUtil.String2ByteArray((string)LiteralString().Value), false);
         }
 
         return Identifier();

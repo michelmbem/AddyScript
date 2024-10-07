@@ -27,7 +27,7 @@ function createColumn($property, header = '', type = "text", width = 100, readon
 
 function createColumns(grid, ds)
 {
-	col0 = createColumn("ProductID", "Product ID", width: 75, readonly: true);
+	col0 = createColumn("ProductID", "ID", width: 50, readonly: true);
 	col0.Frozen = true;
 	
 	col1 = createColumn("ProductName", "Product Name", width: 180);
