@@ -10,8 +10,8 @@ At the time of writing this manual page, AddyScript has a set of 37 predefined f
 
 * `string chr(int ascii)` : gets the unicode character corresponding to the given code. The returned value is of type string.
 * `int ord(string char)` : gets the unicode code of the first character of the given string. In fact, the string must be one character long.
-* `string pack(string fmt, ..values)` : packs several values in a binary string: a way to create structured data items in preparation for a call to a .Net method or a native function that expects a structured argument.
-* `list unpack(string fmt)` : unpacks the combined values ​​into a binary string following the given format.
+* `blob pack(string fmt, ..values)` : packs several values in a binary string (a **blob**): a way to create structured data items in preparation for a call to a .Net method or a native function that expects a structured argument.
+* `list unpack(string fmt, blob structure)` : unpacks the combined values ​​into a binary string following the given format.
 
 ### Math functions
 

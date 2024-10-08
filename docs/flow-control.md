@@ -8,7 +8,7 @@ The if-else statement is used to perform an action only if a certain condition i
 
 #### Form 1:
 
-`if (condition) positive_action`
+`if (condition) action`
 
 Example:
 
@@ -21,7 +21,7 @@ if (n > 10)
 
 #### Form 2:
 
-`if (condition) positive_action else negative_action`
+`if (condition) action else alternative_action`
 
 Example:
 
@@ -48,18 +48,20 @@ switch (expression)
        break;
     case value2:
     case value3:
-    ...
+      action2;
+      break;
+    //...
     case valueN:
        actionN;
        break;
-    ...
+    //...
     default:
        defaultAction;
-       break
+       break;
 }
 ```
 
-Breaks are not required but if a **break** is missing, execution will continue at the next **case** label. The **default** section is also optional but at least one **case** label (or *default* section) must be present in the switch block.
+Breaks are not required but if a **break** is missing, execution will continue at the next **case** section. The **default** section is also optional but at least one **case** section (or *default* section) must be present in the switch block.
 
 Example:
 
@@ -100,7 +102,7 @@ switch (result)
 
 ### Pattern matching
 
-So far, we've seen the **switch** statement and the possibilities it offers. But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times. We also have to use **break** to prevent the flow of execution from continuing to the next **case** label. This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression with the value of each **case** label. This is the kind of problem that pattern matching solves. It combines a better matching syntax with the **switch** keyword, which this time is used as an operator, helping us create expressions that not only choose what action to perform based on the value of an expression, but also return a value. A pattern matching expression typically looks like this:
+So far, we've seen the **switch** statement and the possibilities it offers. But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times. We also have to use **break** to prevent the flow of execution from continuing to the next **case** section. This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression with the value of each **case** label. This is the kind of problem that pattern matching solves. It combines a better matching syntax with the **switch** keyword, which this time is used as an operator, helping us create expressions that not only choose what action to perform based on the value of an expression, but also return a value. A pattern matching expression typically looks like this:
 
 ```
 expression switch {
@@ -113,7 +115,7 @@ expression switch {
 
 **Notes**:
 
-1. Each result in this syntax is an expression.
+1. Each _result_ in this syntax is an expression.
 2. Patterns come in different types (see the table below).
 3. There is no default pattern at all, there is just a special type of pattern that matches everything, thus acting as a default (or fallback) pattern.
 4. A result can be produced in a block, in which case the block must end with a return statement as in a function body (blocks in pattern matching expressions are actually anonymous functions that are declared and used in place).
@@ -130,7 +132,7 @@ res = n switch {
         return 'negative';
     },
     0..9 => 'from 0 to 9',
-    10, 11, 12 => '10, 11 or 12',
+    10, 11, 12 => '10, 11, or 12',
     13, 14..17, 18 => '13 or between 14 and 17 or 18',
     x: 20 <= x && x < 30 => '20 to 29',
     30.. => '30 and above',
@@ -159,11 +161,11 @@ println($'the result with o is {res}');
 The above examples showcase the different kinds of patterns. They are explained in the table below:
 
 |Pattern|Syntax|Description|
-|-|:-:|-|
+|-|-|-|
 |always pattern|an underscore ( _ )|Matches everything; usually acts as the default. Should normally appear at the end of the list to avoid short-circuiting the flow of comparisons|
 |null pattern|the keyword **null**|Matches only expressions that evaluate to the null reference|
 |single value pattern|a literal value of type **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string**|Matches only expressions whose value is equal to its own|
-|range pattern|two literal values ​​of type **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string** separated by two dots ( .. ); one of the limits can be omitted; **e.g.**: `0..9` or `..-1` or `30..`|Matches values ​​that are in the given range; if the lower bound is omitted, the pattern matches anything less than or equal to the upper bound; when the upper bound is omitted, the pattern matches anything greater than or equal to the lower bound |
+|range pattern|two literal values ​​of type **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string** separated by two dots ( .. ).<br>One of the limits can be omitted.<br>**e.g.**: `0..9` or `..-1` or `30..`|Matches values ​​that are in the given range; if the lower bound is omitted, the pattern matches anything less than or equal to the upper bound; when the upper bound is omitted, the pattern matches anything greater than or equal to the lower bound |
 |type pattern|any type name, including user-defined classes|Matches objects of the given type; also matches instances of subclasses if the given type is a class |
 |object pattern|a curly-braced list of property initializers optionally preceded by a type name; **e.g.**: `Exception {message = 'something went wrong'}`|Matches an object of the given type (if a type name is given) that has the same values ​​for the listed properties |
 |predicate pattern|an identifier followed by a colon ( : ) and then a logical expression; **e.g.**: `x: 20 <= x && x < 30`|This type of pattern is a function with a single parameter; the initial identifier is the name you want to give to the parameter; it will contain the value of the expression that is compared to the pattern; the expression that follows the colon is the body of the function; The pattern matches expressions for which its function returns **true**|
@@ -272,12 +274,13 @@ foreach (name => job in jobs)
 
 **Notes**:
 
-* Even in the first form, there is an implicit key named **__key**. In both forms, the _collection_ must be a **string**, a **list**, a **map**, a **set**, a native object implementing the **IEnumerable** interface or an AddyScript object implementing the **iterator protocol**.
+* Even in the first form, there is an implicit key named **__key**. In both forms, the _collection_ must be a **string**, a **blob**, a **tuple**, a **list**, a **map**, a **set**, a native object implementing the **IEnumerable** interface or an AddyScript object implementing the **iterator protocol**.
+
 * It is possible to use the foreach loop to iterate over instances of user-defined classes if their class implements the _interator protocol_. We'll come back on this in the section dedicated to [inheritance and polymorphism](inheritance.md).
 
 ### Jumps
 
-Jumps allow execution to resume from a location other than the next instruction. They are described in the table below:
+Jumps allow execution to resume from a location other than the next instruction. They are generally very useful for prematurely exiting from functions or loops. The table below describes them:
 
 |Jump statement|Syntax|Effect|
 |-|-|-|
@@ -286,29 +289,5 @@ Jumps allow execution to resume from a location other than the next instruction.
 |goto|`goto label;`<br>or _(in a switch block)_<br>`goto case X;`<br>`goto default;`|Unconditionally jumps to the specified location.<br>In a switch block can also jump to one of the case labels.<br><sub>**Note**: A label is any identifier that's appears at the beginning of an instruction and is followed by a colon. **e.g.**: in `printout: println('hello');` _printout_ is the label.</sub>|
 |return|`return;`<br>or<br>`return expression;`|Returns from a function with or without a value.|
 |throw|`throw exception;`<br>or<br>`throw "some error message";`|Raises an error and stops the execution of the script until the raised error is caught by a **try-catch-finally** statement.|
-
-### Iteration Methods
-
-Some data types in AddyScript have methods that can be used to iterate over values of those types. Such a method is generally equivalent to a loop, except that it is more compact and can appear anywhere an expression is expected (which loops cannot do). The following table summarizes AddyScript iteration methods and the classes to which they belong.
-
-|Method|Description|Example|
-|-|-|-|
-|`int int::times(closure action)`<br>`long long::times(closure action)`|Performs the given action n times where n is the integer value on which the method is invoked.|`4.times(\|i\| => println('hello!'));`|
-|`string string::each(closure action)`<br>`blob blob::each(closure action)`<br>`tuple tuple::each(closure action)`<br>`list list::each(closure action)`<br>`set set::each(closure action)`<br>`queue queue::each(closure action)`<br>`stack stack::each(closure action)`<br>`map map::each(closure action)`|Repeats the given action on each item (each character for strings, each byte for blobs, or each key-value pair for maps) of the target object. When the target object is a map, the closure expects two arguments. In any other case, it expects a single argument.|`l = [4, 2, 5, 3, 8, 6];`<br>`sum = 0;`<br>`l.each(\|x\| => sum += x);`<br>`println(sum);`|
-|`tuple tuple::eachIndex(closure action)`<br>`list list::eachIndex(closure action)`|Repeats the given action on each index of the target tuple or list.|`l = [4, 2, 5, 3, 8, 6];`<br>`l.eachIndex(\|i\| => l[i] *= 2);`<br>`println(l.join(', '));`|
-|`map map::eachKey(closure action)`|Repeats the given action on each key of the target map.|`m = {'age' => 30, 'weight' => 80, 'height' => 170};`<br>`m.eachKey(\|k\| => println(k + ': ' + m[k]));`|
-|`map map::eachValue(closure action)`|Repeats the given action on each distinct value of the calling map.|`m = {'age' => 70, 'weight' => 70, 'height' => 180};`<br>`m.eachValue(\|v\| => println(v + ': ' + m.keysOf(v)));`|
-|`bool tuple::all(closure predicate)`<br>`bool list::all(closure predicate)`<br>`bool set::all(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for all items; returns **false** otherwise.|`s = {4, 2, 0, 8, 6};`<br>`b = s.all(\|e\| => e % 2 == 0);`<br>`if (b) println('all them are even');`|
-|`bool tuple::any(closure predicate)`<br>`bool list::any(closure predicate)`<br>`bool set::any(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for at least one of them; returns **false** otherwise.|`s = {4, 1, 2, 0, 3, 8, 6};`<br>`b = s.any(\|e\| => e % 2 == 1);`<br>`if (b) println('there is an odd one');`|
-|`any tuple::first(closure predicate)`<br>`any list::first(closure predicate)`<br>`any set::first(closure predicate)`|Successively evaluates a predicate on each item of a tuple, list, or set, returning the first item for which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.first(\|x\| => x % 2 == 1);`<br>will return 5|
-|`any tuple::last(closure predicate)`<br>`any list::last(closure predicate)`|Traverse a tuple or a list backwards by successively evaluating a predicate on each of its items, returning the first item for which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.last(\|x\| => x % 2 == 1);`<br>will return 1|
-|`int tuple::findIndex(closure predicate)`<br>`int list::findIndex(closure predicate)`|Finds the index of the first item of a tuple or list that satisfies the given predicate.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findIndex(\|x\| => x % 2 == 1);`<br>will return 3|
-|`any tuple::findLastIndex(closure predicate)`<br>`any list::findLastIndex(closure predicate)`|Finds the index of the last item of a list that satisfies the given predicate.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findLastIndex(\|x\| => x % 2 == 0);`<br>will return 8|
-|`list list::where(closure predicate)`<br>`set set::where(closure predicate)`|Successively evaluates a predicate on each item of a list or set, returning a list or set of items on which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.where(\|x\| => x % 2 == 1);`<br>will return [5, 3, 7, 1]|
-|`list list::select(closure transform)`<br>`set set::select(closure transform)`|Successively evaluates a predicate on every item of a list or set, returning a list or set of items created from the original items by its argument.|`s = {'nadia', 'dave', 'roland', 'rick', 'john'};`<br>`t = s.select(\|x\| => x.toUpper());`<br>returns {NADIA, DAVE, ROLAND, RICK, JOHN}|
-|`any tuple::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`|Generate a single value by aggregating the items of a tuple, list or set; the _aggregator_ is a function that takes 2 arguments: an _accumulator_ and the current item; it generates the next value of the _accumulator_; parameter _seed_ is the initial value of the _accumulator_; **aggregate** returns the last value of the _accumulator_.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`sum = l.aggregate(0, \|acc, val\| => acc + val);`<br>will return 36|
-|`map list::groupBy(closure criterion)`|Groups the items of a list according to the given criterion and returns a map of sub-lists identified by the distinct group identifiers that were produced by the criterion.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`g = l.groupBy(\|x\| => x % 2);`<br>will return {0 => [4, 0, 2, 8, 6], 1 => [5, 3, 7, 1]}|
-
-**Note**: Each of these methods always returns the object it is called on, which allows chaining. Chaining is one of the main benefits of using iteration methods instead of simple loops.
 
 [Home](README.md) | [Previous](expressions.md) | [Next](spec-types.md)
