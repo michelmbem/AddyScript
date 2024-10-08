@@ -178,7 +178,39 @@ repeat(myList, function (x)
 
 2. If the parameter list of a lambda expression is empty, put a space between the vertical bars. This prevents parsers from confusing them with an or-else operator (\|\|).
 
-#### External functions
+#### The closure's "bind" method
+
+The **closure** type has a single member: the "bind" method. Its prototype is: `closure closure::bind(string parameterName, any defaultValue)`. Its main purpose is to create a clone of a closure with a modified prototype. The "bind" method operates as follows:
+
+1. If _parameterName_ matches the name of an existing parameter in the original function's header, "bind" proceeds to **currying**: The parameter _parameterName_ is removed from the resulting function's header and is replaced by a fixed value, which in this case is _defaultValue_. The resulting function will then have one parameter less than the original one, with the exact same body that will always evaluate _parameterName_ to _defaultValue_. Here is an example of how to curry a function:
+
+    ```JS
+    // add is the original function: it simply adds two numbers
+    function add(a, b) => a + b;
+
+    // add10 is a variant of add that always use 10 for parameter a
+    add10 = add.bind('a', 10);
+
+    println(add10(5));
+    println(add10(-7));
+    ```
+
+2. If _parameterName_ doesn't match the name of an existing parameter in the original function's header, "bind" simply adds an optional parameter with the given name and default value to the resulting function. This is very helpful when you are creating a function that expects a closure as an argument and that you want the closure to match variable prototypes. As an example, the "each" method of the **list** type is defined as follows:
+
+    ```JS
+    public function each(action)
+    {
+        // action is replaced by a clone that has an optional parameter named __index
+        action = action.bind('__index', null);
+
+        foreach (__index => __value in this)
+            action(__value, __index);
+        
+        return this;
+    }
+    ```
+
+### External functions
 AddyScript allows a script to invoke a function declared in a native library (such as a DLL or a shared object). To do this, the target function must first be declared as an external function in the script using this syntax:
 
 `[LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
@@ -200,40 +232,6 @@ extern function msgbox(
 
 msgbox(null, "Hello funny people!", "AddyScript", 0);
 ```
-
-### Closures
-
-In AddyScript, a **closure** is nothing more than a function that is used as a variable. It can be passed as an argument to another function. This is the case when you want that other function to have customizable behavior. It can also be returned as a result of another function. This is a way to get dynamically generated functions. The **closure** type has a single member: the "bind" method. Its prototype is: `closure closure::bind(string parameterName, any defaultValue)`. Its main purpose is to create a clone of a closure with a modified prototype.
-
-The "bind" method operates as follows:
-
-* If _parameterName_ matches the name of an existing parameter in the original function's header, "bind" proceeds to **currying**: The parameter _parameterName_ is removed from the resulting function's header and is replaced by a fixed value, which in this case is _defaultValue_. The resulting function will then have one parameter less than the original one, with the exact same body that will always evaluate _parameterName_ to _defaultValue_. Here is an example of how to curry a function:
-
-    ```JS
-    // add is the original function: it simply adds two numbers
-    function add(a, b) => a + b;
-
-    // add10 is a variant of add that always use 10 for parameter a
-    add10 = add.bind('a', 10);
-
-    println(add10(5));
-    println(add10(-7));
-    ```
-
-* If _parameterName_ doesn't match the name of an existing parameter in the original function's header, "bind" simply adds an optional parameter with the given name and default value to the resulting function. This is very helpful when you are creating a function that expects a closure as an argument and that you want the closure to match variable prototypes. As an example, the "each" method of the **list** type is defined as follows:
-
-    ```JS
-    public function each(action)
-    {
-        // action is replaced by a clone that has an optional parameter named __index
-        action = action.bind('__index', null);
-
-        foreach (__index => __value in this)
-            action(__value, __index);
-        
-        return this;
-    }
-    ```
 
 ### Re-using code: the import directive
 
