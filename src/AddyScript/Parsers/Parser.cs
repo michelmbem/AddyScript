@@ -305,18 +305,6 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             anoCall.CopyLocation(body);
             return anoCall;
         }
-        
-        if (TryMatch(TokenID.KW_Throw))
-        {
-            Token first = token;
-            Consume(1);
-
-            Expression thrown = RequiredExpression();
-
-            var anoCall = new AnonymousCall(new InlineFunction([], new Block(new Throw(thrown))));
-            anoCall.SetLocation(first.Start, thrown.End);
-            return anoCall;
-        }
 
         return base.MatchCaseExpression();
     }

@@ -1669,11 +1669,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
             foreach (MatchCase matchCase in patMatch.MatchCases)
                 if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)))
+                {
+                    Dictionary<string, IFrameItem> frameItems = [];
+
+                    if (matchCase.Pattern is PredicatePattern predPattern)
+                        frameItems.Add(predPattern.ParameterName, testArg.Value);
+                    else
+                        frameItems.Add(ClassProperty.WRITER_PARAMETER_NAME, testArg.Value);
+
                     try
                     {
-                        currentFrame.PushBlock(new Dictionary<string, IFrameItem> {
-                            [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value
-                        });
+                        currentFrame.PushBlock(frameItems);
                         matchCase.Expression.AcceptTranslator(this);
                         return;
                     }
@@ -1681,6 +1687,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     {
                         currentFrame.PopBlock();
                     }
+                }
 
             returnedValue = Void.Value;
         }

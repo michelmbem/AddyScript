@@ -69,9 +69,9 @@ println();
 const number_regex = @'[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?';
 
 res = readln('type some text: ') switch {
-	x: x matches number_regex && ((decimal)x) > 0 => 'it\'s a positive number',
-	x: x matches number_regex => 'it\'s just a number',
-	_ => 'it\'s not a number'
+	x: x matches number_regex && ((decimal)x) > 0 => $'{x} is a positive number',
+	x: x matches number_regex => $'{x} is just a number',
+	_ => $'{__value} is not a number'
 };
 println($'result: {res}');
 println();
@@ -101,8 +101,8 @@ l.each(|item| => {
 println();
 
 try {
-	randint(-7, 3) switch {
-		0..3 => println($'{__value} is OK!'),
+	randint(-5, 5) switch {
+		-5..2 => println($'{__value} is OK!'),
 		_ => throw 'I don\'t like negative values'
 	};
 } catch (e) {

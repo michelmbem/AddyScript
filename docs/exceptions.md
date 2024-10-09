@@ -60,6 +60,28 @@ or more simply
 
 Of course, you don't have to throw an instance of the **Exception** class. But if you throw something else, it will be used as the exception message.
 
+#### Throw expressions
+
+There are two cases where a throw statement can be used as an expression (called a **throw expression**):
+
+1. In a logical expression with the **??** operator, the right operand can be a _throw expression_. That syntax has a similar effect to using the postfix **!** operator but it gives us control over the message of the exception that is thrown when the first operand is empty. Example:
+
+    ```JS
+    name = readln('type a number: ') ?? throw "You didn't type any name";
+    ```
+
+2. As seen in the pattern matching section, a switch expression can throw an exception when a pattern is matched. Example:
+
+    ```JS
+    score = getScore();
+    mention = score switch {
+        0..3 => 'low',
+        4..6 => 'average',
+        7..10 => 'high',
+        _ => throw new Exception('OutOfRange', 'The score should be between 0 and 10')
+    };
+    ```
+
 ### Try-with-resource
 
 There is a special variant of the **try-catch-finally** statement that has an argument associated with it. This argument is called a _resource_. The _resource_ is intended to be immediately released (meaning that its "dispose" method is automatically invoked) once the **try-catch-finally** statement completes. When a **try-catch-finally** statement owns a resource, it is called a **try-with-resource** statement. In a **try-with-resource** statement, the **catch** and **finally** blocks can be omitted.
@@ -73,13 +95,12 @@ import System::Environment;
 import System::IO;
 
 const BLOCK_SIZE = 4096;
-const EMPTY_BLOCK = '\0' * BLOCK_SIZE;
 
-try (input = File::OpenRead(@"E:\Videos\TV Series\Breaking Bad\Saison 1\01x01.avi"))
+try (input = File::OpenRead(@"D:\Videos\TV Series\My Series\Season 1\S01E01.avi"))
 {
-    try (output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'BBS1E01.avi')))
+    try (output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'MySeries-S01E01.avi')))
     {
-        var block = EMPTY_BLOCK, m = 0, n;
+        var block = blob::of(BLOCK_SIZE), m = 0, n;
         
         while (true) {
             n = input.Read(block, 0, BLOCK_SIZE);

@@ -6,6 +6,7 @@ using System.Text;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
+using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
@@ -108,7 +109,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             BinaryOperator oper = token.ToBinaryOperator();
             Consume(1);
-            var relation = Required(Relation, Resources.ExpressionRequired);
+
+            var relation = oper == BinaryOperator.IfEmpty && TryMatch(TokenID.KW_Throw)
+                         ? ThrowExpression()
+                         : Required(Relation, Resources.ExpressionRequired);
+            
             moreRelations.Enqueue((oper, relation));
         }
 
@@ -865,6 +870,20 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
+    /// Recognizes a <b>throw</b> statement being used as an expresion.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.ThrowExpression"/></returns>
+    protected ThrowExpression ThrowExpression()
+    {
+        Token first = Match(TokenID.KW_Throw);
+        Expression thrown = RequiredExpression();
+
+        var _throw = new Throw(thrown);
+        _throw.SetLocation(first.Start, thrown.End);
+        return new ThrowExpression(_throw);
+    }
+
+    /// <summary>
     /// Recognizes an inline function's declaration.
     /// This method is not really defined here.
     /// Inline functions are only recognized by the full featured parser.
@@ -1290,6 +1309,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// </remarks>
     protected virtual Expression MatchCaseExpression()
     {
-        return RequiredExpression();
+        return TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
     }
 }
