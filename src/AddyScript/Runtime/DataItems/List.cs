@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using AddyScript.Ast.Expressions;
@@ -149,8 +150,8 @@ public sealed class List : DataItem
     {
         "empty" => Boolean.FromBool(IsEmpty()),
         "size" => new Integer(list.Count),
-        "front" => list[0],
-        "back" => list[^1],
+        "front" => list.FirstOrDefault(Void.Value),
+        "back" => list.LastOrDefault(Void.Value),
         _ => base.GetProperty(propertyName),
     };
 

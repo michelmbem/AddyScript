@@ -34,4 +34,14 @@ public class ClassField : ClassMember
     /// Holds the value of a static field.
     /// </summary>
     public DataItem SharedValue { get; set; }
+
+    /// <summary>
+    /// Gets if this field is static.
+    /// </summary>
+    public bool IsStatic => Modifier == Modifier.Static || Modifier == Modifier.StaticFinal;
+
+    /// <summary>
+    /// Gets if this field is final.
+    /// </summary>
+    public bool IsFinal => Modifier == Modifier.Final || Modifier == Modifier.StaticFinal;
 }

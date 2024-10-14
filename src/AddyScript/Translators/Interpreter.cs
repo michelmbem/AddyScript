@@ -882,9 +882,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                             propValue = owner.GetProperty(propertyRef.PropertyName);
                             break;
                         case ClassField field:
-                            propValue = (member.Modifier == Modifier.Static) || (member.Modifier == Modifier.StaticFinal)
-                                      ? field.SharedValue
-                                      : owner.GetProperty(member.Name);
+                            propValue = field.IsStatic ? field.SharedValue : owner.GetProperty(field.Name);
                             break;
                         case ClassMethod method:
                             {
@@ -909,8 +907,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
 
             if (propValue == null && misRefAct != MissingReferenceAction.Ignore)
-                throw new RuntimeError(fileName, propertyRef, string.Format(Resources.PropertyNotFoundInObject,
-                                                                                propertyRef.PropertyName));
+                throw new RuntimeError(fileName, propertyRef, string.Format(Resources.PropertyNotFoundInObject, propertyRef.PropertyName));
 
             returnedValue = propValue;
         }
@@ -1049,7 +1046,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                         ClassField field = methodTarget.Class.GetField(methodCall.FunctionName);
                         if (field != null) CheckAccess(field, methodCall);
 
-                        DataItem fieldValue = field != null && (field.Modifier == Modifier.Static || field.Modifier == Modifier.StaticFinal)
+                        DataItem fieldValue = field != null && field.IsStatic
                                             ? field.SharedValue
                                             : methodTarget.GetProperty(methodCall.FunctionName);
 
@@ -1788,8 +1785,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
         else if (member is ClassProperty property)
         {
-            if (!property.CanWrite)
-                throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteProperty);
+            if (!property.CanWrite) throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteProperty);
 
             CheckAccess(property.Writer, propertyRef);
             Invoke(property.Writer.Function, property.Name, property.Holder, owner, new Literal(rValue));
@@ -1811,8 +1807,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
         else if (targetProperty is ClassProperty property)
         {
-            if (!property.CanWrite)
-                throw new RuntimeError(fileName, staticRef, Resources.CannotWriteProperty);
+            if (!property.CanWrite) throw new RuntimeError(fileName, staticRef, Resources.CannotWriteProperty);
 
             CheckAccess(property.Writer, staticRef);
             Invoke(property.Writer.Function, property.Name, property.Holder, null, new Literal(rValue));
@@ -1843,8 +1838,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         Class superClass = currentFrame.Context.MethodHolder.SuperClass;
         ClassProperty property = superClass.GetProperty(ppr.PropertyName) ??
-            throw new RuntimeError(fileName, ppr, string.Format(Resources.PropertyNotFoundInClass,
-                                                                    ppr.PropertyName, superClass.Name));
+            throw new RuntimeError(fileName, ppr, string.Format(Resources.PropertyNotFoundInClass, ppr.PropertyName, superClass.Name));
 
         if (property.Modifier == Modifier.Abstract)
             throw new RuntimeError(fileName, ppr, string.Format(Resources.CannotInvokeAbstractMember, property.FullName));
