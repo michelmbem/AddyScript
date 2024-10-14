@@ -19,7 +19,7 @@ class DBOConnection
 	
 	public property transaction
 	{
-		read { return this.inTransaction ? this._transactions.peek() : null; }
+		read { return this.inTransaction ? this._transactions.top : null; }
 	}
 	
 	public function open()

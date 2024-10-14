@@ -34,7 +34,7 @@ static class DBOConfig
 	};
 
 	public static function createConnection(providerName!) {
-		if (DBOConfig::providers.containsKey(providerName)) {
+		if (DBOConfig::providers contains providerName) {
 			var provider = DBOConfig::providers[providerName];			
 			var assembly = __context.LoadAssembly(provider.assemblyName);
 			if (assembly === null) throw 'Could not load assembly ' + provider.assemblyName;

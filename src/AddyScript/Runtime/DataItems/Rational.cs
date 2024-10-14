@@ -71,4 +71,11 @@ public sealed class Rational : DataItem
         BinaryOperator.Power => new Rational(value.Power(operand.AsInt32)),
         _ => base.BinaryOperation(_operator, operand),
     };
+
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "num" => new Integer(value.Numerator),
+        "den" => new Integer(value.Denominator),
+        _ => base.GetProperty(propertyName),
+    };
 }

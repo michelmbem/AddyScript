@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using AddyScript.Ast.Expressions;
@@ -103,10 +105,22 @@ public sealed class Map : DataItem
 
                     return new Map(result);
                 }
+            case BinaryOperator.Contains:
+                return Boolean.FromBool(dict.ContainsKey(operand));
             default:
                 return base.BinaryOperation(_operator, operand);
         }
     }
+
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "size" => new Integer(dict.Count),
+        "keys" => new Set(dict.Keys),
+        "values" => new Set(dict.Values),
+        "entries" => new Set(dict.Select(pair => new Tuple([pair.Key, pair.Value]))),
+        _ => base.GetProperty(propertyName),
+    };
 
     public override DataItem GetItem(DataItem index)
     {

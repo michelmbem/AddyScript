@@ -311,6 +311,16 @@ public class Class : IFrameItem
 
         Map.RegisterMethod(new ClassMethod("eachValue", Scope.Public, Modifier.Final, mapEachValueFunction));
 
+        // Create the map::apply method
+        var mapApplyFunction = new Function([new("key"), new("action")],
+                                            new(new IfElse(new BinaryExpression(BinaryOperator.Contains,
+                                                                                new SelfReference(),
+                                                                                new VariableRef("key")),
+                                                           new FunctionCall("action", new ItemRef(new SelfReference(), new VariableRef("key")))),
+                                                new Return(new SelfReference())));
+
+        Map.RegisterMethod(new ClassMethod("apply", Scope.Public, Modifier.Final, mapApplyFunction));
+
         // Create the list::where method
         var lstWhereFunction = new Function([new("predicate")],
                                             new(VariableDecl.Single("l", new ListInitializer()),

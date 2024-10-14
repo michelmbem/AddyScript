@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 using AddyScript.Runtime.OOP;
 
@@ -45,6 +46,14 @@ public sealed class Stack : DataItem
     public override int GetHashCode() => stack.GetHashCode();
 
     public override bool IsEmpty() => stack.Count <= 0;
+
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "size" => new Integer(stack.Count),
+        "top" => stack.Peek(),
+        _ => base.GetProperty(propertyName),
+    };
 
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {

@@ -36,4 +36,21 @@ public sealed class Date(DateTime value) : DataItem
         BinaryOperator.GreaterThanOrEqual => Boolean.FromBool(value >= operand.AsDateTime),
         _ => base.BinaryOperation(_operator, operand),
     };
+
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "date" => new Date(value.Date),
+        "time" => new Date(new DateTime(value.TimeOfDay.Ticks)),
+        "year" => new Integer(value.Year),
+        "month" => new Integer(value.Month),
+        "day" => new Integer(value.Day),
+        "yearday" => new Integer(value.DayOfYear),
+        "weekday" => new String(value.DayOfWeek.ToString()),
+        "hour" => new Integer(value.Hour),
+        "minute" => new Integer(value.Minute),
+        "second" => new Integer(value.Second),
+        "millisecond" => new Integer(value.Millisecond),
+        "ticks" => new Long(value.Ticks),
+        _ => base.GetProperty(propertyName),
+    };
 }

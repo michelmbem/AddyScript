@@ -139,6 +139,14 @@ public sealed class Tuple(DataItem[] items) : DataItem
         }
     }
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "size" => new Integer(items.Length),
+        "front" => items[0],
+        "back" => items[^1],
+        _ => base.GetProperty(propertyName),
+    };
+
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = items.Length;

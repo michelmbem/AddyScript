@@ -105,74 +105,56 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         ];
 
         InnerFunction[] commonFunctions = [EqualsFunction, HashCodeFunction, CompareToFunction, ToStringFunction, CloneFunction, DisposeFunction];
-        InnerFunction[] dateProperties = [DateGetDate, DateGetTime, DateGetTicks];
-        InnerFunction[] dateFunctions = [DateAdd, DateAddTicks, DateSubtract];
+        InnerFunction[] dateFunctions = [DateAdd, DateSubtract];
         InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
         InnerFunction[] blobStaticFunctions = [BlobOf, BlobFromHexString, BlobFromBase64String];
         InnerFunction[] blobFunctions = [BlobToHexString, BlobToBase64String, BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo, BlobResize];
         InnerFunction[] tupleFunctions = [TupleIndexOf, TupleLastIndexOf];
         InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
-        InnerFunction[] mapProperties = [MapSize, MapKeys, MapValues];
         InnerFunction[] setFunctions = [SetAdd, SetRemove, SetClear];
-        InnerFunction[] queueFunctions = [QueueEnqueue, QueuePeek, QueueDequeue, QueueClear];
-        InnerFunction[] stackFunctions = [StackPush, StackPeek, StackPop, StackClear];
-        InnerFunction[] mapFunctions = [MapContainsKey, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
+        InnerFunction[] queueFunctions = [QueueEnqueue, QueueDequeue, QueueClear];
+        InnerFunction[] stackFunctions = [StackPush, StackPop, StackClear];
+        InnerFunction[] mapFunctions = [MapGet, MapUpdate, MapAdd, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
 
         foreach (InnerFunction function in commonFunctions)
             foreach (Class cls in Class.Predefined)
                 if (cls.SuperClass == null)
                     cls.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Rational.RegisterProperty(RationalNum.ToInstanceProperty());
-        Class.Rational.RegisterProperty(RationalDen.ToInstanceProperty());
         Class.Rational.RegisterMethod(RationalInverse.ToInstanceMethod());
 
-        Class.Complex.RegisterProperty(ComplexReal.ToInstanceProperty());
-        Class.Complex.RegisterProperty(ComplexImaginary.ToInstanceProperty());
         Class.Complex.RegisterMethod(ComplexOf.ToStaticMethod());
         Class.Complex.RegisterMethod(ComplexConjugate.ToInstanceMethod());
 
-        Class.Date.RegisterIndexer(DateGet.ToIndexer());
         Class.Date.RegisterMethod(DateOf.ToStaticMethod());
-        foreach (InnerFunction function in dateProperties)
-            Class.Date.RegisterProperty(function.ToInstanceProperty());
         foreach (InnerFunction function in dateFunctions)
             Class.Date.RegisterMethod(function.ToInstanceMethod());
 
-        Class.String.RegisterProperty(StringLength.ToInstanceProperty());
         foreach (InnerFunction function in stringFunctions)
             Class.String.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Blob.RegisterProperty(BlobLength.ToInstanceProperty());
         foreach (InnerFunction function in blobStaticFunctions)
             Class.Blob.RegisterMethod(function.ToStaticMethod());
         foreach (InnerFunction function in blobFunctions)
             Class.Blob.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Tuple.RegisterProperty(TupleSize.ToInstanceProperty());
         foreach (InnerFunction function in tupleFunctions)
             Class.Tuple.RegisterMethod(function.ToInstanceMethod());
 
-        Class.List.RegisterProperty(ListSize.ToInstanceProperty());
         foreach (InnerFunction function in listFunctions)
             Class.List.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Set.RegisterProperty(SetSize.ToInstanceProperty());
         foreach (InnerFunction function in setFunctions)
             Class.Set.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Queue.RegisterProperty(QueueSize.ToInstanceProperty());
         Class.Queue.RegisterMethod(QueueOf.ToStaticMethod());
         foreach (InnerFunction function in queueFunctions)
             Class.Queue.RegisterMethod(function.ToInstanceMethod());
 
-        Class.Stack.RegisterProperty(StackSize.ToInstanceProperty());
         Class.Stack.RegisterMethod(StackOf.ToStaticMethod());
         foreach (InnerFunction function in stackFunctions)
             Class.Stack.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in mapProperties)
-            Class.Map.RegisterProperty(function.ToInstanceProperty());
         foreach (InnerFunction function in mapFunctions)
             Class.Map.RegisterMethod(function.ToInstanceMethod());
 
@@ -737,16 +719,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Rational specific methods
 
-    private static DataItem RationalNumLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsRational32.Numerator);
-    }
-
-    private static DataItem RationalDenLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsRational32.Denominator);
-    }
-
     private static DataItem RationalInverseLogic(DataItem[] arguments)
     {
         return new Rational(arguments[0].AsRational32.Inverse());
@@ -759,16 +731,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem ComplexOfLogic(DataItem[] arguments)
     {
         return new Complex(arguments[0].AsDouble, arguments[1].AsDouble);
-    }
-
-    private static DataItem ComplexRealLogic(DataItem[] arguments)
-    {
-        return new Float(arguments[0].AsComplex64.Real);
-    }
-
-    private static DataItem ComplexImaginaryLogic(DataItem[] arguments)
-    {
-        return new Float(arguments[0].AsComplex64.Imaginary);
     }
 
     private static DataItem ComplexConjugateLogic(DataItem[] arguments)
@@ -785,6 +747,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         DataItem[] values = [.. arguments[0].AsList];
         var date = values.Length switch
         {
+            // ticks
+            1 => new DateTime((long)values[0].AsBigInteger),
             // year, month and day
             3 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32),
             // hour, minute, second and millisecond
@@ -801,42 +765,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new Date(date);
     }
 
-    private static DataItem DateGetDateLogic(DataItem[] arguments)
-    {
-        return new Date(arguments[0].AsDateTime.Date);
-    }
-
-    private static DataItem DateGetTimeLogic(DataItem[] arguments)
-    {
-        long ticks = arguments[0].AsDateTime.TimeOfDay.Ticks;
-        return new Date(new DateTime(ticks));
-    }
-
-    private static DataItem DateGetLogic(DataItem[] arguments)
-    {
-        DataItem self = arguments[0], arg1 = arguments[1];
-        CheckArgType(arg1, Class.String, "date::get", 1);
-
-        return arg1.ToString() switch
-        {
-            "year" => new Integer(self.AsDateTime.Year),
-            "month" => new Integer(self.AsDateTime.Month),
-            "day" => new Integer(self.AsDateTime.Day),
-            "weekday" => new String(self.AsDateTime.DayOfWeek.ToString()),
-            "yearday" => new Integer(self.AsDateTime.DayOfYear),
-            "hour" => new Integer(self.AsDateTime.Hour),
-            "minute" => new Integer(self.AsDateTime.Minute),
-            "second" => new Integer(self.AsDateTime.Second),
-            "millisecond" => new Integer(self.AsDateTime.Millisecond),
-            _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg1)),
-        };
-    }
-
-    private static DataItem DateGetTicksLogic(DataItem[] arguments)
-    {
-        return new Long(arguments[0].AsDateTime.Ticks);
-    }
-
     private static DataItem DateAddLogic(DataItem[] arguments)
     {
         DataItem self = arguments[0], arg1 = arguments[1], arg2 = arguments[2];
@@ -851,14 +779,9 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             "minute" => new Date(self.AsDateTime.AddMinutes(arg1.AsDouble)),
             "second" => new Date(self.AsDateTime.AddSeconds(arg1.AsDouble)),
             "millisecond" => new Date(self.AsDateTime.AddMilliseconds(arg1.AsDouble)),
+            "ticks" => new Date(self.AsDateTime.AddTicks((long)arg1.AsBigInteger)),
             _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2)),
         };
-    }
-
-    private static DataItem DateAddTicksLogic(DataItem[] arguments)
-    {
-        var ticks = (long) arguments[1].AsBigInteger;
-        return new Date(arguments[0].AsDateTime.AddTicks(ticks));
     }
 
     private static DataItem DateSubtractLogic(DataItem[] arguments)
@@ -875,6 +798,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             "minute" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMinutes),
             "second" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalSeconds),
             "millisecond" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMilliseconds),
+            "ticks" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).Ticks),
             _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2)),
         };
     }
@@ -882,11 +806,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region String specific methods
-
-    private static DataItem StringLengthLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].ToString().Length);
-    }
 
     private static DataItem StringIndexOfLogic(DataItem[] arguments)
     {
@@ -1092,11 +1011,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new Blob(Convert.FromBase64String(arguments[0].ToString()));
     }
 
-    private static DataItem BlobLengthLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsByteArray.Length);
-    }
-
     private static DataItem BlobIndexOfLogic(DataItem[] arguments)
     {
         var self = arguments[0].AsByteArray;
@@ -1170,11 +1084,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Tuple specific methods
 
-    private static DataItem TupleSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsArray.Length);
-    }
-
     private static DataItem TupleIndexOfLogic(DataItem[] arguments)
     {
         var self = arguments[0].AsArray;
@@ -1204,11 +1113,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region List specific methods
-
-    private static DataItem ListSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsList.Count);
-    }
 
     private static DataItem ListJoinLogic(DataItem[] arguments)
     {
@@ -1396,11 +1300,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Set specific methods
 
-    private static DataItem SetSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsHashSet.Count);
-    }
-
     private static DataItem SetAddLogic(DataItem[] arguments)
     {
         arguments[0].AsHashSet.Add(arguments[1]);
@@ -1423,11 +1322,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Queue specific methods
 
-    private static DataItem QueueSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsQueue.Count);
-    }
-
     private static DataItem QueueOfLogic(DataItem[] arguments)
     {
         return new Queue(new Queue<DataItem>(arguments[0].AsList));
@@ -1437,11 +1331,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         arguments[0].AsQueue.Enqueue(arguments[1]);
         return Void.Value;
-    }
-
-    private static DataItem QueuePeekLogic(DataItem[] arguments)
-    {
-        return arguments[0].AsQueue.Peek();
     }
 
     private static DataItem QueueDequeueLogic(DataItem[] arguments)
@@ -1459,11 +1348,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Stack specific methods
 
-    private static DataItem StackSizeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsStack.Count);
-    }
-
     private static DataItem StackOfLogic(DataItem[] arguments)
     {
         return new Stack(new Stack<DataItem>(arguments[0].AsList));
@@ -1473,11 +1357,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         arguments[0].AsStack.Push(arguments[1]);
         return Void.Value;
-    }
-
-    private static DataItem StackPeekLogic(DataItem[] arguments)
-    {
-        return arguments[0].AsStack.Peek();
     }
 
     private static DataItem StackPopLogic(DataItem[] arguments)
@@ -1495,44 +1374,37 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Map specific methods
 
-    private static DataItem MapSizeLogic(DataItem[] arguments)
+    private static DataItem MapGetLogic(DataItem[] arguments)
     {
-        return new Integer(arguments[0].AsDictionary.Count);
+        if (arguments[0].AsDictionary.TryGetValue(arguments[1], out DataItem foundValue))
+            return foundValue;
+
+        return arguments[2];
     }
 
-    private static DataItem MapContainsKeyLogic(DataItem[] arguments)
+    private static DataItem MapUpdateLogic(DataItem[] arguments)
     {
-        bool b = arguments[0].AsDictionary.ContainsKey(arguments[1]);
-        return Boolean.FromBool(b);
+        var self = arguments[0].AsDictionary;
+
+        if (self.ContainsKey(arguments[1]))
+        {
+            self[arguments[1]] = arguments[2];
+            return Boolean.True;
+        }
+
+        return Boolean.False;
+    }
+
+    private static DataItem MapAddLogic(DataItem[] arguments)
+    {
+        arguments[0].AsDictionary.Add(arguments[1], arguments[2]);
+        return Void.Value;
     }
 
     private static DataItem MapContainsValueLogic(DataItem[] arguments)
     {
         bool b = arguments[0].AsDictionary.ContainsValue(arguments[1]);
         return Boolean.FromBool(b);
-    }
-
-    private static DataItem MapKeysLogic(DataItem[] arguments)
-    {
-        var keySet = new HashSet<DataItem>();
-        var keys = arguments[0].AsDictionary.Keys;
-
-        foreach (DataItem key in keys)
-            keySet.Add(key);
-
-        return new Set(keySet);
-    }
-
-    private static DataItem MapValuesLogic(DataItem[] arguments)
-    {
-        var valueSet = new HashSet<DataItem>();
-        var values = arguments[0].AsDictionary.Values;
-
-        foreach (DataItem value in values)
-            if (!valueSet.Contains(value))
-                valueSet.Add(value);
-
-        return new Set(valueSet);
     }
 
     private static DataItem MapFrequencyOfLogic(DataItem[] arguments)
@@ -1860,16 +1732,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Rational specific methods
 
     /// <summary>
-    /// Extracts the numerator of a rational number.
-    /// </summary>
-    public static readonly InnerFunction RationalNum = new("num", [new("self")], RationalNumLogic);
-
-    /// <summary>
-    /// Extracts the denominator of a rational number.
-    /// </summary>
-    public static readonly InnerFunction RationalDen = new ("den", [new("self")], RationalDenLogic);
-
-    /// <summary>
     /// Computes the inverse of a rational number.
     /// </summary>
     public static readonly InnerFunction RationalInverse = new ("inverse", [new("self")], RationalInverseLogic);
@@ -1882,16 +1744,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Creates a complex number.
     /// </summary>
     public static readonly InnerFunction ComplexOf = new("of", [new("real"), new("imag")], ComplexOfLogic);
-
-    /// <summary>
-    /// Extracts the real part of a complex number.
-    /// </summary>
-    public static readonly InnerFunction ComplexReal = new ("real", [new("self")], ComplexRealLogic);
-
-    /// <summary>
-    /// Extracts the imaginary part of a complex number.
-    /// </summary>
-    public static readonly InnerFunction ComplexImaginary = new ("imag", [new("self")], ComplexImaginaryLogic);
 
     /// <summary>
     /// Computes the conjugate of a complex number.
@@ -1908,34 +1760,9 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public static readonly InnerFunction DateOf = new ("of", [new("values", false, true, null)], DateOfLogic);
 
     /// <summary>
-    /// Extracts the date part of a date/time value.
-    /// </summary>
-    public static readonly InnerFunction DateGetDate = new ("date", [new("self")], DateGetDateLogic);
-
-    /// <summary>
-    /// Extracts the time part of a date/time value.
-    /// </summary>
-    public static readonly InnerFunction DateGetTime = new ("time", [new("self")], DateGetTimeLogic);
-
-    /// <summary>
-    /// Extracts a date's part.
-    /// </summary>
-    public static readonly InnerFunction DateGet = new ("get", [new("self"), new("part")], DateGetLogic);
-
-    /// <summary>
-    /// Gets the number of ticks of a date/time value.
-    /// </summary>
-    public static readonly InnerFunction DateGetTicks = new ("ticks", [new("self")], DateGetTicksLogic);
-
-    /// <summary>
     /// Adds some time units to a date.
     /// </summary>
     public static readonly InnerFunction DateAdd = new ("add", [new("self"), new("value"), new("unit")], DateAddLogic);
-
-    /// <summary>
-    /// Adds some ticks to a date.
-    /// </summary>
-    public static readonly InnerFunction DateAddTicks = new ("addTicks", [new("self"), new("ticks")], DateAddTicksLogic);
 
     /// <summary>
     /// Computes the difference between two dates.
@@ -1945,11 +1772,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region String specific methods
-
-    /// <summary>
-    /// Determines the length of a string.
-    /// </summary>
-    public static readonly InnerFunction StringLength = new ("length", [new("self")], StringLengthLogic);
 
     /// <summary>
     /// Searches for a string in another string.
@@ -2036,11 +1858,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Blob specific methods
 
     /// <summary>
-    /// Determines the length of a string.
-    /// </summary>
-    public static readonly InnerFunction BlobLength = new("length", [new("self")], BlobLengthLogic);
-
-    /// <summary>
     /// Creates a blob with the given number of bytes.
     /// </summary>
     public static readonly InnerFunction BlobOf = new("of", [new("length")], BlobOfLogic);
@@ -2095,11 +1912,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Tuple specific methods
 
     /// <summary>
-    /// Gets the number of items in a list.
-    /// </summary>
-    public static readonly InnerFunction TupleSize = new("size", [new("self")], TupleSizeLogic);
-
-    /// <summary>
     /// Gets the first index of an item in a list.
     /// </summary>
     public static readonly InnerFunction TupleIndexOf = new("indexOf", [new("self"), new("value"), new("start", new Integer(0)), new("count", new Integer(0))], TupleIndexOfLogic);
@@ -2112,11 +1924,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region List specific methods
-
-    /// <summary>
-    /// Gets the number of items in a list.
-    /// </summary>
-    public static readonly InnerFunction ListSize = new("size", [new("self")], ListSizeLogic);
 
     /// <summary>
     /// Joins several strings into one.
@@ -2208,11 +2015,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Set specific methods
 
     /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction SetSize = new("size", [new("self")], SetSizeLogic);
-
-    /// <summary>
     /// Adds an item in a set.
     /// </summary>
     public static readonly InnerFunction SetAdd = new ("add", [new("self"), new("value")], SetAddLogic);
@@ -2232,11 +2034,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Queue specific methods
 
     /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction QueueSize = new("size", [new("self")], QueueSizeLogic);
-
-    /// <summary>
     /// Creates a queue with the given initial content.
     /// </summary>
     public static readonly InnerFunction QueueOf = new ("of", [new("values", false, true, null)], QueueOfLogic);
@@ -2245,11 +2042,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Enqueues an item in a set.
     /// </summary>
     public static readonly InnerFunction QueueEnqueue = new ("enqueue", [new("self"), new("value")], QueueEnqueueLogic);
-
-    /// <summary>
-    /// Checks if a set contains some value.
-    /// </summary>
-    public static readonly InnerFunction QueuePeek = new ("peek", [new("self")], QueuePeekLogic);
 
     /// <summary>
     /// Dequeues an item from a set.
@@ -2266,11 +2058,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Stack specific methods
 
     /// <summary>
-    /// Gets the number of items in a set.
-    /// </summary>
-    public static readonly InnerFunction StackSize = new("size", [new("self")], StackSizeLogic);
-
-    /// <summary>
     /// Creates a stack with the given initial content.
     /// </summary>
     public static readonly InnerFunction StackOf = new ("of", [new("values", false, true, null)], StackOfLogic);
@@ -2279,11 +2066,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Pushs an item in a set.
     /// </summary>
     public static readonly InnerFunction StackPush = new ("push", [new("self"), new("value")], StackPushLogic);
-
-    /// <summary>
-    /// Checks if a set contains some value.
-    /// </summary>
-    public static readonly InnerFunction StackPeek = new ("peek", [new("self")], StackPeekLogic);
 
     /// <summary>
     /// Pops an item from a set.
@@ -2300,29 +2082,24 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Map specific methods
 
     /// <summary>
-    /// Gets the number of key-value pairs of a map.
+    /// Gets a value from a map and if absent, returns a default value.
     /// </summary>
-    public static readonly InnerFunction MapSize = new("size", [new("self")], MapSizeLogic);
+    public static readonly InnerFunction MapGet = new("get", [new("self"), new("key"), new("defaultValue")], MapGetLogic);
 
     /// <summary>
-    /// Checks if a map contains some key.
+    /// Updates the value of an existing key in a map. Returns true of the map was effectively updated, false otherwise.
     /// </summary>
-    public static readonly InnerFunction MapContainsKey = new("containsKey", [new("self"), new("key")], MapContainsKeyLogic);
+    public static readonly InnerFunction MapUpdate = new("update", [new("self"), new("key"), new("value")], MapUpdateLogic);
+
+    /// <summary>
+    /// Adds key-value pair in a map. Throws an error if the key was already present in the map.
+    /// </summary>
+    public static readonly InnerFunction MapAdd = new("add", [new("self"), new("key"), new("value")], MapAddLogic);
 
     /// <summary>
     /// Checks if a map contains some value.
     /// </summary>
     public static readonly InnerFunction MapContainsValue = new("containsValue", [new("self"), new("value")], MapContainsValueLogic);
-
-    /// <summary>
-    /// Gets the set of keys of a map.
-    /// </summary>
-    public static readonly InnerFunction MapKeys = new("keys", [new("self")], MapKeysLogic);
-
-    /// <summary>
-    /// Gets the set of values of a map.
-    /// </summary>
-    public static readonly InnerFunction MapValues = new("values", [new("self")], MapValuesLogic);
 
     /// <summary>
     /// Gets the number of occurences of a value in a map.
@@ -2410,36 +2187,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public ClassMethod ToInstanceMethod()
     {
         return new ClassMethod(Name, Scope.Public, Modifier.Default, ToMethodFunction());
-    }
-
-    /// <summary>
-    /// Generates an equivalent read-only static property for a class.
-    /// </summary>
-    /// <returns>A <see cref="ClassProperty"/></returns>
-    public ClassProperty ToStaticProperty()
-    {
-        var reader = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Static, ToFunction());
-        return new ClassProperty(Name, Scope.Public, Modifier.Static, reader, null);
-    }
-
-    /// <summary>
-    /// Wraps an inner function into an instance read-only property.
-    /// </summary>
-    /// <returns>A <see cref="ClassProperty"/></returns>
-    public ClassProperty ToInstanceProperty()
-    {
-        var reader = new ClassMethod(ClassProperty.GetReaderName(Name), Scope.Public, Modifier.Default, ToMethodFunction());
-        return new ClassProperty(Name, Scope.Public, Modifier.Default, reader, null);
-    }
-
-    /// <summary>
-    /// Wraps an inner function into a readonly indexer.
-    /// </summary>
-    /// <returns>A <see cref="ClassProperty"/></returns>
-    public ClassProperty ToIndexer()
-    {
-        var reader = new ClassMethod(ClassProperty.GetReaderName(ClassProperty.INDEXER_NAME), Scope.Public, Modifier.Default, ToMethodFunction());
-        return new ClassProperty(ClassProperty.INDEXER_NAME, Scope.Public, Modifier.Default, reader, null);
     }
 
     #endregion

@@ -142,6 +142,13 @@ public sealed class String(string value) : DataItem
         _ => base.BinaryOperation(_operator, operand),
     };
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "length" => new Integer(value.Length),
+        _ => base.GetProperty(propertyName),
+    };
+
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = value.Length;

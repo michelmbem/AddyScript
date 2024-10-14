@@ -118,6 +118,13 @@ public sealed class Set : DataItem
         }
     }
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "size" => new Integer(hashSet.Count),
+        _ => base.GetProperty(propertyName),
+    };
+
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (DataItem element in hashSet)

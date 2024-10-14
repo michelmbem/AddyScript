@@ -158,6 +158,13 @@ public sealed class Blob(byte[] buffer) : DataItem
         }
     }
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "length" => new Integer(buffer.Length),
+        _ => base.GetProperty(propertyName),
+    };
+
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = buffer.Length;

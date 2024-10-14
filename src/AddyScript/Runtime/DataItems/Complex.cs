@@ -69,4 +69,11 @@ public sealed class Complex : DataItem
         BinaryOperator.Power => new Complex(Complex64.Pow(value, operand.AsComplex64)),
         _ => base.BinaryOperation(_operator, operand),
     };
+
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "real" => new Float(value.Real),
+        "imag" => new Float(value.Imaginary),
+        _ => base.GetProperty(propertyName),
+    };
 }

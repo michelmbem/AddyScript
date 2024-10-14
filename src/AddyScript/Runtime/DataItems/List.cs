@@ -145,6 +145,15 @@ public sealed class List : DataItem
         }
     }
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "size" => new Integer(list.Count),
+        "front" => list[0],
+        "back" => list[^1],
+        _ => base.GetProperty(propertyName),
+    };
+
     public override DataItem GetItem(DataItem index)
     {
         int n = index.AsInt32, l = list.Count;

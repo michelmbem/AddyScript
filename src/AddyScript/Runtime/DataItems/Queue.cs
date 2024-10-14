@@ -46,6 +46,14 @@ public sealed class Queue : DataItem
 
     public override bool IsEmpty() => queue.Count <= 0;
 
+    public override DataItem GetProperty(string propertyName) => propertyName switch
+    {
+        "empty" => Boolean.FromBool(IsEmpty()),
+        "size" => new Integer(queue.Count),
+        "front" => queue.Peek(),
+        _ => base.GetProperty(propertyName),
+    };
+
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
         foreach (DataItem item in queue)
