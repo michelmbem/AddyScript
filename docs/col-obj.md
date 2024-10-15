@@ -45,7 +45,7 @@ In addition to the above operators, the **tuple** class exposes the following me
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of items currently stored in the tuple.|
-|`any front { read; }`|property|Gets the first item of a tuple tuple.|
+|`any front { read; }`|property|Gets the first item of a tuple.|
 |`any back { read; }`|property|Gets the last item of a tuple.|
 |`int indexOf(any value, int start = 0, int count = 0)`|method|Gets the position of the first occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
 |`int lastIndexOf(any value, int start = -1, int count = 0)`|method|Gets the position of the last occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
@@ -242,7 +242,7 @@ The following table summarizes all the properties and methods provided by the Ad
 
 ### Maps
 
-A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indexes are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "size" property. The "containsKey" and "containsValue" methods are used to check the existence of a particular pair in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map, the collection returned by "getValues" will contain only one copy of it. To get all the keys related to a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is related to. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).size`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
+A map is a collection of key-value pairs. The key is used as an index to add, retrieve, and update values ​​in the map. So, a map can be thought of as a list where the indices are neither necessarily integers nor necessarily contiguous. Similar to lists, you typically create a map using a map initializer. After that, you can get the number of key-value pairs stored in the map by reading the "size" property. The **contains** operator can be used to check the presence of a particular key in the map. The "containsValue" method on the other hand is used to check the existence of a particular value in the map. To remove a pair, simply call the "remove" method. The "keys" and "values" properties are used to retrieve all the keys and all the values ​in a map, respectively. Note that both methods return sets. So, if a value appears twice in a map. The "entries" property returns a set of all the key-value pairs of a map, each pair being represented as a tuple. To get all the keys associated with a particular value in a map, call its "keysOf" method with that value as a parameter. The "frequencyOf" method on the other hand simply tells how many distinct keys a value is associated with. So `someMap.frequencyOf(someValue)` is equivalent to `someMap.keysOf(someValue).size`. The "inverse" method is used to create a map in which the key-value pairs are inverse to those in the calling map. Finally, to make a map empty, simply call its "clear" method. Here is an example of using the map in AddyScript.
 
 Example:
 
@@ -257,7 +257,7 @@ foreach (prop => value in tom)
 
 someProperty = readln('Type the name of a property: ');
 
-if (tom.containsKey(someProperty))
+if (tom contains someProperty)
     println('Property ' + someProperty + ' is already defined for tom!');
 else
 {
