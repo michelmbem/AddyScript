@@ -45,6 +45,8 @@ In addition to the above operators, the **tuple** class exposes the following me
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of items currently stored in the tuple.|
+|`any front { read; }`|property|Gets the first item of a tuple tuple.|
+|`any back { read; }`|property|Gets the last item of a tuple.|
 |`int indexOf(any value, int start = 0, int count = 0)`|method|Gets the position of the first occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
 |`int lastIndexOf(any value, int start = -1, int count = 0)`|method|Gets the position of the last occurrence of an item in the given range of a tuple. Negative values of the optional start parameter are processed modulo the length of the tuple. Parameter count is ignored if it's negative or zero (that's the default). Returns -1 if the item is not found.|
 
@@ -123,6 +125,9 @@ In addition to the above operators, the **list** class exposes the following mem
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of items currently stored in the list.|
+|`bool empty { read; }`|property|Returns **true** if the list has no item, returns **false** otherwise.|
+|`any front { read; }`|property|Gets the first item of a list. Returns **null** if the list is empty.|
+|`any back { read; }`|property|Gets the last item of a list. Returns **null** if the list is empty.|
 |`void add(any value)`|method|Appends an item to the list.|
 |`void insert(int position, any value)`|method|Inserts an item at the given position into the list. Negative values of the optional start parameter are processed modulo the length of the list.|
 |`void insertAll(int position, list values)`|method|Inserts the items of the given collection at the given position into the list. Negative values of the optional start parameter are processed modulo the length of the list.|
@@ -196,6 +201,7 @@ In addition to the above operators, the **set** class exposes the following memb
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of elements currently stored in the set.|
+|`bool empty { read; }`|property|Returns **true** if the set has no item, returns **false** otherwise.|
 |`void add(any value)`|method|Adds a value to the set. If the same value if already contained in the set, an exception will be thrown.|
 |`bool remove(any value)`|method|Tries to remove a value pair from a set. Returns true on success, false otherwise.|
 |`void clear()`|method|Empties a set.|
@@ -211,9 +217,10 @@ The following table summarizes all the properties and methods provided by the Ad
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of elements currently stored in the queue.|
+|`bool empty { read; }`|property|Returns **true** if the queue has no item, returns **false** otherwise.|
+|`any front { read; }`|property|Gets the oldest value of a queue without removing it. Throws an exception if the queue is empty.|
 |`void enqueue(any value)`|method|Adds a value to the queue.|
 |`any dequeue()`|method|Extracts and returns the oldest value in the queue.|
-|`any peek()`|method|Gets the oldest value in the queue without removing it.|
 |`void clear()`|method|Empties a queue.|
 
 ### Stacks
@@ -227,9 +234,10 @@ The following table summarizes all the properties and methods provided by the Ad
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of elements currently stored in the stack.|
+|`bool empty { read; }`|property|Returns **true** if the stack has no item, returns **false** otherwise.|
+|`any top { read; }`|property|Gets the value on top of a stack without removing it. Throws an exception if the stack is empty.|
 |`void push(any value)`|method|Adds a value to the stack.|
 |`any pop()`|method|Pops a value from the stack.|
-|`any peek()`|method|Peeks the value that's on top the stack without removing it.|
 |`void clear()`|method|Empties a stack.|
 
 ### Maps
@@ -296,16 +304,22 @@ The map class supports the following operators:
 |\+|2 maps|Merges both map in a single one. It fails if both maps have a key in common.|
 |==|2 maps|Checks that both maps contain equal key-value pairs.|
 |!=|2 lists|Checks that one of the maps has at least one key-value pairs that the other map does not have.|
+|**contains**|a map to the left and anything to the right|Checks if the map contains a pair with a key equal to the given value.|
 
 In addition to the above operators, the **map** class exposes the following members:
 
 |Member|Nature|Description|
 |-|-|-|
 |`int size { read; }`|property|Gets the number of key-value pairs currently stored in the map.|
+|`bool empty { read; }`|property|Returns **true** if the map has no key-value pair, returns **false** otherwise.|
 |`set keys { read; }`|property|Gets a set of all the keys of a map.|
 |`set values { read; }`|property|Gets a set of all the distinct values of a map.|
-|`bool containsKey(any key)`|method|Checks if the map contains the given key.|
+|`set entries { read; }`|property|Gets a set of tuples representing all the key-value pairs of a map.|
 |`bool containsValue(any value)`|method|Checks if the map contains the given value.|
+|`any get(any key, any defaultValue)`|method|Tries to get the value that's associated with the given _key_ from the map. Returns the supplied _defaultValue_ if no value is associated with the given _key_ in the map.|
+|`bool update(any key, any value)`|method|Updates the value that's associated with the given _key_ in the map. Returns **true** if a value was effectively updated, returns **false** otherwise.|
+|`void add(any key, any value)`|method|Adds a new key-value pair to the map. Throws an exception if the supplied key was already present in the map.|
+|`map apply(any key, closure action)`|method|Invokes the given _action_ on the value that's associated with the given _key_ in a map if any.|
 |`set keysOf(any value)`|method|Gets a set of all the keys of a map that are bound to a particular value.|
 |`int frequencyOf(any value)`|method|Gets the number of all the keys of a map that are bound to a particular value.<br>This is also the number of occurrences of a value in the map.|
 |`bool remove(any key)`|method|Tries to remove a key-value pair from a map (the one that has the given key if any). Returns true on success, false otherwise.|

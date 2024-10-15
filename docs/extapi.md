@@ -37,7 +37,7 @@ Defining a new built-in class in AddyScript can have two meanings: it can mean a
 
 #### Object classes
 
-For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly as its base class. The meta-class has a constructor that allows you to specify the parent class. Afterwards, you will only need to provide member definitions to the new class. All members can be defined manually. For _property_ or _method_ members, this means creating their AST from scratch. But there is a shortcut which consists in creating an _InnerFunction_ which will not be added to the _InnerFunction.Globals_ collection but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_ or _AddyScript.Runtime.OOP.ClassProperty_ using one of the _ToInstanceMethod_, _ToStaticMethod_, _ToInstanceProperty_ or _ToStaticProperty_ methods of the _InnerFunction_ class.
+For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly as its base class. The meta-class has a constructor that allows you to specify the parent class. Afterwards, you will only need to provide member definitions to the new class. All members can be defined manually. For methods, this means creating their AST from scratch. But there is a shortcut which consists in creating an _InnerFunction_ which will not be added to the _InnerFunction.Globals_ collection but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_ using one of the _ToInstanceMethod_ or _ToStaticMethod_ methods of the _InnerFunction_ class.
 
 Example:
 
