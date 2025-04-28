@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <AssemblyName>asgui</AssemblyName>
+        <Nullable>disable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+      <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+      <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.7" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.2.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.7" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.7" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.7" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.7">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="AvaloniaEdit.TextMate" Version="11.2.0" />
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AddyScript\AddyScript.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\Fonts\" />
+      <Folder Include="Assets\Images\Backgrounds\" />
+      <Folder Include="Assets\Images\Icons\" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+      <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+</Project>

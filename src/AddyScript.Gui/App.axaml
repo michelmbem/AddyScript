@@ -1,0 +1,23 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AddyScript.Gui.App"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="Styles/EditorStyles.axaml"></StyleInclude>
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    </Application.Styles>
+             
+    <Application.Resources>
+        <SolidColorBrush x:Key="WindowBackground" Color="DarkOrange"></SolidColorBrush>
+        <SolidColorBrush x:Key="EditorBackground" Color="White"></SolidColorBrush>
+        <SolidColorBrush x:Key="ToolbarButtonForeground" Color="WhiteSmoke"></SolidColorBrush>
+        <SolidColorBrush x:Key="ToolbarButtonBackground" Color="Transparent"></SolidColorBrush>
+        <SolidColorBrush x:Key="HoverToolbarButtonForeground" Color="LightYellow"></SolidColorBrush>
+        <SolidColorBrush x:Key="HoverToolbarButtonBackground" Color="Orange"></SolidColorBrush>
+        <SolidColorBrush x:Key="InactiveToolbarButtonForeground" Color="LightGray"></SolidColorBrush>
+        <SolidColorBrush x:Key="InactiveToolbarButtonBackground" Color="#11111111"></SolidColorBrush>
+    </Application.Resources>
+</Application>
