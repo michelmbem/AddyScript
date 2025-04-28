@@ -7,7 +7,9 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="AddyScript.Gui.MainWindow"
         Background="{DynamicResource WindowBackground}"
-        Title="AddyScript" Width="1000" Height="700">
+        Title="AddyScript"
+        Icon="/Assets/Images/Icons/AddyScript.ico"
+        Width="1000" Height="700">
         
         <Grid RowDefinitions="Auto, *, Auto">
                 <StackPanel Grid.Row="0" Classes="toolbar">

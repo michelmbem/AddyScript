@@ -39,16 +39,28 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Assets\Fonts\" />
-      <Folder Include="Assets\Images\Backgrounds\" />
-      <Folder Include="Assets\Images\Icons\" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-      <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+      <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
   
     <ItemGroup>
       <Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Properties\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+  
+    <ItemGroup>
+      <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Properties\Resources.fr.resx">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </EmbeddedResource>
     </ItemGroup>
 </Project>

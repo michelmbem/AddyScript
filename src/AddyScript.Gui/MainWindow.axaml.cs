@@ -185,8 +185,8 @@ public partial class MainWindow : Window
     /// <returns>true to continue; false to cancel the current action</returns>
     public async Task<bool> PromptToSave()
     {
-        var box = MessageBoxManager.GetMessageBoxStandard(Title!,
-            "Should the current script be saved?", ButtonEnum.YesNoCancel, MsBox.Avalonia.Enums.Icon.Question);
+        var box = MessageBoxManager.GetMessageBoxStandard(
+            Title!, Properties.Resources.PromptToSave, ButtonEnum.YesNoCancel, MsBox.Avalonia.Enums.Icon.Question);
         var answer = await box.ShowAsync();
 
         switch (answer)
@@ -253,7 +253,7 @@ public partial class MainWindow : Window
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Load a script from file",
+            Title = Properties.Resources.OpenFileDialogTitle,
             Filters = [
                 new FileDialogFilter { Name = "AddyScript files", Extensions = { "add" } },
                 new FileDialogFilter { Name = "All files", Extensions = { "*" } }
@@ -281,7 +281,7 @@ public partial class MainWindow : Window
     {
         var dialog = new SaveFileDialog
         {
-            Title = "Save the script as",
+            Title = Properties.Resources.SaveFileDialogTitle,
             Filters = [
                 new FileDialogFilter { Name = "AddyScript files", Extensions = { "add" } },
                 new FileDialogFilter { Name = "All files", Extensions = { "*" } }
@@ -378,7 +378,9 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBoxManager.GetMessageBoxStandard("Something went wrong",ex.Message, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error).ShowAsync();
+            MessageBoxManager.GetMessageBoxStandard(
+                Properties.Resources.ErrorMessageTitle,ex.Message, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error)
+                .ShowAsync();
         }
         finally
         {
