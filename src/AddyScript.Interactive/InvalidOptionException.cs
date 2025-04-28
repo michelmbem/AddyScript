@@ -3,20 +3,12 @@
 
 namespace AddyScript.Interactive
 {
-    public class InvalidOptionException : ApplicationException
+    public class InvalidOptionException(string option, string message) : ApplicationException(message)
     {
-        public InvalidOptionException(string option)
-            : base("Invalid option: " + option)
+        public InvalidOptionException(string option) : this(option, "Invalid option: " + option)
         {
-            Option = option;
         }
 
-        public InvalidOptionException(string option, string message)
-            : base(message)
-        {
-            Option = option;
-        }
-
-        public string Option { get; private set; }
+        public string Option { get; private set; } = option;
     }
 }

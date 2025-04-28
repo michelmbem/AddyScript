@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Interactive", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Tests", "AddyScript.Tests\AddyScript.Tests.csproj", "{0A24A20E-8751-417A-B77C-B71DB21F609A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Gui", "AddyScript.Gui\AddyScript.Gui.csproj", "{59C242A8-5333-443E-8E8F-17EDD536F234}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

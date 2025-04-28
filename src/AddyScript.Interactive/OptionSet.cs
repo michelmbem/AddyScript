@@ -2,17 +2,15 @@
 {
     public class OptionSet
     {
-        private readonly ScriptContext context = new();
-
         public OptionSet(string[] args)
         {
-            ExecutionMode mode = ExecutionMode.Default;
+            var mode = ExecutionMode.Default;
             string option = null, input = null, log = null;
 
-            context.AddReference(typeof(System.Diagnostics.Process).Assembly);
-            context.AddReference(typeof(System.Console).Assembly);
+            Context.AddReference(typeof(System.Diagnostics.Process).Assembly);
+            Context.AddReference(typeof(System.Console).Assembly);
 
-            foreach (string arg in args)
+            foreach (var arg in args)
             {
                 switch (arg)
                 {
@@ -48,16 +46,17 @@
                                 input = arg;
                                 break;
                             case "-d":
-                                context.AddImportPath(arg);
+                                Context.AddImportPath(arg);
                                 break;
                             case "-r":
-                                context.AddReference(arg);
+                                Context.AddReference(arg);
                                 break;
                             case "-l":
                                 log = arg;
                                 break;
                             default:
-                                if (option == null) throw new InvalidOptionException(arg);
+                                if (option == null)
+                                    throw new InvalidOptionException(arg);
                                 break;
                         }
 
@@ -77,32 +76,21 @@
 
         public string Log { get; private set; }
 
-        public ScriptContext Context => context;
+        public ScriptContext Context { get; } = new();
 
         private static void CheckOption(string option)
         {
             if (option == null) return;
 
-            string message = null;
-
-            switch (option)
+            var message = option switch
             {
-                case "-e":
-                    message = "An expression is expected after -e";
-                    break;
-                case "-f":
-                    message = "A file name is expected after -f";
-                    break;
-                case "-d":
-                    message = "A directory name is expected after -d";
-                    break;
-                case "-r":
-                    message = "An assembly name is expected after -r";
-                    break;
-                case "-l":
-                    message = "A file name is expected after -l";
-                    break;
-            }
+                "-e" => "An expression is expected after -e",
+                "-f" => "A file name is expected after -f",
+                "-d" => "A directory name is expected after -d",
+                "-r" => "An assembly name is expected after -r",
+                "-l" => "A file name is expected after -l",
+                _ => null
+            };
 
             if (message != null)
                 throw new InvalidOptionException(option, message);
