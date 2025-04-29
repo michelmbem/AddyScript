@@ -4,55 +4,87 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="https://github.com/projektanker/icons.avalonia"
         xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
         x:Class="AddyScript.Gui.MainWindow"
         Background="{DynamicResource WindowBackground}"
         Title="AddyScript"
         Icon="/Assets/Images/Icons/AddyScript.ico"
-        Width="1000" Height="700">
-        
-        <Grid RowDefinitions="Auto, *, Auto">
-                <StackPanel Grid.Row="0" Classes="toolbar">
-                        <Button Name="ToolbarNewButton" i:Attached.Icon="fa-file" ToolTip.Tip="New" Click="ToolbarNewButtonClick"/>
-                        <Button Name="ToolbarOpenButton" i:Attached.Icon="fa-folder-open" ToolTip.Tip="Open" Click="ToolbarOpenButtonClick"/>
-                        <Button Name="ToolbarSaveButton" i:Attached.Icon="fa-floppy-disk" ToolTip.Tip="Save" Click="ToolbarSaveButtonClick"/>
-                        <Rectangle Classes="divider"/>
-                        <Button Name="ToolbarPrintButton" i:Attached.Icon="fa-print" ToolTip.Tip="Print" Click="ToolbarPrintButtonClick"/>
-                        <Rectangle Classes="divider"/>
-                        <Button Name="ToolbarUndoButton" i:Attached.Icon="fa-rotate-left" ToolTip.Tip="Undo" Click="ToolbarUndoButtonClick"/>
-                        <Button Name="ToolbarRedoButton" i:Attached.Icon="fa-rotate-right" ToolTip.Tip="Redo" Click="ToolbarRedoButtonClick"/>
-                        <Rectangle Classes="divider"/>
-                        <Button Name="ToolbarCutButton" i:Attached.Icon="fa-scissors" ToolTip.Tip="Cut" Click="ToolbarCutButtonClick"/>
-                        <Button Name="ToolbarCopyButton" i:Attached.Icon="fa-copy" ToolTip.Tip="Copy" Click="ToolbarCopyButtonClick"/>
-                        <Button Name="ToolbarPasteButton" i:Attached.Icon="fa-paste" ToolTip.Tip="Paste" Click="ToolbarPasteButtonClick"/>
-                        <Rectangle Classes="divider"/>
-                        <Button Name="ToolbarRunButton" i:Attached.Icon="fa-play" ToolTip.Tip="Run" Click="ToolbarRunButtonClick"/>
-                        <Button Name="ToolbarConfigButton" i:Attached.Icon="fa-gear" ToolTip.Tip="Configure" Click="ToolbarConfigButtonClick"/>
-                        <Rectangle Classes="divider"/>
-                        <Button Name="ToolbarHelpButton" i:Attached.Icon="fa-circle-info" ToolTip.Tip="Help" Click="ToolbarHelpButtonClick"></Button>
-                </StackPanel>
-                <Border Grid.Row="1" Classes="editor-wrapper">
-                        <ae:TextEditor Name="Editor"
-                                       ShowLineNumbers="True"
-                                       FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
-                                       FontWeight="Light"
-                                       FontSize="14"
-                                       HorizontalScrollBarVisibility="Auto"
-                                       VerticalScrollBarVisibility="Visible">
-                        </ae:TextEditor>
-                </Border>
-                <Grid Grid.Row="2" ColumnDefinitions="*, Auto, 150, Auto, 200, Auto, 50, Auto, 50, Auto, 50" Classes="statusbar">
-                        <Label Name="FileNameStatusLabel" Grid.Column="0"/>
-                        <Rectangle Grid.Column="1" Classes="divider"/>
-                        <Label Name="TextLengthStatusLabel" Grid.Column="2"/>
-                        <Rectangle Grid.Column="3" Classes="divider"/>
-                        <Label Name="CaretStatusLabel" Grid.Column="4"/>
-                        <Rectangle Grid.Column="5" Classes="divider"/>
-                        <Label Name="InsertKeyStatusLabel" Grid.Column="6"/>
-                        <Rectangle Grid.Column="7" Classes="divider"/>
-                        <Label Name="CapsLockKeyStatusLabel" Grid.Column="8"/>
-                        <Rectangle Grid.Column="9" Classes="divider"/>
-                        <Label Name="NumLockKeyStatusLabel" Grid.Column="10"/>
-                </Grid>
-        </Grid>
+        Width="1200" Height="800"
+        Loaded="WindowLoaded"
+        Closing="WindowClosing">
+
+  <Grid RowDefinitions="Auto, *, Auto">
+    <StackPanel Grid.Row="0" Classes="toolbar">
+      <Button Name="ToolbarNewButton" i:Attached.Icon="fa-file" ToolTip.Tip="New" Click="ToolbarNewButtonClick" />
+      <Button Name="ToolbarOpenButton" i:Attached.Icon="fa-folder-open" ToolTip.Tip="Open" Click="ToolbarOpenButtonClick" />
+      <SplitButton Name="ToolbarSaveButton" i:Attached.Icon="fa-floppy-disk" ToolTip.Tip="Save" Click="ToolbarSaveButtonClick">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="Bottom">
+            <MenuItem Name="ToolbarSaveAsMenuItem" Header="Save as" Click="ToolbarSaveAsMenuItemClick"/>
+            <MenuItem Name="ToolbarExportXmlMenuItem" Header="Export AST to XML" Click="ToolbarExportXmlMenuItemClick"/>
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+      <Button Name="ToolbarPrintButton" i:Attached.Icon="fa-print" ToolTip.Tip="Print" Click="ToolbarPrintButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarUndoButton" i:Attached.Icon="fa-rotate-left" ToolTip.Tip="Undo" Click="ToolbarUndoButtonClick" />
+      <Button Name="ToolbarRedoButton" i:Attached.Icon="fa-rotate-right" ToolTip.Tip="Redo" Click="ToolbarRedoButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarCutButton" i:Attached.Icon="fa-scissors" ToolTip.Tip="Cut" Click="ToolbarCutButtonClick" />
+      <Button Name="ToolbarCopyButton" i:Attached.Icon="fa-copy" ToolTip.Tip="Copy" Click="ToolbarCopyButtonClick" />
+      <Button Name="ToolbarPasteButton" i:Attached.Icon="fa-paste" ToolTip.Tip="Paste" Click="ToolbarPasteButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarFindButton" i:Attached.Icon="fa-magnifying-glass" ToolTip.Tip="Find" Click="ToolbarFindButtonClick" />
+      <Button Name="ToolbarReplaceButton" i:Attached.Icon="fa-rotate" ToolTip.Tip="Replace" Click="ToolbarReplaceButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarOutdentButton" i:Attached.Icon="fa-outdent" ToolTip.Tip="Outdent" Click="ToolbarOutdentButtonClick" />
+      <Button Name="ToolbarIndentButton" i:Attached.Icon="fa-indent" ToolTip.Tip="Indent" Click="ToolbarIndentButtonClick" />
+      <Button Name="ToolbarCommentButton" i:Attached.Icon="fa-comment" ToolTip.Tip="Comment" Click="ToolbarCommentButtonClick" />
+      <Button Name="ToolbarUncommentButton" i:Attached.Icon="fa-comment-slash" ToolTip.Tip="Uncomment" Click="ToolbarUncommentButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarRunButton" i:Attached.Icon="fa-play" ToolTip.Tip="Run" Click="ToolbarRunButtonClick" />
+      <Button Name="ToolbarConfigButton" i:Attached.Icon="fa-gear" ToolTip.Tip="Configure" Click="ToolbarConfigButtonClick" />
+      <Rectangle Classes="divider" />
+      <SplitButton Name="ToolbarHelpButton" i:Attached.Icon="fa-circle-info" ToolTip.Tip="Help" Click="ToolbarHelpButtonClick">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="Bottom">
+            <MenuItem Name="ToolbarHelpAboutMenuItem" Header="About AddyScript" Click="ToolbarHelpAboutMenuItemClick"/>
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+    </StackPanel>
+    <Border Grid.Row="1" Classes="editor-wrapper">
+      <ae:TextEditor Name="Editor"
+                     ShowLineNumbers="True"
+                     FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                     FontWeight="Light"
+                     FontSize="14"
+                     HorizontalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Visible">
+      </ae:TextEditor>
+    </Border>
+    <Grid Grid.Row="2" ColumnDefinitions="*, 200, 200, 50, 50, 50" Classes="statusbar">
+      <Label Name="FileNameStatusLabel" Grid.Column="0" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <Rectangle Classes="divider"/>
+        <Label Name="TextLengthStatusLabel"/>
+      </StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal">
+        <Rectangle Classes="divider"/>
+        <Label Name="CaretStatusLabel"/>
+      </StackPanel>
+      <StackPanel Grid.Column="3" Orientation="Horizontal">
+        <Rectangle Classes="divider"/>
+        <Label Name="InsertKeyStatusLabel"/>
+      </StackPanel>
+      <StackPanel Grid.Column="4" Orientation="Horizontal">
+        <Rectangle Classes="divider"/>
+        <Label Name="CapsLockKeyStatusLabel"/>
+      </StackPanel>
+      <StackPanel Grid.Column="5" Orientation="Horizontal">
+        <Rectangle Classes="divider"/>
+        <Label Name="NumLockKeyStatusLabel" />
+      </StackPanel>
+    </Grid>
+  </Grid>
 </Window>

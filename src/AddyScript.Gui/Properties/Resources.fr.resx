@@ -148,7 +148,7 @@
     <value>Fichier:</value>
   </data>
   <data name="FileDialogFilter" xml:space="preserve">
-    <value>Fichiers AddyScript (*.add; *.txt)|*.add; *.txt|Tous les fichiers (*.*)|*.*</value>
+    <value>Fichiers AddyScript (*.add; *.txt)</value>
   </data>
   <data name="InitializationFailure" xml:space="preserve">
     <value>Échec de l'initialisation</value>
@@ -184,7 +184,7 @@
     <value>{0} caractères</value>
   </data>
   <data name="XmlFileFilter" xml:space="preserve">
-    <value>Fichier Xml (*.xml)|*.xml|Tous les fichiers (*.*)|*.*</value>
+    <value>Fichier Xml (*.xml)</value>
   </data>
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>Le type {0} ne prend pas en charge l'extration de tranches</value>

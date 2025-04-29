@@ -151,7 +151,7 @@
     <value>File: </value>
   </data>
   <data name="FileDialogFilter" xml:space="preserve">
-    <value>AddyScript files (*.add; *.txt)|*.add; *.txt|All files (*.*)|*.*</value>
+    <value>AddyScript files (*.add; *.txt)</value>
   </data>
   <data name="InitializationFailure" xml:space="preserve">
     <value>Initialization failure</value>
@@ -193,7 +193,7 @@
     <value>{0} characters</value>
   </data>
   <data name="XmlFileFilter" xml:space="preserve">
-    <value>Xml file (*.xml)|*.xml|All files (*.*)|*.*</value>
+    <value>Xml file (*.xml)</value>
   </data>
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>The {0} type does not have support for slice extraction</value>

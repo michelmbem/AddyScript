@@ -6,27 +6,29 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Indentation.CSharp;
 using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using TextMateSharp.Grammars;
+using StringRes = AddyScript.Gui.Properties.Resources;
+using MBIcon = MsBox.Avalonia.Enums.Icon;
 
 namespace AddyScript.Gui;
 
 public partial class MainWindow : Window
 {
-    private const string TITLE_BASE = "AddyScript";
-    private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
+    #region Fields
+    
+    private const string TitleBase = "AddyScript";
+    private const string HelpLink = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
 
     private string filePath;
     private bool saved;
     
-    private int caretPosition;
-    private int scriptLength;
-    private string errorMessage;
-    private string dndFilePath;
+    #endregion
 
     #region Initialization
     
@@ -34,19 +36,18 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeStyling();
-        Reset();
     }
 
     private void InitializeStyling()
     {
-        var registryOptions = new RegistryOptions(ThemeName.SolarizedLight); 
+        var registryOptions = new RegistryOptions(ThemeName.LightPlus); 
         var textMateInstallation = Editor.InstallTextMate(registryOptions); 
-        textMateInstallation.SetGrammar(registryOptions.GetScopeByLanguageId(registryOptions.GetLanguageByExtension(".cs").Id));
+        textMateInstallation.SetGrammar(registryOptions.GetScopeByLanguageId(
+            registryOptions.GetLanguageByExtension(".cs").Id));
 
         Editor.TextArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
         Editor.TextArea.Caret.PositionChanged += EditorCaretPositionChanged;
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
-        Editor.TextArea.DocumentChanged += EditorDocumentChanged;
         Editor.TextArea.TextEntering += EditorTextEntering;
         Editor.TextArea.TextEntered += EditorTextEntered;
         
@@ -55,7 +56,6 @@ public partial class MainWindow : Window
         Editor.Options.ShowBoxForControlCharacters = true;
         Editor.Options.ColumnRulerPositions = [80, 120];
         Editor.Options.HighlightCurrentLine = true;
-        //Editor.Options.CompletionAcceptAction = CompletionAcceptAction.DoubleTapped;
     }
 
     #endregion
@@ -75,12 +75,12 @@ public partial class MainWindow : Window
             if (string.IsNullOrEmpty(filePath))
             {
                 FileNameStatusLabel.Content = "Untitled";
-                Title = TITLE_BASE;
+                Title = TitleBase;
             }
             else
             {
                 FileNameStatusLabel.Content = value;
-                Title = $"{Path.GetFileName(value)} - {TITLE_BASE}";
+                Title = $"{Path.GetFileName(value)} - {TitleBase}";
             }
         }
     }
@@ -149,9 +149,9 @@ public partial class MainWindow : Window
     public void Reset()
     {
         Editor.Document = new TextDocument();
+        Editor.Document.Changed += EditorDocumentChanged;
         FilePath = null;
         Saved = true;
-        scriptLength = 0;
         UpdateWindowBars();
     }
 
@@ -162,9 +162,9 @@ public partial class MainWindow : Window
     public void Open(string path)
     {
         Editor.Document = new TextDocument(File.ReadAllText(path));
+        Editor.Document.Changed += EditorDocumentChanged;
         FilePath = path;
         Saved = true;
-        scriptLength = Editor.Document.TextLength;
         UpdateWindowBars();
     }
 
@@ -183,16 +183,19 @@ public partial class MainWindow : Window
     /// Prompts the user to save the script before leaving.
     /// </summary>
     /// <returns>true to continue; false to cancel the current action</returns>
-    public async Task<bool> PromptToSave()
+    private async Task<bool> PromptToSave()
     {
-        var box = MessageBoxManager.GetMessageBoxStandard(
-            Title!, Properties.Resources.PromptToSave, ButtonEnum.YesNoCancel, MsBox.Avalonia.Enums.Icon.Question);
-        var answer = await box.ShowAsync();
+        var answer = await MessageBoxManager
+            .GetMessageBoxStandard(Title!, StringRes.PromptToSave, ButtonEnum.YesNoCancel, MBIcon.Question)
+            .ShowAsync();
 
         switch (answer)
         {
             case ButtonResult.Yes:
                 ToolbarSaveButtonClick(null, null);
+                break;
+            case ButtonResult.No:
+                Saved = true;
                 break;
             case ButtonResult.Cancel:
                 return false;
@@ -219,9 +222,9 @@ public partial class MainWindow : Window
     {
         ToolbarUndoButton.IsEnabled = Editor.CanUndo;
         ToolbarRedoButton.IsEnabled = Editor.CanRedo;
-        ToolbarRunButton.IsEnabled = scriptLength > 0;
-        
-        TextLengthStatusLabel.Content = $"{scriptLength} characters";
+        ToolbarRunButton.IsEnabled = Editor.Document.TextLength > 0;
+
+        TextLengthStatusLabel.Content = string.Format(StringRes.TextLength, Editor.Document.TextLength);
         
         if (!Editor.CanUndo) Saved = true;
     }
@@ -235,14 +238,40 @@ public partial class MainWindow : Window
         ToolbarCutButton.IsEnabled = Editor.CanCut;
         ToolbarCopyButton.IsEnabled = Editor.CanCopy;
         
-        CaretStatusLabel.Content = $"Ln: {Editor.TextArea.Caret.Line}  Col: {Editor.TextArea.Caret.Column}  Sel: {Editor.TextArea.Selection.Length}";
+        CaretStatusLabel.Content = string.Format(StringRes.CaretStatus,
+            Editor.TextArea.Caret.Line, Editor.TextArea.Caret.Column, Editor.TextArea.Selection.Length);
     }
     
     #endregion
 
     #region Event handlers
+    
+    #region Window events
 
-    #region Toolbar
+    private void WindowLoaded(object sender, RoutedEventArgs e)
+    {
+        Reset();
+    }
+
+    private async void WindowClosing(object sender, WindowClosingEventArgs e)
+    {
+        if (Saved) return;
+        
+        e.Cancel = true;
+        Closing -= WindowClosing;
+
+        if (await PromptToSave())
+        {
+            while (!Saved)
+                await Task.Delay(100);
+            
+            Close();
+        }
+    }
+    
+    #endregion
+
+    #region Toolbar events
 
     public void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
     {
@@ -251,20 +280,19 @@ public partial class MainWindow : Window
 
     public async void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = Properties.Resources.OpenFileDialogTitle,
-            Filters = [
-                new FileDialogFilter { Name = "AddyScript files", Extensions = { "add" } },
-                new FileDialogFilter { Name = "All files", Extensions = { "*" } }
+            Title = StringRes.OpenFileDialogTitle,
+            AllowMultiple = true,
+            FileTypeFilter = [
+                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                FilePickerFileTypes.All
             ]
-        };
-        
-        var fileNames = await dialog.ShowAsync(this);
+        });
 
-        if (fileNames?.Length > 0)
+        if (files.Count > 0)
         {
-            Open(fileNames[0]);
+            Open(files[0].Path.LocalPath);
         }
     }
 
@@ -272,33 +300,62 @@ public partial class MainWindow : Window
     {
         
         if (string.IsNullOrEmpty(filePath))
-            ToolbarSaveAsButtonClick(null, null);
+            ToolbarSaveAsMenuItemClick(null, null);
         else
             Save(FilePath);
     }
 
-    public async void ToolbarSaveAsButtonClick(object sender, RoutedEventArgs e)
+    private async void ToolbarSaveAsMenuItemClick(object sender, RoutedEventArgs e)
     {
-        var dialog = new SaveFileDialog
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = Properties.Resources.SaveFileDialogTitle,
-            Filters = [
-                new FileDialogFilter { Name = "AddyScript files", Extensions = { "add" } },
-                new FileDialogFilter { Name = "All files", Extensions = { "*" } }
+            Title = StringRes.SaveFileDialogTitle,
+            DefaultExtension = ".add",
+            FileTypeChoices = [
+                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                FilePickerFileTypes.All
             ]
-        };
-        
-        var fileName = await dialog.ShowAsync(this);
+        });
 
-        if (fileName?.Length > 0)
+        if (file is not null)
         {
-            Save(fileName);
+            Save(file.Path.LocalPath);
+        }
+    }
+
+    private async void ToolbarExportXmlMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = StringRes.ExportXmlTitle,
+                DefaultExtension = ".xml",
+                FileTypeChoices = [
+                    new FilePickerFileType(StringRes.XmlFileFilter) { Patterns = ["*.xml"] },
+                    FilePickerFileTypes.All
+                ],
+                SuggestedFileName = !string.IsNullOrEmpty(filePath)
+                                  ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
+                                  : "untitled.xml"
+            });
+
+            if (file is null) return;
+            
+            var program = ScriptEngine.ParseString(Editor.Text);
+            ScriptEngine.ExportXml(program, file.Path.LocalPath);
+            Process.Start(new ProcessStartInfo(file.Path.LocalPath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            await MessageBoxManager
+                .GetMessageBoxStandard(StringRes.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBIcon.Error)
+                .ShowAsync();
         }
     }
 
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
-        
     }
 
     public void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)
@@ -324,6 +381,30 @@ public partial class MainWindow : Window
     public void ToolbarPasteButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Paste();
+    }
+
+    private void ToolbarFindButtonClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ToolbarReplaceButtonClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ToolbarIndentButtonClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ToolbarCommentButtonClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ToolbarUncommentButtonClick(object sender, RoutedEventArgs e)
+    {
     }
 
     public void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
@@ -360,7 +441,7 @@ public partial class MainWindow : Window
         try
         {
             var asis = Process.Start("asis", argsBuilder.ToString());
-            asis.WaitForExit();
+            asis!.WaitForExit();
 
             if (asis.ExitCode <= 0) return;
 
@@ -373,13 +454,13 @@ public partial class MainWindow : Window
             parts = logReader.ReadLine()!.Split(',');
             var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
-            errorMessage = logReader.ReadLine();
+            var errorMessage = logReader.ReadLine();
             //ReportError(new ScriptElement(start, end));
         }
         catch (Exception ex)
         {
-            MessageBoxManager.GetMessageBoxStandard(
-                Properties.Resources.ErrorMessageTitle,ex.Message, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error)
+            MessageBoxManager
+                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,ex.Message, ButtonEnum.Ok, MBIcon.Error)
                 .ShowAsync();
         }
         finally
@@ -392,12 +473,15 @@ public partial class MainWindow : Window
 
     public void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
-        
     }
 
     public void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(HELP_LINK) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(HelpLink) { UseShellExecute = true });
+    }
+
+    private void ToolbarHelpAboutMenuItemClick(object sender, RoutedEventArgs e)
+    {
     }
     
     #endregion
@@ -414,13 +498,9 @@ public partial class MainWindow : Window
         UpdateCutCopyCaretInfo();
     }
 
-    private void EditorDocumentChanged(object sender, DocumentChangedEventArgs e)
+    private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
-        // Handle text length changes
-        if (scriptLength == e.NewDocument.TextLength) return;
-        
-        scriptLength = e.NewDocument.TextLength;
-        Saved = scriptLength <= 0 && string.IsNullOrEmpty(filePath);
+        Saved = Editor.Document.TextLength <= 0 && string.IsNullOrEmpty(filePath);
         UpdateUndoRedoFileSize();
     }
 
