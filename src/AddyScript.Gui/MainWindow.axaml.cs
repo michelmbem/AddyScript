@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
+using AvaloniaEdit.Folding;
 using AvaloniaEdit.Indentation.CSharp;
 using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
@@ -24,6 +25,9 @@ public partial class MainWindow : Window
     
     private const string TitleBase = "AddyScript";
     private const string HelpLink = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
+    
+    private readonly BraceFoldingStrategy foldingStrategy = new();
+    private FoldingManager foldingManager;
 
     private string filePath;
     private bool saved;
@@ -42,20 +46,28 @@ public partial class MainWindow : Window
     {
         var registryOptions = new RegistryOptions(ThemeName.LightPlus); 
         var textMateInstallation = Editor.InstallTextMate(registryOptions); 
-        textMateInstallation.SetGrammar(registryOptions.GetScopeByLanguageId(
-            registryOptions.GetLanguageByExtension(".cs").Id));
-
-        Editor.TextArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
-        Editor.TextArea.Caret.PositionChanged += EditorCaretPositionChanged;
-        Editor.TextArea.SelectionChanged += EditorSelectionChanged;
-        Editor.TextArea.TextEntering += EditorTextEntering;
-        Editor.TextArea.TextEntered += EditorTextEntered;
+        textMateInstallation.SetGrammar(registryOptions.GetScopeByExtension(".cs"));
         
         Editor.Options.AllowToggleOverstrikeMode = true;
         Editor.Options.EnableTextDragDrop = true;
         Editor.Options.ShowBoxForControlCharacters = true;
         Editor.Options.ColumnRulerPositions = [80, 120];
         Editor.Options.HighlightCurrentLine = true;
+
+        Editor.TextArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
+        Editor.TextArea.Caret.PositionChanged += EditorCaretPositionChanged;
+        Editor.TextArea.SelectionChanged += EditorSelectionChanged;
+        Editor.TextArea.TextEntering += EditorTextEntering;
+        Editor.TextArea.TextEntered += EditorTextEntered;
+    }
+
+    private void InitializeFolding()
+    {
+        if (foldingManager != null)
+            FoldingManager.Uninstall(foldingManager);
+        
+        foldingManager = FoldingManager.Install(Editor.TextArea);
+        foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
     }
 
     #endregion
@@ -152,6 +164,7 @@ public partial class MainWindow : Window
         Editor.Document.Changed += EditorDocumentChanged;
         FilePath = null;
         Saved = true;
+        InitializeFolding();
         UpdateWindowBars();
     }
 
@@ -165,6 +178,7 @@ public partial class MainWindow : Window
         Editor.Document.Changed += EditorDocumentChanged;
         FilePath = path;
         Saved = true;
+        InitializeFolding();
         UpdateWindowBars();
     }
 
