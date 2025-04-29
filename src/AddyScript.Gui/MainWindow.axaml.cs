@@ -7,9 +7,11 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Folding;
 using AvaloniaEdit.Indentation.CSharp;
+using AvaloniaEdit.Search;
 using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -28,6 +30,7 @@ public partial class MainWindow : Window
     
     private readonly BraceFoldingStrategy foldingStrategy = new();
     private FoldingManager foldingManager;
+    private SearchPanel searchPanel;
 
     private string filePath;
     private bool saved;
@@ -59,6 +62,8 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.TextEntering += EditorTextEntering;
         Editor.TextArea.TextEntered += EditorTextEntered;
+        
+        searchPanel = SearchPanel.Install(Editor);
     }
 
     private void InitializeFolding()
@@ -255,6 +260,18 @@ public partial class MainWindow : Window
         CaretStatusLabel.Content = string.Format(StringRes.CaretStatus,
             Editor.TextArea.Caret.Line, Editor.TextArea.Caret.Column, Editor.TextArea.Selection.Length);
     }
+
+    private void OpenSearchPanel(bool replaceMode)
+    {
+        searchPanel.IsReplaceMode = replaceMode;
+        searchPanel.Open();
+
+        var selection = Editor.TextArea.Selection;
+        if (!(selection.IsEmpty || selection.IsMultiline))
+            searchPanel.SearchPattern = selection.GetText();
+        
+        Dispatcher.UIThread.Post(searchPanel.Reactivate, DispatcherPriority.Input);
+    }
     
     #endregion
 
@@ -272,13 +289,13 @@ public partial class MainWindow : Window
         if (Saved) return;
         
         e.Cancel = true;
-        Closing -= WindowClosing;
 
         if (await PromptToSave())
         {
             while (!Saved)
                 await Task.Delay(100);
             
+            Closing -= WindowClosing;
             Close();
         }
     }
@@ -305,9 +322,7 @@ public partial class MainWindow : Window
         });
 
         if (files.Count > 0)
-        {
             Open(files[0].Path.LocalPath);
-        }
     }
 
     public void ToolbarSaveButtonClick(object sender, RoutedEventArgs e)
@@ -332,9 +347,7 @@ public partial class MainWindow : Window
         });
 
         if (file is not null)
-        {
             Save(file.Path.LocalPath);
-        }
     }
 
     private async void ToolbarExportXmlMenuItemClick(object sender, RoutedEventArgs e)
@@ -370,6 +383,9 @@ public partial class MainWindow : Window
 
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
+        MessageBoxManager
+            .GetMessageBoxStandard(Title!, StringRes.MissingFunctionality, ButtonEnum.Ok, MBIcon.Warning)
+            .ShowAsync();
     }
 
     public void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)
@@ -399,26 +415,66 @@ public partial class MainWindow : Window
 
     private void ToolbarFindButtonClick(object sender, RoutedEventArgs e)
     {
+        OpenSearchPanel(false);
     }
 
     private void ToolbarReplaceButtonClick(object sender, RoutedEventArgs e)
     {
+        OpenSearchPanel(true);
     }
 
     private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
     {
+        var selection = Editor.TextArea.Selection;
+        
+        if (!selection.IsMultiline) return;
+
+        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        {
+            var line = Editor.Document.Lines[i];
+            if (Editor.Document.GetCharAt(line.Offset) == '\t')
+                Editor.Document.Remove(line.Offset, 1);
+        }
     }
 
     private void ToolbarIndentButtonClick(object sender, RoutedEventArgs e)
     {
+        var selection = Editor.TextArea.Selection;
+        
+        if (!selection.IsMultiline) return;
+
+        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        {
+            var line = Editor.Document.Lines[i];
+            Editor.Document.Insert(line.Offset, "\t");
+        }
     }
 
     private void ToolbarCommentButtonClick(object sender, RoutedEventArgs e)
     {
+        var selection = Editor.TextArea.Selection;
+        
+        if (!selection.IsMultiline) return;
+
+        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        {
+            var line = Editor.Document.Lines[i];
+            Editor.Document.Insert(line.Offset, "//");
+        }
     }
 
     private void ToolbarUncommentButtonClick(object sender, RoutedEventArgs e)
     {
+        var selection = Editor.TextArea.Selection;
+        
+        if (!selection.IsMultiline) return;
+
+        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        {
+            var line = Editor.Document.Lines[i];
+            if (Editor.Document.GetCharAt(line.Offset) == '/' && Editor.Document.GetCharAt(line.Offset + 1) == '/')
+                Editor.Document.Remove(line.Offset, 2);
+        }
     }
 
     public void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
@@ -515,6 +571,7 @@ public partial class MainWindow : Window
     private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
         Saved = Editor.Document.TextLength <= 0 && string.IsNullOrEmpty(filePath);
+        foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
         UpdateUndoRedoFileSize();
     }
 

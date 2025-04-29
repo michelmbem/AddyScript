@@ -19,7 +19,7 @@
       <Button Name="ToolbarOpenButton" i:Attached.Icon="fa-folder-open" ToolTip.Tip="Open" Click="ToolbarOpenButtonClick" />
       <SplitButton Name="ToolbarSaveButton" i:Attached.Icon="fa-floppy-disk" ToolTip.Tip="Save" Click="ToolbarSaveButtonClick">
         <SplitButton.Flyout>
-          <MenuFlyout Placement="Bottom">
+          <MenuFlyout Placement="BottomEdgeAlignedLeft">
             <MenuItem Name="ToolbarSaveAsMenuItem" Header="Save as" Click="ToolbarSaveAsMenuItemClick"/>
             <MenuItem Name="ToolbarExportXmlMenuItem" Header="Export AST to XML" Click="ToolbarExportXmlMenuItemClick"/>
           </MenuFlyout>
@@ -44,10 +44,10 @@
       <Rectangle Classes="divider" />
       <Button Name="ToolbarRunButton" i:Attached.Icon="fa-play" ToolTip.Tip="Run" Click="ToolbarRunButtonClick" />
       <Button Name="ToolbarConfigButton" i:Attached.Icon="fa-gear" ToolTip.Tip="Configure" Click="ToolbarConfigButtonClick" />
-      <Rectangle Classes="divider" />
+      <Rectangle Classes="divider"/>
       <SplitButton Name="ToolbarHelpButton" i:Attached.Icon="fa-circle-info" ToolTip.Tip="Help" Click="ToolbarHelpButtonClick">
         <SplitButton.Flyout>
-          <MenuFlyout Placement="Bottom">
+          <MenuFlyout Placement="BottomEdgeAlignedLeft">
             <MenuItem Name="ToolbarHelpAboutMenuItem" Header="About AddyScript" Click="ToolbarHelpAboutMenuItemClick"/>
           </MenuFlyout>
         </SplitButton.Flyout>
@@ -60,8 +60,7 @@
                      FontWeight="Light"
                      FontSize="14"
                      HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Visible">
-      </ae:TextEditor>
+                     VerticalScrollBarVisibility="Visible"/>
     </Border>
     <Grid Grid.Row="2" ColumnDefinitions="*, 200, 200, 50, 50, 50" Classes="statusbar">
       <Label Name="FileNameStatusLabel" Grid.Column="0" />

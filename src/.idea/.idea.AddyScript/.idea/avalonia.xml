@@ -5,6 +5,7 @@
       <map>
         <entry key="AddyScript.Gui/App.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/MainWindow.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
+        <entry key="AddyScript.Gui/SearchView.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/Styles/EditorStyles.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/Styles/EditprStyles.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
       </map>
