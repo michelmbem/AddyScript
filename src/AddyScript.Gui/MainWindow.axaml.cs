@@ -125,7 +125,7 @@ public partial class MainWindow : Window
     #region Utility
 
     /// <summary>
-    /// Escapes a string that's intended to be used as a command line argument.
+    /// Escapes a string intended to be used as a command line argument.
     /// </summary>
     /// <param name="arg">The string to escape</param>
     /// <returns><paramref name="arg"/> wrapped with double quotes with duplicated double quotes inside</returns>
@@ -143,7 +143,7 @@ public partial class MainWindow : Window
     /// <returns><b>true</b> is <paramref name="e"/> matches the configuration. <b>false</b> otherwise</returns>
     private static bool IsHotKey(KeyEventArgs e, Key key, KeyModifiers modifiers = KeyModifiers.None)
     {
-        return e.Key == key && (modifiers == KeyModifiers.None || (e.KeyModifiers & modifiers) != KeyModifiers.None);
+        return e.Key == key && (e.KeyModifiers & modifiers) == modifiers;
     }
 
     /// <summary>
@@ -198,6 +198,77 @@ public partial class MainWindow : Window
         Saved = true;
     }
 
+    private async Task OpenAsync()
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = StringRes.OpenFileDialogTitle,
+            AllowMultiple = true,
+            FileTypeFilter = [
+                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                FilePickerFileTypes.All
+            ]
+        });
+
+        if (files.Count > 0)
+            Open(files[0].Path.LocalPath);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (string.IsNullOrEmpty(filePath))
+            await SaveAsAsync();
+        else
+            Save(FilePath);
+    }
+
+    private async Task SaveAsAsync()
+    {
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = StringRes.SaveFileDialogTitle,
+            DefaultExtension = ".add",
+            FileTypeChoices = [
+                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                FilePickerFileTypes.All
+            ]
+        });
+
+        if (file is not null)
+            Save(file.Path.LocalPath);
+    }
+
+    private async Task ExportXmlAsync()
+    {
+        try
+        {
+            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = StringRes.ExportXmlTitle,
+                DefaultExtension = ".xml",
+                FileTypeChoices = [
+                    new FilePickerFileType(StringRes.XmlFileFilter) { Patterns = ["*.xml"] },
+                    FilePickerFileTypes.All
+                ],
+                SuggestedFileName = !string.IsNullOrEmpty(filePath)
+                                  ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
+                                  : "untitled.xml"
+            });
+
+            if (file is null) return;
+            
+            var program = ScriptEngine.ParseString(Editor.Text);
+            ScriptEngine.ExportXml(program, file.Path.LocalPath);
+            Process.Start(new ProcessStartInfo(file.Path.LocalPath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            await MessageBoxManager
+                .GetMessageBoxStandard(StringRes.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBIcon.Error)
+                .ShowAsync();
+        }
+    }
+
     /// <summary>
     /// Prompts the user to save the script before leaving.
     /// </summary>
@@ -211,10 +282,7 @@ public partial class MainWindow : Window
         switch (answer)
         {
             case ButtonResult.Yes:
-                ToolbarSaveButtonClick(null, null);
-                break;
-            case ButtonResult.No:
-                Saved = true;
+                await SaveAsync();
                 break;
             case ButtonResult.Cancel:
                 return false;
@@ -272,6 +340,11 @@ public partial class MainWindow : Window
         
         Dispatcher.UIThread.Post(searchPanel.Reactivate, DispatcherPriority.Input);
     }
+
+    private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
+    {
+        Console.WriteLine($@"{errorMessage} @{start}:{end}");
+    }
     
     #endregion
 
@@ -287,14 +360,11 @@ public partial class MainWindow : Window
     private async void WindowClosing(object sender, WindowClosingEventArgs e)
     {
         if (Saved) return;
-        
+
         e.Cancel = true;
 
         if (await PromptToSave())
         {
-            while (!Saved)
-                await Task.Delay(100);
-            
             Closing -= WindowClosing;
             Close();
         }
@@ -309,76 +379,24 @@ public partial class MainWindow : Window
         Reset();
     }
 
-    public async void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
+    public void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
     {
-        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = StringRes.OpenFileDialogTitle,
-            AllowMultiple = true,
-            FileTypeFilter = [
-                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
-                FilePickerFileTypes.All
-            ]
-        });
-
-        if (files.Count > 0)
-            Open(files[0].Path.LocalPath);
+        _ = OpenAsync();
     }
 
     public void ToolbarSaveButtonClick(object sender, RoutedEventArgs e)
     {
-        
-        if (string.IsNullOrEmpty(filePath))
-            ToolbarSaveAsMenuItemClick(null, null);
-        else
-            Save(FilePath);
+        _ = SaveAsync();
     }
 
-    private async void ToolbarSaveAsMenuItemClick(object sender, RoutedEventArgs e)
+    private void ToolbarSaveAsMenuItemClick(object sender, RoutedEventArgs e)
     {
-        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = StringRes.SaveFileDialogTitle,
-            DefaultExtension = ".add",
-            FileTypeChoices = [
-                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
-                FilePickerFileTypes.All
-            ]
-        });
-
-        if (file is not null)
-            Save(file.Path.LocalPath);
+        _ = SaveAsAsync();
     }
 
-    private async void ToolbarExportXmlMenuItemClick(object sender, RoutedEventArgs e)
+    private void ToolbarExportXmlMenuItemClick(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = StringRes.ExportXmlTitle,
-                DefaultExtension = ".xml",
-                FileTypeChoices = [
-                    new FilePickerFileType(StringRes.XmlFileFilter) { Patterns = ["*.xml"] },
-                    FilePickerFileTypes.All
-                ],
-                SuggestedFileName = !string.IsNullOrEmpty(filePath)
-                                  ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
-                                  : "untitled.xml"
-            });
-
-            if (file is null) return;
-            
-            var program = ScriptEngine.ParseString(Editor.Text);
-            ScriptEngine.ExportXml(program, file.Path.LocalPath);
-            Process.Start(new ProcessStartInfo(file.Path.LocalPath) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            await MessageBoxManager
-                .GetMessageBoxStandard(StringRes.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBIcon.Error)
-                .ShowAsync();
-        }
+        _ = ExportXmlAsync();
     }
 
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
@@ -525,7 +543,7 @@ public partial class MainWindow : Window
             var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
             var errorMessage = logReader.ReadLine();
-            //ReportError(new ScriptElement(start, end));
+            ReportError(errorMessage, start, end);;
         }
         catch (Exception ex)
         {
@@ -577,12 +595,12 @@ public partial class MainWindow : Window
 
     private void EditorTextEntering(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($"Text enterring: {e.Text}");
+        Console.WriteLine($@"Text entering: {e.Text}");
     }
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($"Text enterred: {e.Text}");
+        Console.WriteLine($@"Text entered: {e.Text}");
     }
     
     #endregion
