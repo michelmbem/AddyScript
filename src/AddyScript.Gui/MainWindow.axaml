@@ -57,10 +57,7 @@
       <ae:TextEditor Name="Editor"
                      ShowLineNumbers="True"
                      FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
-                     FontWeight="Light"
-                     FontSize="14"
-                     HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Visible"/>
+                     FontSize="14"/>
     </Border>
     <Grid Grid.Row="2" ColumnDefinitions="*, 200, 200, 50, 50, 50" Classes="statusbar">
       <Label Name="FileNameStatusLabel" Grid.Column="0" />

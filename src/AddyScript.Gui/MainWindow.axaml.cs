@@ -211,7 +211,11 @@ public partial class MainWindow : Window
         });
 
         if (files.Count > 0)
-            Open(files[0].Path.LocalPath);
+        {
+            App.OpenFile(files[0].Path.LocalPath);
+            if (Saved && Editor.Document.TextLength <= 0)
+                Close();
+        }
     }
 
     private async Task SaveAsync()
@@ -354,7 +358,6 @@ public partial class MainWindow : Window
 
     private void WindowLoaded(object sender, RoutedEventArgs e)
     {
-        Reset();
     }
 
     private async void WindowClosing(object sender, WindowClosingEventArgs e)
@@ -376,7 +379,9 @@ public partial class MainWindow : Window
 
     public void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
     {
-        Reset();
+        App.OpenFile();
+        if (Saved && Editor.Document.TextLength <= 0)
+            Close();
     }
 
     public void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
@@ -515,10 +520,10 @@ public partial class MainWindow : Window
         var argsBuilder = new StringBuilder();
         argsBuilder.Append("-f ").Append(EscapeCmdLineArg(scriptPath));
 
-        foreach (var directory in Program.Directories)
+        foreach (var directory in App.Directories)
             argsBuilder.Append(" -d ").Append(EscapeCmdLineArg(directory));
 
-        foreach (var assemblyName in Program.Assemblies)
+        foreach (var assemblyName in App.Assemblies)
             argsBuilder.Append(" -r ").Append(EscapeCmdLineArg(assemblyName));
 
         var logPath = Path.ChangeExtension(Path.GetTempFileName(), ".log");
