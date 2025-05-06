@@ -43,7 +43,7 @@ public partial class App : Application
             {
                 case "-d":
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
-                        throw new ApplicationException("A directory name is required after -d");
+                        throw new ArgumentException("A directory name is required after -d");
                     
                     var dirname = args[index + 1];
                     if (!Directory.Exists(dirname))
@@ -53,16 +53,16 @@ public partial class App : Application
                     break;
                 case "-r":
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
-                        throw new ApplicationException("An assembly name is required after -r");
+                        throw new ArgumentException("An assembly name is required after -r");
 
                     var assemblyName = args[index + 1];
                     if (ScriptContext.LoadAssembly(assemblyName) == null)
-                        throw new ApplicationException("Assembly '" + assemblyName + "' could not be loaded");
+                        throw new ArgumentException("Assembly '" + assemblyName + "' could not be loaded");
 
                     if (!assemblies.Contains(assemblyName)) assemblies.Add(assemblyName);
                     break;
                 default:
-                    throw new ApplicationException("Invalid option: " + args[index]);
+                    throw new ArgumentException("Invalid option: " + args[index]);
             }
 
             index += 2;
@@ -79,19 +79,19 @@ public partial class App : Application
         InitialFiles = [.. files];
     }
 
-    public static void OpenFile(string path = null)
+    public static void Load(string filePath = null)
     {
         var window = new MainWindow();
-        
-        if (path != null)
-            window.Open(path);
-        else
+        if (filePath == null)
             window.Reset();
-        
+        else
+            window.Open(filePath);
+
         Windows.Add(window);
-        window.Closed += (sender, args) =>
+        window.Closed += (_, _) =>
         {
             Windows.Remove(window);
+            
             if (Desktop.MainWindow == window && Windows.Count > 0)
                 Desktop.MainWindow = Windows[^1];
         };
@@ -111,12 +111,12 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             foreach (var file in InitialFiles)
-                OpenFile(file);
+                Load(file);
             
             if (Windows.Count <= 0)
-                OpenFile();
+                Load();
             
-            desktop.Exit += (sender, args) =>
+            desktop.Exit += (_, _) =>
             {
                 foreach (var window in Windows)
                     window.Close();

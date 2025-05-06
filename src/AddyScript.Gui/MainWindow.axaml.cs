@@ -212,7 +212,7 @@ public partial class MainWindow : Window
 
         if (files.Count > 0)
         {
-            App.OpenFile(files[0].Path.LocalPath);
+            App.Load(files[0].Path.LocalPath);
             if (Saved && Editor.Document.TextLength <= 0)
                 Close();
         }
@@ -379,7 +379,7 @@ public partial class MainWindow : Window
 
     public void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
     {
-        App.OpenFile();
+        App.Load();
         if (Saved && Editor.Document.TextLength <= 0)
             Close();
     }
