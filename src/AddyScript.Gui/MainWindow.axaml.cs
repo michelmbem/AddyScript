@@ -423,7 +423,7 @@ public partial class MainWindow : Window
             ToolbarCommentButtonClick(null, null);
             e.Handled = true;
         }
-        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control | KeyModifiers.Alt))
+        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control | KeyModifiers.Shift))
         {
             ToolbarUncommentButtonClick(null, null);
             e.Handled = true;
