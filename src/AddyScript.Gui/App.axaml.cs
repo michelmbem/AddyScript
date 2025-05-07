@@ -9,13 +9,10 @@ namespace AddyScript.Gui;
 
 public partial class App : Application
 {
-    internal static string[] Directories { get; set; }
-    internal static string[] Assemblies { get; set; }
+    public static string[] Directories { get; private set; }
+    public static string[] Assemblies { get; private set; }
     private static string[] InitialFiles { get; set; }
     private static List<MainWindow> Windows { get; } = [];
-    
-    private static IClassicDesktopStyleApplicationLifetime Desktop =>
-        Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
     public static void ParseCmdLineArgs(string[] args)
     {
@@ -81,7 +78,9 @@ public partial class App : Application
 
     public static void OpenWindow(string filePath = null)
     {
+        var desktop = (IClassicDesktopStyleApplicationLifetime) Current?.ApplicationLifetime;
         var window = new MainWindow();
+        
         if (filePath == null)
             window.Reset();
         else
@@ -92,13 +91,13 @@ public partial class App : Application
         {
             Windows.Remove(window);
             
-            if (Desktop.MainWindow == window && Windows.Count > 0)
-                Desktop.MainWindow = Windows[^1];
+            if (desktop!.MainWindow == window && Windows.Count > 0)
+                desktop.MainWindow = Windows[^1];
         };
         
         window.Show();
         window.Activate();
-        Desktop.MainWindow ??= window;
+        desktop!.MainWindow ??= window;  
     }
 
     public override void Initialize()
