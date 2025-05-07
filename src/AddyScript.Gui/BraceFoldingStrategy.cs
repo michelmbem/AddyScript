@@ -9,24 +9,24 @@ namespace AddyScript.Gui;
 /// </summary>
 public class BraceFoldingStrategy
 {
-	/// <summary>
-	///     Creates a new BraceFoldingStrategy.
-	/// </summary>
-	public BraceFoldingStrategy()
+    /// <summary>
+    ///     Creates a new BraceFoldingStrategy.
+    /// </summary>
+    public BraceFoldingStrategy()
     {
         OpeningBrace = '{';
         ClosingBrace = '}';
     }
 
-	/// <summary>
-	///     Gets/Sets the opening brace. The default value is '{'.
-	/// </summary>
-	public char OpeningBrace { get; set; }
+    /// <summary>
+    ///     Gets/Sets the opening brace. The default value is '{'.
+    /// </summary>
+    public char OpeningBrace { get; set; }
 
-	/// <summary>
-	///     Gets/Sets the closing brace. The default value is '}'.
-	/// </summary>
-	public char ClosingBrace { get; set; }
+    /// <summary>
+    ///     Gets/Sets the closing brace. The default value is '}'.
+    /// </summary>
+    public char ClosingBrace { get; set; }
 
     public void UpdateFoldings(FoldingManager manager, TextDocument document)
     {

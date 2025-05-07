@@ -6,8 +6,8 @@
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="AddyScript"
-    Width="1200"
-    Height="700"
+    Width="1000"
+    Height="650"
     Background="{DynamicResource WindowBackground}"
     Closing="WindowClosing"
     Icon="/Assets/Images/Icons/AddyScript.ico"
@@ -145,7 +145,7 @@
         <Grid
             Grid.Row="2"
             Classes="statusbar"
-            ColumnDefinitions="*, 200, 200, 50, 50, 50">
+            ColumnDefinitions="*, 150, 200, 50, 50, 50">
             <Label Name="FileNameStatusLabel" Grid.Column="0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Rectangle Classes="divider" />

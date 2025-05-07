@@ -11,7 +11,6 @@ using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Folding;
 using AvaloniaEdit.Indentation.CSharp;
-using AvaloniaEdit.Search;
 using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -634,8 +633,10 @@ public partial class MainWindow : Window
         }
     }
 
-    public void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
+    public async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
+        var optionDialog = new OptionDialog();
+        _ = await optionDialog.ShowDialog<bool>(this);
     }
 
     public void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
