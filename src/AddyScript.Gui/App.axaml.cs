@@ -79,7 +79,7 @@ public partial class App : Application
         InitialFiles = [.. files];
     }
 
-    public static void Load(string filePath = null)
+    public static void OpenWindow(string filePath = null)
     {
         var window = new MainWindow();
         if (filePath == null)
@@ -98,7 +98,7 @@ public partial class App : Application
         
         window.Show();
         window.Activate();
-        Desktop.MainWindow ??= window;  
+        Desktop.MainWindow ??= window;
     }
 
     public override void Initialize()
@@ -111,10 +111,10 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             foreach (var file in InitialFiles)
-                Load(file);
+                OpenWindow(file);
             
             if (Windows.Count <= 0)
-                Load();
+                OpenWindow();
             
             desktop.Exit += (_, _) =>
             {

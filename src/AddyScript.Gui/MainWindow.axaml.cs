@@ -195,6 +195,12 @@ public partial class MainWindow : Window
         Saved = true;
     }
 
+    private void CloseIfEmpty()
+    {
+        if (Saved && Editor.Document.TextLength <= 0)
+            Close();
+    }
+
     private async Task OpenAsync()
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -209,9 +215,8 @@ public partial class MainWindow : Window
 
         if (files.Count > 0)
         {
-            App.Load(files[0].Path.LocalPath);
-            if (Saved && Editor.Document.TextLength <= 0)
-                Close();
+            App.OpenWindow(files[0].Path.LocalPath);
+            CloseIfEmpty();
         }
     }
 
@@ -351,6 +356,11 @@ public partial class MainWindow : Window
 
     private void WindowLoaded(object sender, RoutedEventArgs e)
     {
+        Dispatcher.UIThread.AwaitWithPriority(
+            new Task(() => ToolbarPasteButton.IsEnabled = Editor.CanPaste),
+            DispatcherPriority.ApplicationIdle);
+
+        Editor.TextArea.Focus();
     }
 
     private async void WindowClosing(object sender, WindowClosingEventArgs e)
@@ -365,16 +375,83 @@ public partial class MainWindow : Window
             Close();
         }
     }
-    
+
+    private void WindowKeyDown(object sender, KeyEventArgs e)
+    {
+        if (IsHotKey(e, Key.N, KeyModifiers.Control))
+        {
+            ToolbarNewButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.O, KeyModifiers.Control))
+        {
+            ToolbarOpenButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.S, KeyModifiers.Control))
+        {
+            ToolbarSaveButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.P, KeyModifiers.Control))
+        {
+            ToolbarPrintButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.F, KeyModifiers.Control))
+        {
+            ToolbarFindButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.R, KeyModifiers.Control))
+        {
+            ToolbarReplaceButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.OemMinus, KeyModifiers.Control))
+        {
+            ToolbarOutdentButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.OemPlus, KeyModifiers.Control))
+        {
+            ToolbarIndentButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control))
+        {
+            ToolbarCommentButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control | KeyModifiers.Alt))
+        {
+            ToolbarUncommentButtonClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.F5, KeyModifiers.None))
+        {
+            if (ToolbarRunButton.IsEnabled)
+                ToolbarRunButtonClick(null, null);
+            else
+                Console.Beep();
+
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.F1, KeyModifiers.None))
+        {
+            ToolbarHelpButtonClick(null, null);
+            e.Handled = true;
+        }
+    }
+
     #endregion
 
     #region Toolbar events
 
     public void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
     {
-        App.Load();
-        if (Saved && Editor.Document.TextLength <= 0)
-            Close();
+        App.OpenWindow();
+        CloseIfEmpty();
     }
 
     public void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
