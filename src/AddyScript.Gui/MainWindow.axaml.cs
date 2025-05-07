@@ -30,7 +30,6 @@ public partial class MainWindow : Window
     
     private readonly BraceFoldingStrategy foldingStrategy = new();
     private FoldingManager foldingManager;
-    private SearchPanel searchPanel;
 
     private string filePath;
     private bool saved;
@@ -62,8 +61,6 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.TextEntering += EditorTextEntering;
         Editor.TextArea.TextEntered += EditorTextEntered;
-        
-        searchPanel = SearchPanel.Install(Editor);
     }
 
     private void InitializeFolding()
@@ -335,14 +332,10 @@ public partial class MainWindow : Window
 
     private void OpenSearchPanel(bool replaceMode)
     {
-        searchPanel.IsReplaceMode = replaceMode;
-        searchPanel.Open();
-
         var selection = Editor.TextArea.Selection;
-        if (!(selection.IsEmpty || selection.IsMultiline))
-            searchPanel.SearchPattern = selection.GetText();
-        
-        Dispatcher.UIThread.Post(searchPanel.Reactivate, DispatcherPriority.Input);
+        Editor.SearchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
+        Editor.SearchPanel.IsReplaceMode = replaceMode;
+        Editor.SearchPanel.Open();
     }
 
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
