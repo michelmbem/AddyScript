@@ -9,28 +9,30 @@ namespace AddyScript.Gui;
 
 public partial class App : Application
 {
-    public static string[] Directories { get; private set; }
-    public static string[] Assemblies { get; private set; }
+    public static string[] SearchPaths { get; set; }
+    public static string[] References { get; set; }
     private static string[] InitialFiles { get; set; }
     private static List<MainWindow> Windows { get; } = [];
 
     public static void ParseCmdLineArgs(string[] args)
     {
-        var files = new List<string>();
-        var directories = new List<string>();
-        var assemblies = new List<string>();
+        var searchPaths = new List<string>();
+        var references = new List<string>();
+        var initialFiles = new List<string>();
 
-        /*if (Settings.Default.ScriptContextSettings != null)
+        /*
+         if (Settings.Default.ScriptContextSettings != null)
         {
-            directories.AddRange(Settings.Default.ScriptContextSettings.Directories);
-            assemblies.AddRange(Settings.Default.ScriptContextSettings.Assemblies);
-        }*/
+            searchPaths.AddRange(Settings.Default.ScriptContextSettings.SearchPaths);
+            references.AddRange(Settings.Default.ScriptContextSettings.References);
+        }
+        */
 
-        if (directories.Count <= 0)
-            directories.Add(Path.GetFullPath(@"../../../samples"));
+        if (searchPaths.Count <= 0)
+            searchPaths.Add(Path.GetFullPath(@"../../../samples"));
 
-        if (assemblies.Count <= 0)
-            assemblies.AddRange(["Microsoft.Data.SqlClient"]);
+        if (references.Count <= 0)
+            references.AddRange(["Microsoft.Data.SqlClient"]);
 
         var index = 0;
 
@@ -46,7 +48,7 @@ public partial class App : Application
                     if (!Directory.Exists(dirname))
                         throw new ArgumentException("Directory '" + dirname + "' does not exist");
                     
-                    if (!directories.Contains(dirname)) directories.Add(dirname);
+                    if (!searchPaths.Contains(dirname)) searchPaths.Add(dirname);
                     break;
                 case "-r":
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
@@ -56,7 +58,7 @@ public partial class App : Application
                     if (ScriptContext.LoadAssembly(assemblyName) == null)
                         throw new ArgumentException("Assembly '" + assemblyName + "' could not be loaded");
 
-                    if (!assemblies.Contains(assemblyName)) assemblies.Add(assemblyName);
+                    if (!references.Contains(assemblyName)) references.Add(assemblyName);
                     break;
                 default:
                     throw new ArgumentException("Invalid option: " + args[index]);
@@ -67,13 +69,13 @@ public partial class App : Application
 
         while (index < args.Length)
         {
-            files.Add(args[index]);
+            initialFiles.Add(args[index]);
             ++index;
         }
 
-        Directories = [.. directories];
-        Assemblies = [.. assemblies];
-        InitialFiles = [.. files];
+        SearchPaths = [.. searchPaths];
+        References = [.. references];
+        InitialFiles = [.. initialFiles];
     }
 
     public static void OpenWindow(string filePath = null)
@@ -109,10 +111,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            foreach (var file in InitialFiles)
-                OpenWindow(file);
-            
-            if (Windows.Count <= 0)
+            if (InitialFiles.Length > 0)
+                foreach (var file in InitialFiles)
+                    OpenWindow(file);
+            else
                 OpenWindow();
             
             desktop.Exit += (_, _) =>

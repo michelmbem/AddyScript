@@ -589,10 +589,10 @@ public partial class MainWindow : Window
         var argsBuilder = new StringBuilder();
         argsBuilder.Append("-f ").Append(EscapeCmdLineArg(scriptPath));
 
-        foreach (var directory in App.Directories)
+        foreach (var directory in App.SearchPaths)
             argsBuilder.Append(" -d ").Append(EscapeCmdLineArg(directory));
 
-        foreach (var assemblyName in App.Assemblies)
+        foreach (var assemblyName in App.References)
             argsBuilder.Append(" -r ").Append(EscapeCmdLineArg(assemblyName));
 
         var logPath = Path.ChangeExtension(Path.GetTempFileName(), ".log");
@@ -636,7 +636,11 @@ public partial class MainWindow : Window
     public async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
         var optionDialog = new OptionDialog();
-        _ = await optionDialog.ShowDialog<bool>(this);
+        if (await optionDialog.ShowDialog<bool>(this))
+        {
+            App.SearchPaths = [..optionDialog.SearchPaths];
+            App.References = [..optionDialog.References];
+        }
     }
 
     public void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)

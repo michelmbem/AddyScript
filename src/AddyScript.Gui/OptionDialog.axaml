@@ -3,7 +3,6 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Options"
     Width="550"
     Height="450"
@@ -50,8 +49,11 @@
                                         i:Attached.Icon="fa-circle-minus"
                                         Click="RemoveDirectoryButtonClick"
                                         DockPanel.Dock="Right"
-                                        ToolTip.Tip="Remove from list" />
-                                    <TextBlock Text="{Binding}" />
+                                        ToolTip.Tip="Remove from list"/>
+                                    <TextBlock
+                                        Text="{Binding}"
+                                        VerticalAlignment="Center"
+                                        Margin="0, 0, 2, 0"/>
                                 </DockPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -62,7 +64,7 @@
                 <DockPanel>
                     <Grid
                         Margin="0,5"
-                        ColumnDefinitions="Auto, *, Auto"
+                        ColumnDefinitions="Auto, *, Auto, Auto"
                         DockPanel.Dock="Top">
                         <Label
                             Grid.Column="0"
@@ -73,8 +75,15 @@
                             Grid.Column="1"
                             Margin="1,0" />
                         <Button
-                            Name="AddReferenceButton"
+                            Name="BrowseAssemblyButton"
                             Grid.Column="2"
+                            VerticalAlignment="Stretch"
+                            i:Attached.Icon="fa-folder-open"
+                            Click="BrowseAssemblyButtonClick"
+                            ToolTip.Tip="Browse for an assembly" />
+                        <Button
+                            Name="AddReferenceButton"
+                            Grid.Column="3"
                             VerticalAlignment="Stretch"
                             i:Attached.Icon="fa-circle-plus"
                             Click="AddReferenceButtonClick"
@@ -88,8 +97,11 @@
                                         i:Attached.Icon="fa-circle-minus"
                                         Click="RemoveReferenceButtonClick"
                                         DockPanel.Dock="Right"
-                                        ToolTip.Tip="Remove from list" />
-                                    <TextBlock Text="{Binding}" />
+                                        ToolTip.Tip="Remove from list"/>
+                                    <TextBlock
+                                        Text="{Binding}"
+                                        VerticalAlignment="Center"
+                                        Margin="0, 0, 2, 0"/>
                                 </DockPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

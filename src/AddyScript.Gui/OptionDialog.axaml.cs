@@ -1,21 +1,26 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using StringRes = AddyScript.Gui.Properties.Resources;
+using MBIcon = MsBox.Avalonia.Enums.Icon;
 
 namespace AddyScript.Gui;
 
 public partial class OptionDialog : Window
 {
-    private readonly ObservableCollection<string> searchPaths = [..App.Directories];
-    private readonly ObservableCollection<string> references = [.. App.Assemblies];
+    public ObservableCollection<string> SearchPaths { get; } = [..App.SearchPaths];
+    public ObservableCollection<string> References { get; } = [.. App.References];
 
     public OptionDialog()
     {
         InitializeComponent();
 
-        SearchPathsListBox.ItemsSource = searchPaths;
-        ReferencesListBox.ItemsSource = references;
+        SearchPathsListBox.ItemsSource = SearchPaths;
+        ReferencesListBox.ItemsSource = References;
     }
 
     private async void BrowseDirectoryButtonClick(object sender, RoutedEventArgs e)
@@ -32,24 +37,59 @@ public partial class OptionDialog : Window
 
     private void AddDirectoryButtonClick(object sender, RoutedEventArgs e)
     {
-        searchPaths.Add(NewDirectoryTextBox.Text);
-    }
-
-    private void AddReferenceButtonClick(object sender, RoutedEventArgs e)
-    {
-        references.Add(NewReferenceTextBox.Text);
+        var newDirectory = NewDirectoryTextBox.Text;
+        
+        if (string.IsNullOrWhiteSpace(newDirectory) ||
+            SearchPaths.Contains(newDirectory)) return;
+        
+        if (Directory.Exists(newDirectory))
+            SearchPaths.Add(newDirectory);
+        else
+            MessageBoxManager
+                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,$"Directory '{newDirectory}' does not exist", ButtonEnum.Ok, MBIcon.Error)
+                .ShowAsync();
     }
 
     private void RemoveDirectoryButtonClick(object sender, RoutedEventArgs e)
     {
         if (SearchPathsListBox.SelectedIndex >= 0)
-            searchPaths.RemoveAt(SearchPathsListBox.SelectedIndex);
+            SearchPaths.RemoveAt(SearchPathsListBox.SelectedIndex);
+    }
+
+    private async void BrowseAssemblyButtonClick(object sender, RoutedEventArgs e)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Select a .Net assembly",
+            AllowMultiple = false,
+            FileTypeFilter = [
+                new FilePickerFileType(".Net assembly (*.dll)") { Patterns = ["*.dll"] }
+            ]
+        });
+
+        if (files.Count > 0)
+            NewReferenceTextBox.Text = files[0].Path.LocalPath;
+    }
+
+    private void AddReferenceButtonClick(object sender, RoutedEventArgs e)
+    {
+        var newReference = NewReferenceTextBox.Text;
+        
+        if (string.IsNullOrWhiteSpace(newReference) ||
+            References.Contains(newReference)) return;
+        
+        if (ScriptContext.LoadAssembly(newReference) != null)
+            References.Add(newReference);
+        else
+            MessageBoxManager
+                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,$"Could not load assembly '{newReference}'", ButtonEnum.Ok, MBIcon.Error)
+                .ShowAsync();
     }
 
     private void RemoveReferenceButtonClick(object sender, RoutedEventArgs e)
     {
         if (ReferencesListBox.SelectedIndex >= 0)
-            references.RemoveAt(ReferencesListBox.SelectedIndex);
+            References.RemoveAt(ReferencesListBox.SelectedIndex);
     }
 
     private void OkButtonClick(object sender, RoutedEventArgs e)
