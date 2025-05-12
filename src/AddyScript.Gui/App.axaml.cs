@@ -9,9 +9,9 @@ namespace AddyScript.Gui;
 
 public partial class App : Application
 {
-    public static string[] SearchPaths { get; set; }
-    public static string[] References { get; set; }
-    private static string[] InitialFiles { get; set; }
+    public static string[] SearchPaths { get; set; } = [];
+    public static string[] References { get; set; } = [];
+    private static string[] InitialFiles { get; set; } = [];
     private static List<MainWindow> Windows { get; } = [];
 
     public static void ParseCmdLineArgs(string[] args)
@@ -48,7 +48,8 @@ public partial class App : Application
                     if (!Directory.Exists(dirname))
                         throw new ArgumentException("Directory '" + dirname + "' does not exist");
                     
-                    if (!searchPaths.Contains(dirname)) searchPaths.Add(dirname);
+                    if (!searchPaths.Contains(dirname))
+                        searchPaths.Add(dirname);
                     break;
                 case "-r":
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
@@ -58,7 +59,8 @@ public partial class App : Application
                     if (ScriptContext.LoadAssembly(assemblyName) == null)
                         throw new ArgumentException("Assembly '" + assemblyName + "' could not be loaded");
 
-                    if (!references.Contains(assemblyName)) references.Add(assemblyName);
+                    if (!references.Contains(assemblyName))
+                        references.Add(assemblyName);
                     break;
                 default:
                     throw new ArgumentException("Invalid option: " + args[index]);
