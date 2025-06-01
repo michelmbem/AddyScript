@@ -146,7 +146,7 @@ See the Changelog page of the help manual for more details.
 
 * The ability to compile a script to a DLL or executable managed via Reflection.Emit; this is the real next step. This will improve runtime performance and bring other features like the ability to subclass a .Net type from a script.
 * Reworked the **import** directive syntax: it should look like a function call with a string argument.
-* Migrated the UI to [AvaloniaUI](https://avaloniaui.net/) for better cross-platform support;
+* Migrate the UI to [AvaloniaUI](https://avaloniaui.net/) for better cross-platform support;
 * Additional localized UI resources (up to you).
 * Maybe a variable number of strongly typed catch clauses in the **try-catch-finally** statement.
 
