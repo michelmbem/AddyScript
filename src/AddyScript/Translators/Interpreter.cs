@@ -45,7 +45,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /**
      * Note: Do not read a state field twice expecting it to have the same value!
      * Invocations of RuntimeServices methods may change the value of state field at any time.
-     * This applies more especifically to returnedValue: always make a copy of it for later reuse.
+     * This applies more specifically to returnedValue: always make a copy of it for later reuse.
      */
 
     private readonly HashSet<string> importedModules = [];
@@ -2750,15 +2750,14 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 if (handleBreak) jumpCode = JumpCode.None;
                 return int.MaxValue;
             case JumpCode.Goto:
-                if (labels.TryGetValue(lastGoto.LabelName, out Label label))
-                {
-                    jumpCode = JumpCode.None;
-                    return label.Address;
-                }
-
-                if (canJumpOut) return int.MaxValue;
-
-                throw new RuntimeError(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
+                if (!labels.TryGetValue(lastGoto.LabelName, out var label))
+                    return canJumpOut
+                        ? int.MaxValue
+                        : throw new RuntimeError(fileName, lastGoto,
+                            string.Format(Resources.MissingLabel, lastGoto.LabelName));
+                
+                jumpCode = JumpCode.None;
+                return label.Address;
             default:
                 return int.MaxValue;
         }
