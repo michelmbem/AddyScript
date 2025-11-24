@@ -391,9 +391,9 @@ public abstract class BasicParser
 
         public bool IsIterator => IsMethod && !(IsContructor || IsStatic) && Name == ITERATOR_FUNCTION_NAME;
 
-        public void PushBlock(bool forExpression)
+        public void PushBlock(bool asExpression)
         {
-            CurrentBlock = new ParseTimeBlock(forExpression, CurrentBlock);
+            CurrentBlock = new ParseTimeBlock(asExpression, CurrentBlock);
         }
 
         public void PopBlock()
@@ -409,11 +409,11 @@ public abstract class BasicParser
     /// <summary>
     /// Represents a block at parse time.
     /// </summary>
-    protected class ParseTimeBlock(bool forExpression, ParseTimeBlock next)
+    protected class ParseTimeBlock(bool asExpression, ParseTimeBlock next)
     {
-        public bool ForExpression { get; private set; } = forExpression;
-        public List<ParseTimeLabel> Labels { get; private set; } = [];
+        public bool AsExpression { get; private set; } = asExpression;
         public ParseTimeBlock Next { get; private set; } = next;
+        public List<ParseTimeLabel> Labels { get; private set; } = [];
 
         public Dictionary<string, Label> ConvertLabels(Statement[] statements)
         {
@@ -431,7 +431,7 @@ public abstract class BasicParser
             return converted;
         }
         
-        public bool CanYield => ForExpression || Next is { CanYield: true };
+        public bool CanYield => AsExpression || Next is { CanYield: true };
     }
 
     #endregion

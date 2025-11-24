@@ -1,4 +1,4 @@
-﻿using AddyScript.Ast.Expressions;
+using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.DataItems;
 
 
@@ -8,8 +8,9 @@ namespace AddyScript.Translators;
 public interface IAssignmentProcessor
 {
     void AssignToVariable(VariableRef varRef, DataItem rValue);
-    
+
     void AssignToItem(ItemRef itemRef, DataItem rValue);
+
     void AssignToSlice(SliceRef sliceRef, DataItem rValue);
 
     void AssignToProperty(PropertyRef propertyRef, DataItem rValue);

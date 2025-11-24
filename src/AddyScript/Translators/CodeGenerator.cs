@@ -210,7 +210,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
     {
+        bool wasBlockInline = isBlockInline;
+        isBlockInline = true;
         TranslateBlock(blkAsExpr.Block);
+        isBlockInline = wasBlockInline;
     }
 
     public void TranslateAssignment(Assignment assignment)
@@ -1198,26 +1201,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     private void DumpMatchExpression(Expression expression)
     {
-        if (expression is AnonymousCall anoCall)
+        if (expression is ThrowExpression throwExpr)
         {
-            Block block = ((InlineFunction)anoCall.Callee).Body;
-
-            if (block.Statements.Length == 1 && block.Statements[0] is Throw _throw)
-            {
-                textWriter.Write("throw ");
-                _throw.Expression.AcceptTranslator(this);
-            }
-            else
-            {
-                bool wasFunctionBody = inFunctionBody;
-                bool wasBlockInline = isBlockInline;
-
-                inFunctionBody = isBlockInline = true;
-                block.AcceptTranslator(this);
-
-                inFunctionBody = wasFunctionBody;
-                isBlockInline = wasBlockInline;
-            }
+            textWriter.Write("throw ");
+            throwExpr.Throw.Expression.AcceptTranslator(this);
         }
         else
             expression.AcceptTranslator(this);
