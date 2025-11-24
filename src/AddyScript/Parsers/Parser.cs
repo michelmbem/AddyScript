@@ -370,15 +370,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <summary>
     /// Recognizes a block of statements.
     /// </summary>
-    /// <param name="forExpression">
-    /// Tells if this block is being recognized as an expression.
+    /// <param name="asExpression">
+    /// Tells if the block is recognized as an expression.
     /// </param>
     /// <returns>A <see cref="Ast.Statements.Block"/></returns>
-    protected Block Block(bool forExpression = false)
+    protected Block Block(bool asExpression = false)
     {
         Token first = Match(TokenID.LeftBrace);
         
-        CurrentFunction.PushBlock(forExpression);
+        CurrentFunction.PushBlock(asExpression);
         Statement[] stmts = Asterisk(StatementWithLabels);
         var labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
         CurrentFunction.PopBlock();

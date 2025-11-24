@@ -870,7 +870,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a <b>throw</b> statement being used as an expresion.
+    /// Recognizes a <b>throw</b> statement used as an expresion.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.ThrowExpression"/></returns>
     protected ThrowExpression ThrowExpression()

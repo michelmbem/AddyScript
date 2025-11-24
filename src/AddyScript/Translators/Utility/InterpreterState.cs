@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using AddyScript.Ast.Statements;
 using AddyScript.Runtime;
@@ -11,7 +11,7 @@ namespace AddyScript.Translators.Utility;
 
 public class InterpreterState(Stack<MethodFrame> frames, MethodFrame rootFrame,
                               string fileName, MissingReferenceAction misRefAct,
-                              JumpCode jumpCode, List<DataItem> yieldedValues,
+                              JumpCode jumpCode, LinkedList<DataItem> yieldedValues,
                               Goto lastGoto)
 {
     public readonly Stack<MethodFrame> frames = frames;
@@ -19,6 +19,6 @@ public class InterpreterState(Stack<MethodFrame> frames, MethodFrame rootFrame,
     public readonly string fileName = fileName;
     public readonly MissingReferenceAction misRefAct = misRefAct;
     public readonly JumpCode jumpCode = jumpCode;
-    public readonly List<DataItem> yieldedValues = yieldedValues;
+    public readonly LinkedList<DataItem> yieldedValues = yieldedValues;
     public readonly Goto lastGoto = lastGoto;
 }

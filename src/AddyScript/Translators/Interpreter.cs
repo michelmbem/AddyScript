@@ -56,7 +56,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private string fileName = string.Empty;
     private MissingReferenceAction misRefAct = MissingReferenceAction.Fail;
     private JumpCode jumpCode = JumpCode.None;
-    private List<DataItem> yieldedValues = [];
+    private LinkedList<DataItem> yieldedValues = [];
     private DataItem returnedValue;
     private Goto lastGoto;
     
@@ -509,13 +509,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         TranslateBlock(blkAsExpr.Block);
         
-        if (yieldedValues.Count > 0)
+        if (yieldedValues.First == null)
+            returnedValue = Void.Value;
+        else
         {
-            returnedValue = yieldedValues[0];
+            returnedValue = yieldedValues.First.Value;
             yieldedValues.Clear();
         }
-        else
-            returnedValue = Void.Value;
     }
 
     public void TranslateAssignment(Assignment assignment)
@@ -1548,7 +1548,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     public void TranslateYield(Yield yield)
     {
         yield.Expression.AcceptTranslator(this);
-        yieldedValues.Add(returnedValue);
+        yieldedValues.AddLast(returnedValue);
     }
 
     public void TranslateReturn(Return _return)
@@ -2870,6 +2870,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         savedState.rootFrame.RootBlock.CopyItemsFrom(rootFrame.RootBlock);
         rootFrame = savedState.rootFrame;
         currentFrame = frames.Peek();
+        yieldedValues = savedState.yieldedValues;
         misRefAct = savedState.misRefAct;
         jumpCode = savedState.jumpCode;
         lastGoto = savedState.lastGoto;
@@ -2883,9 +2884,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         jumpCode = JumpCode.None;
         misRefAct = MissingReferenceAction.Fail;
-        yieldedValues = [];
         lastGoto = null;
-        frames = new Stack<MethodFrame>();
+        yieldedValues.Clear();
+        frames.Clear();
         CreateRootFrame();
         RegisterDefaults(fileName);
     }
