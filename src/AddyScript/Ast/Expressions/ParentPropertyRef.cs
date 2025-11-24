@@ -20,6 +20,9 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         public string PropertyName { get; private set; } = propertyName;
 
+        /// <summary>
+        /// Operates assignment to this reference.
+        /// </summary>
         /// <param name="processor">The assignment processor to use</param>
         /// <param name="rValue">The value that should be assigned to this reference</param>
         public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
