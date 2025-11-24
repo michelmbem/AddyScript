@@ -88,7 +88,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         var truePart = RequiredExpression();
         Match(TokenID.Colon);
-        var falsePart = RequiredExpression();
+        var falsePart = TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
 
         return new TernaryExpression(test, truePart, falsePart);
     }
@@ -1305,7 +1305,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
     /// <remarks>
     /// This basic implementation only recognizes simple expressions.
-    /// The full featured parser overrides it to recognize a reacher syntax with blocks.
+    /// The full-featured parser overrides it to recognize a richer syntax with blocks.
     /// </remarks>
     protected virtual Expression MatchCaseExpression()
     {

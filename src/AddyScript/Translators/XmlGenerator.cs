@@ -169,6 +169,11 @@ public class XmlGenerator : ITranslator
         currentElement = previousElement;
     }
 
+    public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
+    {
+        TranslateBlock(blkAsExpr.Block);
+    }
+
     public void TranslateAssignment(Assignment assign)
     {
         XmlElement tmpElement = document.CreateElement("Assignment");

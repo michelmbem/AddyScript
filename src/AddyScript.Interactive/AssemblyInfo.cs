@@ -6,19 +6,13 @@ namespace AddyScript.Interactive
 {
     internal static class AssemblyInfo
     {
-        internal static Assembly ExecutingAssembly
-        {
-            get => Assembly.GetExecutingAssembly();
-        }
+        internal static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
 
-        internal static string Version
-        {
-            get => ExecutingAssembly.GetName().Version.ToString();
-        }
+        internal static string Version => ExecutingAssembly.GetName().Version!.ToString();
 
         internal static T GetAssemblyAttribute<T>()
         {
-            object[] attributes = ExecutingAssembly.GetCustomAttributes(typeof(T), false);
+            var attributes = ExecutingAssembly.GetCustomAttributes(typeof(T), false);
             if (attributes.Length <= 0) return default;
             return (T)attributes[0];
         }

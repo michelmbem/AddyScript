@@ -69,6 +69,10 @@ public sealed class Rational : DataItem
         BinaryOperator.Times => Simplify(value * operand.AsRational32),
         BinaryOperator.Divide => Simplify(value / operand.AsRational32),
         BinaryOperator.Power => new Rational(value.Power(operand.AsInt32)),
+        BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsRational32),
+        BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsRational32),
+        BinaryOperator.GreaterThan => Boolean.FromBool(value > operand.AsRational32),
+        BinaryOperator.GreaterThanOrEqual => Boolean.FromBool(value >= operand.AsRational32),
         _ => base.BinaryOperation(_operator, operand),
     };
 
