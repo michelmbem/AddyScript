@@ -505,6 +505,19 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
     }
 
+    public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
+    {
+        TranslateBlock(blkAsExpr.Block);
+        
+        if (yieldedValues.Count > 0)
+        {
+            returnedValue = yieldedValues[0];
+            yieldedValues.Clear();
+        }
+        else
+            returnedValue = Void.Value;
+    }
+
     public void TranslateAssignment(Assignment assignment)
     {
         try

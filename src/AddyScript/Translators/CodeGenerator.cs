@@ -208,6 +208,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         inFunctionBody = wasFunctionBody;
     }
 
+    public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
+    {
+        TranslateBlock(blkAsExpr.Block);
+    }
+
     public void TranslateAssignment(Assignment assignment)
     {
         assignment.LeftOperand.AcceptTranslator(this);

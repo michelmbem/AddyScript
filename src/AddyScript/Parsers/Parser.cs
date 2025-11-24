@@ -294,19 +294,9 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>An <see cref="Expression"/></returns>
     protected override Expression MatchCaseExpression()
     {
-        if (TryMatch(TokenID.LeftBrace))
-        {
-            PushFunction(null, false, false, false);
-            Block body = Block();
-            body.Append(new Return());
-            PopFunction();
-
-            var anoCall = new AnonymousCall(new InlineFunction([], body));
-            anoCall.CopyLocation(body);
-            return anoCall;
-        }
-
-        return base.MatchCaseExpression();
+        return TryMatch(TokenID.LeftBrace)
+            ? new BlockAsExpression(Block(true))
+            : base.MatchCaseExpression();
     }
 
     /// <summary>
@@ -380,12 +370,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <summary>
     /// Recognizes a block of statements.
     /// </summary>
+    /// <param name="forExpression">
+    /// Tells if this block is being recognized as an expression.
+    /// </param>
     /// <returns>A <see cref="Ast.Statements.Block"/></returns>
-    protected Block Block()
+    protected Block Block(bool forExpression = false)
     {
         Token first = Match(TokenID.LeftBrace);
         
-        CurrentFunction.PushBlock();
+        CurrentFunction.PushBlock(forExpression);
         Statement[] stmts = Asterisk(StatementWithLabels);
         var labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
         CurrentFunction.PopBlock();
@@ -440,7 +433,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Dictionary<string, Label> labels;
         Statement[] stmts;
 
-        CurrentFunction.PushBlock();
+        CurrentFunction.PushBlock(false);
         ++CurrentFunction.SwitchBlocks;
 
         while (TryMatch(TokenID.KW_Case))
@@ -669,7 +662,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private Yield Yield()
     {
         Token first = Match(TokenID.KW_Yield);
-        if (!CurrentFunction.IsIterator)
+        if (!(CurrentFunction.IsIterator || CurrentFunction.CurrentBlock.CanYield))
             throw new SyntaxError(FileName, first, Resources.YieldUsedOutOfIterator);
 
         var expr = RequiredExpression();

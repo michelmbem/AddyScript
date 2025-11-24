@@ -59,7 +59,7 @@ res = ((int)readln('type a number: ')) switch {
 	5..9 => {
 		print('yeah i know, ');
 		println('it\'s between 5 and 9!');
-		return __value;
+		yield __value;
 	},
 	10.. => '10 and above'
 };

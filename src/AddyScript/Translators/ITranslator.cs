@@ -16,6 +16,7 @@ public interface ITranslator
     void TranslateConstantDecl(ConstantDecl cstDecl);
     void TranslateVariableDecl(VariableDecl varDecl);
     void TranslateBlock(Block block);
+    void TranslateBlockAsExpression(BlockAsExpression blkAsExpr);
     void TranslateAssignment(Assignment assignment);
     void TranslateTernaryExpression(TernaryExpression terExpr);
     void TranslateBinaryExpression(BinaryExpression binExpr);
