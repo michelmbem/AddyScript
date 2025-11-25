@@ -1,7 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using AI = AddyScript.Gui.AssemblyInfo;
+
+
 namespace AddyScript.Gui;
+
 
 public partial class AboutBox : Window
 {
@@ -9,10 +13,11 @@ public partial class AboutBox : Window
     {
         InitializeComponent();
         
-        TitleTextBlock.Text = AssemblyInfo.Title;
-        VersionTextBlock.Text = $"Version {AssemblyInfo.Version}";
-        DescriptionTextBlock.Text = AssemblyInfo.Description;
-        CopyrightTextBlock.Text = AssemblyInfo.Copyright;
+        Title = $"About {AI.Title}";
+
+        VersionTextBlock.Text = $"Version {AI.Version}";
+        DescriptionTextBlock.Text = AI.Description;
+        CopyrightTextBlock.Text = AI.Copyright;
     }
 
     private void OkButtonClick(object sender, RoutedEventArgs e)

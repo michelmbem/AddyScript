@@ -1,39 +1,37 @@
 <Window
-        x:Class="AddyScript.Gui.AboutBox"
-        xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="About AddyScript"
-        Width="500"
-        Height="200"
-        CanResize="False"
-        WindowStartupLocation="CenterOwner">
-  <Grid RowDefinitions="*, Auto" ColumnDefinitions="Auto, *">
-    <Image Grid.Row="0"
-           Grid.Column="0"
-           Source="Assets/Images/Icons/AddyScript.png"
-           Width="92"
-           Height="92"
-           Margin="10"/>
-    <Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto, Auto, *, Auto" Margin="10">
-      <TextBlock Grid.Row="0" Name="TitleTextBlock" FontSize="60" FontWeight="Bold"/>
-      <TextBlock Grid.Row="1" Name="VersionTextBlock"/>
-      <TextBlock Grid.Row="2" Name="DescriptionTextBlock" VerticalAlignment="Center"/>
-      <TextBlock Grid.Row="3" Name="CopyrightTextBlock"/>
-    </Grid>
-    <StackPanel
-      Grid.Row="1"
-      Grid.Column="0"
-      Grid.ColumnSpan="2"
-      Margin="5,0"
-      FlowDirection="RightToLeft"
-      Orientation="Horizontal">
-      <Button
-        Name="OkButton"
-        Width="80"
-        Margin="5"
-        HorizontalContentAlignment="Center"
-        Click="OkButtonClick"
-        Content="OK" />
-    </StackPanel>
-  </Grid>
+		x:Class="AddyScript.Gui.AboutBox"
+		xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		Width="500"
+		Height="250"
+		CanResize="False"
+		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/Images/Icons/AddyScript.ico">
+	<Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="10">
+		<Border Grid.Row="0" Height="100">
+			<Border.Background>
+				<ImageBrush Source="Assets/Images/Backgrounds/AddyScript.jpg"
+							Stretch="Uniform"/>
+			</Border.Background>
+		</Border>
+		<Rectangle Grid.Row="1" Height="2" Fill="Black" Margin="0 0 0 10" />
+		<TextBlock Grid.Row="2" Name="VersionTextBlock"/>
+		<TextBlock Grid.Row="3" Name="DescriptionTextBlock" VerticalAlignment="Center"/>
+		<TextBlock Grid.Row="4" Name="CopyrightTextBlock"/>
+		<StackPanel
+		Grid.Row="5"
+		Grid.Column="0"
+		Grid.ColumnSpan="2"
+		Margin="5,0"
+		FlowDirection="RightToLeft"
+		Orientation="Horizontal">
+			<Button
+			Name="OkButton"
+			Width="80"
+			Margin="5"
+			HorizontalContentAlignment="Center"
+			Click="OkButtonClick"
+			Content="OK" />
+		</StackPanel>
+	</Grid>
 </Window>
