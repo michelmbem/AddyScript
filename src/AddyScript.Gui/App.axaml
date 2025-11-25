@@ -19,5 +19,6 @@
     <SolidColorBrush x:Key="HoverToolbarButtonBackground" Color="Orange"></SolidColorBrush>
     <SolidColorBrush x:Key="InactiveToolbarButtonForeground" Color="LightGray"></SolidColorBrush>
     <SolidColorBrush x:Key="InactiveToolbarButtonBackground" Color="#11111111"></SolidColorBrush>
+    <SolidColorBrush x:Key="DividerFill" Color="Silver"></SolidColorBrush>
   </Application.Resources>
 </Application>

@@ -312,8 +312,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateUndoRedoFileSize()
     {
-        ToolbarUndoButton.IsEnabled = Editor.CanUndo;
-        ToolbarRedoButton.IsEnabled = Editor.CanRedo;
+        ToolbarUndoButton.IsEnabled = UndoMenuItem.IsEnabled = Editor.CanUndo;
+        ToolbarRedoButton.IsEnabled = RedoMenuItem.IsEnabled = Editor.CanRedo;
         ToolbarRunButton.IsEnabled = Editor.Document.TextLength > 0;
 
         TextLengthStatusLabel.Content = string.Format(StringRes.TextLength, Editor.Document.TextLength);
@@ -327,8 +327,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateCutCopyCaretInfo()
     {
-        ToolbarCutButton.IsEnabled = Editor.CanCut;
-        ToolbarCopyButton.IsEnabled = Editor.CanCopy;
+        ToolbarCutButton.IsEnabled = CutMenuItem.IsEnabled = Editor.CanCut;
+        ToolbarCopyButton.IsEnabled = CopyMenuItem.IsEnabled = Editor.CanCopy;
         
         CaretStatusLabel.Content = string.Format(StringRes.CaretStatus,
             Editor.TextArea.Caret.Line, Editor.TextArea.Caret.Column, Editor.TextArea.Selection.Length);
@@ -648,8 +648,10 @@ public partial class MainWindow : Window
         Process.Start(new ProcessStartInfo(HelpLink) { UseShellExecute = true });
     }
 
-    private void ToolbarHelpAboutMenuItemClick(object sender, RoutedEventArgs e)
+    private async void ToolbarHelpAboutMenuItemClick(object sender, RoutedEventArgs e)
     {
+        var aboutBox = new AboutBox();
+        await aboutBox.ShowDialog<bool>(this);
     }
     
     #endregion
@@ -681,6 +683,46 @@ public partial class MainWindow : Window
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
         Console.WriteLine($@"Text entered: {e.Text}");
+    }
+    
+    #endregion
+    
+    #region Editor menu events
+
+    private void InsertSnippetMenuItem_OnClick(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SurroundWithMenuItem_OnClick(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        Editor.Delete();
+    }
+
+    private void SelectAllMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        Editor.Select(0, Editor.Document.TextLength);
+    }
+
+    private void ReformatMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var document = Editor.Document;
+            var program = ScriptEngine.ParseString(document.Text);
+            document.Text = ScriptEngine.GenerateCode(program);
+        }
+        catch (Exception ex)
+        {
+            MessageBoxManager
+                .GetMessageBoxStandard(Title!, ex.Message, ButtonEnum.Ok, MBIcon.Warning)
+                .ShowAsync();
+        }
     }
     
     #endregion

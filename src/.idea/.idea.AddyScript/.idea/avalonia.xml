@@ -3,6 +3,7 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="AddyScript.Gui/AboutBox.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/App.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/MainWindow.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/OptionDialog.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />

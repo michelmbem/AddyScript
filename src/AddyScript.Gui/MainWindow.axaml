@@ -32,14 +32,8 @@
                 ToolTip.Tip="Save">
                 <SplitButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                        <MenuItem
-                            Name="ToolbarSaveAsMenuItem"
-                            Click="ToolbarSaveAsMenuItemClick"
-                            Header="Save as" />
-                        <MenuItem
-                            Name="ToolbarExportXmlMenuItem"
-                            Click="ToolbarExportXmlMenuItemClick"
-                            Header="Export AST to XML" />
+                        <MenuItem Name="ToolbarSaveAsMenuItem" Header="Save as" Click="ToolbarSaveAsMenuItemClick" />
+                        <MenuItem Name="ToolbarExportXmlMenuItem" Header="Export AST to XML" Click="ToolbarExportXmlMenuItemClick" />
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>
@@ -126,10 +120,7 @@
                 ToolTip.Tip="Help">
                 <SplitButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                        <MenuItem
-                            Name="ToolbarHelpAboutMenuItem"
-                            Click="ToolbarHelpAboutMenuItemClick"
-                            Header="About AddyScript" />
+                        <MenuItem Name="ToolbarHelpAboutMenuItem" Header="About AddyScript" Click="ToolbarHelpAboutMenuItemClick" />
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>
@@ -139,7 +130,49 @@
                 Name="Editor"
                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
                 FontSize="14"
-                ShowLineNumbers="True" />
+                ShowLineNumbers="True">
+                <ae:TextEditor.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="InsertSnippetMenuItem" Header="Insert snippet" Click="InsertSnippetMenuItem_OnClick"/>
+                        <MenuItem Name="SurroundWithMenuItem" Header="Surround with" Click="SurroundWithMenuItem_OnClick"/>
+                        <Separator/>
+                        <MenuItem Name="UndoMenuItem" Header="Undo" Click="ToolbarUndoButtonClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-rotate-left"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="RedoMenuItem" Header="Redo" Click="ToolbarRedoButtonClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-rotate-right"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Name="CutMenuItem" Header="Cut" Click="ToolbarCutButtonClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-scissors"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="CopyMenuItem" Header="Copy" Click="ToolbarCopyButtonClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-copy"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="PasteMenuItem" Header="Paste" Click="ToolbarPasteButtonClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-paste"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="DeleteMenuItem" Header="Delete" Click="DeleteMenuItemClick">
+                            <MenuItem.Icon>
+                                <i:Icon Value="fa-trash"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Name="SelectAllMenuItem" Header="Select all" Click="SelectAllMenuItemClick"/>
+                        <MenuItem Name="ReformatMenuItem" Header="Reformat code" Click="ReformatMenuItemClick"/>
+                    </ContextMenu>
+                </ae:TextEditor.ContextMenu>
+            </ae:TextEditor>
         </Border>
         <Grid
             Grid.Row="2"

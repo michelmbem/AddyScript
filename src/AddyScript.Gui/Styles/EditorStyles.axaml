@@ -19,7 +19,7 @@
     <Style Selector="Rectangle.divider">
         <Setter Property="Width" Value="1" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Fill" Value="Silver" />
+        <Setter Property="Fill" Value="{DynamicResource DividerFill}" />
     </Style>
 
     <Style Selector="StackPanel.toolbar">
@@ -52,7 +52,7 @@
         <Setter Property="Height" Value="32" />
     </Style>
 
-    <Style Selector="MenuFlyoutPresenter">
+    <Style Selector="MenuFlyoutPresenter, ContextMenu">
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
     </Style>
 
@@ -67,6 +67,15 @@
 
     <Style Selector="MenuItem[IsEnabled=False] /template/ ContentPresenter">
         <Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
+    </Style>
+
+    <Style Selector="MenuItem i|Icon">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+    </Style>
+
+    <Style Selector="Separator">
+        <Setter Property="Background" Value="{DynamicResource DividerFill}" />
     </Style>
 
     <Style Selector="Border.editor-wrapper">
