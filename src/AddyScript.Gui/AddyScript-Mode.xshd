@@ -16,7 +16,7 @@
     <Color name="OperatorKeywords" fontWeight="bold" foreground="MidnightBlue" exampleText="x matches @'\d+'"/>
     <Color name="ThisOrSuperReference" fontWeight="bold" exampleText="this.doStuff(); super::doStuff();"/>
     <Color name="NullOrValueKeywords" fontWeight="bold" exampleText="if (value == null)"/>
-    <Color name="StandardConstants" fontWeight="bold" fontStyle="italic" foreground="DarkSlateGray" exampleText="x = EPSILON"/>
+    <Color name="StandardConstants" fontStyle="italic" foreground="DarkSlateGray" exampleText="x = EPSILON"/>
     <Color name="ContextKeywords" fontWeight="bold" foreground="Teal" exampleText="__value = 2 * __key"/>
     <Color name="MethodCall" foreground="DarkViolet" exampleText="println()"/>
     <Color name="NumberLiteral" foreground="Firebrick" exampleText="3.1415f"/>
