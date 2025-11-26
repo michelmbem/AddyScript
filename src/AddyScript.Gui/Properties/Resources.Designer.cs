@@ -242,5 +242,11 @@ namespace AddyScript.Gui.Properties {
                 return ResourceManager.GetString("AssemblyChooserFilter", resourceCulture);
             }
         }
+        
+        internal static string OptionDialogTitle {
+            get {
+                return ResourceManager.GetString("OptionDialogTitle", resourceCulture);
+            }
+        }
     }
 }

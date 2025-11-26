@@ -19,6 +19,8 @@ public partial class OptionDialog : Window
     {
         InitializeComponent();
 
+        Title = SR.OptionDialogTitle;
+
         SearchPathsListBox.ItemsSource = SearchPaths;
         ReferencesListBox.ItemsSource = References;
     }

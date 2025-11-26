@@ -698,12 +698,16 @@ public partial class MainWindow : Window
 
     private void InsertSnippetMenuItem_OnClick(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        MessageBoxManager
+            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
+            .ShowAsync();
     }
 
     private void SurroundWithMenuItem_OnClick(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        MessageBoxManager
+            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
+            .ShowAsync();
     }
 
     private void DeleteMenuItemClick(object sender, RoutedEventArgs e)

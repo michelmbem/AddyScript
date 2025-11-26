@@ -216,4 +216,7 @@
   <data name="AssemblyChooserFilter" xml:space="preserve">
     <value>.Net assembly (*.dll)</value>
   </data>
+  <data name="OptionDialogTitle" xml:space="preserve">
+    <value>Options</value>
+  </data>
 </root>
