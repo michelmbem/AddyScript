@@ -20,7 +20,8 @@ for (; ; )
 			goto case 'jordan';
 		default:
 			goto one;
-	}}
+	}
+}
 two:
 println('so you\'re right!');
 readln();
