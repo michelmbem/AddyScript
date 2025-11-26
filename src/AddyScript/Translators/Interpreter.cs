@@ -2865,14 +2865,15 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="savedState">An <see cref="InterpreterState"/></param>
     private void RestoreState(InterpreterState savedState)
     {
-        frames = savedState.frames;
+        frames = new(savedState.frames);
         // Note: Items may be copied into a module in the future
         savedState.rootFrame.RootBlock.CopyItemsFrom(rootFrame.RootBlock);
         rootFrame = savedState.rootFrame;
         currentFrame = frames.Peek();
-        yieldedValues = savedState.yieldedValues;
+        fileName = savedState.fileName;
         misRefAct = savedState.misRefAct;
         jumpCode = savedState.jumpCode;
+        yieldedValues = savedState.yieldedValues;
         lastGoto = savedState.lastGoto;
     }
 
