@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-
 namespace AddyScript.Gui;
-
 
 internal static class AssemblyInfo
 {
