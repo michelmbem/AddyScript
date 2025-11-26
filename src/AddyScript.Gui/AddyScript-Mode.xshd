@@ -6,6 +6,7 @@
     <Color name="Preprocessor" foreground="WhiteSmoke" background="DarkRed" exampleText="#region Title" />
     <Color name="Comment" fontStyle="italic" foreground="Gray" exampleText="// comment" />
     <Color name="String" foreground="Green" exampleText="text = &quot;Hello, World!&quot;"/>
+    <Color name="StringEscapeSec" foreground="Olive" exampleText="text = 'Abigail\'s kid'"/>
     <Color name="StringInterpolation" foreground="Olive" exampleText="text = $&quot;Hello, {name}!&quot;"/>
     <Color name="Blob" foreground="DarkOliveGreen" exampleText="bytes = b'Awesome language'"/>
     <Color name="DateTime" foreground="DarkCyan" exampleText="someDate = `2025-11-26`"/>
@@ -38,7 +39,7 @@
     <!-- This is the main ruleset. -->
     <RuleSet>
         <Span color="Preprocessor">
-            <Begin>\#</Begin>
+            <Begin>^\s*\#</Begin>
             <RuleSet name="PreprocessorSet">
                 <Span> <!-- preprocessor directives that allows comments -->
                     <Begin fontWeight="bold">
@@ -80,7 +81,7 @@
             <End>"</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
             </RuleSet>
         </Span>
         
@@ -89,7 +90,7 @@
             <End>'</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
             </RuleSet>
         </Span>
         
@@ -116,7 +117,7 @@
             <End>"</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
                 <Span begin="\{\{" end=""/>
                 <!-- string interpolation -->
                 <Span begin="{" end="}" color="StringInterpolation" ruleSet=""/>
@@ -128,7 +129,7 @@
             <End>'</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
                 <Span begin="\{\{" end=""/>
                 <!-- string interpolation -->
                 <Span begin="{" end="}" color="StringInterpolation" ruleSet=""/>
@@ -140,7 +141,7 @@
             <End>"</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
                 <Span begin="\{\{" end=""/>
                 <!-- string interpolation -->
                 <Span begin="{" end="}" color="StringInterpolation" ruleSet=""/>
@@ -152,7 +153,7 @@
             <End>'</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
                 <Span begin="\{\{" end=""/>
                 <!-- string interpolation -->
                 <Span begin="{" end="}" color="StringInterpolation" ruleSet=""/>
@@ -164,7 +165,7 @@
             <End>"</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
             </RuleSet>
         </Span>
 
@@ -173,7 +174,7 @@
             <End>'</End>
             <RuleSet>
                 <!-- span for escape sequences -->
-                <Span begin="\\" end="."/>
+                <Span begin="\\" end="." color="StringEscapeSec"/>
             </RuleSet>
         </Span>
 

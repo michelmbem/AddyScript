@@ -106,7 +106,7 @@ try {
 		_ => throw 'I don\'t like negative values'
 	};
 } catch (e) {
-	println(e.name + ' : ' + e.message);
+	println($'{e.name} : {e.message}');
 }
 
 readln();
