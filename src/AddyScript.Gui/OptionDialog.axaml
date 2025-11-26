@@ -1,133 +1,100 @@
-<Window
-    x:Class="AddyScript.Gui.OptionDialog"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:i="https://github.com/projektanker/icons.avalonia"
-    Title="Options"
-    Width="550"
-    Height="450"
-    Background="{DynamicResource WindowBackground}"
-    CanResize="False"
-    WindowStartupLocation="CenterOwner">
-
-    <Grid RowDefinitions="*, Auto">
-        <TabControl Grid.Row="0">
-            <TabItem Header="Search Paths">
+<Window x:Class="AddyScript.Gui.OptionDialog"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        Title="Options"
+        Width="550"
+        Height="450"
+        Background="{DynamicResource WindowBackground}"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="*, Auto" Margin="5">
+    <TabControl Grid.Row="0">
+      <TabItem Header="Search Paths">
+        <DockPanel Margin="0,5,0,0">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, Auto">
+            <Label Grid.Column="0" Content="New directory :" VerticalAlignment="Center" />
+            <TextBox Name="NewDirectoryTextBox" Grid.Column="1" Margin="0,0,1,0" />
+            <Button Name="BrowseDirectoryButton"
+                    Grid.Column="2"
+                    i:Attached.Icon="fa-folder-open"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Browse for a directory"
+                    Click="BrowseDirectoryButtonClick" />
+            <Button Name="AddDirectoryButton"
+                    Grid.Column="3"
+                    i:Attached.Icon="fa-circle-plus"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Add to list"
+                    Click="AddDirectoryButtonClick" />
+          </Grid>
+          <ListBox Name="SearchPathsListBox" Margin="0,10,0,0">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
                 <DockPanel>
-                    <Grid
-                        Margin="0,5"
-                        ColumnDefinitions="Auto, *, Auto, Auto"
-                        DockPanel.Dock="Top">
-                        <Label
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Content="New directory :" />
-                        <TextBox
-                            Name="NewDirectoryTextBox"
-                            Grid.Column="1"
-                            Margin="1,0" />
-                        <Button
-                            Name="BrowseDirectoryButton"
-                            Grid.Column="2"
-                            VerticalAlignment="Stretch"
-                            i:Attached.Icon="fa-folder-open"
-                            Click="BrowseDirectoryButtonClick"
-                            ToolTip.Tip="Browse for a directory" />
-                        <Button
-                            Name="AddDirectoryButton"
-                            Grid.Column="3"
-                            VerticalAlignment="Stretch"
-                            i:Attached.Icon="fa-circle-plus"
-                            Click="AddDirectoryButtonClick"
-                            ToolTip.Tip="Add to list" />
-                    </Grid>
-                    <ListBox Name="SearchPathsListBox">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <Button
-                                        i:Attached.Icon="fa-circle-minus"
-                                        Click="RemoveDirectoryButtonClick"
-                                        DockPanel.Dock="Right"
-                                        ToolTip.Tip="Remove from list"/>
-                                    <TextBlock
-                                        Text="{Binding}"
-                                        VerticalAlignment="Center"
-                                        Margin="0, 0, 2, 0"/>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                  <Button i:Attached.Icon="fa-circle-minus"
+                          DockPanel.Dock="Right"
+                          ToolTip.Tip="Remove from list"
+                          Click="RemoveDirectoryButtonClick" />
+                  <TextBlock Text="{Binding}"
+                             VerticalAlignment="Center"
+                             ToolTip.Tip="{Binding}" />
                 </DockPanel>
-            </TabItem>
-            <TabItem Header="References">
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="References">
+        <DockPanel Margin="0,5,0,0">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, Auto">
+            <Label Grid.Column="0" Content="New reference :" VerticalAlignment="Center" />
+            <TextBox Name="NewReferenceTextBox" Grid.Column="1" Margin="0,0,1,0" />
+            <Button Name="BrowseAssemblyButton"
+                    Grid.Column="2"
+                    i:Attached.Icon="fa-folder-open"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Browse for an assembly"
+                    Click="BrowseAssemblyButtonClick" />
+            <Button Name="AddReferenceButton"
+                    Grid.Column="3"
+                    i:Attached.Icon="fa-circle-plus"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Add to list"
+                    Click="AddReferenceButtonClick" />
+          </Grid>
+          <ListBox Name="ReferencesListBox" Margin="0,10,0,0">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
                 <DockPanel>
-                    <Grid
-                        Margin="0,5"
-                        ColumnDefinitions="Auto, *, Auto, Auto"
-                        DockPanel.Dock="Top">
-                        <Label
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Content="New reference :" />
-                        <TextBox
-                            Name="NewReferenceTextBox"
-                            Grid.Column="1"
-                            Margin="1,0" />
-                        <Button
-                            Name="BrowseAssemblyButton"
-                            Grid.Column="2"
-                            VerticalAlignment="Stretch"
-                            i:Attached.Icon="fa-folder-open"
-                            Click="BrowseAssemblyButtonClick"
-                            ToolTip.Tip="Browse for an assembly" />
-                        <Button
-                            Name="AddReferenceButton"
-                            Grid.Column="3"
-                            VerticalAlignment="Stretch"
-                            i:Attached.Icon="fa-circle-plus"
-                            Click="AddReferenceButtonClick"
-                            ToolTip.Tip="Add to list" />
-                    </Grid>
-                    <ListBox Name="ReferencesListBox">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <Button
-                                        i:Attached.Icon="fa-circle-minus"
-                                        Click="RemoveReferenceButtonClick"
-                                        DockPanel.Dock="Right"
-                                        ToolTip.Tip="Remove from list"/>
-                                    <TextBlock
-                                        Text="{Binding}"
-                                        VerticalAlignment="Center"
-                                        Margin="0, 0, 2, 0"/>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                  <Button i:Attached.Icon="fa-circle-minus"
+                          DockPanel.Dock="Right"
+                          ToolTip.Tip="Remove from list"
+                          Click="RemoveReferenceButtonClick" />
+                  <TextBlock Text="{Binding}"
+                             VerticalAlignment="Center"
+                             ToolTip.Tip="{Binding}" />
                 </DockPanel>
-            </TabItem>
-        </TabControl>
-        <StackPanel
-            Grid.Row="1"
-            Margin="5,0"
-            FlowDirection="RightToLeft"
-            Orientation="Horizontal">
-            <Button
-                Name="CancelButton"
-                Width="80"
-                Margin="5"
-                HorizontalContentAlignment="Center"
-                Click="CancelButtonClick"
-                Content="Cancel" />
-            <Button
-                Name="OkButton"
-                Width="80"
-                Margin="5"
-                HorizontalContentAlignment="Center"
-                Click="OkButtonClick"
-                Content="OK" />
-        </StackPanel>
-    </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                FlowDirection="RightToLeft"
+                Margin="5, 10, 10, 5">
+      <Button Name="CancelButton"
+              Content="Cancel"
+              Width="100"
+              HorizontalContentAlignment="Center"
+              Margin="0, 0, 5, 0"
+              Click="CancelButtonClick" />
+      <Button Name="OkButton"
+              Content="OK"
+              Width="100"
+              HorizontalContentAlignment="Center"
+              Click="OkButtonClick" />
+    </StackPanel>
+  </Grid>
 </Window>

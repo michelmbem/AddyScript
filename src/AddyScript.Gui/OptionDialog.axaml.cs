@@ -5,8 +5,8 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using StringRes = AddyScript.Gui.Properties.Resources;
-using MBIcon = MsBox.Avalonia.Enums.Icon;
+using SR = AddyScript.Gui.Properties.Resources;
+using MBI = MsBox.Avalonia.Enums.Icon;
 
 namespace AddyScript.Gui;
 
@@ -25,11 +25,12 @@ public partial class OptionDialog : Window
 
     private async void BrowseDirectoryButtonClick(object sender, RoutedEventArgs e)
     {
-        var directories = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-        {
-            Title = "Select a folder",
-            AllowMultiple = false,
-        });
+        var directories = await StorageProvider.OpenFolderPickerAsync(
+            new FolderPickerOpenOptions
+            {
+                Title = "Select a folder",
+                AllowMultiple = false,
+            });
 
         if (directories.Count > 0)
             NewDirectoryTextBox.Text = directories[0].Path.LocalPath;
@@ -38,34 +39,53 @@ public partial class OptionDialog : Window
     private void AddDirectoryButtonClick(object sender, RoutedEventArgs e)
     {
         var newDirectory = NewDirectoryTextBox.Text;
-        
-        if (string.IsNullOrWhiteSpace(newDirectory) ||
-            SearchPaths.Contains(newDirectory)) return;
-        
+
+        if (string.IsNullOrWhiteSpace(newDirectory) || SearchPaths.Contains(newDirectory))
+            return;
+
         if (Directory.Exists(newDirectory))
+        {
             SearchPaths.Add(newDirectory);
+            NewDirectoryTextBox.Clear();
+        }
         else
-            MessageBoxManager
-                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,$"Directory '{newDirectory}' does not exist", ButtonEnum.Ok, MBIcon.Error)
+        {
+            MessageBoxManager.GetMessageBoxStandard(
+                    SR.ErrorMessageTitle,
+                    $"Directory '{newDirectory}' does not exist",
+                    ButtonEnum.Ok,
+                    MBI.Error)
                 .ShowAsync();
+        }
     }
 
-    private void RemoveDirectoryButtonClick(object sender, RoutedEventArgs e)
+    private async void RemoveDirectoryButtonClick(object sender, RoutedEventArgs e)
     {
-        if (SearchPathsListBox.SelectedIndex >= 0)
+        if (SearchPathsListBox.SelectedIndex < 0) return;
+        
+        var ans = await MessageBoxManager.GetMessageBoxStandard(
+                SR.ConfirmationBoxTitle,
+                SR.ConfirmationBoxMessage,
+                ButtonEnum.YesNo,
+                MBI.Error)
+            .ShowAsync();
+        
+        if (ans == ButtonResult.Yes)
             SearchPaths.RemoveAt(SearchPathsListBox.SelectedIndex);
     }
 
     private async void BrowseAssemblyButtonClick(object sender, RoutedEventArgs e)
     {
-        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = "Select a .Net assembly",
-            AllowMultiple = false,
-            FileTypeFilter = [
-                new FilePickerFileType(".Net assembly (*.dll)") { Patterns = ["*.dll"] }
-            ]
-        });
+        var files = await StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title = "Select a .Net assembly",
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType(".Net assembly (*.dll)") { Patterns = ["*.dll"] }
+                ]
+            });
 
         if (files.Count > 0)
             NewReferenceTextBox.Text = files[0].Path.LocalPath;
@@ -74,21 +94,38 @@ public partial class OptionDialog : Window
     private void AddReferenceButtonClick(object sender, RoutedEventArgs e)
     {
         var newReference = NewReferenceTextBox.Text;
-        
-        if (string.IsNullOrWhiteSpace(newReference) ||
-            References.Contains(newReference)) return;
-        
+
+        if (string.IsNullOrWhiteSpace(newReference) || References.Contains(newReference))
+            return;
+
         if (ScriptContext.LoadAssembly(newReference) != null)
+        {
             References.Add(newReference);
+            NewReferenceTextBox.Clear();
+        }
         else
-            MessageBoxManager
-                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,$"Could not load assembly '{newReference}'", ButtonEnum.Ok, MBIcon.Error)
+        {
+            MessageBoxManager.GetMessageBoxStandard(
+                    SR.ErrorMessageTitle,
+                    $"Could not load assembly '{newReference}'",
+                    ButtonEnum.Ok,
+                    MBI.Error)
                 .ShowAsync();
+        }
     }
 
-    private void RemoveReferenceButtonClick(object sender, RoutedEventArgs e)
+    private async void RemoveReferenceButtonClick(object sender, RoutedEventArgs e)
     {
-        if (ReferencesListBox.SelectedIndex >= 0)
+        if (ReferencesListBox.SelectedIndex < 0) return;
+        
+        var ans = await MessageBoxManager.GetMessageBoxStandard(
+                SR.ConfirmationBoxTitle,
+                SR.ConfirmationBoxMessage,
+                ButtonEnum.YesNo,
+                MBI.Error)
+            .ShowAsync();
+        
+        if (ans == ButtonResult.Yes)
             References.RemoveAt(ReferencesListBox.SelectedIndex);
     }
 

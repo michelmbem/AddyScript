@@ -24,8 +24,8 @@ public partial class MainWindow : Window
 {
     #region Fields
     
-    private const string TitleBase = "AddyScript";
-    private const string HelpLink = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
+    private const string TITLE_BASE = "AddyScript";
+    private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
     
     private readonly BraceFoldingStrategy foldingStrategy = new();
     private FoldingManager foldingManager;
@@ -88,12 +88,12 @@ public partial class MainWindow : Window
             if (string.IsNullOrEmpty(filePath))
             {
                 FileNameStatusLabel.Content = "Untitled";
-                Title = TitleBase;
+                Title = TITLE_BASE;
             }
             else
             {
                 FileNameStatusLabel.Content = value;
-                Title = $"{Path.GetFileName(value)} - {TitleBase}";
+                Title = $"{Path.GetFileName(value)} - {TITLE_BASE}";
             }
         }
     }
@@ -645,7 +645,7 @@ public partial class MainWindow : Window
 
     public void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(HelpLink) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(HELP_LINK) { UseShellExecute = true });
     }
 
     private async void ToolbarHelpAboutMenuItemClick(object sender, RoutedEventArgs e)
