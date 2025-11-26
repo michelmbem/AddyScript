@@ -23,7 +23,7 @@ public partial class MainWindow : Window
 {
     #region Fields
 
-    private const string TITLE_BASE = "AddyScript";
+    private readonly string TITLE_BASE = AssemblyInfo.Title;
     private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
 
     private readonly BraceFoldingStrategy foldingStrategy = new();

@@ -1429,14 +1429,14 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         {
             Consume(1);
 
+            // If the opening parenthesis is not followed by an identifier and equal sign,
             if (!(TryMatch(TokenID.Identifier) && LookAhead(TokenID.Equal, out int pos)))
             {
                 var valueProp = Expression();
 
                 if (valueProp != null)
                 {
-                    props.Add(new PropertyInitializer(AttributeDecl.DEFAULT_FIELD_NAME, valueProp));
-
+                    props.Add(new(AttributeDecl.DEFAULT_FIELD_NAME, valueProp));
                     if (TryMatch(TokenID.Comma)) Consume(1);
                 }
             }
@@ -1453,7 +1453,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             last = Match(TokenID.RightParenthesis);
         }
 
-        var attribute = new AttributeDecl(typeName, props.ToArray());
+        var attribute = new AttributeDecl(typeName, [.. props]);
         attribute.SetLocation(first.Start, last.End);
         return attribute;
     }

@@ -4,7 +4,7 @@ using AddyScript.Ast.Expressions;
 namespace AddyScript.Ast.Statements
 {
     /// <summary>
-    /// Attribute's deckaration, used to attach additional informations to an element in the code.
+    /// Attribute's declaration, used to attach additional informations to an element in the code.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of AttributeDecl.

@@ -19,7 +19,7 @@
     <Color name="ContextKeywords" fontWeight="bold" foreground="Teal" exampleText="__value = 2 * __key"/>
     <Color name="MethodCall" foreground="DarkViolet" exampleText="println()"/>
     <Color name="NumberLiteral" foreground="Firebrick" exampleText="3.1415f"/>
-    <Color name="Modifiers" fontWeight="bold" foreground="Maroon" exampleText="static final a = 10"/>
+    <Color name="Modifiers" fontWeight="bold" foreground="Red" exampleText="static final a = 10"/>
     <Color name="Visibility" fontWeight="bold" foreground="SaddleBrown" exampleText="public toString(fmt = '')"/>
     
     <Property name="DocCommentMarker" value="///" />
@@ -225,6 +225,7 @@
         </Keywords>
         
         <Keywords color="ContextKeywords">
+            <Word>__context</Word>
             <Word>__key</Word>
             <Word>__name</Word>
             <Word>__value</Word>
