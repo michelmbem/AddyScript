@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Xml;
 using Avalonia;
+using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Highlighting.Xshd;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
 
@@ -22,9 +26,26 @@ internal static class Program
     {
         IconProvider.Current.Register<FontAwesomeIconProvider>();
         
+        RegisterGrammar();
+        
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
+    }
+    
+    private static void RegisterGrammar()
+    {
+        using var stream = File.OpenRead("AddyScript-Mode.xshd");
+        using var reader = new XmlTextReader(stream);
+        
+        // Load the definition
+        var asHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        
+        // Register it with the highlighting manager
+        HighlightingManager.Instance.RegisterHighlighting(
+            "AddyScript",
+            [".addy"], 
+            asHighlighting);
     }
 }

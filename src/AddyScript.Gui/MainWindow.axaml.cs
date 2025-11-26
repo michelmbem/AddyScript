@@ -10,11 +10,10 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Folding;
+using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Indentation.CSharp;
-using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using TextMateSharp.Grammars;
 using SR = AddyScript.Gui.Properties.Resources;
 using MBI = MsBox.Avalonia.Enums.Icon;
 
@@ -45,10 +44,8 @@ public partial class MainWindow : Window
 
     private void InitializeStyling()
     {
-        var registryOptions = new RegistryOptions(ThemeName.LightPlus);
-        var textMateInstallation = Editor.InstallTextMate(registryOptions);
-        textMateInstallation.SetGrammar(registryOptions.GetScopeByExtension(".cs"));
-
+        Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("AddyScript");
+        
         Editor.Options.AllowToggleOverstrikeMode = true;
         Editor.Options.EnableTextDragDrop = true;
         Editor.Options.ShowBoxForControlCharacters = true;
