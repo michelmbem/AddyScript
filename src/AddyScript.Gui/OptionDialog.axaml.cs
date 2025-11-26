@@ -28,7 +28,7 @@ public partial class OptionDialog : Window
         var directories = await StorageProvider.OpenFolderPickerAsync(
             new FolderPickerOpenOptions
             {
-                Title = "Select a folder",
+                Title = SR.DirectoryChooserTitle,
                 AllowMultiple = false,
             });
 
@@ -52,7 +52,7 @@ public partial class OptionDialog : Window
         {
             MessageBoxManager.GetMessageBoxStandard(
                     SR.ErrorMessageTitle,
-                    $"Directory '{newDirectory}' does not exist",
+                    string.Format(SR.DirectoryNotFound, newDirectory),
                     ButtonEnum.Ok,
                     MBI.Error)
                 .ShowAsync();
@@ -79,11 +79,11 @@ public partial class OptionDialog : Window
         var files = await StorageProvider.OpenFilePickerAsync(
             new FilePickerOpenOptions
             {
-                Title = "Select a .Net assembly",
+                Title = SR.AssemblyChooserTitle,
                 AllowMultiple = false,
                 FileTypeFilter =
                 [
-                    new FilePickerFileType(".Net assembly (*.dll)") { Patterns = ["*.dll"] }
+                    new FilePickerFileType(SR.AssemblyChooserFilter) { Patterns = ["*.dll"] }
                 ]
             });
 
@@ -106,8 +106,8 @@ public partial class OptionDialog : Window
         else
         {
             MessageBoxManager.GetMessageBoxStandard(
-                    SR.ErrorMessageTitle,
-                    $"Could not load assembly '{newReference}'",
+                    SR.AssemblyLoadFailureTitle,
+                    string.Format(SR.AssemblyLoadFailureMessage, newReference),
                     ButtonEnum.Ok,
                     MBI.Error)
                 .ShowAsync();

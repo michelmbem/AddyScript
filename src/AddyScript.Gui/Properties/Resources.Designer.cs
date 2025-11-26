@@ -206,5 +206,41 @@ namespace AddyScript.Gui.Properties {
                 return ResourceManager.GetString("SlicingNotSupported", resourceCulture);
             }
         }
+        
+        internal static string AboutBoxTitle {
+            get {
+                return ResourceManager.GetString("AboutBoxTitle", resourceCulture);
+            }
+        }
+        
+        internal static string VersionLabel {
+            get {
+                return ResourceManager.GetString("VersionLabel", resourceCulture);
+            }
+        }
+        
+        internal static string DirectoryNotFound {
+            get {
+                return ResourceManager.GetString("DirectoryNotFound", resourceCulture);
+            }
+        }
+        
+        internal static string DirectoryChooserTitle {
+            get {
+                return ResourceManager.GetString("DirectoryChooserTitle", resourceCulture);
+            }
+        }
+        
+        internal static string AssemblyChooserTitle {
+            get {
+                return ResourceManager.GetString("AssemblyChooserTitle", resourceCulture);
+            }
+        }
+        
+        internal static string AssemblyChooserFilter {
+            get {
+                return ResourceManager.GetString("AssemblyChooserFilter", resourceCulture);
+            }
+        }
     }
 }

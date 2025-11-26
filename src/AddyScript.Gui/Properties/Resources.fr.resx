@@ -189,4 +189,19 @@
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>Le type {0} ne prend pas en charge l'extration de tranches</value>
   </data>
+  <data name="AboutBoxTitle" xml:space="preserve">
+    <value>À propos d'{0}</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>Le répertoire '{0}' n'existe pas</value>
+  </data>
+  <data name="DirectoryChooserTitle" xml:space="preserve">
+    <value>Choisir un dossier</value>
+  </data>
+  <data name="AssemblyChooserTitle" xml:space="preserve">
+    <value>Choisir un assembly .Net</value>
+  </data>
+  <data name="AssemblyChooserFilter" xml:space="preserve">
+    <value>Assembly .Net (*.dll)</value>
+  </data>
 </root>

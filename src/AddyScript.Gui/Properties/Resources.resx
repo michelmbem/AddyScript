@@ -198,4 +198,22 @@
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>The {0} type does not have support for slice extraction</value>
   </data>
+  <data name="AboutBoxTitle" xml:space="preserve">
+    <value>About {0}</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>Directory '{0}' does not exist</value>
+  </data>
+  <data name="DirectoryChooserTitle" xml:space="preserve">
+    <value>Select a folder</value>
+  </data>
+  <data name="AssemblyChooserTitle" xml:space="preserve">
+    <value>Select a .Net assembly</value>
+  </data>
+  <data name="AssemblyChooserFilter" xml:space="preserve">
+    <value>.Net assembly (*.dll)</value>
+  </data>
 </root>

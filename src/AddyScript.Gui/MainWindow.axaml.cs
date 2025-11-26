@@ -15,28 +15,28 @@ using AvaloniaEdit.TextMate;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using TextMateSharp.Grammars;
-using StringRes = AddyScript.Gui.Properties.Resources;
-using MBIcon = MsBox.Avalonia.Enums.Icon;
+using SR = AddyScript.Gui.Properties.Resources;
+using MBI = MsBox.Avalonia.Enums.Icon;
 
 namespace AddyScript.Gui;
 
 public partial class MainWindow : Window
 {
     #region Fields
-    
+
     private const string TITLE_BASE = "AddyScript";
     private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
-    
+
     private readonly BraceFoldingStrategy foldingStrategy = new();
     private FoldingManager foldingManager;
 
     private string filePath;
     private bool saved;
-    
+
     #endregion
 
     #region Initialization
-    
+
     public MainWindow()
     {
         InitializeComponent();
@@ -45,10 +45,10 @@ public partial class MainWindow : Window
 
     private void InitializeStyling()
     {
-        var registryOptions = new RegistryOptions(ThemeName.LightPlus); 
-        var textMateInstallation = Editor.InstallTextMate(registryOptions); 
+        var registryOptions = new RegistryOptions(ThemeName.LightPlus);
+        var textMateInstallation = Editor.InstallTextMate(registryOptions);
         textMateInstallation.SetGrammar(registryOptions.GetScopeByExtension(".cs"));
-        
+
         Editor.Options.AllowToggleOverstrikeMode = true;
         Editor.Options.EnableTextDragDrop = true;
         Editor.Options.ShowBoxForControlCharacters = true;
@@ -66,7 +66,7 @@ public partial class MainWindow : Window
     {
         if (foldingManager != null)
             FoldingManager.Uninstall(foldingManager);
-        
+
         foldingManager = FoldingManager.Install(Editor.TextArea);
         foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
     }
@@ -202,15 +202,17 @@ public partial class MainWindow : Window
 
     private async Task OpenAsync()
     {
-        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = StringRes.OpenFileDialogTitle,
-            AllowMultiple = true,
-            FileTypeFilter = [
-                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
-                FilePickerFileTypes.All
-            ]
-        });
+        var files = await StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title = SR.OpenFileDialogTitle,
+                AllowMultiple = true,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType(SR.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                    FilePickerFileTypes.All
+                ]
+            });
 
         if (files.Count > 0)
         {
@@ -231,10 +233,11 @@ public partial class MainWindow : Window
     {
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = StringRes.SaveFileDialogTitle,
+            Title = SR.SaveFileDialogTitle,
             DefaultExtension = ".add",
-            FileTypeChoices = [
-                new FilePickerFileType(StringRes.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+            FileTypeChoices =
+            [
+                new FilePickerFileType(SR.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
                 FilePickerFileTypes.All
             ]
         });
@@ -249,19 +252,20 @@ public partial class MainWindow : Window
         {
             var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = StringRes.ExportXmlTitle,
+                Title = SR.ExportXmlTitle,
                 DefaultExtension = ".xml",
-                FileTypeChoices = [
-                    new FilePickerFileType(StringRes.XmlFileFilter) { Patterns = ["*.xml"] },
+                FileTypeChoices =
+                [
+                    new FilePickerFileType(SR.XmlFileFilter) { Patterns = ["*.xml"] },
                     FilePickerFileTypes.All
                 ],
                 SuggestedFileName = !string.IsNullOrEmpty(filePath)
-                                  ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
-                                  : "untitled.xml"
+                    ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
+                    : "untitled.xml"
             });
 
             if (file is null) return;
-            
+
             var program = ScriptEngine.ParseString(Editor.Text);
             ScriptEngine.ExportXml(program, file.Path.LocalPath);
             Process.Start(new ProcessStartInfo(file.Path.LocalPath) { UseShellExecute = true });
@@ -269,7 +273,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             await MessageBoxManager
-                .GetMessageBoxStandard(StringRes.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBIcon.Error)
+                .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
                 .ShowAsync();
         }
     }
@@ -281,7 +285,7 @@ public partial class MainWindow : Window
     private async Task<bool> PromptToSave()
     {
         var answer = await MessageBoxManager
-            .GetMessageBoxStandard(Title!, StringRes.PromptToSave, ButtonEnum.YesNoCancel, MBIcon.Question)
+            .GetMessageBoxStandard(Title!, SR.PromptToSave, ButtonEnum.YesNoCancel, MBI.Question)
             .ShowAsync();
 
         switch (answer)
@@ -316,8 +320,8 @@ public partial class MainWindow : Window
         ToolbarRedoButton.IsEnabled = RedoMenuItem.IsEnabled = Editor.CanRedo;
         ToolbarRunButton.IsEnabled = Editor.Document.TextLength > 0;
 
-        TextLengthStatusLabel.Content = string.Format(StringRes.TextLength, Editor.Document.TextLength);
-        
+        TextLengthStatusLabel.Content = string.Format(SR.TextLength, Editor.Document.TextLength);
+
         if (!Editor.CanUndo) Saved = true;
     }
 
@@ -329,15 +333,20 @@ public partial class MainWindow : Window
     {
         ToolbarCutButton.IsEnabled = CutMenuItem.IsEnabled = Editor.CanCut;
         ToolbarCopyButton.IsEnabled = CopyMenuItem.IsEnabled = Editor.CanCopy;
-        
-        CaretStatusLabel.Content = string.Format(StringRes.CaretStatus,
-            Editor.TextArea.Caret.Line, Editor.TextArea.Caret.Column, Editor.TextArea.Selection.Length);
+
+        CaretStatusLabel.Content = string.Format(
+            SR.CaretStatus,
+            Editor.TextArea.Caret.Line,
+            Editor.TextArea.Caret.Column,
+            Editor.TextArea.Selection.Length);
     }
 
     private void OpenSearchPanel(bool replaceMode)
     {
         var selection = Editor.TextArea.Selection;
-        Editor.SearchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
+        Editor.SearchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline
+            ? string.Empty
+            : selection.GetText();
         Editor.SearchPanel.IsReplaceMode = replaceMode;
         Editor.SearchPanel.Open();
     }
@@ -346,11 +355,11 @@ public partial class MainWindow : Window
     {
         Console.WriteLine($@"{errorMessage} @{start}:{end}");
     }
-    
+
     #endregion
 
     #region Event handlers
-    
+
     #region Window events
 
     private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -476,7 +485,7 @@ public partial class MainWindow : Window
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
         MessageBoxManager
-            .GetMessageBoxStandard(Title!, StringRes.MissingFunctionality, ButtonEnum.Ok, MBIcon.Warning)
+            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
             .ShowAsync();
     }
 
@@ -518,7 +527,7 @@ public partial class MainWindow : Window
     private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
     {
         var selection = Editor.TextArea.Selection;
-        
+
         if (!selection.IsMultiline) return;
 
         for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
@@ -532,7 +541,7 @@ public partial class MainWindow : Window
     private void ToolbarIndentButtonClick(object sender, RoutedEventArgs e)
     {
         var selection = Editor.TextArea.Selection;
-        
+
         if (!selection.IsMultiline) return;
 
         for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
@@ -545,7 +554,7 @@ public partial class MainWindow : Window
     private void ToolbarCommentButtonClick(object sender, RoutedEventArgs e)
     {
         var selection = Editor.TextArea.Selection;
-        
+
         if (!selection.IsMultiline) return;
 
         for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
@@ -558,7 +567,7 @@ public partial class MainWindow : Window
     private void ToolbarUncommentButtonClick(object sender, RoutedEventArgs e)
     {
         var selection = Editor.TextArea.Selection;
-        
+
         if (!selection.IsMultiline) return;
 
         for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
@@ -617,12 +626,13 @@ public partial class MainWindow : Window
             var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
             var errorMessage = logReader.ReadLine();
-            ReportError(errorMessage, start, end);;
+            ReportError(errorMessage, start, end);
+            ;
         }
         catch (Exception ex)
         {
             MessageBoxManager
-                .GetMessageBoxStandard(StringRes.ErrorMessageTitle,ex.Message, ButtonEnum.Ok, MBIcon.Error)
+                .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
                 .ShowAsync();
         }
         finally
@@ -653,9 +663,9 @@ public partial class MainWindow : Window
         var aboutBox = new AboutBox();
         await aboutBox.ShowDialog<bool>(this);
     }
-    
+
     #endregion
-    
+
     #region Editor events
 
     private void EditorCaretPositionChanged(object sender, EventArgs e)
@@ -684,9 +694,9 @@ public partial class MainWindow : Window
     {
         Console.WriteLine($@"Text entered: {e.Text}");
     }
-    
+
     #endregion
-    
+
     #region Editor menu events
 
     private void InsertSnippetMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -720,12 +730,12 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             MessageBoxManager
-                .GetMessageBoxStandard(Title!, ex.Message, ButtonEnum.Ok, MBIcon.Warning)
+                .GetMessageBoxStandard(Title!, ex.Message, ButtonEnum.Ok, MBI.Warning)
                 .ShowAsync();
         }
     }
-    
+
     #endregion
-    
+
     #endregion
 }
