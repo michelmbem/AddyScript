@@ -45,7 +45,7 @@ internal static class Program
         // Register it with the highlighting manager
         HighlightingManager.Instance.RegisterHighlighting(
             "AddyScript",
-            [".addy"], 
+            [".add", ".txt"], 
             asHighlighting);
     }
 }

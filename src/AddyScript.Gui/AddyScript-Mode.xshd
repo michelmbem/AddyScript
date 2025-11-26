@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <SyntaxDefinition name="AddyScript"
-				  extensions=".addy"
+				  extensions=".add"
 				  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
 	<Color name="Comment" foreground="Green" exampleText="// comment" />
 	<Color name="String" foreground="Blue" exampleText="string text = &quot;Hello, World!&quot;"/>
