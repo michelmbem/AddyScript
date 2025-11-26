@@ -5,8 +5,9 @@
         Title="Options"
         Width="550"
         Height="450"
+        WindowStartupLocation="CenterOwner"
         Background="{DynamicResource WindowBackground}"
-        WindowStartupLocation="CenterOwner">
+        Icon="/Assets/Images/Icons/AddyScript.ico">
   <Grid RowDefinitions="*, Auto" Margin="5">
     <TabControl Grid.Row="0">
       <TabItem Header="Search Paths">
