@@ -2,12 +2,15 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AddyScript.Gui.CodeCompletion;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Folding;
 using AvaloniaEdit.Highlighting;
@@ -28,6 +31,7 @@ public partial class MainWindow : Window
 
     private readonly BraceFoldingStrategy foldingStrategy = new();
     private FoldingManager foldingManager;
+    private CompletionWindow completionWindow;
 
     private string filePath;
     private bool saved;
@@ -57,6 +61,35 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.TextEntering += EditorTextEntering;
         Editor.TextArea.TextEntered += EditorTextEntered;
+    }
+
+    private void InitializeCodeCompletion()
+    {
+        completionWindow = new CompletionWindow(Editor.TextArea);
+        var completionData = completionWindow.CompletionList.CompletionData;
+        
+        // Keywords menu
+        string keywords = @"
+                abs?3 abstract?0 acos?3 as?0 asin?3 atan?3 atan2?3 blob?0 bool?1 break?0 case?0 catch?0 ceil?3 chr?3
+                class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
+                default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0
+                float?1 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1 is?4 list?1 log?3
+                log10?3 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2 min?3 MINDATE?2 MINFLOAT?2 MININT?2
+                NAN?2 new?4 NEWLINE?2 NINFINITY?2 not?0 now?3 null?2 object?1 operator?0 ord?3 pack?3 PI?2 PINFINITY?2 print?3
+                println?3 private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5
+                readln?3 resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1
+                super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 tuple?0 typeof?4 unpack?3 var?0 void?1 while?0
+                with?0 write?5 yield?0
+            ";
+
+        foreach (string keyword in Regex.Split(keywords, @"\s+"))
+        {
+            if (keyword.Length <= 0) continue;
+
+            string[] parts = keyword.Split('?');
+            int imageIndex = int.Parse(parts[1]);
+            completionData.Add(new KeywordData(parts[0], imageIndex));
+        }
     }
 
     private void InitializeFolding()
@@ -122,10 +155,7 @@ public partial class MainWindow : Window
     /// </summary>
     /// <param name="arg">The string to escape</param>
     /// <returns><paramref name="arg"/> wrapped with double quotes with duplicated double quotes inside</returns>
-    private static string EscapeCmdLineArg(string arg)
-    {
-        return $"\"{arg.Replace("\"", "\"\"")}\"";
-    }
+    private static string EscapeCmdLineArg(string arg) => $"\"{arg.Replace("\"", "\"\"")}\"";
 
     /// <summary>
     /// Checks if a <see cref="KeyEventArgs"/> instance matches the given configuration.
@@ -134,32 +164,28 @@ public partial class MainWindow : Window
     /// <param name="key">The expected <see cref="Key"/> member</param>
     /// <param name="modifiers">Tells whether one or any of the Control/Alt/System/Shift keys should be pressed or not</param>
     /// <returns><b>true</b> is <paramref name="e"/> matches the configuration. <b>false</b> otherwise</returns>
-    private static bool IsHotKey(KeyEventArgs e, Key key, KeyModifiers modifiers = KeyModifiers.None)
-    {
-        return e.Key == key && (e.KeyModifiers & modifiers) == modifiers;
-    }
+    private static bool IsHotKey(KeyEventArgs e, Key key, KeyModifiers modifiers = KeyModifiers.None) =>
+        e.Key == key && (e.KeyModifiers & modifiers) == modifiers;
 
     /// <summary>
     /// Checks if a character is a brace in the broad sense of the word.
     /// </summary>
     /// <param name="c">The character to test</param>
     /// <returns>A boolean</returns>
-    private static bool IsBrace(int c)
+    private static bool IsBrace(int c) => c switch
     {
-        return c switch
-        {
-            '(' or ')' or '[' or ']' or '{' or '}' => true,
-            _ => false,
-        };
-    }
+        '(' or ')' or '[' or ']' or '{' or '}' => true,
+        _ => false,
+    };
 
     /// <summary>
     /// Resets the environment.
     /// </summary>
     public void Reset()
     {
-        Editor.Document = new TextDocument();
-        Editor.Document.Changed += EditorDocumentChanged;
+        var document = new TextDocument();
+        document.Changed += EditorDocumentChanged;
+        Editor.Document = document;
         FilePath = null;
         Saved = true;
         InitializeFolding();
@@ -172,8 +198,9 @@ public partial class MainWindow : Window
     /// <param name="path"></param>
     public void Open(string path)
     {
-        Editor.Document = new TextDocument(File.ReadAllText(path));
-        Editor.Document.Changed += EditorDocumentChanged;
+        var document = new TextDocument(File.ReadAllText(path));
+        document.Changed += EditorDocumentChanged;
+        Editor.Document = document;
         FilePath = path;
         Saved = true;
         InitializeFolding();
@@ -338,6 +365,16 @@ public partial class MainWindow : Window
             Editor.TextArea.Selection.Length);
     }
 
+    /// <summary>
+    /// Verifies that a given position is between the boundaries of a comment or a string.
+    /// </summary>
+    /// <param name="position">The given position</param>
+    /// <returns><b>true</b> if the caret is in a comment or a string literal. <b>false</b> otherwise</returns>
+    private bool InCommentOrString(int position)
+    {
+        return false;
+    }
+
     private void OpenSearchPanel(bool replaceMode)
     {
         var selection = Editor.TextArea.Selection;
@@ -350,6 +387,7 @@ public partial class MainWindow : Window
 
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
+        // TODO: Highlight the error in the editor
         Console.WriteLine($@"{errorMessage} @{start}:{end}");
     }
 
@@ -364,7 +402,9 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.AwaitWithPriority(
             new Task(() => ToolbarPasteButton.IsEnabled = Editor.CanPaste),
             DispatcherPriority.ApplicationIdle);
-
+        
+        InitializeCodeCompletion();
+        
         Editor.TextArea.Focus();
     }
 
@@ -383,68 +423,14 @@ public partial class MainWindow : Window
 
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
-        if (IsHotKey(e, Key.N, KeyModifiers.Control))
+        if (IsHotKey(e, Key.I, KeyModifiers.Meta))
         {
-            ToolbarNewButtonClick(null, null);
+            InsertSnippetMenuItemClick(null, null);
             e.Handled = true;
         }
-        else if (IsHotKey(e, Key.O, KeyModifiers.Control))
+        else if (IsHotKey(e, Key.I, KeyModifiers.Meta | KeyModifiers.Shift))
         {
-            ToolbarOpenButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.S, KeyModifiers.Control))
-        {
-            ToolbarSaveButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.P, KeyModifiers.Control))
-        {
-            ToolbarPrintButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.F, KeyModifiers.Control))
-        {
-            ToolbarFindButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.R, KeyModifiers.Control))
-        {
-            ToolbarReplaceButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.OemMinus, KeyModifiers.Control))
-        {
-            ToolbarOutdentButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.OemPlus, KeyModifiers.Control))
-        {
-            ToolbarIndentButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control))
-        {
-            ToolbarCommentButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.Divide, KeyModifiers.Control | KeyModifiers.Shift))
-        {
-            ToolbarUncommentButtonClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.F5, KeyModifiers.None))
-        {
-            if (ToolbarRunButton.IsEnabled)
-                ToolbarRunButtonClick(null, null);
-            else
-                Console.Beep();
-
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.F1, KeyModifiers.None))
-        {
-            ToolbarHelpButtonClick(null, null);
+            SurroundWithMenuItemClick(null, null);
             e.Handled = true;
         }
     }
@@ -689,21 +675,38 @@ public partial class MainWindow : Window
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($@"Text entered: {e.Text}");
+        Console.WriteLine($"Text entered: {e.Text}");
+        if (InCommentOrString(Editor.CaretOffset)) return;
+
+        if (Regex.IsMatch(e.Text, @"^[a-zA-Z_]$"))
+        {
+            Console.WriteLine("Word character entered");
+            var keywords = completionWindow.CompletionList.CompletionData;
+            foreach (var keyword in keywords)
+                if (keyword.Text.StartsWith(e.Text))
+                {
+                    Console.WriteLine($"Matches with keyword: {keyword.Text}");
+                    completionWindow.Show();
+                    return;
+                }
+
+            if (completionWindow.IsOpen) completionWindow.Close();
+        }
+        // TODO: else try to show calltip
     }
 
     #endregion
 
     #region Editor menu events
 
-    private void InsertSnippetMenuItem_OnClick(object sender, RoutedEventArgs e)
+    private void InsertSnippetMenuItemClick(object sender, RoutedEventArgs e)
     {
         MessageBoxManager
             .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
             .ShowAsync();
     }
 
-    private void SurroundWithMenuItem_OnClick(object sender, RoutedEventArgs e)
+    private void SurroundWithMenuItemClick(object sender, RoutedEventArgs e)
     {
         MessageBoxManager
             .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
