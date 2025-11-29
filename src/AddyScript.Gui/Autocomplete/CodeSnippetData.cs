@@ -7,9 +7,9 @@ using System.Collections.Generic;
 namespace AddyScript.Gui.Autocomplete;
 
 internal class CodeSnippetData(string title, string snippet, string description) :
-    AbstractCompletionData(SNIPPET_ICON, title, snippet, description)
+    AbstractCompletionData(SnippetIcon, title, snippet, description)
 {
-    private static readonly IImage SNIPPET_ICON = ImageFactory.LoadFontIcon("fa-code");
+    private static readonly IImage SnippetIcon = ImageFactory.LoadFontIcon("fa-code");
 
     static CodeSnippetData()
     {

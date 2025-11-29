@@ -90,7 +90,7 @@
                     i:Attached.Icon="fa-comment"
                     ToolTip.Tip="Comment"
                     HotKey="Meta+K"
-                    Click="ToolbarIndentButtonClick" />
+                    Click="ToolbarCommentButtonClick" />
             <Button Name="ToolbarUncommentButton"
                     i:Attached.Icon="fa-comment-slash"
                     ToolTip.Tip="Uncomment"

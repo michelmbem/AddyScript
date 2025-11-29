@@ -1,17 +1,3 @@
-using AddyScript.Gui.Autocomplete;
-using AddyScript.Gui.CallTips;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-using AvaloniaEdit.CodeCompletion;
-using AvaloniaEdit.Document;
-using AvaloniaEdit.Folding;
-using AvaloniaEdit.Highlighting;
-using AvaloniaEdit.Indentation.CSharp;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +5,23 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AddyScript.Gui.Autocomplete;
+using AddyScript.Gui.CallTips;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using AvaloniaEdit;
+using AvaloniaEdit.CodeCompletion;
+using AvaloniaEdit.Document;
+using AvaloniaEdit.Editing;
+using AvaloniaEdit.Folding;
+using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Indentation.CSharp;
+using AvaloniaEdit.Search;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using MBI = MsBox.Avalonia.Enums.Icon;
 using SR = AddyScript.Gui.Properties.Resources;
 
@@ -32,13 +35,11 @@ public partial class MainWindow : Window
     private static readonly string TITLE_BASE = AssemblyInfo.Title;
 
     private readonly BraceFoldingStrategy foldingStrategy = new();
-    private readonly Stack<CallTipInfo> callTipInfos = [];
+    private readonly Stack<CallTipInfo> callTipStack = [];
 
     private FoldingManager foldingManager;
-    private CompletionWindow keywordMenu;
-    private CompletionWindow snippetMenu;
-    private CompletionWindow surroundMenu;
-    private OverloadInsightWindow callTipWindow;
+    private CompletionWindow completionWindow;
+    private OverloadInsightWindow insightWindow;
 
     private string filePath;
     private bool saved;
@@ -57,17 +58,19 @@ public partial class MainWindow : Window
     {
         Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("AddyScript");
         
-        Editor.Options.AllowToggleOverstrikeMode = true;
-        Editor.Options.EnableTextDragDrop = true;
-        Editor.Options.ShowBoxForControlCharacters = true;
-        Editor.Options.ColumnRulerPositions = [80, 120];
-        Editor.Options.HighlightCurrentLine = true;
+        TextEditorOptions options = Editor.Options;
+        options.AllowToggleOverstrikeMode = true;
+        options.EnableTextDragDrop = true;
+        options.ShowBoxForControlCharacters = true;
+        options.ColumnRulerPositions = [80, 120];
+        options.HighlightCurrentLine = true;
 
-        Editor.TextArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
-        Editor.TextArea.Caret.PositionChanged += EditorCaretPositionChanged;
-        Editor.TextArea.SelectionChanged += EditorSelectionChanged;
-        Editor.TextArea.TextEntering += EditorTextEntering;
-        Editor.TextArea.TextEntered += EditorTextEntered;
+        TextArea textArea = Editor.TextArea;
+        textArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
+        textArea.Caret.PositionChanged += EditorCaretPositionChanged;
+        textArea.SelectionChanged += EditorSelectionChanged;
+        textArea.TextEntering += EditorTextEntering;
+        textArea.TextEntered += EditorTextEntered;
     }
 
     private void InitializeFolding()
@@ -127,7 +130,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// Gets the current CallTipInfo
     /// </summary>
-    private CallTipInfo CurrentCallTipInfo => callTipInfos.Peek();
+    private CallTipInfo CurrentCallTip => callTipStack.Peek();
 
     #endregion
 
@@ -160,13 +163,6 @@ public partial class MainWindow : Window
         '(' or ')' or '[' or ']' or '{' or '}' => true,
         _ => false,
     };
-
-    /// <summary>
-    /// Checks if a completion window is open.
-    /// </summary>
-    /// <param name="window">The completion window to check</param>
-    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
-    private static bool IsCompletionWindowOpen(CompletionWindow window) => window?.IsOpen == true;
 
     /// <summary>
     /// Resets the environment.
@@ -208,12 +204,18 @@ public partial class MainWindow : Window
         Saved = true;
     }
 
+    /// <summary>
+    /// Closes the window if the document is empty and unchanged.
+    /// </summary>
     private void CloseIfEmpty()
     {
         if (Saved && Editor.Document.TextLength <= 0)
             Close();
     }
 
+    /// <summary>
+    /// Displays an Open File dialog and opens the selected file.
+    /// </summary>
     private async Task OpenAsync()
     {
         var files = await StorageProvider.OpenFilePickerAsync(
@@ -235,6 +237,9 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Saves the script. If no file is associated, displays a Save File dialog.
+    /// </summary>
     private async Task SaveAsync()
     {
         if (string.IsNullOrEmpty(filePath))
@@ -243,6 +248,9 @@ public partial class MainWindow : Window
             Save(FilePath);
     }
 
+    /// <summary>
+    /// Displays a Save File dialog and saves the script to the selected file.
+    /// </summary>
     private async Task SaveAsAsync()
     {
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
@@ -260,6 +268,9 @@ public partial class MainWindow : Window
             Save(file.Path.LocalPath);
     }
 
+    /// <summary>
+    /// Exports the script as an XML representation.
+    /// </summary>
     private async Task ExportXmlAsync()
     {
         try
@@ -439,29 +450,35 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Opens a completion window with the given data.
+    /// Opens the completion window with the given data.
     /// </summary>
     /// <typeparam name="T">The type of the completion data</typeparam>
-    /// <param name="window">The completion window to open</param>
-    /// <param name="data">The completion data to display in the menu</param>
-    private void ShowCompletionWindow<T>(ref CompletionWindow window, List<T> data)
+    /// <param name="completionData">The completion data to display in the menu</param>
+    private void ShowCompletionWindow<T>(List<T> completionData)
         where T : ICompletionData
     {
-        window = new CompletionWindow(Editor.TextArea);
+        completionWindow = new CompletionWindow(Editor.TextArea);
         
-        foreach (ICompletionData item in data)
-            window.CompletionList.CompletionData.Add(item);
+        foreach (var dataItem in completionData)
+            completionWindow.CompletionList.CompletionData.Add(dataItem);
 
-        window.Show();
+        completionWindow.Closed += (s, e) => completionWindow = null;
+        completionWindow.Show();
     }
+
+    /// <summary>
+    /// Checks if the completion window is open.
+    /// </summary>
+    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
+    private bool IsCompletionWindowOpen() => completionWindow?.IsOpen == true;
 
     /// <summary>
     /// Pushes a new CallTipInfo on top of the stack.
     /// </summary>
     /// <param name="callTip">The new CallTipInfo</param>
-    private void PushCallTipInfo(CallTipInfo callTip)
+    private void PushCallTip(CallTipInfo callTip)
     {
-        callTipInfos.Push(callTip);
+        callTipStack.Push(callTip);
         callTip.Reset();
     }
 
@@ -469,10 +486,10 @@ public partial class MainWindow : Window
     /// Pops a CallTipInfo from the stack.
     /// </summary>
     /// <returns><b>true</b> if there is still at least one CallTipInfo in the stack. <b>false</b> otherwise</returns>
-    private bool PopCallTipInfo()
+    private bool PopCallTip()
     {
-        callTipInfos.Pop();
-        return callTipInfos.Count > 0;
+        callTipStack.Pop();
+        return callTipStack.Count > 0;
     }
 
     /// <summary>
@@ -480,13 +497,13 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowCallTip()
     {
-        callTipWindow = new OverloadInsightWindow(Editor.TextArea)
+        insightWindow = new OverloadInsightWindow(Editor.TextArea)
         {
-            Provider = new SimpleOverloadProvider(CurrentCallTipInfo)
+            Provider = new SimpleOverloadProvider(CurrentCallTip)
         };
 
-        callTipWindow.Closed += (s, e) =>  callTipWindow = null;
-        callTipWindow.Show();
+        insightWindow.Closed += (s, e) =>  insightWindow = null;
+        insightWindow.Show();
     }
 
     /// <summary>
@@ -495,12 +512,11 @@ public partial class MainWindow : Window
     /// <param name="replaceMode">Whether the search panel should be open in replace mode or not</param>
     private void OpenSearchPanel(bool replaceMode)
     {
+        var searchPanel = SearchPanel.Install(Editor);
         var selection = Editor.TextArea.Selection;
-        Editor.SearchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline
-            ? string.Empty
-            : selection.GetText();
-        Editor.SearchPanel.IsReplaceMode = replaceMode;
-        Editor.SearchPanel.Open();
+        searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
+        searchPanel.IsReplaceMode = replaceMode;
+        searchPanel.Open();
     }
 
     /// <summary>
@@ -523,8 +539,8 @@ public partial class MainWindow : Window
 
     private void WindowLoaded(object sender, RoutedEventArgs e)
     {
-        Dispatcher.UIThread.AwaitWithPriority(
-            new Task(() => ToolbarPasteButton.IsEnabled = Editor.CanPaste),
+        Dispatcher.UIThread.Post(
+            () => ToolbarPasteButton.IsEnabled = Editor.CanPaste,
             DispatcherPriority.ApplicationIdle);
         
         Editor.TextArea.Focus();
@@ -553,6 +569,11 @@ public partial class MainWindow : Window
         else if (IsHotKey(e, Key.I, KeyModifiers.Meta | KeyModifiers.Shift))
         {
             SurroundWithMenuItemClick(null, null);
+            e.Handled = true;
+        }
+        else if (IsHotKey(e, Key.R, KeyModifiers.Meta))
+        {
+            ReformatMenuItemClick(null, null);
             e.Handled = true;
         }
     }
@@ -688,7 +709,9 @@ public partial class MainWindow : Window
         /****************************************************************************
          * Parsing and running the script is delegated to asis.
          * *************************************************************************/
+        
         string scriptPath;
+        
         if (string.IsNullOrEmpty(filePath))
         {
             scriptPath = Path.ChangeExtension(Path.GetTempFileName(), ".add");
@@ -700,8 +723,7 @@ public partial class MainWindow : Window
             if (!Saved) Save(scriptPath);
         }
 
-        var argsBuilder = new StringBuilder();
-        argsBuilder.Append("-f ").Append(EscapeCmdLineArg(scriptPath));
+        var argsBuilder = new StringBuilder().Append("-f ").Append(EscapeCmdLineArg(scriptPath));
 
         foreach (var directory in App.SearchPaths)
             argsBuilder.Append(" -d ").Append(EscapeCmdLineArg(directory));
@@ -732,7 +754,6 @@ public partial class MainWindow : Window
 
             var errorMessage = logReader.ReadLine();
             ReportError(errorMessage, start, end);
-            ;
         }
         catch (Exception ex)
         {
@@ -807,18 +828,16 @@ public partial class MainWindow : Window
 
         if (char.IsLetterOrDigit(firstChar))
         {
-            if (IsCompletionWindowOpen(keywordMenu)) return;
+            if (IsCompletionWindowOpen()) return;
 
             var matchedKeywords = KeywordData.AllMatching(GetCurrentWord());
             if (matchedKeywords.Count == 0) return;
 
-            ShowCompletionWindow(ref keywordMenu, matchedKeywords);
-            keywordMenu.Closed += (s, a) => keywordMenu = null;
+            ShowCompletionWindow(matchedKeywords);
         }
         else
         {
-            if (IsCompletionWindowOpen(keywordMenu))
-                keywordMenu.Close();
+            if (IsCompletionWindowOpen()) completionWindow.Close();
 
             switch (firstChar)
             {
@@ -826,20 +845,20 @@ public partial class MainWindow : Window
                 {
                     string wordAtLeft = GetWordAtLeft();
                     if (!CallTipProvider.IsDefined(wordAtLeft)) return;
-                    PushCallTipInfo(CallTipProvider.GetCallTipInfo(wordAtLeft));
+                    PushCallTip(CallTipProvider.GetCallTipInfo(wordAtLeft));
                     ShowCallTip();
                     return;
                 }
                 case ',':
-                    if (callTipInfos.Count == 0) return;
-                    callTipWindow.Close();
-                    if (!CurrentCallTipInfo.NextParameter()) return;
+                    if (callTipStack.Count == 0) return;
+                    insightWindow.Close();
+                    if (!CurrentCallTip.NextParameter()) return;
                     ShowCallTip();
                     return;
                 case ')':
-                    if (callTipInfos.Count == 0) return;
-                    callTipWindow.Close();
-                    if (!PopCallTipInfo()) return;
+                    if (callTipStack.Count == 0) return;
+                    insightWindow.Close();
+                    if (!PopCallTip()) return;
                     ShowCallTip();
                     return;
             }
@@ -852,14 +871,12 @@ public partial class MainWindow : Window
 
     private void InsertSnippetMenuItemClick(object sender, RoutedEventArgs e)
     {
-        ShowCompletionWindow(ref snippetMenu, CodeSnippetData.All);
-        snippetMenu.Closed += (sender, args) => snippetMenu = null;
+        ShowCompletionWindow(CodeSnippetData.All);
     }
 
     private void SurroundWithMenuItemClick(object sender, RoutedEventArgs e)
     {
-        ShowCompletionWindow(ref surroundMenu, SurroundCodeData.All);
-        surroundMenu.Closed += (sender, args) => surroundMenu = null;
+        ShowCompletionWindow(SurroundCodeData.All);
     }
 
     private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
