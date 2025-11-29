@@ -4,11 +4,12 @@ using System.Text;
 
 namespace AddyScript.Gui.CallTips;
 
-public class ParameterInfo(string text, bool infinite)
+internal class ParameterInfo(string text, bool infinite)
 {
-    ParameterInfo(Parameter parameter) :
+    public ParameterInfo(Parameter parameter) :
         this(ParameterText(parameter), parameter.VaList)
-    { }
+    {
+    }
 
     public string Text { get; private init; } = text;
 
@@ -31,13 +32,13 @@ public class ParameterInfo(string text, bool infinite)
             switch (parameter.DefaultValue.Class.ClassID)
             {
                 case ClassID.Date:
-                    textBuilder.AppendFormat(" = `{0}`", parameter.DefaultValue);
+                    textBuilder.Append($" = `{parameter.DefaultValue}`");
                     break;
                 case ClassID.String:
-                    textBuilder.AppendFormat(" = '{0}'", parameter.DefaultValue);
+                    textBuilder.Append($" = \"{parameter.DefaultValue}\"");
                     break;
                 default:
-                    textBuilder.AppendFormat(" = {0}", parameter.DefaultValue);
+                    textBuilder.Append($" = {parameter.DefaultValue}");
                     break;
             }
 

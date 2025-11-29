@@ -5,18 +5,18 @@ namespace AddyScript.Gui;
 
 internal static class AssemblyInfo
 {
-    internal static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
+    private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
 
-    internal static string Version => ExecutingAssembly.GetName().Version!.ToString();
+    public static string Version => ExecutingAssembly.GetName().Version!.ToString();
 
-    internal static T GetAssemblyAttribute<T>()
+    private static T GetAssemblyAttribute<T>()
     {
         var attributes = ExecutingAssembly.GetCustomAttributes(typeof(T), false);
         if (attributes.Length <= 0) return default;
         return (T)attributes[0];
     }
 
-    internal static string Title
+    public static string Title
     {
         get
         {
@@ -27,7 +27,7 @@ internal static class AssemblyInfo
         }
     }
 
-    internal static string Description
+    public static string Description
     {
         get
         {
@@ -36,7 +36,7 @@ internal static class AssemblyInfo
         }
     }
 
-    internal static string Copyright
+    public static string Copyright
     {
         get
         {
@@ -45,7 +45,7 @@ internal static class AssemblyInfo
         }
     }
 
-    internal static string Company
+    public static string Company
     {
         get
         {

@@ -6,29 +6,29 @@ namespace AddyScript.Interactive
 {
     internal static class AssemblyInfo
     {
-        internal static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
+        private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
 
-        internal static string Version => ExecutingAssembly.GetName().Version!.ToString();
+        public static string Version => ExecutingAssembly.GetName().Version!.ToString();
 
-        internal static T GetAssemblyAttribute<T>()
+        private static T GetAssemblyAttribute<T>()
         {
             var attributes = ExecutingAssembly.GetCustomAttributes(typeof(T), false);
             if (attributes.Length <= 0) return default;
             return (T)attributes[0];
         }
 
-        internal static string Title
+        public static string Title
         {
             get
             {
                 var titleAttribute = GetAssemblyAttribute<AssemblyTitleAttribute>();
                 return titleAttribute != null
-                     ? titleAttribute.Title
-                     : Path.GetFileNameWithoutExtension(ExecutingAssembly.Location);
+                    ? titleAttribute.Title
+                    : Path.GetFileNameWithoutExtension(ExecutingAssembly.Location);
             }
         }
 
-        internal static string Description
+        public static string Description
         {
             get
             {
@@ -37,7 +37,7 @@ namespace AddyScript.Interactive
             }
         }
 
-        internal static string Copyright
+        public static string Copyright
         {
             get
             {
@@ -46,7 +46,7 @@ namespace AddyScript.Interactive
             }
         }
 
-        internal static string Company
+        public static string Company
         {
             get
             {

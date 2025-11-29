@@ -38,7 +38,7 @@ public partial class MainWindow : Window
     private CompletionWindow keywordMenu;
     private CompletionWindow snippetMenu;
     private CompletionWindow surroundMenu;
-    private OverloadInsightWindow calltipWindow;
+    private OverloadInsightWindow callTipWindow;
 
     private string filePath;
     private bool saved;
@@ -160,6 +160,13 @@ public partial class MainWindow : Window
         '(' or ')' or '[' or ']' or '{' or '}' => true,
         _ => false,
     };
+
+    /// <summary>
+    /// Checks if a completion window is open.
+    /// </summary>
+    /// <param name="window">The completion window to check</param>
+    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
+    private static bool IsCompletionWindowOpen(CompletionWindow window) => window?.IsOpen == true;
 
     /// <summary>
     /// Resets the environment.
@@ -432,13 +439,6 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Checks if a completion window is open.
-    /// </summary>
-    /// <param name="window">The completion window to check</param>
-    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
-    private static bool IsCompletionWindowOpen(CompletionWindow window) => window?.IsOpen == true;
-
-    /// <summary>
     /// Opens a completion window with the given data.
     /// </summary>
     /// <typeparam name="T">The type of the completion data</typeparam>
@@ -472,7 +472,6 @@ public partial class MainWindow : Window
     private bool PopCallTipInfo()
     {
         callTipInfos.Pop();
-
         return callTipInfos.Count > 0;
     }
 
@@ -481,21 +480,13 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowCallTip()
     {
-        calltipWindow = new OverloadInsightWindow(Editor.TextArea)
+        callTipWindow = new OverloadInsightWindow(Editor.TextArea)
         {
             Provider = new SimpleOverloadProvider(CurrentCallTipInfo)
         };
 
-        calltipWindow.Show();
-    }
-
-    /// <summary>
-    /// Hides the currently displayed call tip.
-    /// </summary>
-    private void HideCallTip()
-    {
-        calltipWindow.Close();
-        calltipWindow = null;
+        callTipWindow.Closed += (s, e) =>  callTipWindow = null;
+        callTipWindow.Show();
     }
 
     /// <summary>
@@ -812,7 +803,7 @@ public partial class MainWindow : Window
 
         if (InCommentOrString(Editor.CaretOffset)) return;
 
-        char firstChar = e.Text[0];
+        char firstChar = e.Text![0];
 
         if (char.IsLetterOrDigit(firstChar))
         {
@@ -822,7 +813,7 @@ public partial class MainWindow : Window
             if (matchedKeywords.Count == 0) return;
 
             ShowCompletionWindow(ref keywordMenu, matchedKeywords);
-            keywordMenu.Closed += (sender, args) => keywordMenu = null;
+            keywordMenu.Closed += (s, a) => keywordMenu = null;
         }
         else
         {
@@ -841,13 +832,13 @@ public partial class MainWindow : Window
                 }
                 case ',':
                     if (callTipInfos.Count == 0) return;
-                    HideCallTip();
+                    callTipWindow.Close();
                     if (!CurrentCallTipInfo.NextParameter()) return;
                     ShowCallTip();
                     return;
                 case ')':
                     if (callTipInfos.Count == 0) return;
-                    HideCallTip();
+                    callTipWindow.Close();
                     if (!PopCallTipInfo()) return;
                     ShowCallTip();
                     return;

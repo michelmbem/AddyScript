@@ -18,7 +18,7 @@ internal enum KeywordType
 }
 
 internal partial class KeywordData(string word, KeywordType type) :
-    AbstractCompletionData(KeywordTypeIcon(type), word, word, $"Insert {word}")
+    AbstractCompletionData(KeywordTypeIcon(type), word, word, null)
 {
     static KeywordData()
     {
@@ -58,7 +58,7 @@ internal partial class KeywordData(string word, KeywordType type) :
         KeywordType.Statement => ImageFactory.LoadFontIcon("mdi-label-outline"),
         KeywordType.DataType => ImageFactory.LoadFontIcon("mdi-shape-outline"),
         KeywordType.Constant => ImageFactory.LoadFontIcon("mdi-application-variable-outline"),
-        KeywordType.Function => ImageFactory.LoadFontIcon("mdi-script-outline"),
+        KeywordType.Function => ImageFactory.LoadFontIcon("mdi-function-variant"),
         KeywordType.Operator => ImageFactory.LoadFontIcon("mdi-plus-minus"),
         KeywordType.Contextual => ImageFactory.LoadFontIcon("mdi-label"),
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
@@ -82,7 +82,6 @@ internal partial class KeywordData(string word, KeywordType type) :
             CaretPositioningMode.WordBorder);
 
         int wordLength = wordEnd > wordStart ? wordEnd - wordStart : 0;
-        string replacement = type == KeywordType.Function ? $"{Text}(" : Text;
-        document.Replace(wordStart, wordLength, replacement, OffsetChangeMappingType.RemoveAndInsert);
+        document.Replace(wordStart, wordLength, Text, OffsetChangeMappingType.RemoveAndInsert);
     }
 }

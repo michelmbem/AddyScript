@@ -1,6 +1,7 @@
-using AddyScript.Gui.CallTips;
 using AvaloniaEdit.CodeCompletion;
 using System.ComponentModel;
+
+namespace AddyScript.Gui.CallTips;
 
 internal class SimpleOverloadProvider(params CallTipInfo[] callTips) : IOverloadProvider
 {
@@ -10,7 +11,7 @@ internal class SimpleOverloadProvider(params CallTipInfo[] callTips) : IOverload
 
     public string CurrentIndexText => callTips[SelectedIndex].ToString();
 
-    public object CurrentHeader => $"Overload {SelectedIndex + 1} of {Count}";
+    public object CurrentHeader => null;
 
     public object CurrentContent => callTips[SelectedIndex].ToControl();
 

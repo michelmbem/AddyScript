@@ -5,55 +5,64 @@ using Avalonia.Media;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Avalonia;
+using Projektanker.Icons.Avalonia;
 
 namespace AddyScript.Gui.CallTips;
 
-public class CallTipInfo(string functionName, List<ParameterInfo> parameters)
+internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 {
+    private int activeParameterIndex;
+    
     public CallTipInfo(InnerFunction innerFunction) :
         this(innerFunction.Name, innerFunction.Parameters
-            .Select(p => new ParameterInfo(p.Name, p.VaList))
+            .Select(p => new ParameterInfo(p))
             .ToList())
     {
     }
 
-    public string FunctionName { get; private init; } = functionName;
-
-    public List<ParameterInfo> Parameters { get; private init; } = parameters;
-    
-    public int ActiveParameterIndex { get; private set; } = 0;
-
-    public void Reset() => ActiveParameterIndex = 0;
+    public void Reset() => activeParameterIndex = 0;
 
     public bool NextParameter()
     {
-        int activeIndex = ActiveParameterIndex;
-        
-        if (activeIndex < Parameters.Count - 1)
-        {
-            ActiveParameterIndex = activeIndex + 1;
-            return true;
-        }
+        var lastParameterIndex = parameters.Count - 1;
 
-        return false;
+        if (activeParameterIndex >= lastParameterIndex)
+            return activeParameterIndex == lastParameterIndex && parameters[activeParameterIndex].Infinite;
+        
+        ++activeParameterIndex;
+        return true;
+
     }
 
     public Control ToControl()
     {
         var panel = new StackPanel { Orientation = Orientation.Horizontal };
-        panel.Children.Add(new TextBlock { Text = $"{FunctionName}(" });
-
-        for (int i = 0; i < Parameters.Count; i++)
+        
+        panel.Children.Add(new Icon
         {
-            if (i > 0)
-                panel.Children.Add(new TextBlock { Text = ", " });
+            Value = "mdi-function-variant",
+            Width = 16,
+            Height = 16,
+            Margin = new Thickness(2, 0),
+        });
+        
+        panel.Children.Add(new TextBlock
+        {
+            Text = $"{functionName}(",
+            Foreground = Brushes.DarkOrange,
+            FontWeight = FontWeight.Bold,
+        });
 
-            panel.Children.Add(
-                new TextBlock
-                {
-                    Text = Parameters[i].Text,
-                    FontWeight = i == ActiveParameterIndex ? FontWeight.Bold : FontWeight.Regular
-                });
+        for (var i = 0; i < parameters.Count; ++i)
+        {
+            if (i > 0) panel.Children.Add(new TextBlock { Text = ", " });
+            
+            panel.Children.Add(new TextBlock
+            {
+                Text = parameters[i].Text,
+                FontWeight = i == activeParameterIndex ? FontWeight.Bold : FontWeight.Regular,
+            });
         }
 
         panel.Children.Add(new TextBlock { Text = ")" });
@@ -62,17 +71,12 @@ public class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 
     public override string ToString()
     {
-        var textBuilder = new StringBuilder(FunctionName).Append('(');
-        bool firstParam = true;
+        var textBuilder = new StringBuilder(functionName).Append('(');
 
-        foreach (ParameterInfo parameter in Parameters)
+        for (var i = 0; i < parameters.Count; i++)
         {
-            if (firstParam)
-                firstParam = false;
-            else
-                textBuilder.Append(", ");
-
-            textBuilder.Append(parameter.Text);
+            if (i > 0) textBuilder.Append(", ");
+            textBuilder.Append(parameters[i].Text);
         }
 
         return textBuilder.Append(')').ToString();
