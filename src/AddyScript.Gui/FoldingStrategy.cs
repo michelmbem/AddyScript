@@ -1,0 +1,82 @@
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using AvaloniaEdit.Document;
+using AvaloniaEdit.Folding;
+
+namespace AddyScript.Gui;
+
+public partial class FoldingStrategy
+{
+    private static readonly Regex ImportRegex = CreateImportRegex();
+
+    public void UpdateFoldings(FoldingManager manager, TextDocument document)
+    {
+        var newFoldings = CreateNewFoldings(document);
+        manager.UpdateFoldings(newFoldings, -1);
+    }
+
+    private IEnumerable<NewFolding> CreateNewFoldings(TextDocument document)
+    {
+        var newFoldings = new List<NewFolding>();
+
+        // --- 1. Handle import directives block ---
+        AddImportFoldings(document, newFoldings);
+
+        // --- 2. Handle braces { } ---
+        AddBraceFoldings(document, newFoldings, '{', '}');
+
+        // --- 3. Handle brackets [ ] ---
+        AddBraceFoldings(document, newFoldings, '[', ']');
+
+        // --- 4. Handle parentheses ( ) ---
+        AddBraceFoldings(document, newFoldings, '(', ')');
+
+        newFoldings.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+
+        return newFoldings;
+    }
+
+    private void AddImportFoldings(TextDocument document, List<NewFolding> newFoldings)
+    {
+        var matches = ImportRegex.Matches(document.Text);
+        if (matches.Count <= 1) return;
+
+        var first = matches[0];
+        var last = matches[^1];
+
+        newFoldings.Add(new NewFolding(first.Index, last.Index + last.Length)
+        {
+            Name = "import ..."
+        });
+    }
+
+    private void AddBraceFoldings(TextDocument document, List<NewFolding> newFoldings, char openingBrace, char closingBrace)
+    {
+        var startOffsets = new Stack<int>();
+        var lastNewLineOffset = 0;
+
+        for (var i = 0; i < document.TextLength; i++)
+        {
+            var c = document.GetCharAt(i);
+
+            if (c == openingBrace)
+            {
+                startOffsets.Push(i);
+            }
+            else if (c == closingBrace && startOffsets.Count > 0)
+            {
+                var startOffset = startOffsets.Pop();
+                // don't fold if opening and closing brace are on the same line
+                if (startOffset < lastNewLineOffset)
+                    newFoldings.Add(new NewFolding(startOffset, i + 1));
+            }
+            else if (c is '\n' or '\r')
+            {
+                lastNewLineOffset = i + 1;
+            }
+        }
+    }
+
+    [GeneratedRegex(@"^\s*import\s+.*?;", RegexOptions.Multiline | RegexOptions.Compiled)]
+    private static partial Regex CreateImportRegex();
+}

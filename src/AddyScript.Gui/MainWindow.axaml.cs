@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
+using AddyScript.Gui.Markers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -32,14 +33,15 @@ public partial class MainWindow : Window
     #region Fields
 
     private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
-    private static readonly string TITLE_BASE = AssemblyInfo.Title;
 
-    private readonly BraceFoldingStrategy foldingStrategy = new();
+    private readonly MarkerMargin markerMargin = new();
+    private readonly FoldingStrategy foldingStrategy = new();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
     private FoldingManager foldingManager;
     private CompletionWindow completionWindow;
     private OverloadInsightWindow insightWindow;
+    private DispatcherTimer timer;
 
     private string filePath;
     private bool saved;
@@ -52,6 +54,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeStyling();
+        InitializeTimer();
     }
 
     private void InitializeStyling()
@@ -66,11 +69,25 @@ public partial class MainWindow : Window
         options.HighlightCurrentLine = true;
 
         TextArea textArea = Editor.TextArea;
+        textArea.LeftMargins.Insert(0, markerMargin);
         textArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
         textArea.Caret.PositionChanged += EditorCaretPositionChanged;
         textArea.SelectionChanged += EditorSelectionChanged;
         textArea.TextEntering += EditorTextEntering;
         textArea.TextEntered += EditorTextEntered;
+    }
+
+    private void InitializeTimer()
+    {
+        timer = new DispatcherTimer()
+        {
+            Interval = TimeSpan.FromMilliseconds(250)
+        };
+        
+        timer.Tick += (s, e) =>
+            ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = Editor.CanPaste;
+        
+        timer.Start();
     }
 
     private void InitializeFolding()
@@ -99,12 +116,12 @@ public partial class MainWindow : Window
             if (string.IsNullOrEmpty(filePath))
             {
                 FileNameStatusLabel.Content = "Untitled";
-                Title = TITLE_BASE;
+                Title = AssemblyInfo.Title;
             }
             else
             {
                 FileNameStatusLabel.Content = value;
-                Title = $"{Path.GetFileName(value)} - {TITLE_BASE}";
+                Title = $"{Path.GetFileName(value)} - {AssemblyInfo.Title}";
             }
         }
     }
@@ -169,7 +186,7 @@ public partial class MainWindow : Window
     /// </summary>
     public void Reset()
     {
-        var document = new TextDocument();
+        var document = new TextDocument("\n");
         document.Changed += EditorDocumentChanged;
         Editor.Document = document;
         FilePath = null;
@@ -209,7 +226,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void CloseIfEmpty()
     {
-        if (Saved && Editor.Document.TextLength <= 0)
+        if (Saved && string.IsNullOrWhiteSpace(Editor.Document.Text))
             Close();
     }
 
@@ -358,6 +375,7 @@ public partial class MainWindow : Window
     {
         ToolbarCutButton.IsEnabled = CutMenuItem.IsEnabled = Editor.CanCut;
         ToolbarCopyButton.IsEnabled = CopyMenuItem.IsEnabled = Editor.CanCopy;
+        SurroundWithMenuItem.IsEnabled = !Editor.TextArea.Selection.IsEmpty;
 
         CaretStatusLabel.Content = string.Format(
             SR.CaretStatus,
@@ -527,8 +545,15 @@ public partial class MainWindow : Window
     /// <param name="end">Ending location of the erroneous symbol in code</param>
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
-        // TODO: Highlight the error in the editor
-        Console.WriteLine($"{errorMessage} @{start}:{end}");
+        markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
+    }
+    
+    /// <summary>
+    /// Deletes all error markers.
+    /// </summary>
+    private void ClearErrors()
+    {
+        markerMargin.ClearMarkers();
     }
 
     #endregion
@@ -539,10 +564,6 @@ public partial class MainWindow : Window
 
     private void WindowLoaded(object sender, RoutedEventArgs e)
     {
-        Dispatcher.UIThread.Post(
-            () => ToolbarPasteButton.IsEnabled = Editor.CanPaste,
-            DispatcherPriority.ApplicationIdle);
-        
         Editor.TextArea.Focus();
     }
 
@@ -734,7 +755,7 @@ public partial class MainWindow : Window
         var logPath = Path.ChangeExtension(Path.GetTempFileName(), ".log");
         argsBuilder.Append(" -l ").Append(EscapeCmdLineArg(logPath));
 
-        //ClearErrors();
+        ClearErrors();
 
         try
         {

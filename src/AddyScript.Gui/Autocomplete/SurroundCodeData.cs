@@ -16,18 +16,19 @@ internal class SurroundCodeData(string title, string snippet, string description
     {
         string[][] templates =
             [
+                ["block", "{\n\t$selection$\n}"],
                 ["if", "if ($condition$) {\n\t$selection$\n}"],
                 ["else", "else {\n\t$selection$\n}"],
                 ["switch", "switch ($condition$) {\n\tcase $label$:\n\t\t$selection$\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
                 ["for", "for (;;) {\n\t$selection$\n}"],
                 ["foreach", "foreach ($item$ in $sequence$) {\n\t$selection$\n}"],
                 ["while", "while ($condition$) {\n\t$selection$\n}"],
-                ["do", "do {\n\t$selection$\n} while ($condition$);"],
-                ["try", "try {\n\t$selection$\n} catch (e) {\n}"],
-                ["tryf", "try {\n\t$selection$\n} finally {\n}"],
-                ["tcf", "try {\n\t$selection$\n} catch (e) {\n} finally {\n}"],
-                ["tryres", "try ($resource$) {\n\t$selection$\n}"],
-                ["function", "function $fname$() {\n\t$selection$\n}"],
+                ["do-while", "do {\n\t$selection$\n} while ($condition$);"],
+                ["try-catch", "try {\n\t$selection$\n} catch (e) {\n}"],
+                ["try-finally", "try {\n\t$selection$\n} finally {\n}"],
+                ["try-catch-finally", "try {\n\t$selection$\n} catch (e) {\n} finally {\n}"],
+                ["try-resource", "try ($resource$) {\n\t$selection$\n}"],
+                ["function", "function $fname$($args$) {\n\t$selection$\n}"],
             ];
 
         foreach (string[] template in templates)
@@ -42,7 +43,7 @@ internal class SurroundCodeData(string title, string snippet, string description
     public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
     {
         Selection selection = textArea.Selection;
-        string replacementText = Text.Replace(SELECTION_PLACEHOLDER, selection.GetText());
+        string replacementText = Text.Replace(SELECTION_PLACEHOLDER, selection.GetText()) + "\n";
         selection.ReplaceSelectionWithText(replacementText);
     }
 }
