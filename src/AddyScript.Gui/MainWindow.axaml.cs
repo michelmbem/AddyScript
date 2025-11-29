@@ -1,10 +1,5 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using AddyScript.Gui.CodeCompletion;
+using AddyScript.Gui.Autocomplete;
+using AddyScript.Gui.CallTips;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -17,8 +12,15 @@ using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Indentation.CSharp;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using SR = AddyScript.Gui.Properties.Resources;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MBI = MsBox.Avalonia.Enums.Icon;
+using SR = AddyScript.Gui.Properties.Resources;
 
 namespace AddyScript.Gui;
 
@@ -26,12 +28,17 @@ public partial class MainWindow : Window
 {
     #region Fields
 
-    private readonly string TITLE_BASE = AssemblyInfo.Title;
     private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
+    private static readonly string TITLE_BASE = AssemblyInfo.Title;
 
     private readonly BraceFoldingStrategy foldingStrategy = new();
+    private readonly Stack<CallTipInfo> callTipInfos = [];
+
     private FoldingManager foldingManager;
-    private CompletionWindow completionWindow;
+    private CompletionWindow keywordMenu;
+    private CompletionWindow snippetMenu;
+    private CompletionWindow surroundMenu;
+    private OverloadInsightWindow calltipWindow;
 
     private string filePath;
     private bool saved;
@@ -61,35 +68,6 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.TextEntering += EditorTextEntering;
         Editor.TextArea.TextEntered += EditorTextEntered;
-    }
-
-    private void InitializeCodeCompletion()
-    {
-        completionWindow = new CompletionWindow(Editor.TextArea);
-        var completionData = completionWindow.CompletionList.CompletionData;
-        
-        // Keywords menu
-        string keywords = @"
-                abs?3 abstract?0 acos?3 as?0 asin?3 atan?3 atan2?3 blob?0 bool?1 break?0 case?0 catch?0 ceil?3 chr?3
-                class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
-                default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0
-                float?1 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1 is?4 list?1 log?3
-                log10?3 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2 min?3 MINDATE?2 MINFLOAT?2 MININT?2
-                NAN?2 new?4 NEWLINE?2 NINFINITY?2 not?0 now?3 null?2 object?1 operator?0 ord?3 pack?3 PI?2 PINFINITY?2 print?3
-                println?3 private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5
-                readln?3 resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1
-                super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 tuple?0 typeof?4 unpack?3 var?0 void?1 while?0
-                with?0 write?5 yield?0
-            ";
-
-        foreach (string keyword in Regex.Split(keywords, @"\s+"))
-        {
-            if (keyword.Length <= 0) continue;
-
-            string[] parts = keyword.Split('?');
-            int imageIndex = int.Parse(parts[1]);
-            completionData.Add(new KeywordData(parts[0], imageIndex));
-        }
     }
 
     private void InitializeFolding()
@@ -145,6 +123,11 @@ public partial class MainWindow : Window
                 Title += "*";
         }
     }
+
+    /// <summary>
+    /// Gets the current CallTipInfo
+    /// </summary>
+    private CallTipInfo CurrentCallTipInfo => callTipInfos.Peek();
 
     #endregion
 
@@ -372,9 +355,153 @@ public partial class MainWindow : Window
     /// <returns><b>true</b> if the caret is in a comment or a string literal. <b>false</b> otherwise</returns>
     private bool InCommentOrString(int position)
     {
-        return false;
+        // Retrieves the highlighter
+        var highlighter = Editor.TextArea.GetService(typeof(IHighlighter)) as IHighlighter;
+        if (highlighter == null) return false;
+
+        // Retrieves the highlighted line
+        DocumentLine line = Editor.Document.GetLineByOffset(position);
+        // Apply highlighting to the line
+        HighlightedLine highlightedLine = highlighter.HighlightLine(line.LineNumber);
+
+        // Check if line's coloration at the given position is a comment or a string
+        return highlightedLine.Sections.Any(s =>
+            s.Offset <= position &&
+            position < s.Offset + s.Length &&
+            (s.Color?.Name == "Comment" || s.Color?.Name == "String")
+        );
     }
 
+    /// <summary>
+    /// Retrieves the "word" at the caret position.
+    /// </summary>
+    /// <returns>A string</returns>
+    private string GetCurrentWord()
+    {
+        int caretOffset = Editor.CaretOffset;
+
+        // Edge case: caret at the beginning of the document
+        if (caretOffset <= 0) return string.Empty;
+
+        TextDocument document = Editor.Document;
+
+        // Find the start of the current word
+        int wordStart = TextUtilities.GetNextCaretPosition(
+            document,
+            caretOffset,
+            LogicalDirection.Backward,
+            CaretPositioningMode.WordStart);
+
+        return wordStart < 0 || wordStart >= caretOffset
+             ? string.Empty
+             : document.GetText(wordStart, caretOffset - wordStart);
+    }
+
+    /// <summary>
+    /// Gets the "word" that precedes the "word" at caret position.
+    /// </summary>
+    /// <returns>A string</returns>
+    public string GetWordAtLeft()
+    {
+        TextDocument document = Editor.Document;
+
+        // Find the start of the current word
+        int wordStart = TextUtilities.GetNextCaretPosition(
+            document,
+            Editor.CaretOffset,
+            LogicalDirection.Backward,
+            CaretPositioningMode.WordStart);
+
+        // Find the start of the previous word
+        wordStart = TextUtilities.GetNextCaretPosition(
+            document,
+            wordStart - 1,
+            LogicalDirection.Backward,
+            CaretPositioningMode.WordStart);
+
+        // Find the end of the previous word
+        int wordEnd = TextUtilities.GetNextCaretPosition(
+            document,
+            wordStart,
+            LogicalDirection.Forward,
+            CaretPositioningMode.WordBorder);
+
+        return (wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart)
+             ? string.Empty
+             : document.GetText(wordStart, wordEnd - wordStart);
+    }
+
+    /// <summary>
+    /// Checks if a completion window is open.
+    /// </summary>
+    /// <param name="window">The completion window to check</param>
+    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
+    private static bool IsCompletionWindowOpen(CompletionWindow window) => window?.IsOpen == true;
+
+    /// <summary>
+    /// Opens a completion window with the given data.
+    /// </summary>
+    /// <typeparam name="T">The type of the completion data</typeparam>
+    /// <param name="window">The completion window to open</param>
+    /// <param name="data">The completion data to display in the menu</param>
+    private void ShowCompletionWindow<T>(ref CompletionWindow window, List<T> data)
+        where T : ICompletionData
+    {
+        window = new CompletionWindow(Editor.TextArea);
+        
+        foreach (ICompletionData item in data)
+            window.CompletionList.CompletionData.Add(item);
+
+        window.Show();
+    }
+
+    /// <summary>
+    /// Pushes a new CallTipInfo on top of the stack.
+    /// </summary>
+    /// <param name="callTip">The new CallTipInfo</param>
+    private void PushCallTipInfo(CallTipInfo callTip)
+    {
+        callTipInfos.Push(callTip);
+        callTip.Reset();
+    }
+
+    /// <summary>
+    /// Pops a CallTipInfo from the stack.
+    /// </summary>
+    /// <returns><b>true</b> if there is still at least one CallTipInfo in the stack. <b>false</b> otherwise</returns>
+    private bool PopCallTipInfo()
+    {
+        callTipInfos.Pop();
+
+        return callTipInfos.Count > 0;
+    }
+
+    /// <summary>
+    /// Shows a call tip according to the current callTipInfo.
+    /// </summary>
+    private void ShowCallTip()
+    {
+        calltipWindow = new OverloadInsightWindow(Editor.TextArea)
+        {
+            Provider = new SimpleOverloadProvider(CurrentCallTipInfo)
+        };
+
+        calltipWindow.Show();
+    }
+
+    /// <summary>
+    /// Hides the currently displayed call tip.
+    /// </summary>
+    private void HideCallTip()
+    {
+        calltipWindow.Close();
+        calltipWindow = null;
+    }
+
+    /// <summary>
+    /// Opens the search panel in either search or replace mode.
+    /// </summary>
+    /// <param name="replaceMode">Whether the search panel should be open in replace mode or not</param>
     private void OpenSearchPanel(bool replaceMode)
     {
         var selection = Editor.TextArea.Selection;
@@ -385,10 +512,16 @@ public partial class MainWindow : Window
         Editor.SearchPanel.Open();
     }
 
+    /// <summary>
+    /// Displays an error message related to a script execution.
+    /// </summary>
+    /// <param name="errorMessage">The error message</param>
+    /// <param name="start">Initial location of the erroneous symbol in code</param>
+    /// <param name="end">Ending location of the erroneous symbol in code</param>
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         // TODO: Highlight the error in the editor
-        Console.WriteLine($@"{errorMessage} @{start}:{end}");
+        Console.WriteLine($"{errorMessage} @{start}:{end}");
     }
 
     #endregion
@@ -402,8 +535,6 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.AwaitWithPriority(
             new Task(() => ToolbarPasteButton.IsEnabled = Editor.CanPaste),
             DispatcherPriority.ApplicationIdle);
-        
-        InitializeCodeCompletion();
         
         Editor.TextArea.Focus();
     }
@@ -670,29 +801,58 @@ public partial class MainWindow : Window
 
     private void EditorTextEntering(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($@"Text entering: {e.Text}");
+        Console.WriteLine($"Text entering: {e.Text}");
     }
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($"Text entered: {e.Text}");
+        /****************************************************************************
+        * Tries to popup an keywordMenu menu or to display a calltip
+        * *************************************************************************/
+
         if (InCommentOrString(Editor.CaretOffset)) return;
 
-        if (Regex.IsMatch(e.Text, @"^[a-zA-Z_]$"))
+        char firstChar = e.Text[0];
+
+        if (char.IsLetterOrDigit(firstChar))
         {
-            Console.WriteLine("Word character entered");
-            var keywords = completionWindow.CompletionList.CompletionData;
-            foreach (var keyword in keywords)
-                if (keyword.Text.StartsWith(e.Text))
+            if (IsCompletionWindowOpen(keywordMenu)) return;
+
+            var matchedKeywords = KeywordData.AllMatching(GetCurrentWord());
+            if (matchedKeywords.Count == 0) return;
+
+            ShowCompletionWindow(ref keywordMenu, matchedKeywords);
+            keywordMenu.Closed += (sender, args) => keywordMenu = null;
+        }
+        else
+        {
+            if (IsCompletionWindowOpen(keywordMenu))
+                keywordMenu.Close();
+
+            switch (firstChar)
+            {
+                case '(':
                 {
-                    Console.WriteLine($"Matches with keyword: {keyword.Text}");
-                    completionWindow.Show();
+                    string wordAtLeft = GetWordAtLeft();
+                    if (!CallTipProvider.IsDefined(wordAtLeft)) return;
+                    PushCallTipInfo(CallTipProvider.GetCallTipInfo(wordAtLeft));
+                    ShowCallTip();
                     return;
                 }
-
-            if (completionWindow.IsOpen) completionWindow.Close();
+                case ',':
+                    if (callTipInfos.Count == 0) return;
+                    HideCallTip();
+                    if (!CurrentCallTipInfo.NextParameter()) return;
+                    ShowCallTip();
+                    return;
+                case ')':
+                    if (callTipInfos.Count == 0) return;
+                    HideCallTip();
+                    if (!PopCallTipInfo()) return;
+                    ShowCallTip();
+                    return;
+            }
         }
-        // TODO: else try to show calltip
     }
 
     #endregion
@@ -701,16 +861,14 @@ public partial class MainWindow : Window
 
     private void InsertSnippetMenuItemClick(object sender, RoutedEventArgs e)
     {
-        MessageBoxManager
-            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
-            .ShowAsync();
+        ShowCompletionWindow(ref snippetMenu, CodeSnippetData.All);
+        snippetMenu.Closed += (sender, args) => snippetMenu = null;
     }
 
     private void SurroundWithMenuItemClick(object sender, RoutedEventArgs e)
     {
-        MessageBoxManager
-            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
-            .ShowAsync();
+        ShowCompletionWindow(ref surroundMenu, SurroundCodeData.All);
+        surroundMenu.Closed += (sender, args) => surroundMenu = null;
     }
 
     private void DeleteMenuItemClick(object sender, RoutedEventArgs e)

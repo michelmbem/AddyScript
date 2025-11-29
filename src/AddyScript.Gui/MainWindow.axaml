@@ -137,40 +137,38 @@
                                   Header="Surround with"
                                   Click="SurroundWithMenuItemClick"/>
                         <Separator/>
-                        <MenuItem Name="UndoMenuItem" Header="Undo" Click="ToolbarUndoButtonClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-rotate-left"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Name="RedoMenuItem" Header="Redo" Click="ToolbarRedoButtonClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-rotate-right"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
+                        <MenuItem Name="UndoMenuItem"
+                                  Header="Undo"
+                                  i:MenuItem.Icon="fa-rotate-left"
+                                  Click="ToolbarUndoButtonClick"/>
+                        <MenuItem Name="RedoMenuItem"
+                                  Header="Redo"
+                                  i:MenuItem.Icon="fa-rotate-right"
+                                  Click="ToolbarRedoButtonClick"/>
                         <Separator/>
-                        <MenuItem Name="CutMenuItem" Header="Cut" Click="ToolbarCutButtonClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-scissors"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Name="CopyMenuItem" Header="Copy" Click="ToolbarCopyButtonClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-copy"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Name="PasteMenuItem" Header="Paste" Click="ToolbarPasteButtonClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-paste"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Name="DeleteMenuItem" Header="Delete" Click="DeleteMenuItemClick">
-                            <MenuItem.Icon>
-                                <i:Icon Value="fa-trash"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
+                        <MenuItem Name="CutMenuItem"
+                                  Header="Cut"
+                                  i:MenuItem.Icon="fa-scissors"
+                                  Click="ToolbarCutButtonClick"/>
+                        <MenuItem Name="CopyMenuItem"
+                                  Header="Copy"
+                                  i:MenuItem.Icon="fa-copy"
+                                  Click="ToolbarCopyButtonClick"/>
+                        <MenuItem Name="PasteMenuItem"
+                                  Header="Paste"
+                                  i:MenuItem.Icon="fa-paste"
+                                  Click="ToolbarPasteButtonClick"/>
+                        <MenuItem Name="DeleteMenuItem"
+                                  Header="Delete"
+                                  i:MenuItem.Icon="fa-trash"
+                                  Click="DeleteMenuItemClick"/>
                         <Separator/>
-                        <MenuItem Name="SelectAllMenuItem" Header="Select all" Click="SelectAllMenuItemClick"/>
-                        <MenuItem Name="ReformatMenuItem" Header="Reformat code" Click="ReformatMenuItemClick"/>
+                        <MenuItem Name="SelectAllMenuItem"
+                                  Header="Select all"
+                                  Click="SelectAllMenuItemClick"/>
+                        <MenuItem Name="ReformatMenuItem"
+                                  Header="Reformat code"
+                                  Click="ReformatMenuItemClick"/>
                     </ContextMenu>
                 </ae:TextEditor.ContextMenu>
             </ae:TextEditor>
