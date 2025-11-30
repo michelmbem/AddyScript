@@ -20,6 +20,7 @@ using AvaloniaEdit.Editing;
 using AvaloniaEdit.Folding;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Indentation.CSharp;
+using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Search;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -32,13 +33,14 @@ public partial class MainWindow : Window
 {
     #region Fields
 
-    private const string HELP_LINK = "https://github.com/michelmbem/AddyScript/blob/master/docs/README.md";
+    private const string HELP_LINK = App.REPO_URL + "/blob/master/docs/README.md";
 
     private readonly MarkerMargin markerMargin = new();
     private readonly FoldingStrategy foldingStrategy = new();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
     private FoldingManager foldingManager;
+    private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
     private OverloadInsightWindow insightWindow;
     private DispatcherTimer timer;
@@ -70,11 +72,17 @@ public partial class MainWindow : Window
 
         TextArea textArea = Editor.TextArea;
         textArea.LeftMargins.Insert(0, markerMargin);
-        textArea.IndentationStrategy = new CSharpIndentationStrategy(Editor.Options);
+        textArea.IndentationStrategy = new CSharpIndentationStrategy(options);
         textArea.Caret.PositionChanged += EditorCaretPositionChanged;
         textArea.SelectionChanged += EditorSelectionChanged;
         textArea.TextEntering += EditorTextEntering;
         textArea.TextEntered += EditorTextEntered;
+        
+        textMarkerService = new TextMarkerService(Editor);
+        TextView textView = textArea.TextView;
+        textView.BackgroundRenderers.Add(textMarkerService);
+        textView.PointerMoved += EditorTextViewPointerMoved;
+        textView.PointerExited += (s, e) => ToolTip.SetIsOpen(Editor, false);
     }
 
     private void InitializeTimer()
@@ -186,7 +194,7 @@ public partial class MainWindow : Window
     /// </summary>
     public void Reset()
     {
-        var document = new TextDocument("\n");
+        var document = new TextDocument();
         document.Changed += EditorDocumentChanged;
         Editor.Document = document;
         FilePath = null;
@@ -226,7 +234,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void CloseIfEmpty()
     {
-        if (Saved && string.IsNullOrWhiteSpace(Editor.Document.Text))
+        if (Saved && Editor.Document.TextLength == 0)
             Close();
     }
 
@@ -530,6 +538,7 @@ public partial class MainWindow : Window
     /// <param name="replaceMode">Whether the search panel should be open in replace mode or not</param>
     private void OpenSearchPanel(bool replaceMode)
     {
+        Editor.SearchPanel?.Uninstall();
         var searchPanel = SearchPanel.Install(Editor);
         var selection = Editor.TextArea.Selection;
         searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
@@ -546,6 +555,7 @@ public partial class MainWindow : Window
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
+        textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
     }
     
     /// <summary>
@@ -554,6 +564,7 @@ public partial class MainWindow : Window
     private void ClearErrors()
     {
         markerMargin.ClearMarkers();
+        textMarkerService.ClearMarkers();
     }
 
     #endregion
@@ -827,14 +838,15 @@ public partial class MainWindow : Window
 
     private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
-        Saved = Editor.Document.TextLength <= 0 && string.IsNullOrEmpty(filePath);
-        foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+        TextDocument document = Editor.Document;
+        foldingStrategy.UpdateFoldings(foldingManager, document);
+        Saved = document.TextLength == 0 && string.IsNullOrEmpty(filePath);
         UpdateUndoRedoFileSize();
     }
 
     private void EditorTextEntering(object sender, TextInputEventArgs e)
     {
-        Console.WriteLine($"Text entering: {e.Text}");
+        // unimplemented
     }
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
@@ -884,6 +896,29 @@ public partial class MainWindow : Window
                     return;
             }
         }
+    }
+
+    private void EditorTextViewPointerMoved(object sender, PointerEventArgs e)
+    {
+        if (sender is not TextView { VisualLinesValid: true } textView) return;
+
+        // convert mouse → document offset
+        var vp = textView.GetPosition(e.GetPosition(textView));
+
+        if (vp.HasValue)
+        {
+            var marker = textMarkerService.GetMarkerAt(vp);
+            
+            if (marker == null)
+                ToolTip.SetIsOpen(Editor, false);
+            else
+            {
+                ToolTip.SetTip(Editor, marker.ToolTip);
+                ToolTip.SetIsOpen(Editor, true);
+            }
+        }
+        else
+            ToolTip.SetIsOpen(Editor, false);
     }
 
     #endregion

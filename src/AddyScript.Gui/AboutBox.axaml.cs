@@ -11,7 +11,7 @@ namespace AddyScript.Gui;
 
 public partial class AboutBox : Window
 {
-    private const string GITHUB_LINK = "https://github.com/michelmbem/AddyScript/tree/universal";
+    private const string GITHUB_LINK = App.REPO_URL + "/tree/universal";
     
     public AboutBox()
     {

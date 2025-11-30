@@ -54,8 +54,9 @@ public partial class FoldingStrategy
     {
         var startOffsets = new Stack<int>();
         var lastNewLineOffset = 0;
+        var textLength = document.TextLength;
 
-        for (var i = 0; i < document.TextLength; i++)
+        for (var i = 0; i < textLength; ++i)
         {
             var c = document.GetCharAt(i);
 
@@ -68,7 +69,7 @@ public partial class FoldingStrategy
                 var startOffset = startOffsets.Pop();
                 // don't fold if opening and closing brace are on the same line
                 if (startOffset < lastNewLineOffset)
-                    newFoldings.Add(new NewFolding(startOffset, i + 1));
+                    newFoldings.Add(new NewFolding(startOffset, i));
             }
             else if (c is '\n' or '\r')
             {

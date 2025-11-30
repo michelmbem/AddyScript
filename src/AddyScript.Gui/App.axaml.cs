@@ -9,6 +9,8 @@ namespace AddyScript.Gui;
 
 public partial class App : Application
 {
+    public const string REPO_URL = "https://github.com/michelmbem/AddyScript";
+    
     public static string[] SearchPaths { get; set; } = [];
     public static string[] References { get; set; } = [];
     private static string[] InitialFiles { get; set; } = [];

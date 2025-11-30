@@ -43,7 +43,7 @@ internal class SurroundCodeData(string title, string snippet, string description
     public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
     {
         Selection selection = textArea.Selection;
-        string replacementText = Text.Replace(SELECTION_PLACEHOLDER, selection.GetText()) + "\n";
+        string replacementText = Text.Replace(SELECTION_PLACEHOLDER, selection.GetText());
         selection.ReplaceSelectionWithText(replacementText);
     }
 }
