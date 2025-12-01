@@ -3,6 +3,7 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
 using System;
 using System.Collections.Generic;
+using AddyScript.Gui.Extensions;
 
 namespace AddyScript.Gui.Autocomplete;
 
@@ -15,24 +16,24 @@ internal class CodeSnippetData(string title, string snippet, string description)
     {
         string[][] snippets =
             [
-                ["if", "if (^) ;"],
+                ["if", "if (true) ^;"],
                 ["else", "else ^;"],
-                ["if-block", "if (^) {\n}"],
-                ["else-block", "else {\n\t^;\n}"],
-                ["switch", "switch (^) {\n\tcase $label$:\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
-                ["for", "for (^;;) {\n}"],
-                ["foreach", "foreach (^ in $sequence$) {\n}"],
-                ["while", "while (^) {\n}"],
-                ["do-while", "do {\n\t^;\n} while ($condition$);"],
-                ["try-catch", "try {\n\t^;\n} catch (e) {\n}"],
-                ["try-finally", "try {\n\t^;\n} finally {\n}"],
-                ["try-catch-finally", "try {\n\t^;\n} catch (e) {\n} finally {\n}"],
-                ["try-resource", "try (^) {\n\t;\n}"],
-                ["function", "function $fname$(^) {\n}"],
-                ["extern-function", "[LibImport(\"mylib\", returnType=\"Int32\")]\nextern function $fname$(\n\t^\n);"],
-                ["class", "class $cname$ {\n}"],
+                ["if-block", "if (true) {\n\t^\n}"],
+                ["else-block", "else {\n\t^\n}"],
+                ["switch", "switch (0) {\n\tcase 0:\n\t\t^\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
+                ["for", "for (;;) {\n\t^\n}"],
+                ["foreach", "foreach (item in []) {\n\t^\n}"],
+                ["while", "while (true) {\n\t^\n}"],
+                ["do-while", "do {\n\t^\n} while (true);"],
+                ["try-catch", "try {\n\t^\n} catch (e) {\n\tprintln(e);\n}"],
+                ["try-finally", "try {\n\t^\n} finally {\n}"],
+                ["try-catch-finally", "try {\n\t^\n} catch (e) {\n\tprintln(e);\n} finally {\n}"],
+                ["try-resource", "try (res) {\n\t^\n}"],
+                ["function", "function myFunc(arg1, arg2) {\n\t^\n}"],
+                ["extern-function", "[LibImport(\"mylib\", returnType=\"Int32\")]\nextern function myFunc(\n\t^\n);"],
+                ["class", "class MyClass {\n\t^\n}"],
                 ["import", "import ^;"],
-                ["import-as", "import ^ as $alias$;"],
+                ["import-as", "import ^ as alias;"],
             ];
 
         foreach (string[] snippet in snippets)
@@ -46,9 +47,10 @@ internal class CodeSnippetData(string title, string snippet, string description)
 
     public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
     {
-        string textToInsert = Text;
-        int segmentOffset = segment.Offset;
+        string indentation = textArea.Document.GetIndentation(textArea.Caret.Line);
+        string textToInsert = Text.IndentLines(indentation, true);
         int caretOffset = textToInsert.IndexOf('^');
+        int segmentOffset = segment.Offset;
 
         if (caretOffset < 0)
             caretOffset = textToInsert.Length;

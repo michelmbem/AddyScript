@@ -35,9 +35,12 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 
     }
 
-    public Control ToControl()
+    public Visual ToVisual()
     {
-        var panel = new StackPanel { Orientation = Orientation.Horizontal };
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+        };
         
         panel.Children.Add(new Icon
         {
@@ -71,7 +74,9 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 
     public override string ToString()
     {
-        var textBuilder = new StringBuilder(functionName).Append('(');
+        var textBuilder = new StringBuilder("function ")
+            .Append(functionName)
+            .Append('(');
 
         for (var i = 0; i < parameters.Count; i++)
         {

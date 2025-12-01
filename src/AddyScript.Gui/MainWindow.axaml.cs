@@ -9,11 +9,9 @@ using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
 using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AvaloniaEdit;
@@ -42,6 +40,7 @@ public partial class MainWindow : Window
     private readonly FoldingStrategy foldingStrategy = new();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
+    private bool updateFoldingOnDocChange = true;
     private FoldingManager foldingManager;
     private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
@@ -76,7 +75,7 @@ public partial class MainWindow : Window
         options.HighlightCurrentLine = true;
 
         TextArea textArea = Editor.TextArea;
-        textArea.LeftMargins.Insert(0, markerMargin);
+        textArea.LeftMargins.Insert(1, markerMargin); // markers between line numbers and folding
         textArea.IndentationStrategy = new CSharpIndentationStrategy(options);
         textArea.Caret.PositionChanged += EditorCaretPositionChanged;
         textArea.SelectionChanged += EditorSelectionChanged;
@@ -109,11 +108,7 @@ public partial class MainWindow : Window
             Interval = TimeSpan.FromSeconds(1)
         };
 
-        dwellTimer.Tick += (s, e) =>
-        {
-            HandleEditorDwell();
-            dwellTimer.Stop();
-        };
+        dwellTimer.Tick += EditorDwell;
     }
 
     private void InitializeFolding()
@@ -178,13 +173,6 @@ public partial class MainWindow : Window
     #endregion
 
     #region Utility
-
-    /// <summary>
-    /// Escapes a string intended to be used as a command line argument.
-    /// </summary>
-    /// <param name="arg">The string to escape</param>
-    /// <returns><paramref name="arg"/> wrapped with double quotes with duplicated double quotes inside</returns>
-    private static string EscapeCmdLineArg(string arg) => $"\"{arg.Replace("\"", "\"\"")}\"";
 
     /// <summary>
     /// Checks if a <see cref="KeyEventArgs"/> instance matches the given configuration.
@@ -532,9 +520,12 @@ public partial class MainWindow : Window
         completionWindow = new CompletionWindow(Editor.TextArea);
         
         foreach (var dataItem in completionData)
+        {
             completionWindow.CompletionList.CompletionData.Add(dataItem);
-
+        }
+        
         completionWindow.Closed += (s, e) => completionWindow = null;
+        updateFoldingOnDocChange = false; // prevent folding updates while completion window is open
         completionWindow.Show();
     }
 
@@ -576,41 +567,6 @@ public partial class MainWindow : Window
 
         insightWindow.Closed += (s, e) =>  insightWindow = null;
         insightWindow.Show();
-    }
-
-    /// <summary>
-    /// Handles dwell events in the editor.
-    /// </summary>
-    private void HandleEditorDwell()
-    {
-        if (hoverPosition == null) return;
-        
-        string hoverWord = GetWordAtPosition(hoverPosition.Value);
-        if (string.IsNullOrEmpty(hoverWord)) return;
-        
-        CallTipInfo callTip = CallTipProvider.GetCallTipInfo(hoverWord);
-        if (callTip == null) return;
-        
-        var headerText = new TextBlock
-        {
-            Text = "standard function",
-            FontWeight = FontWeight.Bold,
-            Foreground = Brushes.DarkOrange,
-        };
-        
-        var bodyText = new TextBlock
-        {
-            Text = callTip.ToString(),
-            TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, 3, 0, 0),
-        };
-        
-        var panel = new StackPanel();
-        panel.Children.Add(headerText);
-        panel.Children.Add(bodyText);
-        
-        ToolTip.SetTip(Editor, panel);
-        ToolTip.SetIsOpen(Editor, true);
     }
 
     /// <summary>
@@ -839,16 +795,16 @@ public partial class MainWindow : Window
             if (!Saved) Save(scriptPath);
         }
 
-        var argsBuilder = new StringBuilder().Append("-f ").Append(EscapeCmdLineArg(scriptPath));
+        var argsBuilder = new StringBuilder().Append("-f ").Append(scriptPath.EscapeAsCmdLineArg());
 
         foreach (var directory in App.SearchPaths)
-            argsBuilder.Append(" -d ").Append(EscapeCmdLineArg(directory));
+            argsBuilder.Append(" -d ").Append(directory.EscapeAsCmdLineArg());
 
         foreach (var assemblyName in App.References)
-            argsBuilder.Append(" -r ").Append(EscapeCmdLineArg(assemblyName));
+            argsBuilder.Append(" -r ").Append(assemblyName.EscapeAsCmdLineArg());
 
         var logPath = Path.ChangeExtension(Path.GetTempFileName(), ".log");
-        argsBuilder.Append(" -l ").Append(EscapeCmdLineArg(logPath));
+        argsBuilder.Append(" -l ").Append(logPath.EscapeAsCmdLineArg());
 
         ClearErrors();
 
@@ -923,14 +879,14 @@ public partial class MainWindow : Window
     private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
         var document = (TextDocument) sender;
-        foldingStrategy.UpdateFoldings(foldingManager, document);
+        if(updateFoldingOnDocChange) foldingStrategy.UpdateFoldings(foldingManager, document);
         Saved = document.TextLength == 0 && string.IsNullOrEmpty(filePath);
         UpdateUndoRedoFileSize();
     }
 
     private void EditorTextEntering(object sender, TextInputEventArgs e)
     {
-        // unimplemented
+        updateFoldingOnDocChange = true;
     }
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
@@ -1002,16 +958,12 @@ public partial class MainWindow : Window
         }
         else
             ToolTip.SetIsOpen(Editor, false);
+
+        if (vl == hoverPosition) return;
         
-        if (vl != hoverPosition)
-        {
-            dwellTimer.Stop();
-            hoverPosition = vl;
-        }
-        else if (!dwellTimer.IsEnabled)
-        {
-            dwellTimer.Start();
-        }
+        hoverPosition = vl;
+        dwellTimer.Stop();
+        dwellTimer.Start();
     }
 
     private void EditorTextViewOnPointerExited(object sender, PointerEventArgs e)
@@ -1021,6 +973,22 @@ public partial class MainWindow : Window
         
         // reset hover position
         hoverPosition = null;
+    }
+
+    private void EditorDwell(object sender, EventArgs e)
+    {
+        dwellTimer.Stop();
+        
+        if (hoverPosition == null) return;
+        
+        string hoverWord = GetWordAtPosition(hoverPosition.Value);
+        if (string.IsNullOrWhiteSpace(hoverWord)) return;
+        
+        CallTipInfo callTip = CallTipProvider.GetCallTipInfo(hoverWord);
+        if (callTip == null) return;
+        
+        ToolTip.SetTip(Editor, callTip);
+        ToolTip.SetIsOpen(Editor, true);
     }
 
     #endregion

@@ -13,7 +13,7 @@ internal class SimpleOverloadProvider(params CallTipInfo[] callTips) : IOverload
 
     public object CurrentHeader => null;
 
-    public object CurrentContent => callTips[SelectedIndex].ToControl();
+    public object CurrentContent => callTips[SelectedIndex].ToVisual();
 
     public event PropertyChangedEventHandler PropertyChanged;
 }
