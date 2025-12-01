@@ -55,7 +55,7 @@ internal class CodeSnippetData(string title, string snippet, string description)
         else
             textToInsert = textToInsert.Remove(caretOffset, 1);
 
-        textArea.Document.Insert(segmentOffset, $"{textToInsert}\n");
+        textArea.Document.Insert(segmentOffset, textToInsert);
         textArea.Caret.Offset = segmentOffset + caretOffset;
     }
 }

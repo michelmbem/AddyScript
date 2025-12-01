@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
+using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AvaloniaEdit;
@@ -43,7 +45,9 @@ public partial class MainWindow : Window
     private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
     private OverloadInsightWindow insightWindow;
-    private DispatcherTimer timer;
+    private DispatcherTimer clipboardTimer;
+    private DispatcherTimer dwellTimer;
+    private TextViewPosition? hoverPosition;
 
     private string filePath;
     private bool saved;
@@ -56,7 +60,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeStyling();
-        InitializeTimer();
+        InitializeTimers();
     }
 
     private void InitializeStyling()
@@ -82,20 +86,33 @@ public partial class MainWindow : Window
         TextView textView = textArea.TextView;
         textView.BackgroundRenderers.Add(textMarkerService);
         textView.PointerMoved += EditorTextViewPointerMoved;
-        textView.PointerExited += (s, e) => ToolTip.SetIsOpen(Editor, false);
+        textView.PointerExited += EditorTextViewOnPointerExited;
     }
 
-    private void InitializeTimer()
+    private void InitializeTimers()
     {
-        timer = new DispatcherTimer()
+        // Clipboard monitoring timer
+        clipboardTimer = new DispatcherTimer()
         {
             Interval = TimeSpan.FromMilliseconds(250)
         };
-        
-        timer.Tick += (s, e) =>
+
+        clipboardTimer.Tick += (s, e) =>
             ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = Editor.CanPaste;
         
-        timer.Start();
+        clipboardTimer.Start();
+        
+        // Dwell timer
+        dwellTimer = new DispatcherTimer()
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+
+        dwellTimer.Tick += (s, e) =>
+        {
+            HandleEditorDwell();
+            dwellTimer.Stop();
+        };
     }
 
     private void InitializeFolding()
@@ -177,17 +194,6 @@ public partial class MainWindow : Window
     /// <returns><b>true</b> is <paramref name="e"/> matches the configuration. <b>false</b> otherwise</returns>
     private static bool IsHotKey(KeyEventArgs e, Key key, KeyModifiers modifiers = KeyModifiers.None) =>
         e.Key == key && (e.KeyModifiers & modifiers) == modifiers;
-
-    /// <summary>
-    /// Checks if a character is a brace in the broad sense of the word.
-    /// </summary>
-    /// <param name="c">The character to test</param>
-    /// <returns>A boolean</returns>
-    private static bool IsBrace(int c) => c switch
-    {
-        '(' or ')' or '[' or ']' or '{' or '}' => true,
-        _ => false,
-    };
 
     /// <summary>
     /// Resets the environment.
@@ -445,7 +451,7 @@ public partial class MainWindow : Window
     /// Gets the "word" that precedes the "word" at caret position.
     /// </summary>
     /// <returns>A string</returns>
-    public string GetWordAtLeft()
+    private string GetWordAtLeft()
     {
         TextDocument document = Editor.Document;
 
@@ -470,10 +476,49 @@ public partial class MainWindow : Window
             LogicalDirection.Forward,
             CaretPositioningMode.WordBorder);
 
-        return (wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart)
+        return wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart
              ? string.Empty
              : document.GetText(wordStart, wordEnd - wordStart);
     }
+    
+    /// <summary>
+    /// Gets the "word" at a given offset.
+    /// </summary>
+    /// <param name="offset">The location where to find at</param>
+    /// <returns>A string</returns>
+    private string GetWordAtOffset(int offset)
+    {
+        // Edge case: caret at the beginning of the document
+        if (offset <= 0) return string.Empty;
+
+        TextDocument document = Editor.Document;
+
+        // Find the start of the word
+        int wordStart = TextUtilities.GetNextCaretPosition(
+            document,
+            offset,
+            LogicalDirection.Backward,
+            CaretPositioningMode.WordStart);
+
+        // Find the end of the previous word
+        int wordEnd = TextUtilities.GetNextCaretPosition(
+            document,
+            wordStart,
+            LogicalDirection.Forward,
+            CaretPositioningMode.WordBorder);
+
+        return wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart
+            ? string.Empty
+            : document.GetText(wordStart, wordEnd - wordStart);
+    }
+    
+    /// <summary>
+    /// Gets the "word" at a given offset.
+    /// </summary>
+    /// <param name="position">The location where to find at</param>
+    /// <returns>A string</returns>
+    private string GetWordAtPosition(TextViewPosition position) =>
+        GetWordAtOffset(Editor.Document.GetOffset(position.Line, position.Column));
 
     /// <summary>
     /// Opens the completion window with the given data.
@@ -533,12 +578,46 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// Handles dwell events in the editor.
+    /// </summary>
+    private void HandleEditorDwell()
+    {
+        if (hoverPosition == null) return;
+        
+        string hoverWord = GetWordAtPosition(hoverPosition.Value);
+        if (string.IsNullOrEmpty(hoverWord)) return;
+        
+        CallTipInfo callTip = CallTipProvider.GetCallTipInfo(hoverWord);
+        if (callTip == null) return;
+        
+        var headerText = new TextBlock
+        {
+            Text = "standard function",
+            FontWeight = FontWeight.Bold,
+            Foreground = Brushes.DarkOrange,
+        };
+        
+        var bodyText = new TextBlock
+        {
+            Text = callTip.ToString(),
+        };
+        
+        var panel = new StackPanel();
+        panel.Children.Add(headerText);
+        panel.Children.Add(bodyText);
+        
+        ToolTip.SetTip(Editor, panel);
+        ToolTip.SetIsOpen(Editor, true);
+    }
+
+    /// <summary>
     /// Opens the search panel in either search or replace mode.
     /// </summary>
     /// <param name="replaceMode">Whether the search panel should be open in replace mode or not</param>
     private void OpenSearchPanel(bool replaceMode)
     {
         Editor.SearchPanel?.Uninstall();
+        
         var searchPanel = SearchPanel.Install(Editor);
         var selection = Editor.TextArea.Selection;
         searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
@@ -556,6 +635,7 @@ public partial class MainWindow : Window
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
         textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
+        Editor.TextArea.TextView.Repaint();
     }
     
     /// <summary>
@@ -565,6 +645,7 @@ public partial class MainWindow : Window
     {
         markerMargin.ClearMarkers();
         textMarkerService.ClearMarkers();
+        Editor.TextArea.TextView.Repaint();
     }
 
     #endregion
@@ -838,7 +919,7 @@ public partial class MainWindow : Window
 
     private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
-        TextDocument document = Editor.Document;
+        var document = (TextDocument) sender;
         foldingStrategy.UpdateFoldings(foldingManager, document);
         Saved = document.TextLength == 0 && string.IsNullOrEmpty(filePath);
         UpdateUndoRedoFileSize();
@@ -900,14 +981,13 @@ public partial class MainWindow : Window
 
     private void EditorTextViewPointerMoved(object sender, PointerEventArgs e)
     {
-        if (sender is not TextView { VisualLinesValid: true } textView) return;
-
         // convert mouse → document offset
-        var vp = textView.GetPosition(e.GetPosition(textView));
+        var vl = Editor.GetPositionFromPoint(e.GetPosition(Editor));
 
-        if (vp.HasValue)
+        // show/hide tooltip if a text marker is present at hover position
+        if (vl.HasValue)
         {
-            var marker = textMarkerService.GetMarkerAt(vp);
+            var marker = textMarkerService.GetMarkerAt(vl);
             
             if (marker == null)
                 ToolTip.SetIsOpen(Editor, false);
@@ -919,6 +999,25 @@ public partial class MainWindow : Window
         }
         else
             ToolTip.SetIsOpen(Editor, false);
+        
+        if (vl != hoverPosition)
+        {
+            dwellTimer.Stop();
+            hoverPosition = vl;
+        }
+        else if (!dwellTimer.IsEnabled)
+        {
+            dwellTimer.Start();
+        }
+    }
+
+    private void EditorTextViewOnPointerExited(object sender, PointerEventArgs e)
+    {
+        // hide tooltip
+        ToolTip.SetIsOpen(Editor, false);
+        
+        // reset hover position
+        hoverPosition = null;
     }
 
     #endregion

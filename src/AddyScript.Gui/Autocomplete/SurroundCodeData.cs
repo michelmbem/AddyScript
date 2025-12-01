@@ -33,8 +33,14 @@ internal class SurroundCodeData(string title, string snippet, string description
 
         foreach (string[] template in templates)
         {
-            string substitution = template[1].Replace(SELECTION_PLACEHOLDER, "\" and \"");
-            All.Add(new(template[0], template[1], $"Wrap the selection between \"{substitution}\""));
+            var kind = template[0] switch
+            {
+                "block" or "function" => $"a {template[0]}",
+                "if" or "else" => $"an {template[0]} statement",
+                _ => $"a {template[0]} statement",
+            };
+            
+            All.Add(new(template[0], template[1], $"Wrap selection in {kind}"));
         }
     }
 
