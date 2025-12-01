@@ -98,12 +98,12 @@ namespace AddyScript.Ast.Expressions
         public override Expression GetMatchTest(Expression arg)
         {
             var lowerBoundCheck = lowerBound != null
-                                ? new BinaryExpression(BinaryOperator.GreaterThanOrEqual, arg, new Literal(lowerBound))
-                                : null;
+                ? new BinaryExpression(BinaryOperator.GreaterThanOrEqual, arg, new Literal(lowerBound))
+                : null;
 
             var upperBoundCheck = upperBound != null
-                                ? new BinaryExpression(BinaryOperator.LessThanOrEqual, arg, new Literal(upperBound))
-                                : null;
+                ? new BinaryExpression(BinaryOperator.LessThanOrEqual, arg, new Literal(upperBound))
+                : null;
 
             // Assuming both lowerBound and upperBound cannot be null at the same time!
             if (lowerBoundCheck == null) return upperBoundCheck;

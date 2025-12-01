@@ -9,6 +9,7 @@ using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
 using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -600,6 +601,8 @@ public partial class MainWindow : Window
         var bodyText = new TextBlock
         {
             Text = callTip.ToString(),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 3, 0, 0),
         };
         
         var panel = new StackPanel();
