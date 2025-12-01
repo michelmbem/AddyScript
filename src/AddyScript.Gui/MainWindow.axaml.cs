@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
 using AddyScript.Gui.Extensions;
@@ -23,8 +16,16 @@ using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Indentation.CSharp;
 using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Search;
+using Microsoft.VisualBasic;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MBI = MsBox.Avalonia.Enums.Icon;
 using SR = AddyScript.Gui.Properties.Resources;
 
@@ -918,7 +919,7 @@ public partial class MainWindow : Window
                 {
                     string wordAtLeft = GetWordAtLeft();
                     if (!CallTipProvider.IsDefined(wordAtLeft)) return;
-                    PushCallTip(CallTipProvider.GetCallTipInfo(wordAtLeft));
+                    PushCallTip(CallTipProvider.GetCallTip(wordAtLeft));
                     ShowCallTip();
                     return;
                 }
@@ -941,13 +942,15 @@ public partial class MainWindow : Window
     private void EditorTextViewPointerMoved(object sender, PointerEventArgs e)
     {
         // convert mouse → document offset
-        var vl = Editor.GetPositionFromPoint(e.GetPosition(Editor));
+        var vp = Editor.GetPositionFromPoint(e.GetPosition(Editor));
 
         // show/hide tooltip if a text marker is present at hover position
-        if (vl.HasValue)
+        if (vp == null)
+            ToolTip.SetIsOpen(Editor, false);
+        else
         {
-            var marker = textMarkerService.GetMarkerAt(vl);
-            
+            var marker = textMarkerService.GetMarkerAt(vp);
+
             if (marker == null)
                 ToolTip.SetIsOpen(Editor, false);
             else
@@ -956,12 +959,10 @@ public partial class MainWindow : Window
                 ToolTip.SetIsOpen(Editor, true);
             }
         }
-        else
-            ToolTip.SetIsOpen(Editor, false);
 
-        if (vl == hoverPosition) return;
+        if (vp == hoverPosition) return;
         
-        hoverPosition = vl;
+        hoverPosition = vp;
         dwellTimer.Stop();
         dwellTimer.Start();
     }
@@ -982,10 +983,9 @@ public partial class MainWindow : Window
         if (hoverPosition == null) return;
         
         string hoverWord = GetWordAtPosition(hoverPosition.Value);
-        if (string.IsNullOrWhiteSpace(hoverWord) ||
-            !CallTipProvider.IsDefined(hoverWord)) return;
+        if (!CallTipProvider.IsDefined(hoverWord)) return;
 
-        CallTipInfo callTip = CallTipProvider.GetCallTipInfo(hoverWord);
+        CallTipInfo callTip = CallTipProvider.GetCallTip(hoverWord);
         ToolTip.SetTip(Editor, callTip);
         ToolTip.SetIsOpen(Editor, true);
     }

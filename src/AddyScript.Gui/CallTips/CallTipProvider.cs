@@ -13,7 +13,7 @@ internal static class CallTipProvider
             Registry[innerFunction.Name] = new CallTipInfo(innerFunction);
     }
 
-    public static bool IsDefined(string fName) => Registry.ContainsKey(fName);
+    public static bool IsDefined(string functionName) => Registry.ContainsKey(functionName);
 
-    public static CallTipInfo GetCallTipInfo(string fName) => Registry[fName];
+    public static CallTipInfo GetCallTip(string functionName) => Registry[functionName];
 }
