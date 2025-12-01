@@ -524,8 +524,13 @@ public partial class MainWindow : Window
         {
             completionWindow.CompletionList.CompletionData.Add(dataItem);
         }
-        
-        completionWindow.Closed += (s, e) => completionWindow = null;
+
+        completionWindow.Closed += (s, e) =>
+        {
+            completionWindow = null;
+            Editor.Focus();
+        };
+
         updateFoldingOnDocChange = false; // prevent folding updates while completion window is open
         completionWindow.Show();
     }
@@ -568,6 +573,18 @@ public partial class MainWindow : Window
 
         insightWindow.Closed += (s, e) =>  insightWindow = null;
         insightWindow.Show();
+    }
+
+    /// <summary>
+    /// Displays an informational popup with the specified text.
+    /// </summary>
+    /// <param name="infoText">The text to display in the popup.</param>
+    private void ShowInfoPopup(string infoText)
+    {
+        PopupText.Text = infoText;
+
+        InfoPopup.PlacementTarget = Editor;
+        InfoPopup.IsOpen = true;
     }
 
     /// <summary>
@@ -963,6 +980,7 @@ public partial class MainWindow : Window
         if (vp == hoverPosition) return;
         
         hoverPosition = vp;
+        InfoPopup.IsOpen = false;
         dwellTimer.Stop();
         dwellTimer.Start();
     }
@@ -971,7 +989,7 @@ public partial class MainWindow : Window
     {
         // hide tooltip
         ToolTip.SetIsOpen(Editor, false);
-        
+
         // reset hover position
         hoverPosition = null;
     }
@@ -979,15 +997,14 @@ public partial class MainWindow : Window
     private void EditorDwell(object sender, EventArgs e)
     {
         dwellTimer.Stop();
-        
+
         if (hoverPosition == null) return;
-        
+
         string hoverWord = GetWordAtPosition(hoverPosition.Value);
         if (!CallTipProvider.IsDefined(hoverWord)) return;
 
         CallTipInfo callTip = CallTipProvider.GetCallTip(hoverWord);
-        ToolTip.SetTip(Editor, callTip);
-        ToolTip.SetIsOpen(Editor, true);
+        ShowInfoPopup(callTip.ToString());
     }
 
     #endregion

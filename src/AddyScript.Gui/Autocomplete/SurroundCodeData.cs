@@ -17,20 +17,20 @@ internal class SurroundCodeData(string title, string snippet, string description
     {
         string[][] templates =
             [
-                ["block", "{\n$selection$\n}"],
-                ["block-comment", "/*\n$selection$\n*/"],
-                ["if", "if (true) {\n$selection$\n}"],
-                ["else", "else {\n$selection$\n}"],
-                ["switch", "switch (0) {\n\tcase 0:\n\t$selection$\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
-                ["for", "for (;;) {\n$selection$\n}"],
-                ["foreach", "foreach (item in []) {\n$selection$\n}"],
-                ["while", "while (true) {\n$selection$\n}"],
-                ["do-while", "do {\n$selection$\n} while (true);"],
-                ["try-catch", "try {\n$selection$\n} catch (e) {\n\tprintln(e);\n}"],
-                ["try-finally", "try {\n$selection$\n} finally {\n}"],
-                ["try-catch-finally", "try {\n$selection$\n} catch (e) {\n\tprintln(e);\n} finally {\n}"],
-                ["try-resource", "try (res) {\n$selection$\n}"],
-                ["function", "function myFunc(arg1, arg2) {\n$selection$\n}"],
+                ["block", "{\n\t$selection$\n}"],
+                ["block-comment", "/*\n\t$selection$\n*/"],
+                ["if", "if (true) {\n\t$selection$\n}"],
+                ["else", "else {\n\t$selection$\n}"],
+                ["switch", "switch (0) {\n\tcase 0:\n\t\t$selection$\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
+                ["for", "for (;;) {\n\t$selection$\n}"],
+                ["foreach", "foreach (item in []) {\n\t$selection$\n}"],
+                ["while", "while (true) {\n\t$selection$\n}"],
+                ["do-while", "do {\n\t$selection$\n} while (true);"],
+                ["try-catch", "try {\n\t$selection$\n} catch (e) {\n\tprintln(e);\n}"],
+                ["try-finally", "try {\n\t$selection$\n} finally {\n}"],
+                ["try-catch-finally", "try {\n\t$selection$\n} catch (e) {\n\tprintln(e);\n} finally {\n}"],
+                ["try-resource", "try (res) {\n\t$selection$\n}"],
+                ["function", "function myFunc(arg1, arg2) {\n\t$selection$\n}"],
             ];
 
         foreach (string[] template in templates)
@@ -51,8 +51,11 @@ internal class SurroundCodeData(string title, string snippet, string description
     public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
     {
         Selection selection = textArea.Selection;
-        string indentation = "\t" + textArea.Document.GetIndentation(selection.StartPosition.Line);
-        string replacementText = Text.Replace(SELECTION_PLACEHOLDER, selection.GetText().IndentLines(indentation));
+        string leadingSpace = Text.LeadingWhitespace(SELECTION_PLACEHOLDER);
+        string indentation = textArea.Document.GetIndentation(selection.StartPosition.Line);
+        string indentedSelection = selection.GetText().IndentLines(leadingSpace + indentation);
+        string replacementText = Text.IndentNextLine(SELECTION_PLACEHOLDER, indentation)
+            .Replace(leadingSpace + SELECTION_PLACEHOLDER, indentedSelection);
         selection.ReplaceSelectionWithText(replacementText);
     }
 }

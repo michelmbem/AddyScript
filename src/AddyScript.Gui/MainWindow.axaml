@@ -186,5 +186,21 @@
                 <Label Name="CaretStatusLabel" />
             </StackPanel>
         </Grid>
+        <Popup Name="InfoPopup"
+               Placement="Pointer"
+               IsLightDismissEnabled="False">
+            <Border Background="#CCEEEEEE"
+                    BorderBrush="{DynamicResource WindowBackground}"
+                    BorderThickness="1"
+                    Padding="5">
+                <StackPanel>
+                    <TextBlock Text="Function"
+                               Foreground="{DynamicResource WindowBackground}"
+                               FontWeight="Bold"
+                               Margin="0,0,0,2"/>
+                    <TextBlock Name="PopupText" />
+                </StackPanel>
+            </Border>
+        </Popup>
     </Grid>
 </Window>

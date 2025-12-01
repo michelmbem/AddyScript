@@ -1,5 +1,6 @@
 using AddyScript.Runtime;
 using AddyScript.Runtime.OOP;
+using AddyScript.Translators;
 using System.Text;
 
 namespace AddyScript.Gui.CallTips;
@@ -35,7 +36,7 @@ internal class ParameterInfo(string text, bool infinite)
                     textBuilder.Append($" = `{parameter.DefaultValue}`");
                     break;
                 case ClassID.String:
-                    textBuilder.Append($" = \"{parameter.DefaultValue}\"");
+                    textBuilder.Append($" = \"{CodeGenerator.EscapedString(parameter.DefaultValue.ToString(), false)}\"");
                     break;
                 default:
                     textBuilder.Append($" = {parameter.DefaultValue}");

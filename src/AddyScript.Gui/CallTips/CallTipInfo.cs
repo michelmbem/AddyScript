@@ -74,9 +74,7 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 
     public override string ToString()
     {
-        var textBuilder = new StringBuilder("function ")
-            .Append(functionName)
-            .Append('(');
+        var textBuilder = new StringBuilder(functionName).Append('(');
 
         for (var i = 0; i < parameters.Count; i++)
         {
