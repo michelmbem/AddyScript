@@ -982,11 +982,10 @@ public partial class MainWindow : Window
         if (hoverPosition == null) return;
         
         string hoverWord = GetWordAtPosition(hoverPosition.Value);
-        if (string.IsNullOrWhiteSpace(hoverWord)) return;
-        
+        if (string.IsNullOrWhiteSpace(hoverWord) ||
+            !CallTipProvider.IsDefined(hoverWord)) return;
+
         CallTipInfo callTip = CallTipProvider.GetCallTipInfo(hoverWord);
-        if (callTip == null) return;
-        
         ToolTip.SetTip(Editor, callTip);
         ToolTip.SetIsOpen(Editor, true);
     }
