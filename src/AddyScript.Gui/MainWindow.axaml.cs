@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
 using AddyScript.Gui.Extensions;
@@ -16,16 +23,8 @@ using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Indentation.CSharp;
 using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Search;
-using Microsoft.VisualBasic;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MBI = MsBox.Avalonia.Enums.Icon;
 using SR = AddyScript.Gui.Properties.Resources;
 
