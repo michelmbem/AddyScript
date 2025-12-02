@@ -187,6 +187,7 @@
             </StackPanel>
         </Grid>
         <Popup Name="InfoPopup"
+               Grid.Row="0"
                Placement="Pointer"
                IsLightDismissEnabled="False">
             <Border Background="#CCEEEEEE"

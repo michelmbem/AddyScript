@@ -3,15 +3,34 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="https://github.com/projektanker/icons.avalonia">
     <Design.PreviewWith>
-        <StackPanel Grid.Row="0" Classes="toolbar">
-            <Button i:Attached.Icon="fa-file" />
-            <Button i:Attached.Icon="fa-folder-open" />
-            <Button i:Attached.Icon="fa-floppy-disk" />
-            <Button i:Attached.Icon="fa-print" />
-            <Rectangle Classes="divider" />
-            <Button i:Attached.Icon="fa-rotate-left" />
-            <Button i:Attached.Icon="fa-rotate-right" />
-        </StackPanel>
+        <Border Width="800"
+                Height="600"
+                Background="{DynamicResource WindowBackground}">
+            <Grid RowDefinitions="Auto, *, Auto">
+                <StackPanel Grid.Row="0" Classes="toolbar">
+                    <Button i:Attached.Icon="fa-file" />
+                    <Button i:Attached.Icon="fa-folder-open" />
+                    <SplitButton i:Attached.Icon="fa-floppy-disk">
+                        <SplitButton.Flyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuItem Header="Save as..." />
+                                <MenuItem Header="Export to XML" />
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                    <Rectangle Classes="divider" />
+                    <Button i:Attached.Icon="fa-rotate-left" />
+                </StackPanel>
+                <Border Grid.Row="1" Classes="editor-wrapper"/>
+                <Grid Grid.Row="2" Classes="statusbar" ColumnDefinitions="*, 200">
+                    <Label Grid.Column="0" Content="First label" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Rectangle Classes="divider" />
+                        <Label Content="Second label"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
     </Design.PreviewWith>
 
     <!--  Add Styles Here  -->
@@ -24,7 +43,7 @@
 
     <Style Selector="StackPanel.toolbar">
         <Setter Property="Orientation" Value="Horizontal" />
-        <Setter Property="Margin" Value="5" />
+        <Setter Property="Margin" Value="10, 5" />
         <Setter Property="Spacing" Value="5" />
     </Style>
 
@@ -38,7 +57,8 @@
         <Setter Property="FontSize" Value="24" />
     </Style>
 
-    <Style Selector="StackPanel.toolbar Button:pointerover /template/ ContentPresenter,                    StackPanel.toolbar SplitButton:flyout-open Button /template/ ContentPresenter">
+    <Style Selector="StackPanel.toolbar Button:pointerover /template/ ContentPresenter,
+                     StackPanel.toolbar SplitButton:flyout-open Button /template/ ContentPresenter">
         <Setter Property="Foreground" Value="{DynamicResource HoverToolbarButtonForeground}" />
         <Setter Property="Background" Value="{DynamicResource HoverToolbarButtonBackground}" />
     </Style>
@@ -49,7 +69,7 @@
     </Style>
 
     <Style Selector="StackPanel.toolbar Rectangle.divider">
-        <Setter Property="Height" Value="32" />
+        <Setter Property="Height" Value="24" />
     </Style>
 
     <Style Selector="MenuFlyoutPresenter, ContextMenu">
@@ -79,7 +99,7 @@
     </Style>
 
     <Style Selector="Border.editor-wrapper">
-        <Setter Property="Margin" Value="10, 5, 15, 15" />
+        <Setter Property="Margin" Value="10, 0, 15, 5" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Background" Value="{DynamicResource EditorBackground}" />
         <Setter Property="CornerRadius" Value="10" />
@@ -87,7 +107,7 @@
     </Style>
 
     <Style Selector="Grid.statusbar">
-        <Setter Property="Margin" Value="5" />
+        <Setter Property="Margin" Value="10, 5" />
     </Style>
 
     <Style Selector="Grid.statusbar Label">
@@ -98,5 +118,6 @@
 
     <Style Selector="Grid.statusbar Rectangle.divider">
         <Setter Property="Height" Value="16" />
+        <Setter Property="Margin" Value="5, 0" />
     </Style>
 </Styles>

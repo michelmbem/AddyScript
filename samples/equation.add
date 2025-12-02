@@ -36,15 +36,22 @@ function equation(a, b, c)
 	}
 }
 
-var ans;
-do
-{
+function dialog() {
     println('solving a*x**2 + b*x + c = 0:');
-	a = (float)readln('a = ');
+    println('-----------------------------');
+    
+    a = (float)readln('a = ');
 	b = (float)readln('b = ');
 	c = (float)readln('c = ');
 	
-	equation(a, b, c);
+	return (a, b, c);
+}
+
+var ans;
+
+do
+{
+	equation(..dialog());
 	
 	do
 		ans = readln('continue? (y/n) ').toLower();
