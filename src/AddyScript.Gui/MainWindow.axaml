@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="https://github.com/projektanker/icons.avalonia"
         xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
-        Width="1000"
-        Height="650"
+        Width="900"
+        Height="600"
         Background="{DynamicResource WindowBackground}"
         Icon="/Assets/Images/Icons/AddyScript.ico"
         Loaded="WindowLoaded"
@@ -12,6 +12,22 @@
         Closing="WindowClosing">
     
     <Grid RowDefinitions="Auto, *, Auto">
+        <Popup Name="InfoPopup"
+               Placement="Pointer"
+               IsLightDismissEnabled="False">
+            <Border Background="#DDEEEEEE"
+                    BorderBrush="{DynamicResource WindowBackground}"
+                    BorderThickness="1"
+                    Padding="5">
+                <StackPanel>
+                    <TextBlock Name="PopupHeader"
+                               Foreground="{DynamicResource WindowBackground}"
+                               FontWeight="Bold"
+                               Margin="0,0,0,2"/>
+                    <TextBlock Name="PopupText" />
+                </StackPanel>
+            </Border>
+        </Popup>
         <StackPanel Grid.Row="0" Classes="toolbar">
             <Button Name="ToolbarNewButton"
                     i:Attached.Icon="fa-file"
@@ -32,10 +48,12 @@
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
                         <MenuItem Name="ToolbarSaveAsMenuItem"
                                   Header="Save as..."
+                                  i:MenuItem.Icon="mdi-content-save-edit"
                                   HotKey="Meta+Shift+S"
                                   Click="ToolbarSaveAsMenuItemClick" />
                         <MenuItem Name="ToolbarExportXmlMenuItem"
                                   Header="Export AST to XML"
+                                  i:MenuItem.Icon="mdi-file-xml-box"
                                   Click="ToolbarExportXmlMenuItemClick" />
                     </MenuFlyout>
                 </SplitButton.Flyout>
@@ -78,14 +96,14 @@
                     HotKey="Meta+H"
                     Click="ToolbarReplaceButtonClick" />
             <Rectangle Classes="divider" />
-            <Button Name="ToolbarOutdentButton"
-                    i:Attached.Icon="fa-outdent"
-                    ToolTip.Tip="Outdent"
-                    Click="ToolbarOutdentButtonClick" />
             <Button Name="ToolbarIndentButton"
                     i:Attached.Icon="fa-indent"
                     ToolTip.Tip="Indent"
                     Click="ToolbarIndentButtonClick" />
+            <Button Name="ToolbarOutdentButton"
+                    i:Attached.Icon="fa-outdent"
+                    ToolTip.Tip="Outdent"
+                    Click="ToolbarOutdentButtonClick" />
             <Button Name="ToolbarCommentButton"
                     i:Attached.Icon="fa-comment"
                     ToolTip.Tip="Comment"
@@ -175,7 +193,7 @@
         </Border>
         <Grid Grid.Row="2"
               Classes="statusbar"
-              ColumnDefinitions="*, 200, 250">
+              ColumnDefinitions="*, 200, 200">
             <Label Name="FileNameStatusLabel" Grid.Column="0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Rectangle Classes="divider" />
@@ -186,22 +204,5 @@
                 <Label Name="CaretStatusLabel" />
             </StackPanel>
         </Grid>
-        <Popup Name="InfoPopup"
-               Grid.Row="0"
-               Placement="Pointer"
-               IsLightDismissEnabled="False">
-            <Border Background="#CCEEEEEE"
-                    BorderBrush="{DynamicResource WindowBackground}"
-                    BorderThickness="1"
-                    Padding="5">
-                <StackPanel>
-                    <TextBlock Text="Function"
-                               Foreground="{DynamicResource WindowBackground}"
-                               FontWeight="Bold"
-                               Margin="0,0,0,2"/>
-                    <TextBlock Name="PopupText" />
-                </StackPanel>
-            </Border>
-        </Popup>
     </Grid>
 </Window>

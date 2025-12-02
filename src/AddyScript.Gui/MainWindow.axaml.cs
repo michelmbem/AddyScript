@@ -11,6 +11,7 @@ using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -97,9 +98,7 @@ public partial class MainWindow : Window
             Interval = TimeSpan.FromMilliseconds(250)
         };
 
-        clipboardTimer.Tick += (s, e) =>
-            ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = Editor.CanPaste;
-        
+        clipboardTimer.Tick += EditorMonitorClipboard;
         clipboardTimer.Start();
         
         // Dwell timer
@@ -577,10 +576,12 @@ public partial class MainWindow : Window
     /// <summary>
     /// Displays an informational popup with the specified text.
     /// </summary>
-    /// <param name="infoText">The text to display in the popup.</param>
-    private void ShowInfoPopup(string infoText)
+    /// <param name="header">The text to display in the popup header.</param>
+    /// <param name="text">The text to display in the popup body.</param>
+    private void ShowInfoPopup(string header, string text)
     {
-        PopupText.Text = infoText;
+        PopupHeader.Text = header;
+        PopupText.Text = text;
 
         InfoPopup.PlacementTarget = Editor;
         InfoPopup.IsOpen = true;
@@ -739,24 +740,6 @@ public partial class MainWindow : Window
         OpenSearchPanel(true);
     }
 
-    private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
-    {
-        var document = Editor.Document;
-        var selection = Editor.TextArea.Selection;
-
-        if (selection.IsMultiline)
-        {
-            document.BeginUpdate();
-
-            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
-                document.UnindentLine(i);
-
-            document.EndUpdate();
-        }
-        else
-            document.UnindentLine(Editor.TextArea.Caret.Line);
-    }
-
     private void ToolbarIndentButtonClick(object sender, RoutedEventArgs e)
     {
         var document = Editor.Document;
@@ -773,6 +756,24 @@ public partial class MainWindow : Window
         }
         else
             document.IndentLine(Editor.TextArea.Caret.Line);
+    }
+
+    private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
+    {
+        var document = Editor.Document;
+        var selection = Editor.TextArea.Selection;
+
+        if (selection.IsMultiline)
+        {
+            document.BeginUpdate();
+
+            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
+                document.OutdentLine(i);
+
+            document.EndUpdate();
+        }
+        else
+            document.OutdentLine(Editor.TextArea.Caret.Line);
     }
 
     private void ToolbarCommentButtonClick(object sender, RoutedEventArgs e)
@@ -1011,6 +1012,17 @@ public partial class MainWindow : Window
         hoverPosition = null;
     }
 
+    private async void EditorMonitorClipboard(object sender, EventArgs e)
+    {
+        var clipboard = GetTopLevel(this)?.Clipboard;
+        if (clipboard == null) return;
+
+        var clipboardText = await clipboard.TryGetTextAsync();
+        bool editorCanPaste = !string.IsNullOrEmpty(clipboardText); // Editor.CanPaste always returns true!
+
+        ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = editorCanPaste;
+    }
+
     private void EditorDwell(object sender, EventArgs e)
     {
         dwellTimer.Stop();
@@ -1021,7 +1033,7 @@ public partial class MainWindow : Window
         if (!CallTipProvider.IsDefined(hoverWord)) return;
 
         CallTipInfo callTip = CallTipProvider.GetCallTip(hoverWord);
-        ShowInfoPopup(callTip.ToString());
+        ShowInfoPopup(SR.BuiltinFunction, callTip.ToString());
     }
 
     #endregion

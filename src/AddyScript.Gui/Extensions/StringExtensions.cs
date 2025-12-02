@@ -2,6 +2,9 @@ using System;
 
 namespace AddyScript.Gui.Extensions;
 
+/// <summary>
+/// A set of extension methods for the <b>string</b> type.
+/// </summary>
 public static class StringExtensions
 {
     /// <summary>

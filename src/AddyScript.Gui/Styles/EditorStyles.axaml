@@ -3,8 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="https://github.com/projektanker/icons.avalonia">
     <Design.PreviewWith>
-        <Border Width="800"
-                Height="600"
+        <Border Width="600"
+                Height="400"
                 Background="{DynamicResource WindowBackground}">
             <Grid RowDefinitions="Auto, *, Auto">
                 <StackPanel Grid.Row="0" Classes="toolbar">
@@ -48,8 +48,8 @@
     </Style>
 
     <Style Selector="StackPanel.toolbar Button">
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="4" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />

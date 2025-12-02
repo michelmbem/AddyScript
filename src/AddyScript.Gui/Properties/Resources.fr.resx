@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -203,5 +203,8 @@
   </data>
   <data name="AssemblyChooserFilter" xml:space="preserve">
     <value>Assembly .Net (*.dll)</value>
+  </data>
+  <data name="BuiltinFunction" xml:space="preserve">
+    <value>Fonction interne</value>
   </data>
 </root>

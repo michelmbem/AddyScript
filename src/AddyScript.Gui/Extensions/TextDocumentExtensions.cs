@@ -2,9 +2,19 @@ using AvaloniaEdit.Document;
 
 namespace AddyScript.Gui.Extensions;
 
+/// <summary>
+/// A set of additional methods for the <see cref="TextDocument"/> class.
+/// </summary>
 public static class TextDocumentExtensions
 {
-    public static int GetIndentationChars(this TextDocument document, int lineNumber, int tabSize = 4)
+    /// <summary>
+    /// Gets the indentation size of the given line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
+    /// <param name="tabSize">The number of space chars per tab char</param>
+    /// <returns>The number of individual space chars at the beginning of the line</returns>
+    public static int GetIndentationSize(this TextDocument document, int lineNumber, int tabSize = 4)
     {
         DocumentLine line = document.GetLineByNumber(lineNumber);
         string lineText = document.GetText(line);
@@ -23,9 +33,22 @@ public static class TextDocumentExtensions
         return indentChars;
     }
 
+    /// <summary>
+    /// Gets the indentation level of a line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
+    /// <param name="tabSize">The number of space chars per tab char</param>
+    /// <returns>The number of tab chars at the beginning of the line</returns>
     public static int GetIndentationLevel(this TextDocument document, int lineNumber, int tabSize = 4) =>
-        document.GetIndentationChars(lineNumber, tabSize) / tabSize;
+        document.GetIndentationSize(lineNumber, tabSize) / tabSize;
 
+    /// <summary>
+    /// Get the part of line that reprensents indentation.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
+    /// <returns>A substring of all space and tab chars located at the beginning of the line</returns>
     public static string GetIndentation(this TextDocument document, int lineNumber)
     {
         DocumentLine line = document.GetLineByNumber(lineNumber);
@@ -38,13 +61,27 @@ public static class TextDocumentExtensions
         return lineText[..i];
     }
 
-    public static void IndentLine(this TextDocument document, int lineNumber, int tabSize = 4)
+    /// <summary>
+    /// Increases the indentation level of a line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
+    /// <param name="useSpaces">Determines wheter to use spaces instead of tabs or not</param>
+    /// <param name="tabSize">The number of spaces per tab. Only used when <paramref name="useSpaces"/> is <b>true</b></param>
+    public static void IndentLine(this TextDocument document, int lineNumber, bool useSpaces = false, int tabSize = 4)
     {
         int lineOffset = document.GetLineByNumber(lineNumber).Offset;
-        document.Insert(lineOffset, "\t");
+        string indentation = useSpaces ? new(' ', tabSize) : "\t";
+        document.Insert(lineOffset, indentation);
     }
 
-    public static void UnindentLine(this TextDocument document, int lineNumber, int tabSize = 4)
+    /// <summary>
+    /// Decreases the indentation level of a line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
+    /// <param name="tabSize">The number of spaces per tab</param>
+    public static void OutdentLine(this TextDocument document, int lineNumber, int tabSize = 4)
     {
         int lineOffset = document.GetLineByNumber(lineNumber).Offset;
 
@@ -68,12 +105,22 @@ public static class TextDocumentExtensions
         }
     }
 
+    /// <summary>
+    /// Adds a double-slash sign at the beginning of a line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
     public static void CommentLine(this TextDocument document, int lineNumber)
     {
         int lineOffset = document.GetLineByNumber(lineNumber).Offset;
         document.Insert(lineOffset, "//");
     }
 
+    /// <summary>
+    /// Removes the first occurence of the double-slash sign from the beginning of a line.
+    /// </summary>
+    /// <param name="document">The target document</param>
+    /// <param name="lineNumber">The line number</param>
     public static void UncommentLine(this TextDocument document, int lineNumber)
     {
         DocumentLine line = document.GetLineByNumber(lineNumber);

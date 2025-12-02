@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -218,5 +218,8 @@
   </data>
   <data name="OptionDialogTitle" xml:space="preserve">
     <value>Options</value>
+  </data>
+  <data name="BuiltinFunction" xml:space="preserve">
+    <value>Builtin function</value>
   </data>
 </root>
