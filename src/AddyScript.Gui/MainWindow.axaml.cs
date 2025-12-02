@@ -741,56 +741,74 @@ public partial class MainWindow : Window
 
     private void ToolbarOutdentButtonClick(object sender, RoutedEventArgs e)
     {
+        var document = Editor.Document;
         var selection = Editor.TextArea.Selection;
 
-        if (!selection.IsMultiline) return;
-
-        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        if (selection.IsMultiline)
         {
-            var line = Editor.Document.Lines[i];
-            if (Editor.Document.GetCharAt(line.Offset) == '\t')
-                Editor.Document.Remove(line.Offset, 1);
+            document.BeginUpdate();
+
+            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
+                document.UnindentLine(i);
+
+            document.EndUpdate();
         }
+        else
+            document.UnindentLine(Editor.TextArea.Caret.Line);
     }
 
     private void ToolbarIndentButtonClick(object sender, RoutedEventArgs e)
     {
+        var document = Editor.Document;
         var selection = Editor.TextArea.Selection;
 
-        if (!selection.IsMultiline) return;
-
-        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        if (selection.IsMultiline)
         {
-            var line = Editor.Document.Lines[i];
-            Editor.Document.Insert(line.Offset, "\t");
+            document.BeginUpdate();
+
+            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
+                document.IndentLine(i);
+
+            document.EndUpdate();
         }
+        else
+            document.IndentLine(Editor.TextArea.Caret.Line);
     }
 
     private void ToolbarCommentButtonClick(object sender, RoutedEventArgs e)
     {
+        var document = Editor.Document;
         var selection = Editor.TextArea.Selection;
 
-        if (!selection.IsMultiline) return;
-
-        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        if (selection.IsMultiline)
         {
-            var line = Editor.Document.Lines[i];
-            Editor.Document.Insert(line.Offset, "//");
+            document.BeginUpdate();
+
+            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
+                document.CommentLine(i);
+
+            document.EndUpdate();
         }
+        else
+            document.CommentLine(Editor.TextArea.Caret.Line);
     }
 
     private void ToolbarUncommentButtonClick(object sender, RoutedEventArgs e)
     {
+        var document = Editor.Document;
         var selection = Editor.TextArea.Selection;
 
-        if (!selection.IsMultiline) return;
-
-        for (var i = selection.StartPosition.Line - 1; i < selection.EndPosition.Line; ++i)
+        if (selection.IsMultiline)
         {
-            var line = Editor.Document.Lines[i];
-            if (Editor.Document.GetCharAt(line.Offset) == '/' && Editor.Document.GetCharAt(line.Offset + 1) == '/')
-                Editor.Document.Remove(line.Offset, 2);
+            document.BeginUpdate();
+
+            for (var i = selection.StartPosition.Line; i <= selection.EndPosition.Line; ++i)
+                document.UncommentLine(i);
+
+            document.EndUpdate();
         }
+        else
+            document.UncommentLine(Editor.TextArea.Caret.Line);
     }
 
     public void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
