@@ -28,29 +28,10 @@ public static class StringExtensions
         for (var i = 0; i < lines.Length; ++i)
         {
             if (skipFirstLine && i == 0) continue;
-            lines[i] = indentation + lines[i].TrimStart(' ', '\t');
+            lines[i] = indentation + lines[i];
         }
         
         return string.Join(Environment.NewLine, lines);
-    }
-
-    /// <summary>
-    /// Indents the line following the first occurrence of <paramref name="subString"/>
-    /// with the specified <paramref name="indentation"/>.
-    /// </summary>
-    /// <param name="value">The string in which to indent the next line after <paramref name="subString"/></param>
-    /// <param name="subString">The substring after which the next line should be indented</param>
-    /// <param name="indentation">The indentation to add at the beginning of the line following <paramref name="subString"/></param>
-    /// <returns>A new string with the line following the first occurrence of <paramref name="subString"/> indented</returns>
-    public static string IndentNextLine(this string value, string subString, string indentation)
-    {
-        int offset = value.IndexOf(subString);
-        if (offset < 0) return value;
-
-        offset = value.IndexOf('\n', offset + subString.Length);
-        if (offset < 0) return value;
-
-        return value[..(offset + 1)] + indentation + value[(offset + 1)..];
     }
 
     /// <summary>

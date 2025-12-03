@@ -38,7 +38,7 @@ internal class CodeSnippetData(string title, string snippet, string description)
 
         foreach (string[] snippet in snippets)
         {
-            string description = $"Insert a code snippet like \"{snippet[1].Replace('^', '?')}\"";
+            string description = $"Insert a code snippet like \"{snippet[1].Replace("^", "/*...*/")}\"";
             All.Add(new(snippet[0], snippet[1], description));
         }
     }

@@ -30,7 +30,11 @@ public partial class FoldingStrategy
         // --- 3. Handle multiline comments ---
         AddCommentFoldings(document, newFoldings);
 
-        newFoldings.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+        newFoldings.Sort((a, b) =>
+        {
+            int cmp = a.StartOffset.CompareTo(b.StartOffset);
+            return cmp == 0 ? a.EndOffset.CompareTo(b.EndOffset) : cmp;
+        });
 
         return newFoldings;
     }
@@ -49,7 +53,10 @@ public partial class FoldingStrategy
         });
     }
 
-    private void AddBraceFoldings(TextDocument document, List<NewFolding> newFoldings, char openingBrace, char closingBrace)
+    private void AddBraceFoldings(TextDocument document,
+                                  List<NewFolding> newFoldings,
+                                  char openingBrace,
+                                  char closingBrace)
     {
         var startOffsets = new Stack<int>();
         var textLength = document.TextLength;

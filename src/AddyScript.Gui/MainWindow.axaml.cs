@@ -41,7 +41,6 @@ public partial class MainWindow : Window
     private readonly FoldingStrategy foldingStrategy = new();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
-    private bool updateFoldingOnDocChange = true;
     private FoldingManager foldingManager;
     private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
@@ -49,6 +48,7 @@ public partial class MainWindow : Window
     private DispatcherTimer clipboardTimer;
     private DispatcherTimer dwellTimer;
     private TextViewPosition? hoverPosition;
+    private bool updateFolding;
 
     private string filePath;
     private bool saved;
@@ -117,6 +117,7 @@ public partial class MainWindow : Window
 
         foldingManager = FoldingManager.Install(Editor.TextArea);
         foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+        updateFolding = false;
     }
 
     #endregion
@@ -523,13 +524,7 @@ public partial class MainWindow : Window
             completionWindow.CompletionList.CompletionData.Add(dataItem);
         }
 
-        completionWindow.Closed += (s, e) =>
-        {
-            completionWindow = null;
-            Editor.Focus();
-        };
-
-        updateFoldingOnDocChange = false; // prevent folding updates while completion window is open
+        completionWindow.Closed += (s, e) => completionWindow = null;
         completionWindow.Show();
     }
 
@@ -914,15 +909,14 @@ public partial class MainWindow : Window
 
     private void EditorDocumentChanged(object sender, DocumentChangeEventArgs e)
     {
-        var document = (TextDocument) sender;
-        if(updateFoldingOnDocChange) foldingStrategy.UpdateFoldings(foldingManager, document);
-        Saved = document.TextLength == 0 && string.IsNullOrEmpty(filePath);
+        updateFolding = true;
+        Saved = Editor.Document.TextLength == 0 && string.IsNullOrEmpty(filePath);
         UpdateUndoRedoFileSize();
     }
 
     private void EditorTextEntering(object sender, TextInputEventArgs e)
     {
-        updateFoldingOnDocChange = true;
+        // Does nothing for the moment
     }
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
@@ -1014,13 +1008,14 @@ public partial class MainWindow : Window
 
     private async void EditorMonitorClipboard(object sender, EventArgs e)
     {
+        if (updateFolding) foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+        
         var clipboard = GetTopLevel(this)?.Clipboard;
         if (clipboard == null) return;
 
-        var clipboardText = await clipboard.TryGetTextAsync();
-        bool editorCanPaste = !string.IsNullOrEmpty(clipboardText); // Editor.CanPaste always returns true!
-
-        ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = editorCanPaste;
+        var text = await clipboard.TryGetTextAsync();
+        // We could have used Editor.CanPaste but it always returns true!
+        ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = !string.IsNullOrEmpty(text);
     }
 
     private void EditorDwell(object sender, EventArgs e)

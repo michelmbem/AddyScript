@@ -54,8 +54,7 @@ internal class SurroundCodeData(string title, string snippet, string description
         string leadingSpace = Text.LeadingWhitespace(SELECTION_PLACEHOLDER);
         string indentation = textArea.Document.GetIndentation(selection.StartPosition.Line);
         string indentedSelection = selection.GetText().IndentLines(leadingSpace + indentation);
-        string replacementText = Text.IndentNextLine(SELECTION_PLACEHOLDER, indentation)
-            .Replace(leadingSpace + SELECTION_PLACEHOLDER, indentedSelection);
+        string replacementText = Text.Replace(leadingSpace + SELECTION_PLACEHOLDER, indentedSelection);
         selection.ReplaceSelectionWithText(replacementText);
     }
 }

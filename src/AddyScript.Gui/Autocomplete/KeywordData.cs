@@ -34,7 +34,7 @@ internal partial class KeywordData(string word, KeywordType type) :
             super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 tuple?0 typeof?4 unpack?3 var?0 void?1 when?0
             while?0 with?0 write?5 yield?0";
 
-        foreach (string keyword in KeywordRegex().Split(keywords))
+        foreach (string keyword in KeywordSplitRegex().Split(keywords))
         {
             if (keyword.Length == 0) continue;
 
@@ -51,7 +51,7 @@ internal partial class KeywordData(string word, KeywordType type) :
         All.FindAll(k => k.Text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
 
     [GeneratedRegex(@"\s+")]
-    private static partial Regex KeywordRegex();
+    private static partial Regex KeywordSplitRegex();
 
     private static IImage KeywordTypeIcon(KeywordType type) => type switch
     {
