@@ -51,10 +51,10 @@ internal class SurroundCodeData(string title, string snippet, string description
     public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
     {
         Selection selection = textArea.Selection;
+        string selIndentation = textArea.Document.GetIndentation(selection.StartPosition.Line);
         string leadingSpace = Text.LeadingWhitespace(SELECTION_PLACEHOLDER);
-        string indentation = textArea.Document.GetIndentation(selection.StartPosition.Line);
-        string indentedSelection = selection.GetText().IndentLines(leadingSpace + indentation);
-        string replacementText = Text.Replace(leadingSpace + SELECTION_PLACEHOLDER, indentedSelection);
+        string replacementText = Text.IndentLines(selIndentation, true)
+            .Replace(leadingSpace + SELECTION_PLACEHOLDER, selection.GetText().IndentLines(leadingSpace));
         selection.ReplaceSelectionWithText(replacementText);
     }
 }

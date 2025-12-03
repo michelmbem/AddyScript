@@ -194,28 +194,53 @@ namespace AddyScript.Ast.Expressions
 
 
     /// <summary>
-    /// A subclass of <see cref="Pattern"/> made of a collection of child patterns.
-    /// It checks that the value to match satisfies at least one of its children.
+    /// A subclass of <see cref="Pattern"/> that negates its child patterns.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of <see cref="NegativePattern"/>.
+    /// </remarks>
+    /// <param name="child">The child pattern</param>
+    public class NegativePattern(Pattern child) : Pattern
+    {
+        /// <summary>
+        /// The child of this <see cref="NegativePattern"/>.
+        /// </summary>
+        public Pattern Child => child;
+
+        public override Expression GetMatchTest(Expression arg) =>
+            new UnaryExpression(UnaryOperator.Not, child.GetMatchTest(arg));
+    }
+
+
+    /// <summary>
+    /// A subclass of <see cref="Pattern"/> made of 2 child patterns.
+    /// It checks that the value to match satisfies either one or both of its children.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of <see cref="CompositePattern"/>.
     /// </remarks>
-    /// <param name="components"></param>
-    public class CompositePattern(params Pattern[] components) : Pattern
+    /// <param name="inclusive">Controls how children are combined</param>
+    /// <param name="left">The first child pattern</param>
+    /// <param name="right">The second child pattern</param>
+    public class CompositePattern(bool inclusive, Pattern left, Pattern right) : Pattern
     {
         /// <summary>
-        /// The children of this <see cref="CompositePattern"/>.
+        /// Controls how children are combined.
         /// </summary>
-        public Pattern[] Components => components;
+        public bool Inclusive => inclusive;
 
-        public override Expression GetMatchTest(Expression arg)
-        {
-            Expression matchTest = components[0].GetMatchTest(arg);
+        /// <summary>
+        /// The first child of this <see cref="CompositePattern"/>.
+        /// </summary>
+        public Pattern Left => left;
 
-            for (int i = 1; i < components.Length; ++i)
-                matchTest = new BinaryExpression(BinaryOperator.OrElse, matchTest, components[i].GetMatchTest(arg));
+        /// <summary>
+        /// The second child of this <see cref="CompositePattern"/>.
+        /// </summary>
+        public Pattern Right => right;
 
-            return matchTest;
-        }
+        public override Expression GetMatchTest(Expression arg) => inclusive
+            ? new BinaryExpression(BinaryOperator.AndAlso, left.GetMatchTest(arg), right.GetMatchTest(arg))
+            : new BinaryExpression(BinaryOperator.OrElse, left.GetMatchTest(arg), right.GetMatchTest(arg));
     }
 }
