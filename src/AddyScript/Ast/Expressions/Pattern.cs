@@ -1,5 +1,6 @@
 using AddyScript.Ast.Statements;
 using AddyScript.Runtime.DataItems;
+using AddyScript.Runtime.OOP;
 
 
 namespace AddyScript.Ast.Expressions
@@ -175,18 +176,9 @@ namespace AddyScript.Ast.Expressions
     /// <remarks>
     /// Initializes a new instance of <see cref="PredicatePattern"/>.
     /// </remarks>
-    /// <param name="parameterName">
-    /// The name of the parameter of the predicate that this <see cref="Pattern"/> invokes to match a value
-    /// </param>
     /// <param name="predicate">The predicate that this <see cref="Pattern"/> invokes to match a value</param>
-    public class PredicatePattern(string parameterName, Expression predicate) : Pattern
+    public class PredicatePattern(Expression predicate) : Pattern
     {
-        /// <summary>
-        /// The name of the parameter of the predicate that this <see cref="Pattern"/> invokes to match a value.<br/>
-        /// It is basically an alias for the value that is being tested within the predicate's body.
-        /// </summary>
-        public string ParameterName => parameterName;
-
         /// <summary>
         /// The predicate that this <see cref="Pattern"/> invokes to match a value.
         /// </summary>
@@ -194,8 +186,8 @@ namespace AddyScript.Ast.Expressions
 
         public override Expression GetMatchTest(Expression arg)
         {
-            var parameter = new ParameterDecl(parameterName, false, false, null, true);
-            var inlineFn = new InlineFunction([parameter], Block.Return(predicate));
+            var parameter = new ParameterDecl(ClassProperty.WRITER_PARAMETER_NAME, false, false, null, true);
+            var inlineFn = new InlineFunction([parameter], Block.WithReturn(predicate));
             return new AnonymousCall(inlineFn, [new ListItem(arg)], null);
         }
     }

@@ -15,7 +15,7 @@
     <Color name="TypeNameKeywords" fontWeight="bold" foreground="DarkRed" exampleText="b = (bool)'true'" />
     <Color name="OperatorKeywords" fontWeight="bold" foreground="MidnightBlue" exampleText="x matches @'\d+'"/>
     <Color name="ThisOrSuperReference" fontWeight="bold" exampleText="this.doStuff(); super::doStuff();"/>
-    <Color name="NullOrValueKeywords" fontWeight="bold" exampleText="if (value == null)"/>
+    <Color name="ValueKeywords" fontWeight="bold" exampleText="if (value == null)"/>
     <Color name="StandardConstants" fontStyle="italic" foreground="DarkSlateGray" exampleText="x = EPSILON"/>
     <Color name="ContextKeywords" fontWeight="bold" foreground="Teal" exampleText="__value = 2 * __key"/>
     <Color name="MethodCall" foreground="DarkViolet" exampleText="println()"/>
@@ -209,13 +209,16 @@
             <Word>if</Word>
             <Word>import</Word>
             <Word>in</Word>
+            <Word>not</Word>
             <Word>operator</Word>
+            <Word>or</Word>
             <Word>property</Word>
             <Word>return</Word>
             <Word>switch</Word>
             <Word>throw</Word>
             <Word>try</Word>
             <Word>var</Word>
+            <Word>when</Word>
             <Word>while</Word>
             <Word>yield</Word>
         </Keywords>
@@ -279,7 +282,7 @@
             <Word>public</Word>
         </Keywords>
         
-        <Keywords color="NullOrValueKeywords">
+        <Keywords color="ValueKeywords">
             <Word>null</Word>
             <Word>false</Word>
             <Word>true</Word>

@@ -11,6 +11,7 @@ using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
+using Void = AddyScript.Runtime.DataItems.Void;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
 using Complex = AddyScript.Runtime.DataItems.Complex;
@@ -133,41 +134,63 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Expression expr = Term();
         if (expr == null) return null;
 
+        bool negate = false;
+
         switch (token.TokenID)
         {
             case TokenID.DoubleEqual or TokenID.ExclamationEqual or TokenID.TripleEqual or
                  TokenID.ExclamationDoubleEqual or TokenID.LessThan or TokenID.LessThanEqual or
                  TokenID.GreaterThan or TokenID.GreaterThanEqual or TokenID.KW_StartsWith or
                  TokenID.KW_EndsWith or TokenID.KW_Contains or TokenID.KW_Matches:
-                {
-                    BinaryOperator oper = token.ToBinaryOperator();
-                    Consume(1);
-                    var term = Required(Term, Resources.ExpressionRequired);
-                    expr = new BinaryExpression(oper, expr, term);
-                    break;
-                }
+            {
+                BinaryOperator oper = token.ToBinaryOperator();
+                Consume(1);
+                var term = Required(Term, Resources.ExpressionRequired);
+                expr = new BinaryExpression(oper, expr, term);
+                break;
+            }
+            case TokenID.KW_Not:
+                negate = true;
+                Consume(1);
+                if (TryMatch(TokenID.KW_In)) goto case TokenID.KW_In;
+                throw new SyntaxError(FileName, token);
+            case TokenID.KW_In:
+            {
+                Consume(1);
+                var container = Required(Term, Resources.ExpressionRequired);
+                Expression element = expr;
+                expr = new BinaryExpression(BinaryOperator.Contains, container, element);
+                if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+                expr.SetLocation(element.Start, container.End);
+                break;
+            }
             case TokenID.KW_Is:
+            {
+                Consume(1);
+
+                if (TryMatch(TokenID.KW_Not))
                 {
+                    negate = true;
                     Consume(1);
-
-                    bool negate = false;
-                    if (TryMatch(TokenID.KW_Not))
-                    {
-                        Consume(1);
-                        negate = true;
-                    }
-
-                    if (!TryMatchAny(TokenID.TypeName, TokenID.Identifier))
-                        throw new SyntaxError(FileName, token, Resources.TypeNameExpected);
-
-                    Token typeName = token;
-                    Consume(1);
-                    Expression _checked = expr;
-                    expr = new TypeVerification(_checked, typeName.ToString());
-                    if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
-                    expr.SetLocation(_checked.Start, typeName.End);
-                    break;
                 }
+
+                var pattern = MatchCasePattern();
+                Expression checkedExpr = expr;
+
+                expr = pattern switch
+                {
+                    null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
+                    TypePattern typePattern when typePattern is not ObjectPattern =>
+                            new TypeVerification(checkedExpr, typePattern.TypeName),
+                    _ => new PatternMatching(checkedExpr,
+                                             new (pattern, new Literal(Boolean.True)),
+                                             new (new AlwaysPattern(), new Literal(Boolean.False))),
+                };
+
+                if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+                expr.SetLocation(checkedExpr.Start, pattern.End);
+                break;
+            }
         }
 
         return expr;
@@ -434,13 +457,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         return token.TokenID switch
         {
-            TokenID.LT_Null => Literal(null),
+            TokenID.LT_Null => Literal(Void.Value),
             TokenID.LT_Boolean => Literal(Boolean.FromBool((bool)token.Value)),
             TokenID.LT_Integer => Literal(new Integer((int)token.Value)),
             TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
             TokenID.LT_Float => Literal(new Float((double)token.Value)),
-            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
             TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
+            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
             TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
             TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
             TokenID.LT_String => Literal(new String((string)token.Value)),
@@ -467,7 +490,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Ast.Expressions.Literal"/></returns>
     protected Literal Literal(DataItem value)
     {
-        Literal literal = value != null ? new(value) : new();
+        var literal = new Literal(value);
         literal.CopyLocation(token);
         Consume(1);
 
@@ -547,41 +570,41 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         switch (token.TokenID)
         {
             case TokenID.LeftBrace:
+            {
+                Consume(1);
+                expr = new ObjectInitializer(List(PropertyInitializer, true, Resources.DuplicatedProperty));
+                last = Match(TokenID.RightBrace);
+                break;
+            }
+            case TokenID.Identifier:
+            {
+                QualifiedName className = QualifiedName(ref first, ref last);
+                ListItem[] positionalArgs = null;
+                Dictionary<string, Expression> namedArgs = null;
+                PropertyInitializer[] fields = null;
+
+                if (token.TokenID == TokenID.LeftParenthesis)
                 {
                     Consume(1);
-                    expr = new ObjectInitializer(List(PropertyInitializer, true, Resources.DuplicatedProperty));
+                    (positionalArgs, namedArgs) = FunctionArguments();
+                    last = Match(TokenID.RightParenthesis);
+                }
+
+                if (TryMatch(TokenID.LeftBrace))
+                {
+                    Consume(1);
+                    fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
                     last = Match(TokenID.RightBrace);
                 }
-                break;
-            case TokenID.Identifier:
+                else if (last.TokenID != TokenID.RightParenthesis) // Require an empty pair of parenthesis when no initializer is supplied
                 {
-                    QualifiedName className = QualifiedName(ref first, ref last);
-                    ListItem[] positionalArgs = null;
-                    Dictionary<string, Expression> namedArgs = null;
-                    PropertyInitializer[] fields = null;
-
-                    if (token.TokenID == TokenID.LeftParenthesis)
-                    {
-                        Consume(1);
-                        (positionalArgs, namedArgs) = FunctionArguments();
-                        last = Match(TokenID.RightParenthesis);
-                    }
-
-                    if (TryMatch(TokenID.LeftBrace))
-                    {
-                        Consume(1);
-                        fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
-                        last = Match(TokenID.RightBrace);
-                    }
-                    else if (last.TokenID != TokenID.RightParenthesis)
-                    {
-                        Match(TokenID.LeftParenthesis);
-                        last = Match(TokenID.RightParenthesis);
-                    }
-
-                    expr = new ConstructorCall(className, positionalArgs, namedArgs, fields);
+                    Match(TokenID.LeftParenthesis);
+                    last = Match(TokenID.RightParenthesis);
                 }
+
+                expr = new ConstructorCall(className, positionalArgs, namedArgs, fields);
                 break;
+            }
             default:
                 throw new SyntaxError(FileName, token, Resources.InvalidNewUsage);
         }
@@ -1122,7 +1145,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Pattern"/></returns>
     protected Pattern MatchCasePattern()
     {
-        var patterns = new List<Pattern>();
+        List<Pattern> patterns = [];
         bool loop = true;
         int pos;
 
@@ -1143,42 +1166,15 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 case TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
                      TokenID.LT_Decimal or TokenID.LT_Date or TokenID.LT_String:
                 literal_value:
+                {
+                    TokenID lBoundID = token.TokenID;
+                    DataItem lBound = DataItemFactory.CreateDataItem(token.Value);
+                    if (negative) lBound = lBound.UnaryOperation(UnaryOperator.Minus);
+                    Consume(1);
+
+                    if (TryMatch(TokenID.DoubleDot))
                     {
-                        TokenID lBoundID = token.TokenID;
-                        DataItem lBound = DataItemFactory.CreateDataItem(token.Value);
-                        if (negative) lBound = lBound.UnaryOperation(UnaryOperator.Minus);
-                        Consume(1);
-
-                        if (TryMatch(TokenID.DoubleDot))
-                        {
-                            last = token;
-                            Consume(1);
-
-                            if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out pos))
-                            {
-                                negative = token.TokenID == TokenID.Minus;
-                                Consume(pos - 1);
-                            }
-                            else
-                                negative = false;
-
-                            if (TryMatch(lBoundID))
-                            {
-                                last = token;
-                                DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
-                                if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
-                                pattern = new RangePattern(lBound, uBound);
-                                Consume(1);
-                            }
-                            else
-                                pattern = new RangePattern(lBound, null);
-                        }
-                        else
-                            pattern = new ValuePattern(lBound);
-                    }
-                    break;
-                case TokenID.DoubleDot:
-                    {
+                        last = token;
                         Consume(1);
 
                         if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out pos))
@@ -1186,43 +1182,44 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                             negative = token.TokenID == TokenID.Minus;
                             Consume(pos - 1);
                         }
-
-                        last = MatchAny(TokenID.LT_Boolean, TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
-                                        TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
-
-                        DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
-                        if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
-                        pattern = new RangePattern(null, uBound);
-                    }
-                    break;
-                case TokenID.TypeName:
-                    {
-                        string typeName = token.ToString();
-                        Consume(1);
-
-                        if (typeName == AlwaysPattern.Symbol)
-                            pattern = new AlwaysPattern();
-                        else if (TryMatch(TokenID.LeftBrace))
-                            pattern = new ObjectPattern(typeName, MatchCaseObjectPattern(ref last));
                         else
-                            pattern = new TypePattern(typeName);
+                            negative = false;
+
+                        if (TryMatch(lBoundID))
+                        {
+                            last = token;
+                            DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
+                            if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
+                            pattern = new RangePattern(lBound, uBound);
+                            Consume(1);
+                        }
+                        else
+                            pattern = new RangePattern(lBound, null);
                     }
+                    else
+                        pattern = new ValuePattern(lBound);
+
                     break;
-                case TokenID.Identifier:
-                    if (LookAhead(TokenID.Colon, out pos))
+                }
+                case TokenID.DoubleDot:
+                {
+                    Consume(1);
+
+                    if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out pos))
                     {
-                        string parameterName = token.ToString();
-                        Consume(pos);
-                        Expression predicate = RequiredExpression();
-                        pattern = new PredicatePattern(parameterName, predicate);
-                        last.CopyLocation(predicate);
-                        break;
+                        negative = token.TokenID == TokenID.Minus;
+                        Consume(pos - 1);
                     }
 
-                    goto case TokenID.TypeName;
-                case TokenID.LeftBrace:
-                    pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPattern(ref last));
+                    last = MatchAny(TokenID.LT_Boolean, TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
+                                    TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
+
+                    DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
+                    if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
+                    pattern = new RangePattern(null, uBound);
+
                     break;
+                }
                 case TokenID.Plus or TokenID.Minus:
                     if (!LookAhead(t => t.IsNumeric, out pos)) throw new SyntaxError(FileName, token);
 
@@ -1230,7 +1227,30 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     Consume(pos - 1);
 
                     goto literal_value;
-                case TokenID.Comma:
+                case TokenID.TypeName or TokenID.Identifier:
+                {
+                    string typeName = token.ToString();
+                    Consume(1);
+
+                    if (typeName == AlwaysPattern.Symbol)
+                        pattern = new AlwaysPattern();
+                    else if (TryMatch(TokenID.LeftBrace))
+                        pattern = new ObjectPattern(typeName, MatchCaseObjectPattern(ref last));
+                    else
+                        pattern = new TypePattern(typeName);
+
+                    break;
+                }
+                case TokenID.LeftBrace:
+                    pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPattern(ref last));
+                    break;
+                case TokenID.KW_When:
+                    Consume(1);
+                    Expression predicate = RequiredExpression();
+                    pattern = new PredicatePattern(predicate);
+                    last.CopyLocation(predicate);
+                    break;
+                case TokenID.KW_Or:
                     if (patterns.Count > 0)
                         Consume(1);
                     else
@@ -1248,7 +1268,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
         }
 
-        if (patterns.Count <= 0) return null;
+        if (patterns.Count == 0) return null;
         if (patterns.Count == 1) return patterns[0];
 
         var composite = new CompositePattern([.. patterns]);

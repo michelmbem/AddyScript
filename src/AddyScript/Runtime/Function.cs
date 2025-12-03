@@ -27,7 +27,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// Represents the empty function (one that does nothing).
     /// </summary>
-    public static readonly Function Empty = new ([], Block.Return());
+    public static readonly Function Empty = new ([], Block.WithReturn());
 
     /// <summary>
     /// Maps method names to corresponding instances of <see cref="Function"/>.

@@ -1177,7 +1177,6 @@ public class XmlGenerator : ITranslator
         else if (pattern is PredicatePattern predPat)
         {
             XmlElement tmpElement = document.CreateElement("PredicatePattern");
-            tmpElement.SetAttribute("ParameterName", predPat.ParameterName);
             parent.AppendChild(tmpElement);
 
             XmlElement savedElement = currentElement;

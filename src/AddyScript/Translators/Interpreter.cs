@@ -393,7 +393,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         MethodInfo method = GetPInvokeMethod(libName, procName, returnType, paramTypes);
         var extFnCall = new ExternalFunctionCall(method, args);
         var fnParams = extDecl.Parameters.Select(p => p.ToParameter()).ToArray();
-        var function = new Function(fnParams, Block.Return(extFnCall)); // No attribute retention
+        var function = new Function(fnParams, Block.WithReturn(extFnCall)); // No attribute retention
         rootFrame.RootBlock.PutItem(extDecl.Name, function);
     }
 
@@ -901,7 +901,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                             {
                                 var parameters = method.Function.Parameters;
                                 var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
-                                var fn = new Function(parameters, Block.Return(new MethodCall(new Literal(owner), method.Name, args)));
+                                var fn = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(owner), method.Name, args)));
                                 propValue = new Closure(fn);
                             }
                             break;
@@ -1255,7 +1255,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
                 
                 // Create a closure wrapping a function that will invoke the original method's implementation
-                var function = new Function(parameters, Block.Return(new MethodCall(new Literal(newTarget), member.Name, args)));
+                var function = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(newTarget), member.Name, args)));
                 returnedValue = new Closure(function);
             }
         }
@@ -1680,12 +1680,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             foreach (MatchCase matchCase in patMatch.MatchCases)
                 if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)))
                 {
-                    Dictionary<string, IFrameItem> frameItems = [];
-
-                    if (matchCase.Pattern is PredicatePattern predPattern)
-                        frameItems.Add(predPattern.ParameterName, testArg.Value);
-                    else
-                        frameItems.Add(ClassProperty.WRITER_PARAMETER_NAME, testArg.Value);
+                    var frameItems = new Dictionary<string, IFrameItem> {
+                        [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
+                    };
 
                     try
                     {

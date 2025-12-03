@@ -1,4 +1,4 @@
-﻿namespace AddyScript.Translators.Utility;
+namespace AddyScript.Translators.Utility;
 
 
 /// <summary>

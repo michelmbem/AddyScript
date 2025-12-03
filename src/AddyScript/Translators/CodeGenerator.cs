@@ -1183,8 +1183,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             textWriter.Write(typePat.TypeName);
         else if (pattern is PredicatePattern predPat)
         {
-            textWriter.Write(predPat.ParameterName);
-            textWriter.Write(": ");
+            textWriter.Write("when ");
             predPat.Predicate.AcceptTranslator(this);
         }
         else if (pattern is CompositePattern compPat)

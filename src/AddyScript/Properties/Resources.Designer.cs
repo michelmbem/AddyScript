@@ -1214,7 +1214,7 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à A type name is expected.
+        ///   Recherche une chaîne localisée semblable à A type name or pattern is expected.
         /// </summary>
         internal static string TypeNameExpected {
             get {

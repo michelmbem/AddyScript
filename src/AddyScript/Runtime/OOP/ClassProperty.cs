@@ -1,4 +1,4 @@
-﻿using AddyScript.Ast.Expressions;
+using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 
 
@@ -172,10 +172,10 @@ public class ClassProperty : ClassMember
                 break;
             case Modifier.Static:
                 var qName = new QualifiedName(Holder.Name, BackingFieldName);
-                readerBody = Block.Return(new StaticPropertyRef(qName));
+                readerBody = Block.WithReturn(new StaticPropertyRef(qName));
                 break;
             default:
-                readerBody = Block.Return(PropertyRef.This(BackingFieldName));
+                readerBody = Block.WithReturn(PropertyRef.This(BackingFieldName));
                 break;
         }
 

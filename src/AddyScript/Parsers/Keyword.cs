@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using AddyScript.Runtime.OOP;
 
@@ -9,12 +9,17 @@ namespace AddyScript.Parsers;
 /// <summary>
 /// Represents a keyword.
 /// </summary>
-public class Keyword
+/// <remarks>
+/// Initializes ab instance of <see cref="Keyword"/>
+/// </remarks>
+/// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
+/// <param name="value">The keyword's value (if any)</param>
+public class Keyword(TokenID tokenID, object value = null)
 {
     /// <summary>
-    /// A repository for the keywords.
+    /// A registry for the keywords.
     /// </summary>
-    private static readonly Dictionary<string, Keyword> keywords = new Dictionary<string,Keyword>();
+    private static readonly Dictionary<string, Keyword> Registry = [];
 
     #region Class Initializer
 
@@ -30,6 +35,8 @@ public class Keyword
         Register("else", TokenID.KW_Else);
         Register("switch", TokenID.KW_Switch);
         Register("case", TokenID.KW_Case);
+        Register("when", TokenID.KW_When);
+        Register("or", TokenID.KW_Or);
         Register("default", TokenID.KW_Default);
         Register("for", TokenID.KW_For);
         Register("foreach", TokenID.KW_ForEach);
@@ -43,8 +50,8 @@ public class Keyword
         Register("as", TokenID.KW_As);
         Register("extern", TokenID.KW_Extern);
         Register("function", TokenID.KW_Function);
-        Register("yield", TokenID.KW_Yield);
         Register("return", TokenID.KW_Return);
+        Register("yield", TokenID.KW_Yield);
         Register("class", TokenID.KW_Class);
         Register("constructor", TokenID.KW_Constructor);
         Register("property", TokenID.KW_Property);
@@ -104,41 +111,17 @@ public class Keyword
 
     #endregion
 
-    #region Constructors
-
-    /// <summary>
-    /// Initializes ab instance of <see cref="Keyword"/>
-    /// </summary>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    /// <param name="value">The keyword's value (if any)</param>
-    public Keyword(TokenID tokenID, object value)
-    {
-        TokenID = tokenID;
-        Value = value;
-    }
-
-    /// <summary>
-    /// Initializes ab instance of <see cref="Keyword"/>
-    /// </summary>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    public Keyword(TokenID tokenID)
-    {
-        TokenID = tokenID;
-    }
-
-    #endregion
-
     #region Properties
 
     /// <summary>
     /// The keyword's <see cref="TokenID"/>.
     /// </summary>
-    public TokenID TokenID { get; private set; }
+    public TokenID TokenID { get; } = tokenID;
 
     /// <summary>
     /// The keyword's value (if any).
     /// </summary>
-    public object Value { get; private set; }
+    public object Value { get; } = value;
 
     #endregion
 
@@ -150,40 +133,22 @@ public class Keyword
     /// <param name="text">The textual representation of the keyword</param>
     /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
     /// <param name="value">The keyword's value (if any)</param>
-    private static void Register(string text, TokenID tokenID, object value)
-    {
-        keywords.Add(text, new Keyword(tokenID, value));
-    }
-
-    /// <summary>
-    /// Registers a keyword in the repository.
-    /// </summary>
-    /// <param name="text">The textual representation of the keyword</param>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    private static void Register(string text, TokenID tokenID)
-    {
-        keywords.Add(text, new Keyword(tokenID));
-    }
+    private static void Register(string text, TokenID tokenID, object value = null) =>
+        Registry.Add(text, new Keyword(tokenID, value));
 
     /// <summary>
     /// Gets if the given string matches a registered keyword.
     /// </summary>
     /// <param name="text">The textual representation of the keyword</param>
     /// <returns>A <see cref="bool"/></returns>
-    public static bool IsDefined(string text)
-    {
-        return keywords.ContainsKey(text);
-    }
+    public static bool IsDefined(string text) => Registry.ContainsKey(text);
 
     /// <summary>
     /// Gets the keyword matching the given string.
     /// </summary>
     /// <param name="text">The textual representation of the keyword</param>
     /// <returns>A <see cref="Keyword"/></returns>
-    public static Keyword Get(string text)
-    {
-        return keywords[text];
-    }
+    public static Keyword Get(string text) => Registry[text];
 
     #endregion
 }

@@ -47,7 +47,7 @@ println();
 
 res = PI switch {
 	3.14 => 'three-point-fourteen',
-	0, 1, 2..4, 5..8, 9 => 'in the set {0, 1, 2 to 4, 5 to 8, 9}',
+	0 or 1 or 2..4 or 5..8 or 9 => 'in the set {0, 1, 2 to 4, 5 to 8, 9}',
 	float => 'a floatting-point number'
 };
 println($'result with PI: {res}');
@@ -69,8 +69,8 @@ println();
 const number_regex = @'[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?';
 
 res = readln('type some text: ') switch {
-	x: x matches number_regex && ((decimal)x) > 0 => $'{x} is a positive number',
-	x: x matches number_regex => $'{x} is just a number',
+	when __value matches number_regex && ((decimal)__value) > 0 => $'{__value} is a positive number',
+	when __value matches number_regex => $'{__value} is just a number',
 	_ => $'{__value} is not a number'
 };
 println($'result: {res}');
@@ -100,9 +100,15 @@ l.each(|item| => {
 });
 println();
 
+if ((kim = l[-1]) is Employee {name = 'Kim Ondo'})
+{
+	println($'{kim.name} is a {kim.languages.join(" and ")} developper');
+	println();
+}
+
 try {
 	randint(-5, 5) switch {
-		-5..2 => println($'{__value} is OK!'),
+		0.. => println($'{__value} is OK!'),
 		_ => throw 'I don\'t like negative values'
 	};
 } catch (e) {

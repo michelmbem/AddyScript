@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -316,7 +316,7 @@
     <value>Too many arguments for a call to {0}</value>
   </data>
   <data name="TypeNameExpected" xml:space="preserve">
-    <value>A type name is expected</value>
+    <value>A type name or pattern is expected</value>
   </data>
   <data name="UnableToFindMethod" xml:space="preserve">
     <value>Unable to find the corresponding method in {0}</value>

@@ -19,7 +19,7 @@ for (i = 0; i < 16; i++)
 	print('{0:X} ', i);
 	resetColor();
 	
-	if (!({0, 1, 8, 9} contains i))
+	if (i not in {0, 1, 8, 9})
     {
         for (j = 0; j < 16; j++)
         {

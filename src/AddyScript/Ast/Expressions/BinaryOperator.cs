@@ -127,7 +127,7 @@ namespace AddyScript.Ast.Expressions
 
         /// <summary>
         /// String comparison operator : contains<br/>
-        /// Also used for lists and sets
+        /// Also used for tuples, lists and sets
         /// </summary>
         Contains,
 

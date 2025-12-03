@@ -737,7 +737,7 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetExceptionMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.Return(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.This("name")));
 
         return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
@@ -781,7 +781,7 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetAttributeMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.Return(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.This("name")));
 
         return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
@@ -837,7 +837,7 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetTypeInfoMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.Return(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.This("name")));
 
         return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
@@ -864,7 +864,7 @@ public class Class : IFrameItem
     private static IEnumerable<ClassProperty> GetMemberInfoProperties()
     {
         var fullNameFunc = new Function([],
-                                        Block.Return(new BinaryExpression(BinaryOperator.Plus,
+                                        Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
                                                                           new PropertyRef(PropertyRef.This("holder"), "name"),
                                                                           new BinaryExpression(BinaryOperator.Plus,
                                                                                                new Literal(new String(".")),
@@ -920,13 +920,13 @@ public class Class : IFrameItem
     private static IEnumerable<ClassProperty> GetPropertyInfoProperties()
     {
         var canReadFunc = new Function([],
-                                       Block.Return(new BinaryExpression(BinaryOperator.NotIdentical,
+                                       Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
                                                                          PropertyRef.This("_reader"),
                                                                          new Literal())));
         var canReadMethod = new ClassMethod(ClassProperty.GetReaderName("canRead"), Scope.Public, Modifier.Default, canReadFunc);
 
         var canWriteFunc = new Function([],
-                                       Block.Return(new BinaryExpression(BinaryOperator.NotIdentical,
+                                       Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
                                                                          PropertyRef.This("_writer"),
                                                                          new Literal())));
         var canWriteMethod = new ClassMethod(ClassProperty.GetReaderName("canWrite"), Scope.Public, Modifier.Default, canWriteFunc);
@@ -1332,7 +1332,7 @@ public class Class : IFrameItem
     /// </summary>
     private void GenerateReflector()
     {
-        var typeFunc = new Function([], Block.Return(new TypeOfExpression(Name)));
+        var typeFunc = new Function([], Block.WithReturn(new TypeOfExpression(Name)));
         var typeReader = new ClassMethod(ClassProperty.GetReaderName("type"), Scope.Public, Modifier.Final, typeFunc);
         var typeProperty = new ClassProperty("type", Scope.Public, Modifier.Final, typeReader, null);
 

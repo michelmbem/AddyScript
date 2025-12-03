@@ -2153,7 +2153,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public Function ToFunction()
     {
         var arguments = Parameters.Select(p => new VariableRef(p.Name)).ToArray();
-        return new Function(Parameters, Block.Return(new InnerFunctionCall(this, arguments)));
+        return new Function(Parameters, Block.WithReturn(new InnerFunctionCall(this, arguments)));
     }
 
     /// <summary>
@@ -2168,7 +2168,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                                   .Prepend(new SelfReference())
                                   .ToArray();
 
-        return new Function(Parameters[1..], Block.Return(new InnerFunctionCall(this, arguments)));
+        return new Function(Parameters[1..], Block.WithReturn(new InnerFunctionCall(this, arguments)));
     }
 
     /// <summary>

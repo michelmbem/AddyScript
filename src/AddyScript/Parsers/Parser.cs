@@ -277,7 +277,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         else
         {
             var returned = RequiredExpression();
-            body = Ast.Statements.Block.Return(returned);
+            body = Ast.Statements.Block.WithReturn(returned);
             body.CopyLocation(returned);
         }
 
@@ -794,7 +794,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             ScriptElement last = returned;
             if (!isInline) last = Match(TokenID.SemiColon);
 
-            body = Ast.Statements.Block.Return(returned);
+            body = Ast.Statements.Block.WithReturn(returned);
             body.SetLocation(returned.Start, last.End);
         }
         else
@@ -1015,7 +1015,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             
             last = Match(TokenID.SemiColon);
             
-            readerBody = Ast.Statements.Block.Return(returned);
+            readerBody = Ast.Statements.Block.WithReturn(returned);
             readerBody.SetLocation(returned.Start, last.End);
         }
         else
