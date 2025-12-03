@@ -35,19 +35,15 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("else", TokenID.KW_Else);
         Register("switch", TokenID.KW_Switch);
         Register("case", TokenID.KW_Case);
-        Register("when", TokenID.KW_When);
-        Register("or", TokenID.KW_Or);
         Register("default", TokenID.KW_Default);
         Register("for", TokenID.KW_For);
         Register("foreach", TokenID.KW_ForEach);
-        Register("in", TokenID.KW_In);
         Register("while", TokenID.KW_While);
         Register("do", TokenID.KW_Do);
         Register("continue", TokenID.KW_Continue);
         Register("break", TokenID.KW_Break);
         Register("goto", TokenID.KW_Goto);
         Register("import", TokenID.KW_Import);
-        Register("as", TokenID.KW_As);
         Register("extern", TokenID.KW_Extern);
         Register("function", TokenID.KW_Function);
         Register("return", TokenID.KW_Return);
@@ -59,13 +55,13 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("event", TokenID.KW_Event);
         Register("this", TokenID.KW_This);
         Register("super", TokenID.KW_Super);
-        Register("new", TokenID.KW_New);
 
         Register("throw", TokenID.KW_Throw);
         Register("try", TokenID.KW_Try);
         Register("catch", TokenID.KW_Catch);
         Register("finally", TokenID.KW_Finally);
         
+        Register("as", TokenID.KW_As);
         Register("typeof", TokenID.KW_TypeOf);
         Register("is", TokenID.KW_Is);
         Register("not", TokenID.KW_Not);
@@ -73,6 +69,11 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("endswith", TokenID.KW_EndsWith);
         Register("contains", TokenID.KW_Contains);
         Register("matches", TokenID.KW_Matches);
+        Register("in", TokenID.KW_In);
+        Register("when", TokenID.KW_When);
+        Register("and", TokenID.KW_And);
+        Register("or", TokenID.KW_Or);
+        Register("new", TokenID.KW_New);
         Register("with", TokenID.KW_With);
 
         Register("public", TokenID.Scope, Scope.Public);

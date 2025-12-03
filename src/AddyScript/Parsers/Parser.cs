@@ -23,7 +23,6 @@ namespace AddyScript.Parsers;
 /// <param name="lexer">The bound lexer</param>
 public class Parser(Lexer lexer) : ExpressionParser(lexer)
 {
-
     /// <summary>
     /// Recognizes an entire script.
     /// </summary>
@@ -41,19 +40,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a non-null statement.
-    /// </summary>
-    /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
-    public Statement RequiredStatement()
-    {
-        return Required(StatementWithLabels, string.Format(Resources.UnexpectedToken, token));
-    }
-
-    /// <summary>
     /// Recognizes a statement eventually preceded by labels.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
-    protected Statement StatementWithLabels()
+    private Statement StatementWithLabels()
     {
         while (TryMatch(TokenID.Identifier) && LookAhead(TokenID.Colon, out int k))
         {
@@ -69,7 +59,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a statement.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
-    protected Statement Statement()
+    private Statement Statement()
     {
         // Skip empty statements
         while (TryMatch(TokenID.SemiColon)) Consume(1);
@@ -101,7 +91,16 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             _ => ExpressionAsStatement(),
         };
     }
-
+    
+    /// <summary>
+    /// Recognizes a non-null statement.
+    /// </summary>
+    /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
+    public Statement RequiredStatement()
+    {
+        return Required(Statement, Resources.StatementRequired);
+    }
+    
     /// <summary>
     /// Recognizes a statement decorated with some attributes.
     /// </summary>
@@ -110,7 +109,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// This is just a helpful way to attach additionnal informations to a statement.
     /// </remarks>
     /// <returns>An <see cref="Ast.Statements.StatementWithAttributes"/></returns>
-    protected StatementWithAttributes StatementWithAttributes()
+    private StatementWithAttributes StatementWithAttributes()
     {
         Token first = Match(TokenID.LeftBracket);
         AttributeDecl[] attributes = List(Attribute, true, Resources.DuplicatedAttribute);
@@ -135,7 +134,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Reconizes an expression when it's used as a statement.
     /// </summary>
     /// <returns>An <see cref="Expression"/></returns>
-    protected Expression ExpressionAsStatement()
+    private Expression ExpressionAsStatement()
     {
         Expression expr = Expression();
 
@@ -152,7 +151,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes an import directive.
     /// </summary>
     /// <returns>A reference to <see cref="ImportDirective"/></returns>
-    protected ImportDirective Import()
+    private ImportDirective Import()
     {
         Token first = Match(TokenID.KW_Import), last = first;
         QualifiedName moduleName = QualifiedName(ref first, ref last);
@@ -175,7 +174,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a class definition.
     /// </summary>
     /// <returns>A <see cref="ClassDefinition"/></returns>
-    protected ClassDefinition Class()
+    private ClassDefinition Class()
     {
         Token first = null;
 
@@ -226,7 +225,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a function's declaration.
     /// </summary>
     /// <returns>A <see cref="FunctionDecl"/></returns>
-    protected FunctionDecl Function()
+    private FunctionDecl Function()
     {
         Token first = Match(TokenID.KW_Function);
         string name = Match(TokenID.Identifier).ToString();
@@ -295,15 +294,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     protected override Expression MatchCaseExpression()
     {
         return TryMatch(TokenID.LeftBrace)
-            ? new BlockAsExpression(Block(true))
-            : base.MatchCaseExpression();
+             ? new BlockAsExpression(Block(true))
+             : base.MatchCaseExpression();
     }
 
     /// <summary>
     /// Recognizes an external function's declaration.
     /// </summary>
     /// <returns>An <see cref="ExternalFunctionDecl"/></returns>
-    protected ExternalFunctionDecl ExternalFunction()
+    private ExternalFunctionDecl ExternalFunction()
     {
         Token first = Match(TokenID.KW_Extern);
         Match(TokenID.KW_Function);
@@ -320,7 +319,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the declaration of one or many constants.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.ConstantDecl"/></returns>
-    protected ConstantDecl ConstantDecl()
+    private ConstantDecl ConstantDecl()
     {
         Token first = Match(TokenID.KW_Const);
         var initializers = List(PropertyInitializer, true, Resources.DuplicatedConstant);
@@ -335,7 +334,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the declaration of one or many variables.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.VariableDecl"/></returns>
-    protected VariableDecl VariableDecl()
+    private VariableDecl VariableDecl()
     {
         List<PropertyInitializer> initializers = [];
         Token first = Match(TokenID.KW_Var);
@@ -374,7 +373,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Tells if the block is recognized as an expression.
     /// </param>
     /// <returns>A <see cref="Ast.Statements.Block"/></returns>
-    protected Block Block(bool asExpression = false)
+    private Block Block(bool asExpression = false)
     {
         Token first = Match(TokenID.LeftBrace);
         
@@ -394,7 +393,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes an if-else statement.
     /// </summary>
     /// <returns>An <see cref="Ast.Statements.IfElse"/></returns>
-    protected IfElse IfElse()
+    private IfElse IfElse()
     {
         Token first = Match(TokenID.KW_If);
         Match(TokenID.LeftParenthesis);
@@ -419,7 +418,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes an switch block.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.SwitchBlock"/></returns>
-    protected SwitchBlock SwitchBlock()
+    private SwitchBlock SwitchBlock()
     {
         Token first = Match(TokenID.KW_Switch);
         Match(TokenID.LeftParenthesis);
@@ -481,7 +480,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a for loop.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.ForLoop"/></returns>
-    protected ForLoop ForLoop()
+    private ForLoop ForLoop()
     {
         Token first = Match(TokenID.KW_For);
         Match(TokenID.LeftParenthesis);
@@ -513,7 +512,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a for-each loop.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.ForEachLoop"/></returns>
-    protected ForEachLoop ForEachLoop()
+    private ForEachLoop ForEachLoop()
     {
         Token first = Match(TokenID.KW_ForEach);
         Match(TokenID.LeftParenthesis);
@@ -544,7 +543,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a while loop.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.WhileLoop"/></returns>
-    protected WhileLoop WhileLoop()
+    private WhileLoop WhileLoop()
     {
         Token first = Match(TokenID.KW_While);
         Match(TokenID.LeftParenthesis);
@@ -564,7 +563,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a do-while loop.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.DoLoop"/></returns>
-    protected DoLoop DoLoop()
+    private DoLoop DoLoop()
     {
         Token first = Match(TokenID.KW_Do);
 
@@ -586,7 +585,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a continue statement.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Continue"/></returns>
-    protected Continue Continue()
+    private Continue Continue()
     {
         Token first = Match(TokenID.KW_Continue);
         if (CurrentFunction.Loops <= 0)
@@ -603,7 +602,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a break statement.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Break"/></returns>
-    protected Break Break()
+    private Break Break()
     {
         Token first = Match(TokenID.KW_Break);
         if (CurrentFunction.Loops <= 0 && CurrentFunction.SwitchBlocks <= 0)
@@ -620,7 +619,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a goto statement.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Goto"/></returns>
-    protected Goto Goto()
+    private Goto Goto()
     {
         string labelName;
         bool jumpToCaseLabel = false;
@@ -677,7 +676,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a return statement.
     /// </summary>
     /// <returns><see cref="Return"/></returns>
-    protected Return Return()
+    private Return Return()
     {
         Token first = Match(TokenID.KW_Return);
         if (CurrentFunction.FinallyBlocks > 0)
@@ -722,7 +721,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a try-catch-finally statement.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.TryCatchFinally"/></returns>
-    protected TryCatchFinally TryCatchFinally()
+    private TryCatchFinally TryCatchFinally()
     {
         Token first = Match(TokenID.KW_Try);
 
@@ -780,7 +779,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="isMethod">Tells if the function is a method or not</param>
     /// <param name="isStatic">Tells if the method is static or not</param>
     /// <returns>A <see cref="Ast.Statements.Block"/></returns>
-    protected Block FunctionBody(string functionName, bool isInline, bool isMethod, bool isStatic)
+    private Block FunctionBody(string functionName, bool isInline, bool isMethod, bool isStatic)
     {
         Block body;
 
@@ -812,7 +811,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the definition of a class member.
     /// </summary>
     /// <returns>A <see cref="ClassMemberDecl"/></returns>
-    protected ClassMemberDecl ClassMember()
+    private ClassMemberDecl ClassMember()
     {
         (Scope, Modifier, AttributeDecl[]) prefix = MemberPrefix(out Token first);
 
@@ -846,10 +845,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the scope, modifier and attributes of a class member.
     /// </summary>
     /// <param name="first">The initial <see cref="Token"/> of the member being recognized</param>
-    /// <returns>A <see cref="(Scope, Modifier, AttributeDecl[])"/> tuple</returns>
+    /// <returns>A (Scope, Modifier, AttributeDecl[]) tuple</returns>
     /// <throws></throws>
     /// <exception cref="SyntaxError">Malformed prefix</exception>
-    protected (Scope, Modifier, AttributeDecl[]) MemberPrefix(out Token first)
+    private (Scope, Modifier, AttributeDecl[]) MemberPrefix(out Token first)
     {
         Scope scope = Scope.Private;
         Modifier modifier = Modifier.Default;
@@ -907,7 +906,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="scope">The scope of this constructor</param>
     /// <returns>A <see cref="ClassMethodDecl"/></returns>
-    protected ClassMethodDecl Constructor(Scope scope)
+    private ClassMethodDecl Constructor(Scope scope)
     {
         Token first = Match(TokenID.KW_Constructor);
         ParameterDecl[] parameters = ParameterList();
@@ -943,7 +942,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the field</param>
     /// <param name="modifier">The modifier of the field</param>
     /// <returns>A <see cref="ClassFieldDecl"/></returns>
-    protected ClassFieldDecl ClassField(Scope scope, Modifier modifier)
+    private ClassFieldDecl ClassField(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.Identifier);
         string name = first.ToString();
@@ -968,7 +967,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the property</param>
     /// <param name="modifier">The modifier of the property</param>
     /// <returns>A <see cref="ClassPropertyDecl"/></returns>
-    protected ClassPropertyDecl ClassProperty(Scope scope, Modifier modifier)
+    private ClassPropertyDecl ClassProperty(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.KW_Property), last;
 
@@ -1112,7 +1111,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the method</param>
     /// <param name="modifier">The modifier of the method</param>
     /// <returns>A <see cref="ClassMethodDecl"/></returns>
-    protected ClassMethodDecl ClassMethod(Scope scope, Modifier modifier)
+    private ClassMethodDecl ClassMethod(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.KW_Function);
         string name = Match(TokenID.Identifier).ToString();
@@ -1138,7 +1137,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="scope">The scope of the outcoming method</param>
     /// <returns>A <see cref="ClassMethodDecl"/></returns>
-    protected ClassMethodDecl ClassOperator(Scope scope)
+    private ClassMethodDecl ClassOperator(Scope scope)
     {
         Token first = Match(TokenID.KW_Operator);
         Token _operator = MatchOverloadableOperator();
@@ -1164,7 +1163,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the _event</param>
     /// <param name="modifier">The modifier of the _event</param>
     /// <returns>A <see cref="ClassEventDecl"/></returns>
-    protected ClassEventDecl ClassEvent(Scope scope, Modifier modifier)
+    private ClassEventDecl ClassEvent(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.KW_Event);
         string name = Match(TokenID.Identifier).ToString();
@@ -1188,7 +1187,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="methods">Will contain a collection of method definitions after identification</param>
     /// <param name="events">Will contain a collection of event definitions after identification</param>
     /// <exception cref="ScriptError">If a rule of syntax is violated</exception>
-    protected void IdentifiyClassMembers(Modifier modifier, ClassMemberDecl[] members,
+    private void IdentifiyClassMembers(Modifier modifier, ClassMemberDecl[] members,
                                          ref ClassMethodDecl constructor, ref ClassPropertyDecl indexer,
                                          List<ClassFieldDecl> fields, List<ClassPropertyDecl> properties,
                                          List<ClassMethodDecl> methods, List<ClassEventDecl> events)
@@ -1270,7 +1269,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes a list of function's parameters.
     /// </summary>
     /// <returns>An array of <see cref="ParameterDecl"/>s</returns>
-    protected ParameterDecl[] ParameterList()
+    private ParameterDecl[] ParameterList()
     {
         Match(TokenID.LeftParenthesis);
         ParameterDecl[] parameters = List(Parameter, true, Resources.DuplicatedParameter);
@@ -1294,7 +1293,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the declaration of a function's parameter.
     /// </summary>
     /// <returns>A <see cref="ParameterDecl"/></returns>
-    protected ParameterDecl Parameter()
+    private ParameterDecl Parameter()
     {
         string name = null;
         bool byRef = false, vaList = false, canBeEmpty = true;
@@ -1379,7 +1378,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <b>true</b> if the token's ID is <paramref name="requiredID"/> and that its value is <paramref name="expectedValue"/>;
     /// <b>false</b> otherwise
     /// </returns>
-    protected bool TryMatchValue(TokenID requiredID, object expectedValue)
+    private bool TryMatchValue(TokenID requiredID, object expectedValue)
     {
         return TryMatch(t => t.TokenID == requiredID && t.Value.Equals(expectedValue));
     }
@@ -1389,7 +1388,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="word">The identifier to match</param>
     /// <returns><b>true</b> if the token is the <paramref name="word"/> identifier; <b>false</b> otherwise</returns>
-    protected bool TryMatchWord(string word)
+    private bool TryMatchWord(string word)
     {
         return TryMatchValue(TokenID.Identifier, word);
     }
@@ -1398,7 +1397,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Expects the next token to be an overloadable operator.
     /// </summary>
     /// <returns>A token</returns>
-    protected Token MatchOverloadableOperator()
+    private Token MatchOverloadableOperator()
     {
         if (TryMatchAny(TokenID.Plus, TokenID.Minus, TokenID.DoublePlus, TokenID.DoubleMinus, TokenID.Tilda,
                         TokenID.Asterisk, TokenID.Slash, TokenID.Percent, TokenID.DoubleAsterisk, TokenID.DoubleLessThan,
@@ -1419,7 +1418,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the declaration of an attribute (or annotation).
     /// </summary>
     /// <returns>An <see cref="AttributeDecl"/></returns>
-    protected AttributeDecl Attribute()
+    private AttributeDecl Attribute()
     {
         Token first = Match(TokenID.Identifier), last = first;
         string typeName = first.ToString();
@@ -1463,7 +1462,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="address">The next statement's address</param>
     /// <returns>A <see cref="Ast.Statements.CaseLabel"/></returns>
-    protected CaseLabel CaseLabel(int address)
+    private CaseLabel CaseLabel(int address)
     {
         Token first = Match(TokenID.KW_Case);
         SkipComments();
@@ -1490,7 +1489,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="tokenID">The operator's TokenID</param>
     /// <param name="count">The given number of operands</param>
     /// <returns>A boolean</returns>
-    protected static bool IsValidOperandCount(TokenID tokenID, int count)
+    private static bool IsValidOperandCount(TokenID tokenID, int count)
     {
         return tokenID switch
         {
@@ -1508,7 +1507,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="count">The given number of operands</param>
     /// <param name="postfix">Tells whether the operator is the postfix variant or not</param>
     /// <returns>A boolean</returns>
-    protected static bool IsUnaryOperator(TokenID tokenID, int count, out bool postfix)
+    private static bool IsUnaryOperator(TokenID tokenID, int count, out bool postfix)
     {
         switch (tokenID)
         {

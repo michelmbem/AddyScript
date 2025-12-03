@@ -23,8 +23,8 @@ internal partial class KeywordData(string word, KeywordType type) :
     static KeywordData()
     {
         const string keywords =
-            @"abs?3 abstract?0 acos?3 as?0 asin?3 atan?3 atan2?3 blob?0 bool?1 break?0 case?0 catch?0 ceil?3 chr?3
-            class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
+            @"abs?3 abstract?0 acos?3 and?0 as?0 asin?3 atan?3 atan2?3 blob?0 bool?1 break?0 case?0 catch?0 ceil?3
+            chr?3 class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
             default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0
             float?1 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1 is?4 list?1 log?3
             log10?3 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2 min?3 MINDATE?2 MINFLOAT?2 MININT?2

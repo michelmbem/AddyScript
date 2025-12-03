@@ -31,16 +31,6 @@ namespace AddyScript.Parsers;
 /// <param name="lexer">The bound lexer</param>
 public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 {
-
-    /// <summary>
-    /// Recognizes a non-null expression.
-    /// </summary>
-    /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
-    public Expression RequiredExpression()
-    {
-        return Required(Expression, Resources.ExpressionRequired);
-    }
-
     /// <summary>
     /// Recognizes an expression.
     /// </summary>
@@ -53,10 +43,19 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
+    /// Recognizes a non-null expression.
+    /// </summary>
+    /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
+    protected Expression RequiredExpression()
+    {
+        return Required(Expression, Resources.ExpressionRequired);
+    }
+
+    /// <summary>
     /// Recognizes an assignment.
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.Assignment"/></returns>
-    protected Expression Assignment()
+    private Expression Assignment()
     {
         Expression expr = TernaryExpression();
         if (expr == null) return null;
@@ -79,7 +78,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a ternary expression.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.TernaryExpression"/></returns>
-    protected Expression TernaryExpression()
+    private Expression TernaryExpression()
     {
         Expression test = Condition();
         if (test == null) return null;
@@ -98,7 +97,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a logical expression.
     /// </summary>
     /// <returns>A <see cref="BinaryExpression"/> with the &, &&, |, ||, ^ or ?? operator</returns>
-    protected Expression Condition()
+    private Expression Condition()
     {
         Expression expr = Relation();
         if (expr == null) return null;
@@ -125,11 +124,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a relational expession.
     /// </summary>
     /// <returns>
-    /// A <see cref="BinaryExpression"/> with the ==, !=, ===, !==, <, <=, >, >=,
-    /// 'startswith', 'endswith', 'contains' or 'matches' operator;
+    /// A <see cref="BinaryExpression"/> with the ==, !=, ===, !==, &lt;, &lt;=, &gt;, &gt;=,
+    /// <i>startswith</i>, <i>endswith</i>, <i>contains</i>, <i>matches</i> or <i>in</i> operator;
     /// or a <see cref="TypeVerification"/> (like in <i>expr</i> <b>is</b> <i>typeName</i>)
     /// </returns>
-    protected Expression Relation()
+    private Expression Relation()
     {
         Expression expr = Term();
         if (expr == null) return null;
@@ -180,7 +179,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 expr = pattern switch
                 {
                     null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
-                    TypePattern typePattern when typePattern is not ObjectPattern =>
+                    TypePattern typePattern and not ObjectPattern =>
                             new TypeVerification(checkedExpr, typePattern.TypeName),
                     _ => new PatternMatching(checkedExpr,
                                              new (pattern, new Literal(Boolean.True)),
@@ -200,7 +199,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes an addition or a subtraction.
     /// </summary>
     /// <returns>A <see cref="BinaryExpression"/> with the + or - operator</returns>
-    protected Expression Term()
+    private Expression Term()
     {
         Expression expr = Factor();
         if (expr == null) return null;
@@ -222,7 +221,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a multiplication, a divison, a modulo or a shift.
     /// </summary>
     /// <returns>A <see cref="BinaryExpression"/> with the *, /, %, &lt;&lt; or &gt;&gt; operator</returns>
-    protected Expression Factor()
+    private Expression Factor()
     {
         Expression expr = Exponentiation();
         if (expr == null) return null;
@@ -245,7 +244,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes an exponentiation.
     /// </summary>
     /// <returns>A <see cref="BinaryExpression"/> with the ** operator</returns>
-    protected Expression Exponentiation()
+    private Expression Exponentiation()
     {
         Expression expr = PostfixUnaryExpression();
         if (expr == null) return null;
@@ -265,7 +264,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a unary expression with a postfix operator.
     /// </summary>
     /// <returns>A <see cref="UnaryExpression"/> with the postfix variant of the ++, -- or ! operator</returns>
-    protected Expression PostfixUnaryExpression()
+    private Expression PostfixUnaryExpression()
     {
         Expression expr = PrefixUnaryExpression();
         if (expr == null) return null;
@@ -303,7 +302,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a unary expression with a prefix operator.
     /// </summary>
     /// <returns>A <see cref="UnaryExpression"/> with the +, -, ! or ~ operator</returns>
-    protected Expression PrefixUnaryExpression()
+    private Expression PrefixUnaryExpression()
     {
         Expression expr;
 
@@ -331,7 +330,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// An <see cref="ItemRef"/>, a <see cref="SliceRef"/>, a <see cref="PropertyRef"/>, a <see cref="MethodCall"/>,
     /// a <see cref="PatternMatching"/> or an <see cref="AlteredCopy"/>
     /// </returns>
-    protected Expression Composite()
+    private Expression Composite()
     {
         Expression expr = Atom();
         if (expr == null) return null;
@@ -346,12 +345,22 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             switch (token.TokenID)
             {
                 case TokenID.LeftBracket or TokenID.QuestionBracket:
-                    {
-                        bool optional = token.TokenID == TokenID.QuestionBracket;
-                        Consume(1);
+                {
+                    bool optional = token.TokenID == TokenID.QuestionBracket;
+                    Consume(1);
 
-                        Expression lBound = null, uBound = null;
-                        bool isSlice = false;
+                    Expression lBound = null, uBound = null;
+                    bool isSlice = false;
+
+                    if (TryMatch(TokenID.DoubleDot))
+                    {
+                        Consume(1);
+                        uBound = Expression();
+                        isSlice = true;
+                    }
+                    else
+                    {
+                        lBound = RequiredExpression();
 
                         if (TryMatch(TokenID.DoubleDot))
                         {
@@ -359,84 +368,74 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                             uBound = Expression();
                             isSlice = true;
                         }
-                        else
-                        {
-                            lBound = RequiredExpression();
-
-                            if (TryMatch(TokenID.DoubleDot))
-                            {
-                                Consume(1);
-                                uBound = Expression();
-                                isSlice = true;
-                            }
-                        }
-
-                        bookmark = Match(TokenID.RightBracket);
-
-                        Expression owner = expr;
-                        expr = isSlice
-                             ? new SliceRef(owner, lBound, uBound) { Optional = optional }
-                             : new ItemRef(owner, lBound) { Optional = optional };
-                        expr.SetLocation(owner.Start, bookmark.End);
                     }
+
+                    bookmark = Match(TokenID.RightBracket);
+
+                    Expression owner = expr;
+                    expr = isSlice
+                         ? new SliceRef(owner, lBound, uBound) { Optional = optional }
+                         : new ItemRef(owner, lBound) { Optional = optional };
+                    expr.SetLocation(owner.Start, bookmark.End);
                     break;
+                }
                 case TokenID.Dot or TokenID.QuestionDot:
-                    {
-                        bool optional = token.TokenID == TokenID.QuestionDot;
-                        Consume(1);
+                {
+                    bool optional = token.TokenID == TokenID.QuestionDot;
+                    Consume(1);
 
-                        bookmark = Match(TokenID.Identifier);
-                        string memberName = bookmark.ToString();
+                    bookmark = Match(TokenID.Identifier);
+                    string memberName = bookmark.ToString();
 
-                        Expression owner = expr;
-                        if (TryMatch(TokenID.LeftParenthesis))
-                        {
-                            Consume(1);
-                            (var positionalArgs, var namedArgs) = FunctionArguments();
-                            bookmark = Match(TokenID.RightParenthesis);
-                            expr = new MethodCall(owner, memberName, positionalArgs, namedArgs) { Optional = optional };
-                        }
-                        else
-                            expr = new PropertyRef(owner, memberName) { Optional = optional };
-
-                        expr.SetLocation(owner.Start, bookmark.End);
-                    }
-                    break;
-                case TokenID.LeftParenthesis:
+                    Expression owner = expr;
+                    if (TryMatch(TokenID.LeftParenthesis))
                     {
                         Consume(1);
                         (var positionalArgs, var namedArgs) = FunctionArguments();
                         bookmark = Match(TokenID.RightParenthesis);
-
-                        Expression callee = expr;
-                        expr = new AnonymousCall(callee, positionalArgs, namedArgs);
-                        expr.SetLocation(callee.Start, bookmark.End);
+                        expr = new MethodCall(owner, memberName, positionalArgs, namedArgs) { Optional = optional };
                     }
+                    else
+                        expr = new PropertyRef(owner, memberName) { Optional = optional };
+
+                    expr.SetLocation(owner.Start, bookmark.End);
                     break;
+                }
+                case TokenID.LeftParenthesis:
+                {
+                    Consume(1);
+                    (var positionalArgs, var namedArgs) = FunctionArguments();
+                    bookmark = Match(TokenID.RightParenthesis);
+
+                    Expression callee = expr;
+                    expr = new AnonymousCall(callee, positionalArgs, namedArgs);
+                    expr.SetLocation(callee.Start, bookmark.End);
+                    break;
+                }
                 case TokenID.KW_Switch:
-                    {
-                        Consume(1);
-                        Match(TokenID.LeftBrace);
-                        MatchCase[] cases = List(MatchCase, false, null);
-                        Token last = Match(TokenID.RightBrace);
+                {
+                    Consume(1);
+                    Match(TokenID.LeftBrace);
+                    MatchCase[] cases = List(MatchCase, false, null);
+                    Token last = Match(TokenID.RightBrace);
 
-                        Expression expr2match = expr;
-                        expr = new PatternMatching(expr2match, cases);
-                        expr.SetLocation(expr2match.Start, last.End);
-                    }
+                    Expression expr2match = expr;
+                    expr = new PatternMatching(expr2match, cases);
+                    expr.SetLocation(expr2match.Start, last.End);
                     break;
+                }
                 case TokenID.KW_With:
-                    {
-                        Consume(1);
-                        Match(TokenID.LeftBrace);
-                        PropertyInitializer[] fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
-                        Token last = Match(TokenID.RightBrace);
+                {
+                    Consume(1);
+                    Match(TokenID.LeftBrace);
+                    PropertyInitializer[] fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
+                    Token last = Match(TokenID.RightBrace);
 
-                        Expression original = expr;
-                        expr = new AlteredCopy(original, fields);
-                        expr.SetLocation(original.Start, last.End);
-                    }
+                    Expression original = expr;
+                    expr = new AlteredCopy(original, fields);
+                    expr.SetLocation(original.Start, last.End);
                     break;
+                }
                 default:
                     loop = false;
                     break;
@@ -451,7 +450,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// simple calls, conversions, parenthesized expressions and the <b>typeof</b> expression.
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
-    protected Expression Atom()
+    private Expression Atom()
     {
         SkipComments();
 
@@ -488,7 +487,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// </summary>
     /// <param name="value">The value to wrap in a literal expression</param>
     /// <returns>A <see cref="Ast.Expressions.Literal"/></returns>
-    protected Literal Literal(DataItem value)
+    private Literal Literal(DataItem value)
     {
         var literal = new Literal(value);
         literal.CopyLocation(token);
@@ -501,7 +500,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Creates an instance of <see cref="Ast.Expressions.SelfReference"/>.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.SelfReference"/></returns>
-    protected SelfReference SelfReference()
+    private SelfReference SelfReference()
     {
         if (!CurrentFunction.IsMethod || CurrentFunction.IsStatic)
             throw new SyntaxError(FileName, token, Resources.ThisUsedOutOfMethod);
@@ -519,7 +518,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>
     /// A <see cref="ParentMethodCall"/>, a <see cref="ParentPropertyRef"/>, or a <see cref="ParentIndexerRef"/>
     /// </returns>
-    protected Expression AtomStartingWithSuper()
+    private Expression AtomStartingWithSuper()
     {
         Expression expr;
         Token first = Match(TokenID.KW_Super), last;
@@ -560,7 +559,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>
     /// An <see cref="ObjectInitializer"/> or a <see cref="ConstructorCall"/>
     /// </returns>
-    protected Expression AtomStartingWithNew()
+    private Expression AtomStartingWithNew()
     {
         Expression expr;
         Token first = Match(TokenID.KW_New), last = null;
@@ -618,7 +617,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes expressions that start with the <b>typeof</b> keyword.
     /// </summary>
     /// <returns>A <see cref="TypeOfExpression"/></returns>
-    protected Expression AtomStartingWithTypeOf()
+    private Expression AtomStartingWithTypeOf()
     {
         Token first = Match(TokenID.KW_TypeOf);
         Match(TokenID.LeftParenthesis);
@@ -641,7 +640,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>
     /// A <see cref="StaticMethodCall"/> or a <see cref="StaticPropertyRef"/>
     /// </returns>
-    protected Expression AtomStartingWithTypeName()
+    private Expression AtomStartingWithTypeName()
     {
         Expression expr;
 
@@ -672,7 +671,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// A <see cref="VariableRef"/>, a <see cref="FunctionCall"/>,
     /// a <see cref="StaticPropertyRef"/> or a <see cref="StaticMethodCall"/>
     /// </returns>
-    protected Expression AtomStartingWithId()
+    private Expression AtomStartingWithId()
     {
         Expression expr;
         Token first = null, last = null;
@@ -681,7 +680,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (token.TokenID == TokenID.LeftParenthesis)
         {
             Consume(1);
-            (var positionalArgs, var namedArgs) = FunctionArguments();
+            var (positionalArgs, namedArgs) = FunctionArguments();
             expr = name.IsIdentifier
                  ? new FunctionCall(name[0].Value, positionalArgs, namedArgs)
                  : new StaticMethodCall(name, positionalArgs, namedArgs);
@@ -704,7 +703,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// A <see cref="Conversion"/>, a <see cref="TupleInitializer"/>
     /// or simply a parenthesized <see cref="Ast.Expressions.Expression"/>
     /// </returns>
-    protected Expression AtomStartingWithLParen()
+    private Expression AtomStartingWithLParen()
     {
         Token first = Match(TokenID.LeftParenthesis);
 
@@ -758,7 +757,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>
     /// A <see cref="MapInitializer"/> or a <see cref="SetInitializer"/>
     /// </returns>
-    protected Expression AtomStartingWithLBrace()
+    private Expression AtomStartingWithLBrace()
     {
         List<MapItemInitializer> mapItems = [];
         List<ListItem> setItems = [];
@@ -811,7 +810,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a list's initializer.
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.ListInitializer"/></returns>
-    protected Expression ListInitializer()
+    private Expression ListInitializer()
     {
         Token first = Match(TokenID.LeftBracket);
         ListItem[] items = List(ListItem, false, null);
@@ -896,7 +895,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a <b>throw</b> statement used as an expresion.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.ThrowExpression"/></returns>
-    protected ThrowExpression ThrowExpression()
+    private ThrowExpression ThrowExpression()
     {
         Token first = Match(TokenID.KW_Throw);
         Expression thrown = RequiredExpression();
@@ -933,15 +932,15 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// with subsequent operands stored in a queue with corresponding operators.
     /// </summary>
     /// <param name="firstOperand">The first operand of the chain of binary expressions</param>
-    /// <param name="moreOps">A <see cref="Queue{T}"/> of <see cref="(BinaryOperator, Expression)"/> pairs</param>
+    /// <param name="moreOps">A <see cref="Queue{T}"/> of (BinaryOperator, Expression) pairs</param>
     /// <returns>A  <see cref="BinaryExpression"/></returns>
-    protected static Expression LeftAssociativeChain(Expression firstOperand, Queue<(BinaryOperator, Expression)> moreOps)
+    private static Expression LeftAssociativeChain(Expression firstOperand, Queue<(BinaryOperator, Expression)> moreOps)
     {
         Expression chainExpr = firstOperand;
 
         while (moreOps.Count > 0)
         {
-            (BinaryOperator _operator, Expression operand) = moreOps.Dequeue();
+            var (_operator, operand) = moreOps.Dequeue();
             chainExpr = new BinaryExpression(_operator, chainExpr, operand);
         }
 
@@ -1010,7 +1009,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a list or set item initializer.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.ListItem"/></returns>
-    protected ListItem ListItem()
+    private ListItem ListItem()
     {
         ScriptLocation start = null;
         Expression expr;
@@ -1040,7 +1039,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a map item initializer.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.MapItemInitializer"/></returns>
-    protected MapItemInitializer MapItemInitializer()
+    private MapItemInitializer MapItemInitializer()
     {
         Expression key = Expression();
         if (key == null) return null;
@@ -1056,7 +1055,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes the set of arguments passed to a function or method when it's called.
     /// </summary>
-    /// <returns>A <see cref="(ListItem[], Dictionary{string, Expression})"/> tuple</returns>
+    /// <returns>A (ListItem[], Dictionary{string, Expression})" tuple</returns>
     protected (ListItem[], Dictionary<string, Expression>) FunctionArguments()
     {
         List<ListItem> positionalArgs = [];
@@ -1126,7 +1125,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes a case in a <see cref="PatternMatching"/>
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.MatchCase"/></returns>
-    protected MatchCase MatchCase()
+    private MatchCase MatchCase()
     {
         Pattern pattern = MatchCasePattern();
         if (pattern == null) return null;
@@ -1143,7 +1142,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes the <see cref="Pattern"/> component of a <see cref="Ast.Expressions.MatchCase"/>.
     /// </summary>
     /// <returns>A <see cref="Pattern"/></returns>
-    protected Pattern MatchCasePattern()
+    private Pattern MatchCasePattern()
     {
         List<Pattern> patterns = [];
         bool loop = true;
@@ -1279,12 +1278,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes the <see cref="ObjectPattern.Example"/> member.
     /// </summary>
-    /// <returns>An <see cref="Object"/> with literal property values</returns>
-    protected DataItem MatchCaseObjectPattern(ref Token last)
+    /// <returns>An <see cref="object"/> with literal property values</returns>
+    private DataItem MatchCaseObjectPattern(ref Token last)
     {
-        var fieldBag = new Dictionary<string, DataItem>();
+        Dictionary<string, DataItem> fieldBag = [];
         bool negative = false, loop = true;
-        Token fieldValueToken;
 
         Match(TokenID.LeftBrace);
 
@@ -1293,6 +1291,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             string fieldName = Match(TokenID.Identifier).ToString();
             Match(TokenID.Equal);
 
+            Token fieldValueToken;
             if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out int pos))
             {
                 negative = token.TokenID == TokenID.Minus;

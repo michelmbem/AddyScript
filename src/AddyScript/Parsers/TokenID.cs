@@ -80,6 +80,7 @@ public enum TokenID
     KW_Switch,
     KW_Case,
     KW_When,
+    KW_And,
     KW_Or,
     KW_Default,
     KW_For,

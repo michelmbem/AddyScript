@@ -189,7 +189,6 @@
         </Rule>
 
         <Keywords color="Keywords">
-            <Word>as</Word>
             <Word>break</Word>
             <Word>case</Word>
             <Word>catch</Word>
@@ -208,17 +207,13 @@
             <Word>goto</Word>
             <Word>if</Word>
             <Word>import</Word>
-            <Word>in</Word>
-            <Word>not</Word>
             <Word>operator</Word>
-            <Word>or</Word>
             <Word>property</Word>
             <Word>return</Word>
             <Word>switch</Word>
             <Word>throw</Word>
             <Word>try</Word>
             <Word>var</Word>
-            <Word>when</Word>
             <Word>while</Word>
             <Word>yield</Word>
         </Keywords>
@@ -259,13 +254,19 @@
         </Keywords>
         
         <Keywords color="OperatorKeywords">
+            <Word>and</Word>
+            <Word>as</Word>
             <Word>contains</Word>
             <Word>endswith</Word>
+            <Word>in</Word>
             <Word>is</Word>
             <Word>matches</Word>
             <Word>new</Word>
+            <Word>not</Word>
+            <Word>or</Word>
             <Word>startswith</Word>
             <Word>typeof</Word>
+            <Word>when</Word>
             <Word>with</Word>
         </Keywords>
         

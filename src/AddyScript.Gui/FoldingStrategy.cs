@@ -17,21 +17,17 @@ public partial class FoldingStrategy
 
     private IEnumerable<NewFolding> CreateNewFoldings(TextDocument document)
     {
-        var newFoldings = new List<NewFolding>();
+        List<NewFolding> newFoldings = [];
 
         // --- 1. Handle import directives block ---
         AddImportFoldings(document, newFoldings);
 
-        // --- 2. Handle braces { } ---
+        // --- 2. Handle braces, brackets and parentheses ---
         AddBraceFoldings(document, newFoldings, '{', '}');
-
-        // --- 3. Handle brackets [ ] ---
         AddBraceFoldings(document, newFoldings, '[', ']');
-
-        // --- 4. Handle parentheses ( ) ---
         AddBraceFoldings(document, newFoldings, '(', ')');
 
-        // --- 5. Handle multiline comments ---
+        // --- 3. Handle multiline comments ---
         AddCommentFoldings(document, newFoldings);
 
         newFoldings.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
@@ -42,7 +38,7 @@ public partial class FoldingStrategy
     private void AddImportFoldings(TextDocument document, List<NewFolding> newFoldings)
     {
         var matches = ImportRegex.Matches(document.Text);
-        if (matches.Count <= 1) return;
+        if (matches.Count < 2) return;
 
         var first = matches[0];
         var last = matches[^1];
