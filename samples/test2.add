@@ -1,6 +1,6 @@
 import std::util;
 
-abstract null class A
+abstract class A
 {
 	protected constructor()
 	{
