@@ -70,7 +70,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
         }
 
         innerWriter.Write(value);
-        atLineStart = value is '\r' or '\n';
+        atLineStart = value == '\n';
 
         if (atLineStart)
             prefixBuilder.Clear();

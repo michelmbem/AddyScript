@@ -45,7 +45,7 @@ public partial class MainWindow : Window
     private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
     private OverloadInsightWindow insightWindow;
-    private DispatcherTimer clipboardTimer;
+    private DispatcherTimer idleTimer;
     private DispatcherTimer dwellTimer;
     private TextViewPosition? hoverPosition;
     private bool updateFolding;
@@ -93,13 +93,13 @@ public partial class MainWindow : Window
     private void InitializeTimers()
     {
         // Clipboard monitoring timer
-        clipboardTimer = new DispatcherTimer()
+        idleTimer = new DispatcherTimer()
         {
             Interval = TimeSpan.FromMilliseconds(250)
         };
 
-        clipboardTimer.Tick += EditorMonitorClipboard;
-        clipboardTimer.Start();
+        idleTimer.Tick += EditorIdle;
+        idleTimer.Start();
         
         // Dwell timer
         dwellTimer = new DispatcherTimer()
@@ -575,6 +575,8 @@ public partial class MainWindow : Window
     /// <param name="text">The text to display in the popup body.</param>
     private void ShowInfoPopup(string header, string text)
     {
+        dwellTimer.Stop();
+
         PopupHeader.Text = header;
         PopupText.Text = text;
 
@@ -954,13 +956,13 @@ public partial class MainWindow : Window
                 }
                 case ',':
                     if (callTipStack.Count == 0) return;
-                    insightWindow.Close();
+                    insightWindow?.Close();
                     if (!CurrentCallTip.NextParameter()) return;
                     ShowCallTip();
                     return;
                 case ')':
                     if (callTipStack.Count == 0) return;
-                    insightWindow.Close();
+                    insightWindow?.Close();
                     if (!PopCallTip()) return;
                     ShowCallTip();
                     return;
@@ -1006,9 +1008,10 @@ public partial class MainWindow : Window
         hoverPosition = null;
     }
 
-    private async void EditorMonitorClipboard(object sender, EventArgs e)
+    private async void EditorIdle(object sender, EventArgs e)
     {
-        if (updateFolding) foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+        if (updateFolding)
+            foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
         
         var clipboard = GetTopLevel(this)?.Clipboard;
         if (clipboard == null) return;

@@ -40,6 +40,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     }
 
     /// <summary>
+    /// Recognizes a non-null statement.
+    /// </summary>
+    /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
+    public Statement RequiredStatement()
+    {
+        return Required(Statement, Resources.StatementRequired);
+    }
+
+    /// <summary>
     /// Recognizes a statement eventually preceded by labels.
     /// </summary>
     /// <returns>A <see cref="Ast.Statements.Statement"/></returns>
@@ -62,8 +71,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private Statement Statement()
     {
         // Skip empty statements
-        while (TryMatch(TokenID.SemiColon)) Consume(1);
-
+        while (TryMatch(TokenID.SemiColon))
+            Consume(1);
 
         return token.TokenID switch
         {
@@ -90,15 +99,6 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             TokenID.KW_Try => TryCatchFinally(),
             _ => ExpressionAsStatement(),
         };
-    }
-    
-    /// <summary>
-    /// Recognizes a non-null statement.
-    /// </summary>
-    /// <returns>An <see cref="Ast.Statements.Statement"/></returns>
-    public Statement RequiredStatement()
-    {
-        return Required(Statement, Resources.StatementRequired);
     }
     
     /// <summary>
@@ -813,28 +813,28 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="ClassMemberDecl"/></returns>
     private ClassMemberDecl ClassMember()
     {
-        (Scope, Modifier, AttributeDecl[]) prefix = MemberPrefix(out Token first);
+        var (scope, modifier, attributes) = ClassMemberPrefix(out Token first);
 
         SkipComments();
 
         ClassMemberDecl member = token.TokenID switch
         {
-            TokenID.Identifier => ClassField(prefix.Item1, prefix.Item2),
-            TokenID.KW_Constructor => prefix.Item2 == Modifier.Default
-                                    ? Constructor(prefix.Item1)
+            TokenID.Identifier => ClassField(scope, modifier),
+            TokenID.KW_Constructor => modifier == Modifier.Default
+                                    ? Constructor(scope)
                                     : throw new SyntaxError(FileName, token, Resources.InvalidConstructorModifier),
-            TokenID.KW_Property => ClassProperty(prefix.Item1, prefix.Item2),
-            TokenID.KW_Function => ClassMethod(prefix.Item1, prefix.Item2),
-            TokenID.KW_Operator => prefix.Item2 == Modifier.Default
-                                 ? ClassOperator(prefix.Item1)
+            TokenID.KW_Property => ClassProperty(scope, modifier),
+            TokenID.KW_Function => ClassMethod(scope, modifier),
+            TokenID.KW_Operator => modifier == Modifier.Default
+                                 ? ClassOperator(scope)
                                  : throw new SyntaxError(FileName, token, Resources.InvalidOperatorModifier),
-            TokenID.KW_Event => ClassEvent(prefix.Item1, prefix.Item2),
+            TokenID.KW_Event => ClassEvent(scope, modifier),
             _ => null,
         };
 
         if (member != null)
         {
-            member.Attributes = prefix.Item3;
+            member.Attributes = attributes;
             if (first != null) member.SetLocation(first.Start, member.End);
         }
 
@@ -846,59 +846,59 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="first">The initial <see cref="Token"/> of the member being recognized</param>
     /// <returns>A (Scope, Modifier, AttributeDecl[]) tuple</returns>
-    /// <throws></throws>
     /// <exception cref="SyntaxError">Malformed prefix</exception>
-    private (Scope, Modifier, AttributeDecl[]) MemberPrefix(out Token first)
+    private (Scope, Modifier, AttributeDecl[]) ClassMemberPrefix(out Token first)
     {
-        Scope scope = Scope.Private;
-        Modifier modifier = Modifier.Default;
+        Scope? scope = null;
+        Modifier? modifier = null;
         AttributeDecl[] attributes = null;
-        bool loop = true, gotScope = false, gotModifier = false, gotAttributes = false;
-
         first = null;
 
-        while (loop)
+        SkipComments();
+
+        if (token.TokenID == TokenID.LeftBracket)
         {
-            SkipComments();
-
-            switch (token.TokenID)
-            {
-                case TokenID.Scope:
-                    if (gotScope) throw new SyntaxError(FileName, token);
-
-                    (first, scope, gotScope) = (token, (Scope)token.Value, true);
-                    Consume(1);
-                    break;
-                case TokenID.Modifier:
-                    if (gotModifier) throw new SyntaxError(FileName, token);
-
-                    (first, modifier, gotModifier) = (token, (Modifier)token.Value, true);
-                    Consume(1);
-
-                    if ((modifier == Modifier.Static && TryMatchValue(TokenID.Modifier, Modifier.Final)) ||
-                        (modifier == Modifier.Final && TryMatchValue(TokenID.Modifier, Modifier.Static)))
-                    {
-                        modifier = Modifier.StaticFinal;
-                        Consume(1);
-                    }
-
-                    break;
-                case TokenID.LeftBracket:
-                    if (gotAttributes) throw new SyntaxError(FileName, token);
-
-                    first = token;
-                    Consume(1);
-                    attributes = List(Attribute, true, Resources.DuplicatedAttribute);
-                    Match(TokenID.RightBracket);
-                    gotAttributes = true;
-                    break;
-                default:
-                    loop = false;
-                    break;
-            }
+            first = token;
+            Consume(1);
+            attributes = List(Attribute, true, Resources.DuplicatedAttribute);
+            Match(TokenID.RightBracket);
         }
 
-        return (scope, modifier, attributes);
+        switch (token.TokenID)
+        {
+            case TokenID.Scope:
+                scope = (Scope)token.Value;
+                Consume(1);
+                if (TryMatch(TokenID.Modifier))
+                    modifier = ClassMemberModifier();
+                break;
+            case TokenID.Modifier:
+                modifier = ClassMemberModifier();
+                Consume(1);
+                if (TryMatch(TokenID.Scope))
+                {
+                    scope = (Scope)token.Value;
+                    Consume(1);
+                }
+                break;
+        }
+
+        return (scope ?? Scope.Private, modifier ?? Modifier.Default, attributes);
+    }
+
+    private Modifier ClassMemberModifier()
+    {
+        var modifier = (Modifier)token.Value;
+        Consume(1);
+
+        if ((modifier == Modifier.Static && TryMatchValue(TokenID.Modifier, Modifier.Final)) ||
+            (modifier == Modifier.Final && TryMatchValue(TokenID.Modifier, Modifier.Static)))
+        {
+            modifier = Modifier.StaticFinal;
+            Consume(1);
+        }
+
+        return modifier;
     }
 
     /// <summary>

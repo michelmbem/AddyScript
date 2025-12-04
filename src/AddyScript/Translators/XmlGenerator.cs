@@ -1187,13 +1187,31 @@ public class XmlGenerator : ITranslator
 
             currentElement = savedElement;
         }
+        else if (pattern is NegativePattern negPat)
+        {
+            XmlElement tmpElement = document.CreateElement("NegativePattern");
+
+            XmlElement childElement = document.CreateElement("Child");
+            ProcessPattern(childElement, negPat.Child);
+            tmpElement.AppendChild(childElement);
+
+            parent.AppendChild(tmpElement);
+        }
         else if (pattern is CompositePattern compPat)
         {
             XmlElement tmpElement = document.CreateElement("CompositePattern");
-            parent.AppendChild(tmpElement);
+            tmpElement.SetAttribute("Inclusive", compPat.Inclusive.ToString());
 
-            foreach (Pattern component in compPat.Components)
-                ProcessPattern(tmpElement, component);
+            XmlElement childElement = document.CreateElement("Left");
+            ProcessPattern(childElement, compPat.Left);
+            tmpElement.AppendChild(childElement);
+
+
+            childElement = document.CreateElement("Right");
+            ProcessPattern(childElement, compPat.Right);
+            tmpElement.AppendChild(childElement);
+
+            parent.AppendChild(tmpElement);
         }
     }
 

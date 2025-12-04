@@ -1144,142 +1144,196 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Pattern"/></returns>
     private Pattern MatchCasePattern()
     {
-        List<Pattern> patterns = [];
-        bool loop = true;
-        int pos;
+        var pairs = new Queue<(Pattern, bool)>();
+        bool conditionAllowed = true; // indicates that 'not', 'and', 'or', 'when' are allowed
+        bool inclusiveCmp = false; // inclusive composition ('and' instead of 'or')
+        bool morePatterns; // look-up for more pattern => chaining
 
-        while (loop)
+        do
         {
             SkipComments();
 
             Token first = token, last = first;
-            Pattern pattern = null;
-            bool negative = false;
+            bool negate = false;
 
-            switch (token.TokenID)
+            if (conditionAllowed && token.TokenID == TokenID.KW_Not)
             {
-                case TokenID.LT_Null:
-                    pattern = new NullPattern();
-                    Consume(1);
-                    break;
-                case TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
-                     TokenID.LT_Decimal or TokenID.LT_Date or TokenID.LT_String:
-                literal_value:
-                {
-                    TokenID lBoundID = token.TokenID;
-                    DataItem lBound = DataItemFactory.CreateDataItem(token.Value);
-                    if (negative) lBound = lBound.UnaryOperation(UnaryOperator.Minus);
-                    Consume(1);
-
-                    if (TryMatch(TokenID.DoubleDot))
-                    {
-                        last = token;
-                        Consume(1);
-
-                        if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out pos))
-                        {
-                            negative = token.TokenID == TokenID.Minus;
-                            Consume(pos - 1);
-                        }
-                        else
-                            negative = false;
-
-                        if (TryMatch(lBoundID))
-                        {
-                            last = token;
-                            DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
-                            if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
-                            pattern = new RangePattern(lBound, uBound);
-                            Consume(1);
-                        }
-                        else
-                            pattern = new RangePattern(lBound, null);
-                    }
-                    else
-                        pattern = new ValuePattern(lBound);
-
-                    break;
-                }
-                case TokenID.DoubleDot:
-                {
-                    Consume(1);
-
-                    if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out pos))
-                    {
-                        negative = token.TokenID == TokenID.Minus;
-                        Consume(pos - 1);
-                    }
-
-                    last = MatchAny(TokenID.LT_Boolean, TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
-                                    TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
-
-                    DataItem uBound = DataItemFactory.CreateDataItem(last.Value);
-                    if (negative) uBound = uBound.UnaryOperation(UnaryOperator.Minus);
-                    pattern = new RangePattern(null, uBound);
-
-                    break;
-                }
-                case TokenID.Plus or TokenID.Minus:
-                    if (!LookAhead(t => t.IsNumeric, out pos)) throw new SyntaxError(FileName, token);
-
-                    negative = token.TokenID == TokenID.Minus;
-                    Consume(pos - 1);
-
-                    goto literal_value;
-                case TokenID.TypeName or TokenID.Identifier:
-                {
-                    string typeName = token.ToString();
-                    Consume(1);
-
-                    if (typeName == AlwaysPattern.Symbol)
-                        pattern = new AlwaysPattern();
-                    else if (TryMatch(TokenID.LeftBrace))
-                        pattern = new ObjectPattern(typeName, MatchCaseObjectPattern(ref last));
-                    else
-                        pattern = new TypePattern(typeName);
-
-                    break;
-                }
-                case TokenID.LeftBrace:
-                    pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPattern(ref last));
-                    break;
-                case TokenID.KW_When:
-                    Consume(1);
-                    Expression predicate = RequiredExpression();
-                    pattern = new PredicatePattern(predicate);
-                    last.CopyLocation(predicate);
-                    break;
-                case TokenID.KW_Or:
-                    if (patterns.Count > 0)
-                        Consume(1);
-                    else
-                        throw new SyntaxError(FileName, token);
-                    break;
-                default:
-                    loop = false;
-                    break;
+                negate = true;
+                conditionAllowed = false;
+                Consume(1);
+                SkipComments();
             }
+
+            Pattern pattern = MatchCaseSimplePattern(conditionAllowed, ref last);
+            conditionAllowed &= pattern is not PredicatePattern;
 
             if (pattern != null)
             {
+                if (negate) pattern = new NegativePattern(pattern);
                 pattern.SetLocation(first.Start, last.End);
-                patterns.Add(pattern);
+                pairs.Enqueue((pattern, inclusiveCmp));
+            }
+            else if (negate) // 'not' used without a following pattern
+                throw new SyntaxError(FileName, first);
+
+            morePatterns = false;
+            if (!conditionAllowed) continue;
+
+            SkipComments();
+            switch (token.TokenID)
+            {
+                case TokenID.KW_And or TokenID.KW_Or:
+                    morePatterns = true;
+                    inclusiveCmp = token.TokenID == TokenID.KW_And;
+                    Consume(1);
+                    break;
+                case TokenID.KW_When:
+                    morePatterns = inclusiveCmp = true;
+                    break;
             }
         }
+        while (morePatterns);
 
-        if (patterns.Count == 0) return null;
-        if (patterns.Count == 1) return patterns[0];
+        if (pairs.Count == 0) return null;
 
-        var composite = new CompositePattern([.. patterns]);
-        composite.SetLocation(patterns[0].Start, patterns[^1].End);
-        return composite;
+        var (left, _) = pairs.Dequeue();
+        while (pairs.Count > 0)
+        {
+            var (right, incl) = pairs.Dequeue();
+            left = new CompositePattern(incl, left, right);
+            left.SetLocation(left.Start, right.End);
+        }
+        return left;
+    }
+
+    /// <summary>
+    /// Recognizes a simple pattern <see cref="Pattern"/>.
+    /// One that does not include the <b>not</b>, <b>and</b>, <b>or</b> operators.
+    /// Conditionally recognizes the <b>when</b> operator.
+    /// </summary>
+    /// <param name="predicateAllowed">Determines whether <b>when</b> is allowed or not</param>
+    /// <param name="last">A reference to the last terminal symbol that should be returned</param>
+    /// <returns>A <see cref="Pattern"/></returns>
+    /// <exception cref="SyntaxError">If an invalid symbol is met</exception>
+    private Pattern MatchCaseSimplePattern(bool predicateAllowed, ref Token last)
+    {
+        Pattern pattern = null;
+
+        switch (token.TokenID)
+        {
+            case TokenID.LT_Null:
+                pattern = new NullPattern();
+                Consume(1);
+                break;
+            case TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
+                 TokenID.LT_Decimal or TokenID.LT_Date or TokenID.LT_String:
+                pattern = MatchCaseValueOrRangePattern(true, false, ref last);
+                break;
+            case TokenID.DoubleDot:
+                pattern = MatchCaseValueOrRangePattern(false, false, ref last);
+                break;
+            case TokenID.Plus or TokenID.Minus:
+            {
+                if (!LookAhead(t => t.IsNumeric, out int pos)) throw new SyntaxError(FileName, token);
+                bool negateLBound = token.TokenID == TokenID.Minus;
+                Consume(pos - 1);
+                pattern = MatchCaseValueOrRangePattern(true, negateLBound, ref last);
+                break;
+            }
+            case TokenID.TypeName or TokenID.Identifier:
+            {
+                string typeName = token.ToString();
+                Consume(1);
+
+                if (typeName == AlwaysPattern.Symbol)
+                    pattern = new AlwaysPattern();
+                else if (TryMatch(TokenID.LeftBrace))
+                    pattern = new ObjectPattern(typeName, MatchCaseObjectPatternExample(ref last));
+                else
+                    pattern = new TypePattern(typeName);
+                break;
+            }
+            case TokenID.LeftBrace:
+                pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPatternExample(ref last));
+                break;
+            case TokenID.KW_When when predicateAllowed:
+                Consume(1);
+                Expression predicate = RequiredExpression();
+                pattern = new PredicatePattern(predicate);
+                last.CopyLocation(predicate);
+                break;
+        }
+
+        return pattern;
+    }
+
+    /// <summary>
+    /// Recognizes a <see cref="ValuePattern"/> or a <see cref="RangePattern"/>.
+    /// </summary>
+    /// <param name="withLBound">Determines if the lower bound of arange should be parsed</param>
+    /// <param name="negateLBound">Determines if a negative signed was initially met for the lower bound</param>
+    /// <param name="last">A reference to the last terminal symbol that should be returned</param>
+    /// <returns>A <see cref="Pattern"/></returns>
+    private Pattern MatchCaseValueOrRangePattern(bool withLBound, bool negateLBound, ref Token last)
+    {
+        Pattern pattern;
+        DataItem lBound = null;
+        TokenID? lBoundID = null;
+
+        if (withLBound)
+        {
+            lBound = MatchCasePatternLiteralValue(negateLBound, ref last);
+            lBoundID = last.TokenID;
+        }
+
+        if (TryMatch(TokenID.DoubleDot))
+        {
+            last = token;
+            Consume(1);
+
+            bool negateUBound = false;
+            if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out int pos))
+            {
+                negateUBound = token.TokenID == TokenID.Minus;
+                Consume(pos - 1);
+            }
+
+            if (lBoundID == null || TryMatch(lBoundID.Value))
+            {
+                DataItem uBound = MatchCasePatternLiteralValue(negateUBound, ref last);
+                pattern = new RangePattern(lBound, uBound);
+            }
+            else
+                pattern = new RangePattern(lBound, null);
+        }
+        else
+            pattern = new ValuePattern(lBound);
+
+        return pattern;
+    }
+
+    /// <summary>
+    /// Reads a literal value of one of the types which are allowed for patterns.
+    /// </summary>
+    /// <param name="negate">Determines if a negative signe was initially met for the value</param>
+    /// <param name="last">A reference to the last terminal symbol that should be returned</param>
+    /// <returns>A <see cref="DataItem"/></returns>
+    private DataItem MatchCasePatternLiteralValue(bool negate, ref Token last)
+    {
+        last = MatchAny(TokenID.LT_Boolean, TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
+                        TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
+
+        DataItem literalValue = DataItemFactory.CreateDataItem(last.Value);
+        if (negate) literalValue = literalValue.UnaryOperation(UnaryOperator.Minus);
+
+        return literalValue;
     }
 
     /// <summary>
     /// Recognizes the <see cref="ObjectPattern.Example"/> member.
     /// </summary>
     /// <returns>An <see cref="object"/> with literal property values</returns>
-    private DataItem MatchCaseObjectPattern(ref Token last)
+    private DataItem MatchCaseObjectPatternExample(ref Token last)
     {
         Dictionary<string, DataItem> fieldBag = [];
         bool negative = false, loop = true;

@@ -47,7 +47,7 @@ println();
 
 res = PI switch {
 	3.14 => 'three-point-fourteen',
-	0 or 1 or 2..4 or 5..8 or 9 => 'in the set {0, 1, 2 to 4, 5 to 8, 9}',
+	0 or 1 or 2..4 or 5..8 or 9 => 'in the set {0 or 1 or 2 to 4 or 5 to 8 or 9}',
 	float => 'a floatting-point number'
 };
 println($'result with PI: {res}');
@@ -56,7 +56,7 @@ println();
 res = ((int)readln('type a number: ')) switch {
 	..-1 => 'negative',
 	0..4 => 'from 0 to 4',
-	5..9 => {
+	5..10 and not 10 => {
 		print('yeah i know, ');
 		println('it\'s between 5 and 9!');
 		yield __value;

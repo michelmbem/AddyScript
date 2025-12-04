@@ -1186,15 +1186,16 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             textWriter.Write("when ");
             predPat.Predicate.AcceptTranslator(this);
         }
+        else if (pattern is NegativePattern negPat)
+        {
+            textWriter.Write("not ");
+            DumpMatchCasePattern(negPat.Child);
+        }
         else if (pattern is CompositePattern compPat)
         {
-            DumpMatchCasePattern(compPat.Components[0]);
-
-            for (int i = 1; i < compPat.Components.Length; ++i)
-            {
-                textWriter.Write(", ");
-                DumpMatchCasePattern(compPat.Components[i]);
-            }
+            DumpMatchCasePattern(compPat.Left);
+            textWriter.Write(compPat.Inclusive ? " and " : " or ");
+            DumpMatchCasePattern(compPat.Right);
         }
     }
 
