@@ -1292,7 +1292,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             Consume(1);
 
             bool negateUBound = false;
-            if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out int pos))
+            if (TryMatchAny(TokenID.Plus, TokenID.Minus) &&
+                LookAhead(t => t.IsNumeric, out int pos))
             {
                 negateUBound = token.TokenID == TokenID.Minus;
                 Consume(pos - 1);

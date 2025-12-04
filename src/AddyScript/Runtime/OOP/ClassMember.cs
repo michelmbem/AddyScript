@@ -19,7 +19,7 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// <summary>
     /// The member's name.
     /// </summary>
-    public string Name { get; private set; } = name;
+    public string Name { get; } = name;
 
     /// <summary>
     /// The scope of this member.
@@ -39,10 +39,7 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// <summary>
     /// The name of this member prefixed by the class name.
     /// </summary>
-    public string FullName
-    {
-        get { return Holder == null ? Name : Holder.Name + "::" + Name; }
-    }
+    public string FullName => Holder == null ? Name : Holder.Name + "::" + Name;
 
     /// <summary>
     /// The member's attributes.
