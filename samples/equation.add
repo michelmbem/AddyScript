@@ -54,7 +54,7 @@ function readopt(message, options, defopt) {
 		.join('/');
 	
 	do {
-		opt = readln($"{message} ({printopts}) ").toLower();
+		opt = readln($"{message} ({printopts}) ").toLower().trim();
 		opt ??= defopt;
 	} while (opt not in options);
 	
