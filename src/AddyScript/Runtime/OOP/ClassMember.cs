@@ -24,12 +24,12 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// <summary>
     /// The scope of this member.
     /// </summary>
-    public Scope Scope { get; private set; } = scope;
+    public Scope Scope { get; } = scope;
 
     /// <summary>
     /// Determines whether this member is abstract, final, static or none.
     /// </summary>
-    public Modifier Modifier { get; private set; } = modifier;
+    public Modifier Modifier { get; } = modifier;
 
     /// <summary>
     /// Represents the class that holds this member (the class in which the member is declared).
@@ -39,7 +39,7 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// <summary>
     /// The name of this member prefixed by the class name.
     /// </summary>
-    public string FullName => Holder == null ? Name : Holder.Name + "::" + Name;
+    public string FullName => Holder != null ? $"{Holder.Name}::{Name}" : Name;
 
     /// <summary>
     /// The member's attributes.

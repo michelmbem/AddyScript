@@ -37,23 +37,30 @@ function equation(a, b, c)
 }
 
 function dialog() {
-    println('solving a*x**2 + b*x + c = 0:');
-    println('-----------------------------');
-    
-    a = (float)readln('a = ');
+	println('solving a*x**2 + b*x + c = 0:');
+	println('-----------------------------');
+	
+	a = (float)readln('a = ');
 	b = (float)readln('b = ');
 	c = (float)readln('c = ');
 	
 	return (a, b, c);
 }
 
-var ans;
+function readopt(message, options, defopt) {
+	var opt;
+	var printopts = options
+		.select(|x| => x == defopt ? x.toUpper() : x)
+		.join('/');
+	
+	do {
+		opt = readln($"{message} ({printopts}) ").toLower();
+		opt ??= defopt;
+	} while (opt not in options);
+	
+	return opt;
+}
 
 do
-{
 	equation(..dialog());
-	
-	do
-		ans = readln('continue? (y/n) ').toLower();
-	while (ans != 'y' & ans != 'n');
-} while (ans == 'y');
+while ('y' == readopt('continue ?', ['y', 'n'], 'y'));

@@ -49,9 +49,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
      */
 
     private readonly HashSet<string> importedModules = [];
-    private readonly NameTree nameCache = new();
+    private readonly NameTree nameCache = new ();
     private readonly Dictionary<Class, DataItem> typeInfoCache = [];
-    private Stack<MethodFrame> frames = new();
+    private Stack<MethodFrame> frames = new ();
     private MethodFrame rootFrame, currentFrame;
     private string fileName = string.Empty;
     private MissingReferenceAction misRefAct = MissingReferenceAction.Fail;
@@ -2353,11 +2353,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         InitializeFields(ex);
 
         if (sx.InnerException != null)
-            ex.SetProperty("_name", new String(sx.InnerException.GetType().Name));
+            ex.SetProperty("__name", new String(sx.InnerException.GetType().Name));
         
-        ex.SetProperty("_message", new String(sx.Message));
-        ex.SetProperty("_source", new String(fileName));
-        ex.SetProperty("_line", new Integer(sx.Element.Start.LineNumber));
+        ex.SetProperty("__message", new String(sx.Message));
+        ex.SetProperty("__source", new String(fileName));
+        ex.SetProperty("__line", new Integer(sx.Element.Start.LineNumber));
 
         return ex;
     }
@@ -2403,16 +2403,16 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             DataItem indexerInfo = klass.Indexer != null ? GetPropertyInfo(klass.Indexer) : Void.Value;
 
             InitializeFields(typeInfo);
-            typeInfo.SetProperty("_superType", superType);
-            typeInfo.SetProperty("_modifier", new String(klass.Modifier.ToString()));
-            typeInfo.SetProperty("_name", new String(klass.Name));
-            typeInfo.SetProperty("_constructor", GetMethodInfo(klass.Constructor));
-            typeInfo.SetProperty("_indexer", indexerInfo);
-            typeInfo.SetProperty("_fields", GetFieldInfoMap(klass));
-            typeInfo.SetProperty("_properties", GetPropertyInfoMap(klass));
-            typeInfo.SetProperty("_methods", GetMethodInfoMap(klass));
-            typeInfo.SetProperty("_events", GetEventInfoMap(klass));
-            typeInfo.SetProperty("_attributes", GetAttributeList(klass.Attributes));
+            typeInfo.SetProperty("__superType", superType);
+            typeInfo.SetProperty("__modifier", new String(klass.Modifier.ToString()));
+            typeInfo.SetProperty("__name", new String(klass.Name));
+            typeInfo.SetProperty("__constructor", GetMethodInfo(klass.Constructor));
+            typeInfo.SetProperty("__indexer", indexerInfo);
+            typeInfo.SetProperty("__fields", GetFieldInfoMap(klass));
+            typeInfo.SetProperty("__properties", GetPropertyInfoMap(klass));
+            typeInfo.SetProperty("__methods", GetMethodInfoMap(klass));
+            typeInfo.SetProperty("__events", GetEventInfoMap(klass));
+            typeInfo.SetProperty("__attributes", GetAttributeList(klass.Attributes));
             typeInfoCache.Add(klass, result = typeInfo);
         }
         
@@ -2430,11 +2430,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         var memberInfo = new Object(klass);
 
         InitializeFields(memberInfo);
-        memberInfo.SetProperty("_scope", new String(member.Scope.ToString()));
-        memberInfo.SetProperty("_modifier", new String(member.Modifier.ToString()));
-        memberInfo.SetProperty("_name", new String(member.Name));
-        memberInfo.SetProperty("_holder", new String(member.Holder.Name));
-        memberInfo.SetProperty("_attributes", GetAttributeList(member.Attributes));
+        memberInfo.SetProperty("__scope", new String(member.Scope.ToString()));
+        memberInfo.SetProperty("__modifier", new String(member.Modifier.ToString()));
+        memberInfo.SetProperty("__name", new String(member.Name));
+        memberInfo.SetProperty("__holder", new String(member.Holder.Name));
+        memberInfo.SetProperty("__attributes", GetAttributeList(member.Attributes));
 
         return memberInfo;
     }
@@ -2448,7 +2448,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         DataItem fieldInfo = GetMemberInfo(field, Class.FieldInfo);
         
-        fieldInfo.SetProperty("_sharedValue", field.SharedValue ?? Void.Value);
+        fieldInfo.SetProperty("__sharedValue", field.SharedValue ?? Void.Value);
 
         return fieldInfo;
     }
@@ -2480,8 +2480,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         DataItem propertyInfo = GetMemberInfo(property, Class.PropertyInfo);
 
-        propertyInfo.SetProperty("_reader", property.CanRead ? GetMethodInfo(property.Reader) : Void.Value);
-        propertyInfo.SetProperty("_writer", property.CanWrite ? GetMethodInfo(property.Writer) : Void.Value);
+        propertyInfo.SetProperty("__reader", property.CanRead ? GetMethodInfo(property.Reader) : Void.Value);
+        propertyInfo.SetProperty("__writer", property.CanWrite ? GetMethodInfo(property.Writer) : Void.Value);
         
         return propertyInfo;
     }
@@ -2513,7 +2513,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         DataItem methodInfo = GetMemberInfo(method, Class.MethodInfo);
      
-        methodInfo.SetProperty("_parameters", GetParameterInfoMap(method.Function.Parameters));
+        methodInfo.SetProperty("__parameters", GetParameterInfoMap(method.Function.Parameters));
 
         return methodInfo;
     }
@@ -2544,7 +2544,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private DataItem GetEventInfo(ClassEvent _event)
     {
         DataItem _eventInfo = GetMemberInfo(_event, Class.EventInfo);
-        _eventInfo.SetProperty("_parameters", GetParameterInfoMap(_event.Parameters));
+        _eventInfo.SetProperty("__parameters", GetParameterInfoMap(_event.Parameters));
         return _eventInfo;
     }
 
@@ -2576,12 +2576,12 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         var parameterInfo = new Object(Class.ParameterInfo);
 
         InitializeFields(parameterInfo);
-        parameterInfo.SetProperty("_name", new String(parameter.Name));
-        parameterInfo.SetProperty("_byRef", Boolean.FromBool(parameter.ByRef));
-        parameterInfo.SetProperty("_vaList", Boolean.FromBool(parameter.VaList));
-        parameterInfo.SetProperty("_defaultValue", parameter.DefaultValue ?? Void.Value);
-        parameterInfo.SetProperty("_canBeEmpty", Boolean.FromBool(parameter.CanBeEmpty));
-        parameterInfo.SetProperty("_attributes", GetAttributeList(parameter.Attributes));
+        parameterInfo.SetProperty("__name", new String(parameter.Name));
+        parameterInfo.SetProperty("__byRef", Boolean.FromBool(parameter.ByRef));
+        parameterInfo.SetProperty("__vaList", Boolean.FromBool(parameter.VaList));
+        parameterInfo.SetProperty("__defaultValue", parameter.DefaultValue ?? Void.Value);
+        parameterInfo.SetProperty("__canBeEmpty", Boolean.FromBool(parameter.CanBeEmpty));
+        parameterInfo.SetProperty("__attributes", GetAttributeList(parameter.Attributes));
 
         return parameterInfo;
     }
@@ -2854,7 +2854,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// </summary>
     /// <returns>An <see cref="InterpreterState"/></returns>
     private InterpreterState GetState()
-        => new(frames, rootFrame, fileName, misRefAct, jumpCode, yieldedValues, lastGoto);
+        => new (frames, rootFrame, fileName, misRefAct, jumpCode, yieldedValues, lastGoto);
 
     /// <summary>
     /// Restores a the interpreter to an initially captured state.
@@ -2862,7 +2862,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="savedState">An <see cref="InterpreterState"/></param>
     private void RestoreState(InterpreterState savedState)
     {
-        frames = new(savedState.frames);
+        frames = new (savedState.frames);
         // Note: Items may be copied into a module in the future
         savedState.rootFrame.RootBlock.CopyItemsFrom(rootFrame.RootBlock);
         rootFrame = savedState.rootFrame;

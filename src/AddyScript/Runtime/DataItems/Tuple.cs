@@ -17,13 +17,13 @@ public sealed class Tuple(DataItem[] items) : DataItem
 
     public override DataItem[] AsArray => items;
 
-    public override List<DataItem> AsList => new(items);
+    public override List<DataItem> AsList => new (items);
 
-    public override HashSet<DataItem> AsHashSet => new(items);
+    public override HashSet<DataItem> AsHashSet => new (items);
 
-    public override Queue<DataItem> AsQueue => new(items);
+    public override Queue<DataItem> AsQueue => new (items);
 
-    public override Stack<DataItem> AsStack => new(items);
+    public override Stack<DataItem> AsStack => new (items);
 
     public override object AsNativeObject => items;
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -23,6 +22,9 @@ namespace AddyScript.Parsers;
 /// <param name="lexer">The bound lexer</param>
 public class Parser(Lexer lexer) : ExpressionParser(lexer)
 {
+    public const string PROPERTY_READER_START = "read";
+    public const string PROPERTY_WRITER_START = "write";
+
     /// <summary>
     /// Recognizes an entire script.
     /// </summary>
@@ -201,18 +203,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         }
 
         Match(TokenID.LeftBrace);
-        
-        ClassMethodDecl constructor = null;
-        ClassPropertyDecl indexer = null;
-        List<ClassFieldDecl> fields = [];
-        List<ClassPropertyDecl> properties = [];
-        List<ClassMethodDecl> methods = [];
-        List<ClassEventDecl> events = [];
-        
         PushClass(modifier, className, superClassName);
-        IdentifiyClassMembers(modifier, Asterisk(ClassMember), ref constructor, ref indexer, fields, properties, methods, events);
+        var (constructor, indexer, fields, properties, methods, events) =
+            IdentifiyClassMembers(modifier, Asterisk(ClassMember));
         PopClass();
-
         Token last = Match(TokenID.RightBrace);
 
         var classDef = new ClassDefinition(className, superClassName, modifier, constructor, indexer,
@@ -781,29 +775,29 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="Ast.Statements.Block"/></returns>
     private Block FunctionBody(string functionName, bool isInline, bool isMethod, bool isStatic)
     {
-        Block body;
-
-        PushFunction(functionName, isMethod, false, isStatic);
-
-        if (TryMatch(TokenID.Arrow))
-        {
-            Consume(1);
-            var returned = RequiredExpression();
-            
-            ScriptElement last = returned;
-            if (!isInline) last = Match(TokenID.SemiColon);
-
-            body = Ast.Statements.Block.WithReturn(returned);
-            body.SetLocation(returned.Start, last.End);
-        }
-        else
-        {
-            body = Block();
-            body.Append(new Return());
-        }
-
+        PushFunction(functionName, isMethod, false /* Not for constructors */, isStatic);
+        Block body = TryMatch(TokenID.Arrow) ? ExpressionBody(isInline) : BlockBody();
         PopFunction();
+        return body;
+    }
 
+    private Block ExpressionBody(bool isInline)
+    {
+        Consume(1); // Skip the arrow (=>)
+        var returned = RequiredExpression();
+
+        ScriptElement last = returned;
+        if (!isInline) last = Match(TokenID.SemiColon);
+
+        Block body = Ast.Statements.Block.WithReturn(returned);
+        body.SetLocation(returned.Start, last.End);
+        return body;
+    }
+
+    private Block BlockBody()
+    {
+        Block body = Block();
+        body.Append(new Return());
         return body;
     }
 
@@ -819,16 +813,16 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
         ClassMemberDecl member = token.TokenID switch
         {
-            TokenID.Identifier => ClassField(scope, modifier),
+            TokenID.Identifier => Field(scope, modifier),
             TokenID.KW_Constructor => modifier == Modifier.Default
                                     ? Constructor(scope)
                                     : throw new SyntaxError(FileName, token, Resources.InvalidConstructorModifier),
-            TokenID.KW_Property => ClassProperty(scope, modifier),
-            TokenID.KW_Function => ClassMethod(scope, modifier),
+            TokenID.KW_Property => Property(scope, modifier),
+            TokenID.KW_Function => Method(scope, modifier),
             TokenID.KW_Operator => modifier == Modifier.Default
-                                 ? ClassOperator(scope)
+                                 ? Operator(scope)
                                  : throw new SyntaxError(FileName, token, Resources.InvalidOperatorModifier),
-            TokenID.KW_Event => ClassEvent(scope, modifier),
+            TokenID.KW_Event => Event(scope, modifier),
             _ => null,
         };
 
@@ -854,9 +848,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         AttributeDecl[] attributes = null;
         first = null;
 
-        SkipComments();
-
-        if (token.TokenID == TokenID.LeftBracket)
+        if (TryMatch(TokenID.LeftBracket))
         {
             first = token;
             Consume(1);
@@ -915,21 +907,21 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         if (TryMatch(TokenID.Colon))
         {
             Consume(1);
+
             Token superStart = Match(TokenID.KW_Super);
             Match(TokenID.LeftParenthesis);
-            var args = FunctionArguments();
+            var (positionalArgs, namedArgs) = FunctionArguments();
             Token superEnd = Match(TokenID.RightParenthesis);
 
-            superCall = new ParentConstructorCall(args.Item1, args.Item2);
+            superCall = new ParentConstructorCall(positionalArgs, namedArgs);
             superCall.SetLocation(superStart.Start, superEnd.End);
         }
 
         PushFunction(CurrentClass.Name, true, true, false);
-        Block body = Block();
+        Block body = BlockBody();
         PopFunction();
 
         if (superCall != null) body.Insert(0, superCall);
-        body.Append(new Return());
 
         var constructor = new ClassMethodDecl(CurrentClass.Name, scope, Modifier.Default, parameters, body);
         constructor.SetLocation(first.Start, body.End);
@@ -942,7 +934,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the field</param>
     /// <param name="modifier">The modifier of the field</param>
     /// <returns>A <see cref="ClassFieldDecl"/></returns>
-    private ClassFieldDecl ClassField(Scope scope, Modifier modifier)
+    private ClassFieldDecl Field(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.Identifier);
         string name = first.ToString();
@@ -967,142 +959,154 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the property</param>
     /// <param name="modifier">The modifier of the property</param>
     /// <returns>A <see cref="ClassPropertyDecl"/></returns>
-    private ClassPropertyDecl ClassProperty(Scope scope, Modifier modifier)
+    private ClassPropertyDecl Property(Scope scope, Modifier modifier)
     {
-        Token first = Match(TokenID.KW_Property), last;
+        Token first = Match(TokenID.KW_Property);
 
         string name;
-        bool isIndexer = false;
-
-        // Determine if its a simple property or an indexer
         if (TryMatch(TokenID.LeftBracket))
         {
             Consume(1); // To skip '['
             Match(TokenID.RightBracket);
-            name = Runtime.OOP.ClassProperty.INDEXER_NAME;
-            isIndexer = true;
+            name = ClassProperty.INDEXER_NAME;
+
+            // Indexers are not compatible with the "static" modifier
+            if (modifier == Modifier.Static)
+                throw new SyntaxError(FileName, first, Resources.IndexerCantBeStatic);
         }
         else
             name = Match(TokenID.Identifier).ToString();
 
-        // Indexers are not compatible with the "static" modifier
-        if (isIndexer && modifier == Modifier.Static)
-            throw new SyntaxError(FileName, first, Resources.IndexerCantBeStatic);
-
-        PropertyAccess access = PropertyAccess.None;
-        Block readerBody = null, writerBody = null;
-        Scope readerScope = scope, writerScope = scope;
-        bool isAuto = false;
-
-        // Handle shorter syntaxes as well as the complete one
-        if (TryMatch(TokenID.SemiColon))
-        {
-            // Shortest syntax, automatic read and write access, example: property name;
-            last = token;
-            Consume(1); // To skip ';'
-            isAuto = modifier != Modifier.Abstract;
-            access = PropertyAccess.ReadWrite;
-        }
-        else if (modifier != Modifier.Abstract && TryMatch(TokenID.Arrow))
-        {
-            // Compact syntax with a returned expression, readonly access, example: property name => expression;
-            Consume(1); // To skip "=>"
-
-            PushFunction(Runtime.OOP.ClassProperty.GetReaderName(name), true, false, modifier == Modifier.Static);
-            var returned = RequiredExpression();
-            PopFunction();
-            
-            last = Match(TokenID.SemiColon);
-            
-            readerBody = Ast.Statements.Block.WithReturn(returned);
-            readerBody.SetLocation(returned.Start, last.End);
-        }
-        else
-        {
-            // Expanded syntax with complete and compact variants, example: property name { read... write... }
-            Match(TokenID.LeftBrace);
-
-            bool loop = true, gotReader = false, gotWriter = false, gotAccessorScope = false;
-
-            while (loop)
-            {
-                Scope accessorScope = scope;
-
-                if (TryMatch(TokenID.Scope))
-                {
-                    if (gotAccessorScope) throw new SyntaxError(FileName, token, Resources.InvalidAccessorsScope);
-
-                    accessorScope = (Scope)token.Value;
-                    if (accessorScope >= scope)
-                        throw new SyntaxError(FileName, token, Resources.AccessorScopeMustBeMoreRestrictive);
-                    
-                    Consume(1);
-                    gotAccessorScope = true;
-                }
-
-                if (TryMatchWord("read"))
-                {
-                    if (gotReader) throw new SyntaxError(FileName, token, Resources.DuplicatedReadAccessor);
-
-                    Consume(1); // To skip the "read" word
-
-                    if (isAuto || modifier == Modifier.Abstract)
-                        Match(TokenID.SemiColon);
-                    else if (!gotWriter && TryMatch(TokenID.SemiColon))
-                    {
-                        isAuto = true;
-                        Consume(1);
-                    }
-                    else
-                        readerBody = FunctionBody(Runtime.OOP.ClassProperty.GetReaderName(name),
-                                                  false, true, modifier == Modifier.Static);
-
-                    gotReader = true;
-                    access |= PropertyAccess.Read;
-                    readerScope = accessorScope;
-                }
-                else if (TryMatchWord("write"))
-                {
-                    if (gotWriter) throw new SyntaxError(FileName, token, Resources.DuplicatedWriteAccessor);
-
-                    Consume(1); // To skip the "write" word
-
-                    if (isAuto || modifier == Modifier.Abstract)
-                        Match(TokenID.SemiColon);
-                    else if (!gotReader && TryMatch(TokenID.SemiColon))
-                    {
-                        isAuto = true;
-                        Consume(1);
-                    }
-                    else
-                        writerBody = FunctionBody(Runtime.OOP.ClassProperty.GetWriterName(name),
-                                                  false, true, modifier == Modifier.Static);
-
-                    gotWriter = true;
-                    access |= PropertyAccess.Write;
-                    writerScope = accessorScope;
-                }
-                else
-                    loop = false;
-            }
-
-            last = Match(TokenID.RightBrace);
-
-            if (access == PropertyAccess.None)
-                throw new SyntaxError(FileName, first, Resources.NoEmptyProperty);
-        }
+        var (access, readerScope, readerBody, writerScope, writerBody) =
+            ProperyBody(name, scope, modifier, out ScriptElement last);
 
         // Validate that the user is not trying to define an automatic indexer
-        if (isIndexer && isAuto) throw new SyntaxError(FileName, first, Resources.IndexerCantBeAuto);
+        if (name == ClassProperty.INDEXER_NAME && modifier != Modifier.Abstract && readerBody == null && writerBody == null)
+            throw new SyntaxError(FileName, first, Resources.IndexerCantBeAuto);
 
-        var classProperty = isAuto || modifier == Modifier.Abstract
-                          ? new ClassPropertyDecl(name, scope, modifier, access)
-                          : new ClassPropertyDecl(name, scope, modifier, readerBody, writerBody);
-
-        classProperty.ReaderScope = readerScope;
-        classProperty.WriterScope = writerScope;
+        var classProperty = new ClassPropertyDecl(name, scope, modifier, access, readerScope, readerBody, writerScope, writerBody);
         classProperty.SetLocation(first.Start, last.End);
         return classProperty;
+    }
+
+    private (PropertyAccess access, Scope readerScope, Block readerBody, Scope writerScope, Block writerBody)
+        ProperyBody(string name, Scope scope, Modifier modifier, out ScriptElement last)
+    {
+        PropertyAccess access = PropertyAccess.None;
+        Scope readerScope = scope;
+        Scope writerScope = scope;
+        Block readerBody = null;
+        Block writerBody = null;
+        last = null;
+
+        SkipComments();
+
+        switch (token.TokenID)
+        {
+            case TokenID.SemiColon: // Shortest syntax, automatic read and write access
+                access = PropertyAccess.ReadWrite;
+                last = token;
+                Consume(1);
+                break;
+            case TokenID.Arrow: // Compact syntax with a returned expression, readonly access
+                if (modifier == Modifier.Abstract)
+                    throw new SyntaxError(FileName, token, Resources.AbstractMemberCantHaveBody);
+
+                PushFunction(ClassProperty.GetReaderName(name), true, false, modifier == Modifier.Static);
+                last = readerBody = ExpressionBody(false);
+                PopFunction();
+                break;
+            case TokenID.LeftBrace: // Expanded form
+                (access, readerScope, readerBody, writerScope, writerBody) =
+                    PropertyAccessors(name, scope, modifier, ref last);
+                break;
+        }
+
+        return (access, readerScope, readerBody, writerScope, writerBody);
+    }
+
+    private (PropertyAccess access, Scope readerScope, Block readerBody, Scope writerScope, Block writerBody)
+        PropertyAccessors(string name, Scope scope, Modifier modifier, ref ScriptElement last)
+    {
+        PropertyAccess access;
+        Scope? readerScope;
+        Scope? writerScope;
+        Block readerBody = null;
+        Block writerBody = null;
+
+        Match(TokenID.LeftBrace);
+        Scope? tempScope = AccessorScope(scope, null);
+
+        if (TryMatchWord(PROPERTY_READER_START))
+        {
+            Consume(1); // To skip the 'read' word
+            access = PropertyAccess.Read;
+            readerBody = AccessorBody(ClassProperty.GetReaderName(name), modifier);
+            readerScope = tempScope;
+            writerScope = AccessorScope(scope, readerScope);
+
+            if (TryMatchWord(PROPERTY_WRITER_START))
+            {
+                Consume(1); // To skip the 'write' word
+                access = PropertyAccess.ReadWrite;
+                writerBody = AccessorBody(ClassProperty.GetWriterName(name), modifier);
+            }
+            else if (writerScope.HasValue)
+                throw new SyntaxError(FileName, token); // A definition should follow any accessor scope
+        }
+        else if (TryMatchWord(PROPERTY_WRITER_START))
+        {
+            Consume(1); // To skip the 'write' word
+            access = PropertyAccess.Write;
+            writerBody = AccessorBody(ClassProperty.GetWriterName(name), modifier);
+            writerScope = tempScope;
+            readerScope = AccessorScope(scope, writerScope);
+
+            if (TryMatchWord(PROPERTY_READER_START))
+            {
+                Consume(1); // To skip the 'read' word
+                access = PropertyAccess.ReadWrite;
+                readerBody = AccessorBody(ClassProperty.GetReaderName(name), modifier);
+            }
+            else if (readerScope.HasValue)
+                throw new SyntaxError(FileName, token); // A definition should follow any accessor scope
+        }
+        else
+            throw new SyntaxError(FileName, token, Resources.NoEmptyProperty);
+
+        last = Match(TokenID.RightBrace);
+
+        return (access, readerScope ?? scope, readerBody, writerScope ?? scope, writerBody);
+    }
+
+    private Scope? AccessorScope(Scope propertyScope, Scope? otherAccessorScope)
+    {
+        Scope? accessorScope = null;
+        
+        if (TryMatch(TokenID.Scope))
+        {
+            if (otherAccessorScope.HasValue)
+                throw new SyntaxError(FileName, token, Resources.BothAccessorsCantRedefineScope);
+            accessorScope = (Scope)token.Value;
+            if (accessorScope.Value >= propertyScope)
+                throw new SyntaxError(FileName, token, Resources.AccessorScopeMustBeMoreRestrictive);
+            Consume(1);
+        }
+
+        return accessorScope;
+    }
+
+    private Block AccessorBody(string name, Modifier modifier)
+    {
+        if (TryMatch(TokenID.SemiColon))
+        {
+            Consume(1); // Skip ';'
+            return null;
+        }
+        else if (modifier == Modifier.Abstract)
+            throw new SyntaxError(FileName, token, Resources.AbstractMemberCantHaveBody);
+
+        return FunctionBody(name, false, true, modifier == Modifier.Static);
     }
 
     /// <summary>
@@ -1111,7 +1115,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the method</param>
     /// <param name="modifier">The modifier of the method</param>
     /// <returns>A <see cref="ClassMethodDecl"/></returns>
-    private ClassMethodDecl ClassMethod(Scope scope, Modifier modifier)
+    private ClassMethodDecl Method(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.KW_Function);
         string name = Match(TokenID.Identifier).ToString();
@@ -1137,7 +1141,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </summary>
     /// <param name="scope">The scope of the outcoming method</param>
     /// <returns>A <see cref="ClassMethodDecl"/></returns>
-    private ClassMethodDecl ClassOperator(Scope scope)
+    private ClassMethodDecl Operator(Scope scope)
     {
         Token first = Match(TokenID.KW_Operator);
         Token _operator = MatchOverloadableOperator();
@@ -1147,8 +1151,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             throw new SyntaxError(FileName, first, string.Format(Resources.InvalidOperandCount, _operator));
 
         string name = IsUnaryOperator(_operator.TokenID, parameters.Length, out bool postfix)
-                    ? Runtime.OOP.ClassMethod.GetMethodName(_operator.ToUnaryOperator(postfix))
-                    : Runtime.OOP.ClassMethod.GetMethodName(_operator.ToBinaryOperator());
+                    ? ClassMethod.GetMethodName(_operator.ToUnaryOperator(postfix))
+                    : ClassMethod.GetMethodName(_operator.ToBinaryOperator());
 
         Block body = FunctionBody(name, false, true, false);
 
@@ -1163,7 +1167,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="scope">The scope of the _event</param>
     /// <param name="modifier">The modifier of the _event</param>
     /// <returns>A <see cref="ClassEventDecl"/></returns>
-    private ClassEventDecl ClassEvent(Scope scope, Modifier modifier)
+    private ClassEventDecl Event(Scope scope, Modifier modifier)
     {
         Token first = Match(TokenID.KW_Event);
         string name = Match(TokenID.Identifier).ToString();
@@ -1176,22 +1180,23 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     }
 
     /// <summary>
-    /// Identifies the members of a class definition and initializes the corresponding property accordingly.
+    /// Identifies the members of a class definition and group them by category.
     /// </summary>
     /// <param name="modifier">The modifier of the class</param>
     /// <param name="members">The list of all members defined for the target class</param>
-    /// <param name="constructor">Will contain a reference to the constructor after identification</param>
-    /// <param name="indexer">Will contain a reference to the indexer after identification</param>
-    /// <param name="fields">Will contain a collection of field definitions after identification</param>
-    /// <param name="properties">Will contain a collection of property definitions after identification</param>
-    /// <param name="methods">Will contain a collection of method definitions after identification</param>
-    /// <param name="events">Will contain a collection of event definitions after identification</param>
+    /// <returns>A tuple of all class members grouped by category</returns>
     /// <exception cref="ScriptError">If a rule of syntax is violated</exception>
-    private void IdentifiyClassMembers(Modifier modifier, ClassMemberDecl[] members,
-                                         ref ClassMethodDecl constructor, ref ClassPropertyDecl indexer,
-                                         List<ClassFieldDecl> fields, List<ClassPropertyDecl> properties,
-                                         List<ClassMethodDecl> methods, List<ClassEventDecl> events)
+    private (ClassMethodDecl, ClassPropertyDecl, List<ClassFieldDecl>,
+             List<ClassPropertyDecl>, List<ClassMethodDecl>, List<ClassEventDecl>)
+        IdentifiyClassMembers(Modifier modifier, ClassMemberDecl[] members)
     {
+        ClassMethodDecl constructor = null;
+        ClassPropertyDecl indexer = null;
+        List<ClassFieldDecl> fields = [];
+        List<ClassPropertyDecl> properties = [];
+        List<ClassMethodDecl> methods = [];
+        List<ClassEventDecl> events = [];
+
         foreach (ClassMemberDecl member in members)
         {
             // Check that each member has a unique name
@@ -1213,10 +1218,9 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 {
                     case Modifier.Abstract: // A field cannot be abstract
                         throw new ScriptError(FileName, field, string.Format(Resources.InvalidFieldModifier, field.Modifier));
-                    case Modifier.StaticFinal:  // A static final field (i.e. a class constant) should have a default value
-                        if (field.Initializer == null)
-                            throw new ScriptError(FileName, field, Resources.ConstantFieldShouldBeInitialized);
-                        break;
+                    case Modifier.StaticFinal when field.Initializer == null:
+                        // A static final field (i.e. a class constant) should have a default value
+                        throw new ScriptError(FileName, field, Resources.ConstantFieldShouldBeInitialized);
                 }
 
                 fields.Add(field);
@@ -1263,6 +1267,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 }
             }
         }
+
+        return (constructor, indexer, fields, properties, methods, events);
     }
 
     /// <summary>
@@ -1378,20 +1384,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <b>true</b> if the token's ID is <paramref name="requiredID"/> and that its value is <paramref name="expectedValue"/>;
     /// <b>false</b> otherwise
     /// </returns>
-    private bool TryMatchValue(TokenID requiredID, object expectedValue)
-    {
-        return TryMatch(t => t.TokenID == requiredID && t.Value.Equals(expectedValue));
-    }
+    private bool TryMatchValue(TokenID requiredID, object expectedValue) =>
+        TryMatch(t => t.TokenID == requiredID && t.Value.Equals(expectedValue));
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment is the <paramref name="word"/> identifier.
     /// </summary>
     /// <param name="word">The identifier to match</param>
     /// <returns><b>true</b> if the token is the <paramref name="word"/> identifier; <b>false</b> otherwise</returns>
-    private bool TryMatchWord(string word)
-    {
-        return TryMatchValue(TokenID.Identifier, word);
-    }
+    private bool TryMatchWord(string word) => TryMatchValue(TokenID.Identifier, word);
 
     /// <summary>
     /// Expects the next token to be an overloadable operator.
@@ -1435,7 +1436,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
                 if (valueProp != null)
                 {
-                    props.Add(new(AttributeDecl.DEFAULT_FIELD_NAME, valueProp));
+                    props.Add(new (AttributeDecl.DEFAULT_FIELD_NAME, valueProp));
                     if (TryMatch(TokenID.Comma)) Consume(1);
                 }
             }

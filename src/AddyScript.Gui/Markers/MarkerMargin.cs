@@ -75,5 +75,5 @@ internal class MarkerMargin : AbstractMargin
         ToolTip.SetIsOpen(this, false);
     }
 
-    protected override Size MeasureOverride(Size availableSize) => new(WIDTH, 0);
+    protected override Size MeasureOverride(Size availableSize) => new (WIDTH, 0);
 }

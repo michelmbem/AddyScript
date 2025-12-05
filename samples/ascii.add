@@ -2,7 +2,7 @@ import sys::console;
 
 setForeground('Yellow');
 println('******** THE ASCII CODE ********');
-println('');
+println();
 
 print('  ');
 for (i = 0; i < 16; i++)

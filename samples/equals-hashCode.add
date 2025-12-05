@@ -43,7 +43,7 @@ println();
 s = {..products};
 
 println('items in the set:');
-println(((list)s).join(NEWLINE));
+s.each(println);
 println();
 
 distincts = products.aggregate([], |acc, val| => {

@@ -21,7 +21,7 @@ public class Lexer
     private const int MAX_BUFFER_SIZE = 512;
 
     private readonly TextReader input;
-    private readonly StringBuilder buffer = new();
+    private readonly StringBuilder buffer = new ();
     private int charIndex, offset, lineOffset, lineNumber;
     private int startOffset, startLineOffset, startLineNumber;
 

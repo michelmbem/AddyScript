@@ -14,7 +14,7 @@ public class InterpreterState(Stack<MethodFrame> frames, MethodFrame rootFrame,
                               JumpCode jumpCode, LinkedList<DataItem> yieldedValues,
                               Goto lastGoto)
 {
-    public readonly Stack<MethodFrame> frames = new(frames);
+    public readonly Stack<MethodFrame> frames = new (frames);
     public readonly MethodFrame rootFrame = rootFrame;
     public readonly string fileName = fileName;
     public readonly MissingReferenceAction misRefAct = misRefAct;

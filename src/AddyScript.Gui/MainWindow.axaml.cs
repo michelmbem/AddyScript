@@ -37,8 +37,8 @@ public partial class MainWindow : Window
 
     private const string HELP_LINK = App.REPO_URL + "/blob/master/docs/README.md";
 
-    private readonly MarkerMargin markerMargin = new();
-    private readonly FoldingStrategy foldingStrategy = new();
+    private readonly MarkerMargin markerMargin = new ();
+    private readonly FoldingStrategy foldingStrategy = new ();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
     private FoldingManager foldingManager;
@@ -477,10 +477,11 @@ public partial class MainWindow : Window
     /// <returns>A string</returns>
     private string GetWordAtOffset(int offset)
     {
-        // Edge case: caret at the beginning of the document
-        if (offset <= 0) return string.Empty;
-
         TextDocument document = Editor.Document;
+
+        // Edge case: caret at the beginning of the document
+        if (offset <= 0 || offset >= document.TextLength)
+            return string.Empty;
 
         // Find the start of the word
         int wordStart = TextUtilities.GetNextCaretPosition(
@@ -514,7 +515,7 @@ public partial class MainWindow : Window
     /// </summary>
     /// <typeparam name="T">The type of the completion data</typeparam>
     /// <param name="completionData">The completion data to display in the menu</param>
-    private void ShowCompletionWindow<T>(List<T> completionData)
+    private void ShowCompletionWindow<T>(IEnumerable<T> completionData)
         where T : ICompletionData
     {
         completionWindow = new CompletionWindow(Editor.TextArea);
@@ -608,7 +609,7 @@ public partial class MainWindow : Window
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
-        textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
+        textMarkerService.AddMarker(new (start.Offset, end.Offset) { ToolTip = errorMessage });
         Editor.TextArea.TextView.Repaint();
     }
     

@@ -14,13 +14,13 @@ public sealed class Complex : DataItem
 
     public Complex(Complex64 value) => this.value = value;
 
-    public Complex(double realPart, double imaginaryPart) => value = new(realPart, imaginaryPart);
+    public Complex(double realPart, double imaginaryPart) => value = new (realPart, imaginaryPart);
 
-    public Complex(double realPart) => value = new(realPart, 0);
+    public Complex(double realPart) => value = new (realPart, 0);
 
-    public Complex Opposite => new(-value);
+    public Complex Opposite => new (-value);
 
-    public Complex Conjugate => new(Complex64.Conjugate(value));
+    public Complex Conjugate => new (Complex64.Conjugate(value));
 
     public override Class Class => Class.Complex;
 

@@ -828,7 +828,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private StringInterpolation StringInterpolation()
     {
         List<Expression> substitutions = [];
-        StringBuilder patternBuffer = new();
+        StringBuilder patternBuffer = new ();
         string mutableString = token.ToString();
         int counter = 0, limit = mutableString.Length;
         char ch;

@@ -1029,35 +1029,38 @@ public class XmlGenerator : ITranslator
         if (property.Modifier != Modifier.Default)
             tmpElement.SetAttribute("Modifier", property.Modifier.ToString());
 
+        if (property.Access != PropertyAccess.None)
+            tmpElement.SetAttribute("Access", property.Access.ToString());
+
+        if ((property.Access & PropertyAccess.Write) != PropertyAccess.None)
+            tmpElement.SetAttribute("WriterScope", property.WriterScope.ToString());
+
         XmlElement savedElement = currentElement;
-        
-        if (!(property.IsAuto || property.Modifier == Modifier.Abstract))
+
+        if (property.CanRead)
         {
-            if (property.CanRead)
+            currentElement = document.CreateElement("Reader");
+            currentElement.SetAttribute("Scope", property.ReaderScope.ToString());
+            tmpElement.AppendChild(currentElement);
+
+            if (property.ReaderBody != null)
             {
-                currentElement = document.CreateElement("Reader");
-                currentElement.SetAttribute("Scope", property.ReaderScope.ToString());
-                tmpElement.AppendChild(currentElement);
                 blockElementName = "Body";
                 property.ReaderBody.AcceptTranslator(this);
             }
+        }
 
-            if (property.CanWrite)
+        if (property.CanWrite)
+        {
+            currentElement = document.CreateElement("Writer");
+            currentElement.SetAttribute("Scope", property.WriterScope.ToString());
+            tmpElement.AppendChild(currentElement);
+
+            if (property.ReaderBody != null)
             {
-                currentElement = document.CreateElement("Writer");
-                currentElement.SetAttribute("Scope", property.WriterScope.ToString());
-                tmpElement.AppendChild(currentElement);
                 blockElementName = "Body";
                 property.WriterBody.AcceptTranslator(this);
             }
-        }
-        else
-        {
-            tmpElement.SetAttribute("Access", property.Access.ToString());
-            if ((property.Access & PropertyAccess.Read) != PropertyAccess.None)
-                tmpElement.SetAttribute("ReaderScope", property.ReaderScope.ToString());
-            if ((property.Access & PropertyAccess.Write) != PropertyAccess.None)
-                tmpElement.SetAttribute("WriterScope", property.WriterScope.ToString());
         }
 
         currentElement = savedElement;

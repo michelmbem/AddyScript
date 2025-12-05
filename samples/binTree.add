@@ -1,53 +1,52 @@
 import sys::console; // for 'setForeground', 'resetColor' and 'clearScreen'
 
 // Adds an element to the tree
-function addTree(&tree, elem, prn = null)
+function treeAdd(&node, elem, prn = null)
 {
-	if (tree === null)
-		tree = new {value = elem, parent = prn, left = null, right = null};
-	else if (elem <= tree.value)
-		addTree(tree.left, elem, tree);
+	if (node === null)
+		node = new {value = elem, parent = prn, left = null, right = null};
+	else if (elem <= node.value)
+		treeAdd(node.left, elem, node);
 	else
-		addTree(tree.right, elem, tree);
+		treeAdd(node.right, elem, node);
 }
 
 // Computes the depth of the tree
-function treeDepth(tree)
-{
-	if (tree === null) return 0;
-	return 1 + max(treeDepth(tree.left), treeDepth(tree.right));
-}
+function treeDepth(node) =>
+	node === null ? 0 : 1 + max(treeDepth(node.left), treeDepth(node.right));
 
 // Finds a node in the tree
-function findNode(tree, elem)
+function findNode(node, elem)
 {
-	if (tree === null) return null;
-	if (tree.value === elem) return tree;
-	return findNode(tree.left, elem) ?? findNode(tree.right, elem);
+	if (node === null) return null;
+	if (node.value === elem) return node;
+	return findNode(node.left, elem) ?? findNode(node.right, elem);
 }
 
 // Prints the tree
-function printTree(tree, bookmark = null, prefix = "")
+function printTree(node, bookmark = null, prefix = "")
 {
-	if (tree === null) return;
+	if (node === null) return;
 	
-	printLineLead(tree, prefix);
-	setForeground(tree === bookmark ? "Yellow" : "Red");
-	println(tree.value);
+	printLineLead(node, prefix);
+	setForeground(node === bookmark ? "Yellow" : "Red");
+	println(node.value);
 	resetColor();
 	
-	printTree(tree.left, bookmark, "<");
-	printTree(tree.right, bookmark, ">");
+	printTree(node.left, bookmark, "<");
+	printTree(node.right, bookmark, ">");
 }
 
 /**
-* Prints the leading part of a line according to the node's depth and position
+* Prints the leading part of a line according to the tree's depth and position
 */
 function printLineLead(node, prefix)
 {
 	if (node.parent === null) return;
 	
-	var tmpNode = node.parent, tmpParent = tmpNode.parent, lineLead = "";
+	var tmpNode = node.parent,
+		tmpParent = tmpNode.parent,
+		lineLead = "";
 	
 	while (tmpParent !== null)
 	{
@@ -60,31 +59,34 @@ function printLineLead(node, prefix)
 		tmpParent = tmpParent.parent;
 	}
 	
-	print(lineLead + '+' + '--' + prefix);
+	print($'{lineLead}+--{prefix}');
 }
 
 /********************** MAIN PROGRAM **********************/
-tree = null;
-for (i = 0; i < 20; i++)
-{
-    addTree(tree, randint(100));
+
+if (__name == "main") {
+	node = null;
+	for (i = 0; i < 20; i++)
+	{
+	    treeAdd(node, randint(100));
+	}
+	
+	printTree(node);
+	println();
+	
+	println("node depth: {0}", treeDepth(node));
+	println();
+	
+	value = (int) readln("value to find = ");
+	found = findNode(node, value);
+	
+	if (found !== null)
+	{
+		clear();
+		printTree(node, found);
+	}
+	else
+		println($"Could not find {value} in the tree");
+	
+	readln();
 }
-
-printTree(tree);
-println();
-
-println("tree depth: {0}", treeDepth(tree));
-println();
-
-value = (int) readln("value to find = ");
-found = findNode(tree, value);
-
-if (found !== null)
-{
-	clear();
-	printTree(tree, found);
-}
-else
-	println("{0} was not found in the tree", value);
-
-readln();

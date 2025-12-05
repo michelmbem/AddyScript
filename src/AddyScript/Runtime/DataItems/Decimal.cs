@@ -12,7 +12,7 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Decimal(BigDecimal value) : DataItem
 {
-    public Decimal Opposite => new(-value);
+    public Decimal Opposite => new (-value);
 
     public override Class Class => Class.Decimal;
 
@@ -22,13 +22,13 @@ public sealed class Decimal(BigDecimal value) : DataItem
 
     public override BigInteger AsBigInteger => (BigInteger)value;
 
-    public override Rational32 AsRational32 => new((int)value);
+    public override Rational32 AsRational32 => new ((int)value);
 
     public override double AsDouble => (double)value;
 
     public override BigDecimal AsBigDecimal => value;
 
-    public override Complex64 AsComplex64 => new((double)value, 0);
+    public override Complex64 AsComplex64 => new ((double)value, 0);
 
     public override object AsNativeObject => value;
 

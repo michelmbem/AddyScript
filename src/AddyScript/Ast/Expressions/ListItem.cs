@@ -1,13 +1,14 @@
-﻿namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions
 {
     /// <summary>
     /// Represents a list or set initializer item.
+    /// Also used to represent functions positional arguments.
     /// </summary>
-    /// <param name="expr">The wrapped expression</param>
+    /// <param name="expr">The item's value</param>
     public class ListItem(Expression expr, bool spread = false) : ScriptElement
     {
         /// <summary>
-        /// The wrapped expression.
+        /// The item's value.
         /// </summary>
         public Expression Expression { get; private set; } = expr;
 

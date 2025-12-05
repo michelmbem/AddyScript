@@ -68,7 +68,7 @@ public sealed class String(string value) : DataItem
         }
     }
 
-    public override BigDecimal AsBigDecimal => new(value);
+    public override BigDecimal AsBigDecimal => new (value);
 
     public override DateTime AsDateTime
     {

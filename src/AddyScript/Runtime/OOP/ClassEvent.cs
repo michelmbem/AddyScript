@@ -1,4 +1,4 @@
-﻿using AddyScript.Ast.Expressions;
+using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 
 
@@ -75,7 +75,7 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     public ClassMethod CreateAddHandlerMethod()
     {
         var addHandlerFunc = new Function([new Parameter("handler")],
-                                          new Block(new MethodCall(PropertyRef.This(HandlerSetName),
+                                          new Block(new MethodCall(PropertyRef.OfSelf(HandlerSetName),
                                                                    "add",
                                                                    new VariableRef("handler")),
                                                     new Return()));
@@ -90,7 +90,7 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     public ClassMethod CreateRemoveHandlerMethod()
     {
         var removeHandlerFunc = new Function([new Parameter("handler")],
-                                             new Block(new MethodCall(PropertyRef.This(HandlerSetName),
+                                             new Block(new MethodCall(PropertyRef.OfSelf(HandlerSetName),
                                                                       "remove",
                                                                       new VariableRef("handler")),
                                                        new Return()));
@@ -112,7 +112,7 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
         var triggerEventFunc = new Function(Parameters,
                                             new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                       "handler",
-                                                                      PropertyRef.This(HandlerSetName),
+                                                                      PropertyRef.OfSelf(HandlerSetName),
                                                                       new FunctionCall("handler", arguments)),
                                                       new Return()));
 

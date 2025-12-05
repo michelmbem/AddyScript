@@ -35,7 +35,6 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public static readonly Dictionary<string, Function> Map = [];
 
     private readonly Dictionary<Type, Delegate> delegateCache = [];
-    private readonly Dictionary<string, IFrameItem> capturedItems = [];
     private MethodFrame declaringFrame;
 
     /// <summary>
@@ -46,12 +45,12 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// The parameters of this function.
     /// </summary>
-    public Parameter[] Parameters { get; private set; } = parameters;
+    public Parameter[] Parameters { get; } = parameters;
 
     /// <summary>
     /// The body of this function if it is user defined.
     /// </summary>
-    public Block Body { get; private set; } = body;
+    public Block Body { get; set; } = body;
 
     /// <summary>
     /// The function's attributes.
@@ -67,12 +66,12 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
         set
         {
             declaringFrame = value;
-            capturedItems.Clear();
+            CapturedItems.Clear();
 
             if (value == null) return;
 
             foreach (string name in value.GetNames())
-                capturedItems.Add(name, value.GetItem(name));
+                CapturedItems.Add(name, value.GetItem(name));
         }
     }
 
@@ -80,7 +79,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// Gets a reference to the items that were present in
     /// the parent function's frame when this function was created.
     /// </summary>
-    public Dictionary<string, IFrameItem> CapturedItems => capturedItems;
+    public Dictionary<string, IFrameItem> CapturedItems { get; } = [];
 
     /// <summary>
     /// The minimum number of arguments required by a call to this function.
@@ -99,16 +98,8 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// The maximum number of arguments required by a call to this function.
     /// </summary>
-    public int MaxNumArgs
-    {
-        get
-        {
-            if (Parameters.Length > 0 && Parameters[Parameters.Length - 1].VaList)
-                return int.MaxValue;
-
-            return Parameters.Length;
-        }
-    }
+    public int MaxNumArgs =>
+        Parameters.Length > 0 && Parameters[^1].VaList ? int.MaxValue : Parameters.Length;
 
     /// <summary>
     /// Updates the captured items after any call.
@@ -117,8 +108,8 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public void UpdateCapturedItems(Dictionary<string, IFrameItem> frameItems)
     {
         foreach (var pair in frameItems)
-            if (capturedItems.ContainsKey(pair.Key))
-                capturedItems[pair.Key] = pair.Value;
+            if (CapturedItems.ContainsKey(pair.Key))
+                CapturedItems[pair.Key] = pair.Value;
     }
 
     /// <summary>

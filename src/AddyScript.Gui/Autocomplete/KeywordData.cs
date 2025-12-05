@@ -41,7 +41,8 @@ internal partial class KeywordData(string word, KeywordType type) :
             string[] parts = keyword.Split('?');
             int typeOrdinal = int.Parse(parts[1]);
 
-            All.Add(new(parts[0], (KeywordType)typeOrdinal));
+            All.Add(new (parts[0], (KeywordType)typeOrdinal));
+            All.Sort((a, b) => string.Compare(a.Text, b.Text, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 

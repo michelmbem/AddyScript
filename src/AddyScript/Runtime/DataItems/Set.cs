@@ -15,19 +15,19 @@ public sealed class Set : DataItem
 
     public Set() => hashSet = [];
 
-    public Set(IEnumerable<DataItem> initialContent) => hashSet = new(initialContent);
+    public Set(IEnumerable<DataItem> initialContent) => hashSet = new (initialContent);
 
     public override Class Class => Class.Set;
 
     public override DataItem[] AsArray => [..hashSet];
 
-    public override List<DataItem> AsList => new(hashSet);
+    public override List<DataItem> AsList => new (hashSet);
 
     public override HashSet<DataItem> AsHashSet => hashSet;
 
-    public override Queue<DataItem> AsQueue => new(hashSet);
+    public override Queue<DataItem> AsQueue => new (hashSet);
 
-    public override Stack<DataItem> AsStack => new(hashSet);
+    public override Stack<DataItem> AsStack => new (hashSet);
 
     public override object AsNativeObject => hashSet;
 

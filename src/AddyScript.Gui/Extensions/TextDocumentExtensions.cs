@@ -71,7 +71,7 @@ public static class TextDocumentExtensions
     public static void IndentLine(this TextDocument document, int lineNumber, bool useSpaces = false, int tabSize = 4)
     {
         int lineOffset = document.GetLineByNumber(lineNumber).Offset;
-        string indentation = useSpaces ? new(' ', tabSize) : "\t";
+        string indentation = useSpaces ? new (' ', tabSize) : "\t";
         document.Insert(lineOffset, indentation);
     }
 

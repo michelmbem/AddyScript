@@ -193,7 +193,7 @@
         </Border>
         <Grid Grid.Row="2"
               Classes="statusbar"
-              ColumnDefinitions="*, 200, 200">
+              ColumnDefinitions="*, 200, 200, Auto">
             <Label Name="FileNameStatusLabel" Grid.Column="0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Rectangle Classes="divider" />
@@ -202,6 +202,12 @@
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Rectangle Classes="divider" />
                 <Label Name="CaretStatusLabel" />
+            </StackPanel>
+            <StackPanel Name="InfoStatusSection"
+                        Grid.Column="3"
+                        Orientation="Horizontal"
+                        IsVisible="False">
+                <Rectangle Classes="divider" />
             </StackPanel>
         </Grid>
     </Grid>

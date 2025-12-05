@@ -255,7 +255,7 @@ public abstract class BasicParser
     protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length <= 0) throw new SyntaxError(FileName, token, errorMessage);
+        if (elements.Length == 0) throw new SyntaxError(FileName, token, errorMessage);
         return elements;
     }
 

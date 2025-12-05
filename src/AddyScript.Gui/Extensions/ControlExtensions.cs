@@ -14,7 +14,7 @@ public static class ControlExtensions
     /// <summary>
     /// Standard DPI
     /// </summary>
-    private static readonly Vector StandardDpi = new(96, 96);
+    private static readonly Vector StandardDpi = new (96, 96);
 
     /// <summary>
     /// Renders <paramref name="visual"/> to a bitmap.

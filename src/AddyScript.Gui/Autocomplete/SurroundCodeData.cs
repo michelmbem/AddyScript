@@ -42,7 +42,7 @@ internal class SurroundCodeData(string title, string snippet, string description
                 _ => $"a {template[0]} statement",
             };
             
-            All.Add(new(template[0], template[1], $"Wrap selection in {kind}"));
+            All.Add(new (template[0], template[1], $"Wrap selection in {kind}"));
         }
     }
 

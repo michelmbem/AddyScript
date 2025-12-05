@@ -18,17 +18,17 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The object to which this field belongs.
         /// </summary>
-        public Expression Owner { get; private set; } = owner;
+        public Expression Owner { get; } = owner;
 
         /// <summary>
         /// The property's name.
         /// </summary>
-        public string PropertyName { get; private set; } = propertyName;
+        public string PropertyName { get; } = propertyName;
 
         /// <summary>
         /// Determines whether to stop null reference propagation or not.
         /// </summary>
-        public bool Optional { get; set; } = false;
+        public bool Optional { get; set; }
 
         /// <summary>
         /// A factory method to quickly create instances of <see cref="PropertyRef"/>
@@ -36,10 +36,8 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         /// <param name="propertyName">The property's name</param>
         /// <returns>A <see cref="PropertyRef"/></returns>
-        public static PropertyRef This(string propertyName)
-        {
-            return new PropertyRef(new SelfReference(), propertyName);
-        }
+        public static PropertyRef OfSelf(string propertyName) =>
+            new (new SelfReference(), propertyName);
 
 
         /// <summary>

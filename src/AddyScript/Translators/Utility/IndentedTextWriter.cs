@@ -10,8 +10,8 @@ namespace AddyScript.Translators.Utility;
 public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
 {
     private readonly TextWriter innerWriter = innerWriter;
-    private readonly Stack<string> prefixStack = new();
-    private readonly StringBuilder prefixBuilder = new();
+    private readonly Stack<string> prefixStack = new ();
+    private readonly StringBuilder prefixBuilder = new ();
     private string linePrefix = string.Empty;
     private bool atLineStart = true;
 

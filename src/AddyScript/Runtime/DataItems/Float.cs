@@ -13,7 +13,7 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Float(double value) : DataItem
 {
-    public Float Opposite => new(-value);
+    public Float Opposite => new (-value);
 
     public override Class Class => Class.Float;
 

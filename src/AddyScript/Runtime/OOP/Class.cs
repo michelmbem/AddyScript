@@ -71,12 +71,12 @@ public class Class : IFrameItem
     /// <summary>
     /// Maps the <b>blob</b> primitive type.
     /// </summary>
-    public static readonly Class Blob = new(ClassID.Blob, "blob", Modifier.Final);
+    public static readonly Class Blob = new (ClassID.Blob, "blob", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>tuple</b> primitive type.
     /// </summary>
-    public static readonly Class Tuple = new(ClassID.Tuple, "tuple", Modifier.Final);
+    public static readonly Class Tuple = new (ClassID.Tuple, "tuple", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>list</b> primitive type.
@@ -101,7 +101,7 @@ public class Class : IFrameItem
     /// <summary>
     /// Maps the <b>map</b> primitive type.
     /// </summary>
-    public static readonly Class Map = new(ClassID.Map, "map", Modifier.Final);
+    public static readonly Class Map = new (ClassID.Map, "map", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>object</b> primitive type. This is the base class of all user defined classes.
@@ -127,7 +127,7 @@ public class Class : IFrameItem
     /// </summary>
     public static readonly Class Exception =
         new (Object, "Exception", Modifier.Default, GetExceptionConstructor(), null,
-             GetExceptionFields(), GetExceptionProperties(), GetExceptionMethods(), null);
+             [], GetExceptionProperties(), GetExceptionMethods(), null);
 
     #endregion
 
@@ -138,7 +138,7 @@ public class Class : IFrameItem
     /// </summary>
     public static readonly Class Attribute =
         new (Object, "Attribute", Modifier.Final, GetAttributeConstructor(), null,
-             GetAttributeFields(), GetAttributeProperties(), GetAttributeMethods(), null);
+             [], GetAttributeProperties(), GetAttributeMethods(), null);
 
     #endregion
 
@@ -163,35 +163,35 @@ public class Class : IFrameItem
     /// </summary>
     public static readonly Class FieldInfo =
         new (MemberInfo, "FieldInfo", Modifier.Final, CreateDefaultConstructor("FieldInfo", Scope.Private),
-             null, GetFieldInfoFields(), GetFieldInfoProperties(), null, null);
+             null, [], GetFieldInfoProperties(), null, null);
 
     /// <summary>
     /// PropertyInfo type.
     /// </summary>
     public static readonly Class PropertyInfo =
         new (MemberInfo, "PropertyInfo", Modifier.Final, CreateDefaultConstructor("PropertyInfo", Scope.Private),
-             null, GetPropertyInfoFields(), GetPropertyInfoProperties(), null, null);
+             null, [], GetPropertyInfoProperties(), null, null);
 
     /// <summary>
     /// MethodInfo type.
     /// </summary>
     public static readonly Class MethodInfo =
         new (MemberInfo, "MethodInfo", Modifier.Final, CreateDefaultConstructor("MethodInfo", Scope.Private),
-             null, GetMethodInfoFields(), GetMethodInfoProperties(), null, null);
+             null, [], GetMethodInfoProperties(), null, null);
 
     /// <summary>
     /// EventInfo type.
     /// </summary>
     public static readonly Class EventInfo =
         new (MemberInfo, "EventInfo", Modifier.Final, CreateDefaultConstructor("EventInfo", Scope.Private),
-             null, GetEventInfoFields(), GetEventInfoProperties(), null, null);
+             null, [], GetEventInfoProperties(), null, null);
 
     /// <summary>
     /// ParameterInfo type.
     /// </summary>
     public static readonly Class ParameterInfo =
         new (Object, "ParameterInfo", Modifier.Final, CreateDefaultConstructor("ParameterInfo", Scope.Private),
-             null, GetParameterInfoFields(), GetParameterInfoProperties(), null, null);
+             null, [], GetParameterInfoProperties(), null, null);
 
     #endregion
 
@@ -242,8 +242,8 @@ public class Class : IFrameItem
         ];
 
         // Create the int::times and long::times method
-        var timesFunction = new Function([new("action")],
-                                         new(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
+        var timesFunction = new Function([new ("action")],
+                                         new (new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
                                                          new BinaryExpression(BinaryOperator.LessThan, new VariableRef("i"), new SelfReference()),
                                                          [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
                                                          new FunctionCall("action", new VariableRef("i"))),
@@ -253,8 +253,8 @@ public class Class : IFrameItem
         Long.RegisterMethod(new ClassMethod("times", Scope.Public, Modifier.Final, timesFunction));
 
         // Create the string::each, list::each, set::each, queue::each and stack::each methods
-        var eachFunction = new Function([new("action")],
-                                        new(new Assignment(new VariableRef("action"),
+        var eachFunction = new Function([new ("action")],
+                                        new (new Assignment(new VariableRef("action"),
                                                            new MethodCall(new VariableRef("action"), "bind", new Literal(new String("__index")), new Literal())),
                                         new ForEachLoop("__index",
                                                         "__value",
@@ -271,9 +271,9 @@ public class Class : IFrameItem
         Stack.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, eachFunction));
 
         // Create the tuple::eachIndex and list::eachIndex methods
-        var eachIndexFunction = new Function([new("action")],
-                                             new(new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
-                                                             new BinaryExpression(BinaryOperator.LessThan, new VariableRef("i"), PropertyRef.This("size")),
+        var eachIndexFunction = new Function([new ("action")],
+                                             new (new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
+                                                             new BinaryExpression(BinaryOperator.LessThan, new VariableRef("i"), PropertyRef.OfSelf("size")),
                                                              [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
                                                              new FunctionCall("action", new VariableRef("i"))),
                                                  new Return(new SelfReference())));
@@ -282,8 +282,8 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("eachIndex", Scope.Public, Modifier.Final, eachIndexFunction));
 
         // Create the map::each method
-        var mapEachFunction = new Function([new("action")],
-                                           new(new ForEachLoop("__key",
+        var mapEachFunction = new Function([new ("action")],
+                                           new (new ForEachLoop("__key",
                                                                "__value",
                                                                new SelfReference(),
                                                                new FunctionCall("action", new VariableRef("__key"), new VariableRef("__value"))),
@@ -292,28 +292,28 @@ public class Class : IFrameItem
         Map.RegisterMethod(new ClassMethod("each", Scope.Public, Modifier.Final, mapEachFunction));
 
         // Create the map::eachKey method
-        var mapEachKeyFunction = new Function([new("action")],
-                                              new(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+        var mapEachKeyFunction = new Function([new ("action")],
+                                              new (new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                   "__value",
-                                                                  PropertyRef.This("keys"),
+                                                                  PropertyRef.OfSelf("keys"),
                                                                   new FunctionCall("action", new VariableRef("__value"))),
                                                   new Return(new SelfReference())));
 
         Map.RegisterMethod(new ClassMethod("eachKey", Scope.Public, Modifier.Final, mapEachKeyFunction));
 
         // Create the map::eachValue method
-        var mapEachValueFunction = new Function([new("action")],
-                                                new(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
+        var mapEachValueFunction = new Function([new ("action")],
+                                                new (new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                     "__value",
-                                                                    PropertyRef.This("values"),
+                                                                    PropertyRef.OfSelf("values"),
                                                                     new FunctionCall("action", new VariableRef("__value"))),
                                                     new Return(new SelfReference())));
 
         Map.RegisterMethod(new ClassMethod("eachValue", Scope.Public, Modifier.Final, mapEachValueFunction));
 
         // Create the map::apply method
-        var mapApplyFunction = new Function([new("key"), new("action")],
-                                            new(new IfElse(new BinaryExpression(BinaryOperator.Contains,
+        var mapApplyFunction = new Function([new ("key"), new ("action")],
+                                            new (new IfElse(new BinaryExpression(BinaryOperator.Contains,
                                                                                 new SelfReference(),
                                                                                 new VariableRef("key")),
                                                            new FunctionCall("action", new ItemRef(new SelfReference(), new VariableRef("key")))),
@@ -322,8 +322,8 @@ public class Class : IFrameItem
         Map.RegisterMethod(new ClassMethod("apply", Scope.Public, Modifier.Final, mapApplyFunction));
 
         // Create the list::where method
-        var lstWhereFunction = new Function([new("predicate")],
-                                            new(VariableDecl.Single("l", new ListInitializer()),
+        var lstWhereFunction = new Function([new ("predicate")],
+                                            new (VariableDecl.Single("l", new ListInitializer()),
                                                 new Assignment(new VariableRef("predicate"),
                                                                new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                                 new ForEachLoop("__index",
@@ -336,8 +336,8 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("where", Scope.Public, Modifier.Final, lstWhereFunction));
 
         // Create the set::where method
-        var setWhereFunction = new Function([new("predicate")],
-                                            new(VariableDecl.Single("s", new SetInitializer()),
+        var setWhereFunction = new Function([new ("predicate")],
+                                            new (VariableDecl.Single("s", new SetInitializer()),
                                                 new Assignment(new VariableRef("selector"),
                                                                new MethodCall(new VariableRef("selector"), "bind", new Literal(new String("__index")), new Literal())),
                                                 new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
@@ -350,8 +350,8 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("where", Scope.Public, Modifier.Final, setWhereFunction));
 
         // Create the tuple::all, list::all and set::all methods
-        var allFunction = new Function([new("predicate")],
-                                       new(new Assignment(new VariableRef("predicate"),
+        var allFunction = new Function([new ("predicate")],
+                                       new (new Assignment(new VariableRef("predicate"),
                                                           new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                            new ForEachLoop("__index",
                                                            "__value",
@@ -365,8 +365,8 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("all", Scope.Public, Modifier.Final, allFunction));
 
         // Create the tuple::any, list::any and set::any methods
-        var anyFunction = new Function([new("predicate")],
-                                       new(new Assignment(new VariableRef("predicate"),
+        var anyFunction = new Function([new ("predicate")],
+                                       new (new Assignment(new VariableRef("predicate"),
                                                           new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                            new ForEachLoop("__index",
                                                            "__value",
@@ -380,8 +380,8 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("any", Scope.Public, Modifier.Final, anyFunction));
 
         // Create the tuple::first, list::first and set::first methods
-        var firstFunction = new Function([new("predicate")],
-                                         new(new Assignment(new VariableRef("predicate"),
+        var firstFunction = new Function([new ("predicate")],
+                                         new (new Assignment(new VariableRef("predicate"),
                                                             new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                              new ForEachLoop("__index",
                                                              "__value",
@@ -395,11 +395,11 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("first", Scope.Public, Modifier.Final, firstFunction));
 
         // Create the tuple::last and list::last methods
-        var lastFunction = new Function([new("predicate")],
-                                        new(new Assignment(new VariableRef("predicate"),
+        var lastFunction = new Function([new ("predicate")],
+                                        new (new Assignment(new VariableRef("predicate"),
                                                            new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                             new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                        PropertyRef.This("size"),
+                                                                                                        PropertyRef.OfSelf("size"),
                                                                                                         new Literal(new Integer(1)))) ],
                                                         new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
                                                                             new VariableRef("i"),
@@ -413,13 +413,13 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
 
         // Create the tuple::findIndex and list::findIndex methods
-        var findIndexFunction = new Function([new("predicate")],
-                                             new(new Assignment(new VariableRef("predicate"),
+        var findIndexFunction = new Function([new ("predicate")],
+                                             new (new Assignment(new VariableRef("predicate"),
                                                                 new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                                  new ForLoop([VariableDecl.Single("i", new Literal(new Integer(0)))],
                                                              new BinaryExpression(BinaryOperator.LessThan,
                                                                                   new VariableRef("i"),
-                                                                                  PropertyRef.This("size")),
+                                                                                  PropertyRef.OfSelf("size")),
                                                              [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
                                                              new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
                                                                         new Return(new VariableRef("i")))),
@@ -429,11 +429,11 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("findIndex", Scope.Public, Modifier.Final, findIndexFunction));
 
         // Create the tuple::findLastIndex and list::findLastIndex methods
-        var findLastIndexFunction = new Function([new("predicate")],
-                                                 new(new Assignment(new VariableRef("predicate"),
+        var findLastIndexFunction = new Function([new ("predicate")],
+                                                 new (new Assignment(new VariableRef("predicate"),
                                                                     new MethodCall(new VariableRef("predicate"), "bind", new Literal(new String("__index")), new Literal())),
                                                      new ForLoop([ VariableDecl.Single("i", new BinaryExpression(BinaryOperator.Minus,
-                                                                                                                 PropertyRef.This("size"),
+                                                                                                                 PropertyRef.OfSelf("size"),
                                                                                                                  new Literal(new Integer(1)))) ],
                                                                  new BinaryExpression(BinaryOperator.GreaterThanOrEqual,
                                                                                      new VariableRef("i"),
@@ -447,8 +447,8 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("findLastIndex", Scope.Public, Modifier.Final, findLastIndexFunction));
 
         // Create the list::select method
-        var lstSelectFunction = new Function([new("selector")],
-                                             new(VariableDecl.Single("l", new ListInitializer()),
+        var lstSelectFunction = new Function([new ("selector")],
+                                             new (VariableDecl.Single("l", new ListInitializer()),
                                                  new Assignment(new VariableRef("selector"),
                                                                 new MethodCall(new VariableRef("selector"), "bind", new Literal(new String("__index")), new Literal())),
                                                  new ForEachLoop("__index",
@@ -462,8 +462,8 @@ public class Class : IFrameItem
         List.RegisterMethod(new ClassMethod("select", Scope.Public, Modifier.Final, lstSelectFunction));
 
         // Create the set::select method
-        var setSelectFunction = new Function([new("selector")],
-                                             new(VariableDecl.Single("s", new SetInitializer()),
+        var setSelectFunction = new Function([new ("selector")],
+                                             new (VariableDecl.Single("s", new SetInitializer()),
                                                  new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                  "__value",
                                                                  new SelfReference(),
@@ -475,8 +475,8 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("select", Scope.Public, Modifier.Final, setSelectFunction));
 
         // Create the tuple::aggregate, list::aggregate and set::aggregate methods
-        var aggregateFunction = new Function([new("seed"), new("aggregator")],
-                                             new(VariableDecl.Single("accumulator", new VariableRef("seed")),
+        var aggregateFunction = new Function([new ("seed"), new ("aggregator")],
+                                             new (VariableDecl.Single("accumulator", new VariableRef("seed")),
                                                  new Assignment(new VariableRef("aggregator"),
                                                                 new MethodCall(new VariableRef("aggregator"), "bind", new Literal(new String("__index")), new Literal())),
                                                  new ForEachLoop("__index",
@@ -494,8 +494,8 @@ public class Class : IFrameItem
         Set.RegisterMethod(new ClassMethod("aggregate", Scope.Public, Modifier.Final, aggregateFunction));
 
         // Create the list::groupBy method
-        var groupByFunction = new Function([new("groupFunc")],
-                                           new(VariableDecl.Single("groups", new MapInitializer()),
+        var groupByFunction = new Function([new ("groupFunc")],
+                                           new (VariableDecl.Single("groups", new MapInitializer()),
                                                new Assignment(new VariableRef("groupFunc"),
                                                               new MethodCall(new VariableRef("groupFunc"), "bind", new Literal(new String("__index")), new Literal())),
                                                new ForEachLoop("__index",
@@ -600,22 +600,22 @@ public class Class : IFrameItem
     /// <summary>
     /// A member of the <see cref="Runtime.ClassID"/> that quickly identifies the class.
     /// </summary>
-    public ClassID ClassID { get; private set; }
+    public ClassID ClassID { get; }
 
     /// <summary>
     /// The class's canonical name.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     /// <summary>
     /// One between <b>abstract</b>, <b>final</b> and <b>static</b>.
     /// </summary>
-    public Modifier Modifier { get; private set; }
+    public Modifier Modifier { get; }
 
     /// <summary>
     /// The superclass of the calling one.
     /// </summary>
-    public Class SuperClass { get; private set; }
+    public Class SuperClass { get; }
 
     /// <summary>
     /// The class's constructor.
@@ -630,22 +630,22 @@ public class Class : IFrameItem
     /// <summary>
     /// The class's fields.
     /// </summary>
-    public ClassMemberSet<ClassField> Fields { get; private set; }
+    public ClassMemberSet<ClassField> Fields { get; }
 
     /// <summary>
     /// The class's properties.
     /// </summary>
-    public ClassMemberSet<ClassProperty> Properties { get; private set; }
+    public ClassMemberSet<ClassProperty> Properties { get; }
 
     /// <summary>
     /// The class's methods.
     /// </summary>
-    public ClassMemberSet<ClassMethod> Methods { get; private set; }
+    public ClassMemberSet<ClassMethod> Methods { get; }
 
     /// <summary>
     /// The class's events.
     /// </summary>
-    public ClassMemberSet<ClassEvent> Events { get; private set; }
+    public ClassMemberSet<ClassEvent> Events { get; }
 
     /// <summary>
     /// The attributes of the class.
@@ -662,27 +662,24 @@ public class Class : IFrameItem
     /// <param name="className">The name of the owning class</param>
     /// <param name="scope">The scope of the constructor</param>
     /// <returns>A <see cref="ClassMethod"/></returns>
-    private static ClassMethod CreateDefaultConstructor(string className, Scope scope)
-    {
-        return new ClassMethod(className, scope, Modifier.Default, Function.Empty);
-    }
+    private static ClassMethod CreateDefaultConstructor(string className, Scope scope) =>
+        new (className, scope, Modifier.Default, Function.Empty);
 
     /// <summary>
-    /// Generates the logic of the <i>TypeInfo::__read_superType</i> and  <i>MemberInfo::__read_definer</i> methods.
+    /// Generates the body of the <i>TypeInfo::__read_superType</i> and  <i>MemberInfo::__read_definer</i> methods.
     /// </summary>
     /// <param name="fieldName">The name of the field that holds the class's name</param>
-    /// <returns>A <see cref="Function"/></returns>
-    public static Function CreateTypeInfoEvaluator(string fieldName)
+    /// <returns>A <see cref="Block"/></returns>
+    public static Block CreateTypeInfoEvaluator(string fieldName)
     {
-        return new Function([],
-                            new Block(VariableDecl.Single("__super", PropertyRef.This(fieldName)),
-                                      new IfElse(new BinaryExpression(BinaryOperator.Equal, new VariableRef("__super"), new Literal()),
-                                                 new Return(new Literal())),
-                                      new Return(new FunctionCall("eval", new BinaryExpression(BinaryOperator.Plus,
-                                                                                               new BinaryExpression(BinaryOperator.Plus,
-                                                                                                                    new Literal(new String("typeof(")),
-                                                                                                                    new VariableRef("__super")),
-                                                                                               new Literal(new String(")")))))));
+        return new (VariableDecl.Single("__super", PropertyRef.OfSelf(fieldName)),
+                    new IfElse(new BinaryExpression(BinaryOperator.Equal, new VariableRef("__super"), new Literal()),
+                               new Return(new Literal())),
+                    new Return(new FunctionCall("eval", new BinaryExpression(BinaryOperator.Plus,
+                                                                             new BinaryExpression(BinaryOperator.Plus,
+                                                                                                  new Literal(new String("typeof(")),
+                                                                                                  new VariableRef("__super")),
+                                                                             new Literal(new String(")"))))));
     }
 
     /// <summary>
@@ -693,42 +690,26 @@ public class Class : IFrameItem
     {
         var ctorFunc = new Function([new Parameter("name"), new Parameter("msg", DataItems.Void.Value)],
                                     new Block(new IfElse(new BinaryExpression(BinaryOperator.Identical, new VariableRef("msg"), new Literal()),
-                                                         new Assignment(PropertyRef.This("_message"), new VariableRef("name")),
-                                                         new Block(new Assignment(PropertyRef.This("_name"),
+                                                         new Assignment(PropertyRef.OfSelf("__message"), new VariableRef("name")),
+                                                         new Block(new Assignment(PropertyRef.OfSelf("__name"),
                                                                                   new UnaryExpression(UnaryOperator.NotEmpty, new VariableRef("name"))),
-                                                                   new Assignment(PropertyRef.This("_message"), new VariableRef("msg")))),
+                                                                   new Assignment(PropertyRef.OfSelf("__message"), new VariableRef("msg")))),
                                               new Return()));
 
-        return new ClassMethod("Exception", Scope.Public, Modifier.Default, ctorFunc);
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>Exception</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetExceptionFields()
-    {
-        return [
-            new ClassField("_name", Scope.Private, Modifier.Default, new Literal(new String("Exception"))),
-            new ClassField("_message", Scope.Private, Modifier.Default, new Literal(new String(""))),
-            new ClassField("_source", Scope.Private, Modifier.Default, new Literal(new String(""))),
-            new ClassField("_line", Scope.Private, Modifier.Default, new Literal(new Integer(0)))
-        ];
+        return new ("Exception", Scope.Public, Modifier.Default, ctorFunc);
     }
 
     /// <summary>
     /// Gets the properties of the <i>Exception</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetExceptionProperties()
-    {
-        return [
-            new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
-            new ClassProperty("message", Scope.Public, Modifier.Default, "_message", PropertyAccess.Read),
-            new ClassProperty("source", Scope.Public, Modifier.Default, "_source", PropertyAccess.Read),
-            new ClassProperty("line", Scope.Public, Modifier.Default, "_line", PropertyAccess.Read)
+    private static IEnumerable<ClassProperty> GetExceptionProperties() =>
+        [
+            new ("name", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("message", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("source", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("line", Scope.Public, Modifier.Default, PropertyAccess.Read)
         ];
-    }
 
     /// <summary>
     /// Gets the methods of the <i>Exception</i> class.
@@ -737,9 +718,9 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetExceptionMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.WithReturn(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.OfSelf("name")));
 
-        return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
+        return [new ("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
 
     /// <summary>
@@ -749,30 +730,19 @@ public class Class : IFrameItem
     private static ClassMethod GetAttributeConstructor()
     {
         var ctorFunc = new Function([new Parameter("name")],
-                                    new Block(new Assignment(PropertyRef.This("_name"),
+                                    new Block(new Assignment(PropertyRef.OfSelf("__name"),
                                                              new UnaryExpression(UnaryOperator.NotEmpty, new VariableRef("name"))),
                                               new Return()));
 
-        return new ClassMethod("Attribute", Scope.Public, Modifier.Default, ctorFunc);
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>Attribute</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetAttributeFields()
-    {
-        return [new ClassField("_name", Scope.Private, Modifier.Default, null)];
+        return new ("Attribute", Scope.Public, Modifier.Default, ctorFunc);
     }
 
     /// <summary>
     /// Gets the properties of the <i>Attribute</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetAttributeProperties()
-    {
-        return [new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read)];
-    }
+    private static IEnumerable<ClassProperty> GetAttributeProperties() =>
+        [new ("name", Scope.Public, Modifier.Default, PropertyAccess.Read)];
 
     /// <summary>
     /// Gets the methods of the <i>Attribute</i> class.
@@ -781,54 +751,35 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetAttributeMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.WithReturn(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.OfSelf("name")));
 
-        return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
+        return [new ("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
 
     /// <summary>
     /// Gets the fields of the <i>TypeInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetTypeInfoFields()
-    {
-        return [
-            new ClassField("_superType", Scope.Private, Modifier.Default, null),
-            new ClassField("_modifier", Scope.Private, Modifier.Default, null),
-            new ClassField("_name", Scope.Private, Modifier.Default, null),
-            new ClassField("_constructor", Scope.Private, Modifier.Default, null),
-            new ClassField("_indexer", Scope.Private, Modifier.Default, null),
-            new ClassField("_fields", Scope.Private, Modifier.Default, null),
-            new ClassField("_properties", Scope.Private, Modifier.Default, null),
-            new ClassField("_methods", Scope.Private, Modifier.Default, null),
-            new ClassField("_events", Scope.Private, Modifier.Default, null),
-            new ClassField("_attributes", Scope.Private, Modifier.Default, null)
-        ];
-    }
+    private static IEnumerable<ClassField> GetTypeInfoFields() =>
+        [new ("__superType", Scope.Private, Modifier.Default, null)];
 
     /// <summary>
     /// Gets the properties of the <i>TypeInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetTypeInfoProperties()
-    {
-        var getSuperTypeMethod = new ClassMethod(ClassProperty.GetReaderName("superType"),
-                                                 Scope.Public, Modifier.Default,
-                                                 CreateTypeInfoEvaluator("_superType"));
-
-        return [
-            new ClassProperty("superType", Scope.Public, Modifier.Default, getSuperTypeMethod, null),
-            new ClassProperty("modifier", Scope.Public, Modifier.Default, "_modifier", PropertyAccess.Read),
-            new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
-            new ClassProperty("constructor", Scope.Public, Modifier.Default, "_constructor", PropertyAccess.Read),
-            new ClassProperty("indexer", Scope.Public, Modifier.Default, "_indexer", PropertyAccess.Read),
-            new ClassProperty("fields", Scope.Public, Modifier.Default, "_fields", PropertyAccess.Read),
-            new ClassProperty("properties", Scope.Public, Modifier.Default, "_properties", PropertyAccess.Read),
-            new ClassProperty("methods", Scope.Public, Modifier.Default, "_methods", PropertyAccess.Read),
-            new ClassProperty("events", Scope.Public, Modifier.Default, "_events", PropertyAccess.Read),
-            new ClassProperty("attributes", Scope.Public, Modifier.Default, "_attributes", PropertyAccess.Read)
+    private static IEnumerable<ClassProperty> GetTypeInfoProperties() =>
+        [
+            new ("superType", Scope.Public, Modifier.Default, CreateTypeInfoEvaluator("__superType")),
+            new ("modifier", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("name", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("constructor", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("indexer", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("fields", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("properties", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("methods", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("events", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("attributes", Scope.Public, Modifier.Default, PropertyAccess.Read)
         ];
-    }
 
     /// <summary>
     /// Gets the methods of the <i>TypeInfo</i> class.
@@ -837,25 +788,17 @@ public class Class : IFrameItem
     private static IEnumerable<ClassMethod> GetTypeInfoMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.WithReturn(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.OfSelf("name")));
 
-        return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
+        return [new ("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
 
     /// <summary>
     /// Gets the fields of the <i>MemberInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetMemberInfoFields()
-    {
-        return [
-            new ClassField("_scope", Scope.Private, Modifier.Default, null),
-            new ClassField("_modifier", Scope.Private, Modifier.Default, null),
-            new ClassField("_name", Scope.Private, Modifier.Default, null),
-            new ClassField("_holder", Scope.Private, Modifier.Default, null),
-            new ClassField("_attributes", Scope.Private, Modifier.Default, null)
-        ];
-    }
+    private static IEnumerable<ClassField> GetMemberInfoFields() =>
+        [new ("__holder", Scope.Private, Modifier.Default, null)];
 
     /// <summary>
     /// Gets the properties of the <i>MemberInfo</i> class.
@@ -863,55 +806,28 @@ public class Class : IFrameItem
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
     private static IEnumerable<ClassProperty> GetMemberInfoProperties()
     {
-        var fullNameFunc = new Function([],
-                                        Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
-                                                                          new PropertyRef(PropertyRef.This("holder"), "name"),
-                                                                          new BinaryExpression(BinaryOperator.Plus,
-                                                                                               new Literal(new String(".")),
-                                                                                               PropertyRef.This("name")))));
-
-        var fullNameGetter = new ClassMethod(ClassProperty.GetReaderName("fullName"), Scope.Public, Modifier.Default, fullNameFunc);
-        var holderGetter = new ClassMethod(ClassProperty.GetReaderName("holder"), Scope.Public, Modifier.Default, CreateTypeInfoEvaluator("_holder"));
+        var fullNameReaderBody = Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
+                                                                       new PropertyRef(PropertyRef.OfSelf("holder"), "name"),
+                                                                       new BinaryExpression(BinaryOperator.Plus,
+                                                                                            new Literal(new String(".")),
+                                                                                            PropertyRef.OfSelf("name"))));
 
         return [
-            new ClassProperty("scope", Scope.Public, Modifier.Default, "_scope", PropertyAccess.Read),
-            new ClassProperty("modifier", Scope.Public, Modifier.Default, "_modifier", PropertyAccess.Read),
-            new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
-            new ClassProperty("fullName", Scope.Public, Modifier.Default, fullNameGetter, null),
-            new ClassProperty("holder", Scope.Public, Modifier.Default, holderGetter, null),
-            new ClassProperty("attributes", Scope.Public, Modifier.Default, "_attributes", PropertyAccess.Read)
+            new ("scope", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("modifier", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("name", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("fullName", Scope.Public, Modifier.Default, fullNameReaderBody),
+            new ("holder", Scope.Public, Modifier.Default, CreateTypeInfoEvaluator("__holder")),
+            new ("attributes", Scope.Public, Modifier.Default, PropertyAccess.Read)
         ];
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>FieldInfo</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetFieldInfoFields()
-    {
-        return [new ClassField("_sharedValue", Scope.Private, Modifier.Default, null)];
     }
 
     /// <summary>
     /// Gets the properties of the <i>FieldInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetFieldInfoProperties()
-    {
-        return [new ClassProperty("sharedValue", Scope.Public, Modifier.Default, "_sharedValue", PropertyAccess.Read)];
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>PropertyInfo</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetPropertyInfoFields()
-    {
-        return [
-            new ClassField("_reader", Scope.Private, Modifier.Default, null),
-            new ClassField("_writer", Scope.Private, Modifier.Default, null)
-        ];
-    }
+    private static IEnumerable<ClassProperty> GetFieldInfoProperties() =>
+        [new ("sharedValue", Scope.Public, Modifier.Default, PropertyAccess.Read)];
 
     /// <summary>
     /// Gets the properties of the <i>PropertyInfo</i> class.
@@ -919,93 +835,49 @@ public class Class : IFrameItem
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
     private static IEnumerable<ClassProperty> GetPropertyInfoProperties()
     {
-        var canReadFunc = new Function([],
-                                       Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
-                                                                         PropertyRef.This("_reader"),
-                                                                         new Literal())));
-        var canReadMethod = new ClassMethod(ClassProperty.GetReaderName("canRead"), Scope.Public, Modifier.Default, canReadFunc);
-
-        var canWriteFunc = new Function([],
-                                       Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
-                                                                         PropertyRef.This("_writer"),
-                                                                         new Literal())));
-        var canWriteMethod = new ClassMethod(ClassProperty.GetReaderName("canWrite"), Scope.Public, Modifier.Default, canWriteFunc);
+        var canReadBody = Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
+                                                                PropertyRef.OfSelf("reader"),
+                                                                new Literal()));
+        
+        var canWriteBody = Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
+                                                                 PropertyRef.OfSelf("writer"),
+                                                                 new Literal()));
 
         return [
-            new ClassProperty("reader", Scope.Public, Modifier.Default, "_reader", PropertyAccess.Read),
-            new ClassProperty("writer", Scope.Public, Modifier.Default, "_writer", PropertyAccess.Read),
-            new ClassProperty("canRead", Scope.Public, Modifier.Default, canReadMethod, null),
-            new ClassProperty("canWrite", Scope.Public, Modifier.Default, canWriteMethod, null)
+            new ("reader", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("writer", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("canRead", Scope.Public, Modifier.Default, canReadBody),
+            new ("canWrite", Scope.Public, Modifier.Default, canWriteBody)
         ];
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>MethodInfo</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetMethodInfoFields()
-    {
-        return [new ClassField("_parameters", Scope.Private, Modifier.Default, null)];
     }
 
     /// <summary>
     /// Gets the properties of the <i>MethodInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetMethodInfoProperties()
-    {
-        return [new ClassProperty("parameters", Scope.Public, Modifier.Default, "_parameters", PropertyAccess.Read)];
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>EventInfo</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetEventInfoFields()
-    {
-        return [new ClassField("_parameters", Scope.Private, Modifier.Default, null)];
-    }
+    private static IEnumerable<ClassProperty> GetMethodInfoProperties() =>
+        [new("parameters", Scope.Public, Modifier.Default, PropertyAccess.Read)];
 
     /// <summary>
     /// Gets the properties of the <i>EventInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetEventInfoProperties()
-    {
-        return [new ClassProperty("parameters", Scope.Public, Modifier.Default, "_parameters", PropertyAccess.Read)];
-    }
-
-    /// <summary>
-    /// Gets the fields of the <i>ParameterInfo</i> class.
-    /// </summary>
-    /// <returns>An array of <see cref="ClassField"/>s</returns>
-    private static IEnumerable<ClassField> GetParameterInfoFields()
-    {
-        return [
-            new ClassField("_name", Scope.Private, Modifier.Default, null),
-            new ClassField("_byRef", Scope.Private, Modifier.Default, null),
-            new ClassField("_vaList", Scope.Private, Modifier.Default, null),
-            new ClassField("_defaultValue", Scope.Private, Modifier.Default, null),
-            new ClassField("_canBeEmpty", Scope.Private, Modifier.Default, null),
-            new ClassField("_attributes", Scope.Private, Modifier.Default, null)
-        ];
-    }
+    private static IEnumerable<ClassProperty> GetEventInfoProperties() =>
+        [new("parameters", Scope.Public, Modifier.Default, PropertyAccess.Read)];
 
     /// <summary>
     /// Gets the properties of the <i>ParameterInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
-    private static IEnumerable<ClassProperty> GetParameterInfoProperties()
-    {
-        return [
-            new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
-            new ClassProperty("byRef", Scope.Public, Modifier.Default, "_byRef", PropertyAccess.Read),
-            new ClassProperty("vaList", Scope.Public, Modifier.Default, "_vaList", PropertyAccess.Read),
-            new ClassProperty("defaultValue", Scope.Public, Modifier.Default, "_defaultValue", PropertyAccess.Read),
-            new ClassProperty("canBeEmpty", Scope.Public, Modifier.Default, "_canBeEmpty", PropertyAccess.Read),
-            new ClassProperty("attributes", Scope.Public, Modifier.Default, "_attributes", PropertyAccess.Read)
+    private static IEnumerable<ClassProperty> GetParameterInfoProperties() =>
+        [
+            new ("name", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("byRef", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("vaList", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("defaultValue", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("canBeEmpty", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("attributes", Scope.Public, Modifier.Default, PropertyAccess.Read)
         ];
-    }
 
     #endregion
 
@@ -1252,19 +1124,16 @@ public class Class : IFrameItem
         Properties.Add(property);
         property.Holder = this;
 
-        if (!string.IsNullOrEmpty(property.BackingFieldName))
-            property.GenerateAccessors();
-
         if (property.CanRead)
             RegisterMethod(property.Reader);
 
         if (property.CanWrite)
             RegisterMethod(property.Writer);
 
-        if (property.IsAuto)
+        if (property.GenerateAccessors(out var backingFieldName))
         {
             var bfm = property.Modifier == Modifier.Static ? Modifier.Static : Modifier.Default;
-            var backingField = new ClassField(property.BackingFieldName, Scope.Private, bfm, null);
+            var backingField = new ClassField(backingFieldName, Scope.Private, bfm, null);
             RegisterField(backingField);
         }
     }
@@ -1332,10 +1201,8 @@ public class Class : IFrameItem
     /// </summary>
     private void GenerateReflector()
     {
-        var typeFunc = new Function([], Block.WithReturn(new TypeOfExpression(Name)));
-        var typeReader = new ClassMethod(ClassProperty.GetReaderName("type"), Scope.Public, Modifier.Final, typeFunc);
-        var typeProperty = new ClassProperty("type", Scope.Public, Modifier.Final, typeReader, null);
-
+        var typeReaderBody = Block.WithReturn(new TypeOfExpression(Name));
+        var typeProperty = new ClassProperty("type", Scope.Public, Modifier.Final, typeReaderBody);
         RegisterProperty(typeProperty);
     }
 

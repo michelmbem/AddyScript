@@ -13,9 +13,9 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Integer(int value) : DataItem
 {
-    public Integer Opposite => new(-value);
+    public Integer Opposite => new (-value);
 
-    public Integer Complement => new(~value);
+    public Integer Complement => new (~value);
 
     public override Class Class => Class.Integer;
 
@@ -23,15 +23,15 @@ public sealed class Integer(int value) : DataItem
 
     public override int AsInt32 => value;
 
-    public override BigInteger AsBigInteger => new(value);
+    public override BigInteger AsBigInteger => new (value);
 
-    public override Rational32 AsRational32 => new(value);
+    public override Rational32 AsRational32 => new (value);
 
     public override double AsDouble => value;
 
-    public override BigDecimal AsBigDecimal => new(value);
+    public override BigDecimal AsBigDecimal => new (value);
 
-    public override Complex64 AsComplex64 => new(value, 0);
+    public override Complex64 AsComplex64 => new (value, 0);
 
     public override object AsNativeObject => value;
 

@@ -1,4 +1,4 @@
-﻿namespace AddyScript.Interactive
+namespace AddyScript.Interactive
 {
     public class OptionSet
     {
@@ -76,7 +76,7 @@
 
         public string Log { get; private set; }
 
-        public ScriptContext Context { get; } = new();
+        public ScriptContext Context { get; } = new ();
 
         private static void CheckOption(string option)
         {

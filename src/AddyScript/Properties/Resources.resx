@@ -436,12 +436,6 @@ It requires some initialization to support the expected operation.</value>
   <data name="AccessorScopeMustBeMoreRestrictive" xml:space="preserve">
     <value>The scope of an accessor must be more restrictive than the property's scope</value>
   </data>
-  <data name="DuplicatedReadAccessor" xml:space="preserve">
-    <value>A read accessor has already been defined for the property</value>
-  </data>
-  <data name="DuplicatedWriteAccessor" xml:space="preserve">
-    <value>A write accessor has already been defined for the property</value>
-  </data>
   <data name="InvalidOperandCount" xml:space="preserve">
     <value>Invalid operands count for operator {0}</value>
   </data>
@@ -546,5 +540,8 @@ It requires some initialization to support the expected operation.</value>
   </data>
   <data name="CannotComputeGcdForNegative" xml:space="preserve">
     <value>Cannot compute the Gcd of negative numbers</value>
+  </data>
+  <data name="BothAccessorsCantRedefineScope" xml:space="preserve">
+    <value>The scope cannot be redefined for both accessors of a property</value>
   </data>
 </root>
