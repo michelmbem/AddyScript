@@ -1,7 +1,6 @@
 ﻿using System;
 
-
-namespace AddyScript.Runtime.OOP;
+namespace AddyScript.Ast.Statements;
 
 
 [Flags]

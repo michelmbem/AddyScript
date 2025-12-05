@@ -34,7 +34,7 @@ public class ClassMemberSet<T> : List<T>
         ArgumentNullException.ThrowIfNull(item);
 
         if (dictionary.ContainsKey(item.Name))
-            throw new ArgumentException("Item '" + item.Name + "' already exists in the collection");
+            throw new ArgumentException($"Item '{item.Name}' already exists in the collection");
         
         base.Add(item);
         dictionary.Add(item.Name, item);

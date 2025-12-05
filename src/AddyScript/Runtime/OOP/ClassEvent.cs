@@ -28,45 +28,31 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     /// Gets the name of the field that will automatically be generated
     /// to hold the collection of handlers of this event.
     /// </summary>
-    private string HandlerSetName
-    {
-        get { return "__" + Name + "_handlers"; }
-    }
+    private string HandlerSetName => $"__{Name}_handlers";
 
     /// <summary>
     /// Gets the name of the method that will automatically be generated
     /// to register handlers for this event.
     /// </summary>
-    private string AddHandlerName
-    {
-        get { return "add_" + Name; }
-    }
+    private string AddHandlerName => $"add_{Name}";
 
     /// <summary>
     /// Gets the name of the method that will automatically be generated
     /// to unregister handlers for this event.
     /// </summary>
-    private string RemoveHandlerName
-    {
-        get { return "remove_" + Name; }
-    }
+    private string RemoveHandlerName => $"remove_{Name}";
 
     /// <summary>
     /// Gets the name of the method that will automatically be generated to trigger this event.
     /// </summary>
-    private string TriggerEventName
-    {
-        get { return "trigger_" + Name; }
-    }
+    private string TriggerEventName => $"trigger_{Name}";
 
     /// <summary>
     /// Generates a field to hold a collection of handlers for this event.
     /// </summary>
     /// <returns>A <see cref="ClassField"/></returns>
-    public ClassField CreateHandlerSetField()
-    {
-        return new ClassField(HandlerSetName, Scope.Private, Modifier, new SetInitializer());
-    }
+    public ClassField CreateHandlerSetField() =>
+        new (HandlerSetName, Scope.Private, Modifier, new SetInitializer());
 
     /// <summary>
     /// Generates a method to make it easier to register handlers for this event.
@@ -74,13 +60,13 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     /// <returns>A <see cref="ClassMethod"/></returns>
     public ClassMethod CreateAddHandlerMethod()
     {
-        var addHandlerFunc = new Function([new Parameter("handler")],
+        var addHandlerFunc = new Function([new ("handler")],
                                           new Block(new MethodCall(PropertyRef.OfSelf(HandlerSetName),
                                                                    "add",
                                                                    new VariableRef("handler")),
                                                     new Return()));
 
-        return new ClassMethod(AddHandlerName, Scope, Modifier, addHandlerFunc);
+        return new (AddHandlerName, Scope, Modifier, addHandlerFunc);
     }
 
     /// <summary>
@@ -89,13 +75,13 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     /// <returns>A <see cref="ClassMethod"/></returns>
     public ClassMethod CreateRemoveHandlerMethod()
     {
-        var removeHandlerFunc = new Function([new Parameter("handler")],
+        var removeHandlerFunc = new Function([new ("handler")],
                                              new Block(new MethodCall(PropertyRef.OfSelf(HandlerSetName),
                                                                       "remove",
                                                                       new VariableRef("handler")),
                                                        new Return()));
 
-        return new ClassMethod(RemoveHandlerName, Scope, Modifier, removeHandlerFunc);
+        return new (RemoveHandlerName, Scope, Modifier, removeHandlerFunc);
     }
 
     /// <summary>
@@ -116,6 +102,6 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
                                                                       new FunctionCall("handler", arguments)),
                                                       new Return()));
 
-        return new ClassMethod(TriggerEventName, Scope.Private, Modifier, triggerEventFunc);
+        return new (TriggerEventName, Scope.Private, Modifier, triggerEventFunc);
     }
 }

@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
+using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Highlighting.Xshd;
 
 namespace AddyScript.Gui;
 
@@ -11,16 +15,23 @@ public partial class App : Application
 {
     public const string REPO_URL = "https://github.com/michelmbem/AddyScript";
     
+    #region Properties
+    
     public static string[] SearchPaths { get; set; } = [];
+    
     public static string[] References { get; set; } = [];
-    private static string[] InitialFiles { get; set; } = [];
+    
     private static List<MainWindow> Windows { get; } = [];
+    
+    #endregion
+    
+    #region Utility Static Methods
 
-    public static void ParseCmdLineArgs(string[] args)
+    private static string[] ParseCmdLineArgs(string[] args)
     {
-        var searchPaths = new List<string>();
-        var references = new List<string>();
-        var initialFiles = new List<string>();
+        List<string> searchPaths = [];
+        List<string> references = [];
+        List<string> initialFiles = [];
 
         /*
          if (Settings.Default.ScriptContextSettings != null)
@@ -30,10 +41,10 @@ public partial class App : Application
         }
         */
 
-        if (searchPaths.Count <= 0)
+        if (searchPaths.Count == 0)
             searchPaths.Add(Path.GetFullPath(@"../../../samples"));
 
-        if (references.Count <= 0)
+        if (references.Count == 0)
             references.AddRange(["Microsoft.Data.SqlClient"]);
 
         var index = 0;
@@ -43,17 +54,20 @@ public partial class App : Application
             switch (args[index])
             {
                 case "-d":
+                {
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
                         throw new ArgumentException("A directory name is required after -d");
-                    
+
                     var dirname = args[index + 1];
                     if (!Directory.Exists(dirname))
                         throw new ArgumentException("Directory '" + dirname + "' does not exist");
-                    
+
                     if (!searchPaths.Contains(dirname))
                         searchPaths.Add(dirname);
                     break;
+                }
                 case "-r":
+                {
                     if (index == args.Length - 1 || args[index + 1][0] == '-')
                         throw new ArgumentException("An assembly name is required after -r");
 
@@ -64,6 +78,7 @@ public partial class App : Application
                     if (!references.Contains(assemblyName))
                         references.Add(assemblyName);
                     break;
+                }
                 default:
                     throw new ArgumentException("Invalid option: " + args[index]);
             }
@@ -73,13 +88,13 @@ public partial class App : Application
 
         while (index < args.Length)
         {
-            initialFiles.Add(args[index]);
-            ++index;
+            initialFiles.Add(args[index++]);
         }
 
         SearchPaths = [.. searchPaths];
         References = [.. references];
-        InitialFiles = [.. initialFiles];
+        
+        return [.. initialFiles];
     }
 
     public static void OpenWindow(string filePath = null)
@@ -87,7 +102,7 @@ public partial class App : Application
         var desktop = (IClassicDesktopStyleApplicationLifetime) Current?.ApplicationLifetime;
         var window = new MainWindow();
         
-        if (filePath == null)
+        if (string.IsNullOrWhiteSpace(filePath))
             window.Reset();
         else
             window.Open(filePath);
@@ -105,6 +120,27 @@ public partial class App : Application
         window.Activate();
         desktop!.MainWindow ??= window;  
     }
+    
+    private static void RegisterGrammar()
+    {
+        // Correct URI format avares://<assembly-name>/path/to/resource
+        var uri = new Uri("avares://asgui/Assets/Grammars/AddyScript-Mode.xshd");
+        using var stream = AssetLoader.Open(uri);
+        using var reader = new XmlTextReader(stream);
+        
+        // Load the definition
+        var asHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        
+        // Register it with the highlighting manager
+        HighlightingManager.Instance.RegisterHighlighting(
+            "AddyScript",
+            [".add", ".txt"], 
+            asHighlighting);
+    }
+    
+    #endregion
+    
+    #region Overrides
 
     public override void Initialize()
     {
@@ -113,10 +149,14 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        RegisterGrammar();
+        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            if (InitialFiles.Length > 0)
-                foreach (var file in InitialFiles)
+            var initialFiles = ParseCmdLineArgs(desktop.Args);
+            
+            if (initialFiles.Length > 0)
+                foreach (var file in initialFiles)
                     OpenWindow(file);
             else
                 OpenWindow();
@@ -130,4 +170,6 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
+    
+    #endregion
 }

@@ -34,14 +34,13 @@ public class ClassProperty : ClassMember
             Reader = new ClassMethod(GetReaderName(name), readerScope, modifier, new (readerParameters, readerBody));
         }
 
-        if (writerBody != null || (access & PropertyAccess.Write) != PropertyAccess.None)
-        {
-            Parameter[] writerParameters = IsIndexer
-                                         ? [new(ForEachLoop.DEFAULT_KEY_NAME), new(WRITER_PARAMETER_NAME)]
-                                         : [new(WRITER_PARAMETER_NAME)];
+        if (writerBody == null && (access & PropertyAccess.Write) == PropertyAccess.None) return;
+        
+        Parameter[] writerParameters = IsIndexer
+            ? [new(ForEachLoop.DEFAULT_KEY_NAME), new(WRITER_PARAMETER_NAME)]
+            : [new(WRITER_PARAMETER_NAME)];
 
-            Writer = new ClassMethod(GetWriterName(name), writerScope, modifier, new(writerParameters, writerBody));
-        }
+        Writer = new ClassMethod(GetWriterName(name), writerScope, modifier, new(writerParameters, writerBody));
     }
 
     /// <summary>
@@ -99,20 +98,14 @@ public class ClassProperty : ClassMember
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <returns>A <see cref="string"/></returns>
-    public static string GetReaderName(string name)
-    {
-        return "__read_" + name;
-    }
+    public static string GetReaderName(string name) => $"__read_{name}";
 
     /// <summary>
     /// Creates a suitable name for a write-accessor, given the property's name.
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <returns>A <see cref="string"/></returns>
-    public static string GetWriterName(string name)
-    {
-        return "__write_" + name;
-    }
+    public static string GetWriterName(string name) => $"__write_{name}";
 
     /// <summary>
     /// Handles automatic accessors logic generation.
@@ -124,13 +117,13 @@ public class ClassProperty : ClassMember
 
         if (Reader != null && Reader.Function.Body == null)
         {
-            Reader.Function.Body ??= GenerateReaderBody(backingFieldName);
+            Reader.Function.Body = GenerateReaderBody(backingFieldName);
             generated = true;
         }
 
         if (Writer != null && Writer.Function.Body == null)
         {
-            Writer.Function.Body ??= GenerateWriterBody(backingFieldName);
+            Writer.Function.Body = GenerateWriterBody(backingFieldName);
             generated = true;
         }
 

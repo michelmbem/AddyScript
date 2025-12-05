@@ -63,10 +63,4 @@
         <DependentUpon>Resources.resx</DependentUpon>
       </EmbeddedResource>
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="AddyScript-Mode.xshd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
 </Project>
