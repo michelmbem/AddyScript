@@ -35,6 +35,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public static readonly Dictionary<string, Function> Map = [];
 
     private readonly Dictionary<Type, Delegate> delegateCache = [];
+    private readonly Dictionary<string, IFrameItem> capturedItems = [];
     private MethodFrame declaringFrame;
 
     /// <summary>
@@ -66,12 +67,12 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
         set
         {
             declaringFrame = value;
-            CapturedItems.Clear();
+            capturedItems.Clear();
 
             if (value == null) return;
 
             foreach (string name in value.GetNames())
-                CapturedItems.Add(name, value.GetItem(name));
+                capturedItems.Add(name, value.GetItem(name));
         }
     }
 
@@ -79,7 +80,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// Gets a reference to the items that were present in
     /// the parent function's frame when this function was created.
     /// </summary>
-    public Dictionary<string, IFrameItem> CapturedItems { get; } = [];
+    public Dictionary<string, IFrameItem> CapturedItems => capturedItems;
 
     /// <summary>
     /// The minimum number of arguments required by a call to this function.
@@ -108,8 +109,8 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public void UpdateCapturedItems(Dictionary<string, IFrameItem> frameItems)
     {
         foreach (var pair in frameItems)
-            if (CapturedItems.ContainsKey(pair.Key))
-                CapturedItems[pair.Key] = pair.Value;
+            if (capturedItems.ContainsKey(pair.Key))
+                capturedItems[pair.Key] = pair.Value;
     }
 
     /// <summary>

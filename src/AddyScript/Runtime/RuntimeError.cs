@@ -22,17 +22,14 @@ public class RuntimeError : ScriptError
     }
 
     public RuntimeError(string fileName, AstNode astNode, DataItem thrown)
-        : base(fileName, astNode, thrown.GetProperty("_message").ToString())
+        : base(fileName, astNode, thrown.GetProperty("__message").ToString())
     {
         Thrown = thrown;
-        thrown.SetProperty("_source", new String(FileName));
-        thrown.SetProperty("_line", new Integer(AstNode.Start.LineNumber));
+        thrown.SetProperty("__source", new String(FileName));
+        thrown.SetProperty("__line", new Integer(AstNode.Start.LineNumber));
     }
 
-    public AstNode AstNode
-    {
-        get { return (AstNode) Element; }
-    }
+    public AstNode AstNode => (AstNode) Element;
 
     public DataItem Thrown { get; private set; }
 }

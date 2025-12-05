@@ -561,8 +561,9 @@ public class Class : IFrameItem
     /// <param name="classID">The class identifier</param>
     /// <param name="name">The name of this class</param>
     /// <param name="modifier">Determines the way this class supports inheritance</param>
-    private Class(ClassID classID, string name, Modifier modifier)
-        : this(classID, name, modifier, null, CreateDefaultConstructor(name, Scope.Private), null, null, null, null, null)
+    private Class(ClassID classID, string name, Modifier modifier) :
+        this(classID, name, modifier, null, CreateDefaultConstructor(name, Scope.Private),
+        null, null, null, null, null)
     {
     }
 
@@ -583,8 +584,8 @@ public class Class : IFrameItem
                  IEnumerable<ClassField> fields,
                  IEnumerable<ClassProperty> properties,
                  IEnumerable<ClassMethod> methods,
-                 IEnumerable<ClassEvent> events)
-        : this(superClass.ClassID, name, modifier, superClass, constructor, indexer, fields, properties, methods, events)
+                 IEnumerable<ClassEvent> events) :
+        this(superClass.ClassID, name, modifier, superClass, constructor, indexer, fields, properties, methods, events)
     {
     }
 
@@ -670,7 +671,7 @@ public class Class : IFrameItem
     /// </summary>
     /// <param name="fieldName">The name of the field that holds the class's name</param>
     /// <returns>A <see cref="Block"/></returns>
-    public static Block CreateTypeInfoEvaluator(string fieldName)
+    private static Block CreateTypeInfoEvaluator(string fieldName)
     {
         return new (VariableDecl.Single("__super", PropertyRef.OfSelf(fieldName)),
                     new IfElse(new BinaryExpression(BinaryOperator.Equal, new VariableRef("__super"), new Literal()),
@@ -690,7 +691,8 @@ public class Class : IFrameItem
     {
         var ctorFunc = new Function([new Parameter("name"), new Parameter("msg", DataItems.Void.Value)],
                                     new Block(new IfElse(new BinaryExpression(BinaryOperator.Identical, new VariableRef("msg"), new Literal()),
-                                                         new Assignment(PropertyRef.OfSelf("__message"), new VariableRef("name")),
+                                                         new Block(new Assignment(PropertyRef.OfSelf("__name"), new Literal(new String(nameof(Exception)))),
+                                                                         new Assignment(PropertyRef.OfSelf("__message"), new VariableRef("name"))),
                                                          new Block(new Assignment(PropertyRef.OfSelf("__name"),
                                                                                   new UnaryExpression(UnaryOperator.NotEmpty, new VariableRef("name"))),
                                                                    new Assignment(PropertyRef.OfSelf("__message"), new VariableRef("msg")))),
@@ -1081,17 +1083,10 @@ public class Class : IFrameItem
     public void RegisterIndexer(ClassProperty indexer)
     {
         Indexer = indexer;
-
-        if (indexer != null)
-        {
-            indexer.Holder = this;
-
-            if (indexer.CanRead)
-                RegisterMethod(indexer.Reader);
-
-            if (indexer.CanWrite)
-                RegisterMethod(indexer.Writer);
-        }
+        if (indexer == null) return;
+        indexer.Holder = this;
+        if (indexer.CanRead) RegisterMethod(indexer.Reader);
+        if (indexer.CanWrite) RegisterMethod(indexer.Writer);
     }
 
     /// <summary>
@@ -1110,9 +1105,9 @@ public class Class : IFrameItem
     /// <param name="fields">The provided set of fields</param>
     public void RegisterFields(IEnumerable<ClassField> fields)
     {
-        if (fields != null)
-            foreach (ClassField field in fields)
-                RegisterField(field);
+        if (fields == null) return;
+        foreach (ClassField field in fields)
+            RegisterField(field);
     }
 
     /// <summary>
@@ -1123,19 +1118,12 @@ public class Class : IFrameItem
     {
         Properties.Add(property);
         property.Holder = this;
-
-        if (property.CanRead)
-            RegisterMethod(property.Reader);
-
-        if (property.CanWrite)
-            RegisterMethod(property.Writer);
-
-        if (property.GenerateAccessors(out var backingFieldName))
-        {
-            var bfm = property.Modifier == Modifier.Static ? Modifier.Static : Modifier.Default;
-            var backingField = new ClassField(backingFieldName, Scope.Private, bfm, null);
-            RegisterField(backingField);
-        }
+        if (property.CanRead) RegisterMethod(property.Reader);
+        if (property.CanWrite) RegisterMethod(property.Writer);
+        if (!property.GenerateAccessors(out var backingFieldName)) return;
+        var bfm = property.Modifier == Modifier.Static ? Modifier.Static : Modifier.Default;
+        var backingField = new ClassField(backingFieldName, Scope.Private, bfm, null);
+        RegisterField(backingField);
     }
 
     /// <summary>
@@ -1144,9 +1132,9 @@ public class Class : IFrameItem
     /// <param name="properties">The provided set of properties</param>
     public void RegisterProperties(IEnumerable<ClassProperty> properties)
     {
-        if (properties != null)
-            foreach (ClassProperty property in properties)
-                RegisterProperty(property);
+        if (properties == null) return;
+        foreach (ClassProperty property in properties)
+            RegisterProperty(property);
     }
 
     /// <summary>
@@ -1165,9 +1153,9 @@ public class Class : IFrameItem
     /// <param name="methods">The provided set of methods</param>
     public void RegisterMethods(IEnumerable<ClassMethod> methods)
     {
-        if (methods != null)
-            foreach (ClassMethod method in methods)
-                RegisterMethod(method);
+        if (methods == null) return;
+        foreach (ClassMethod method in methods)
+            RegisterMethod(method);
     }
 
     /// <summary>
@@ -1178,7 +1166,6 @@ public class Class : IFrameItem
     {
         Events.Add(_event);
         _event.Holder = this;
-
         RegisterField(_event.CreateHandlerSetField());
         RegisterMethod(_event.CreateAddHandlerMethod());
         RegisterMethod(_event.CreateRemoveHandlerMethod());
@@ -1191,9 +1178,9 @@ public class Class : IFrameItem
     /// <param name="events">The provided set of events</param>
     public void RegisterEvents(IEnumerable<ClassEvent> events)
     {
-        if (events != null)
-            foreach (ClassEvent _event in events)
-                RegisterEvent(_event);
+        if (events == null) return;
+        foreach (ClassEvent _event in events)
+            RegisterEvent(_event);
     }
 
     /// <summary>

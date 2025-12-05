@@ -53,7 +53,7 @@ public static class RuntimeServices
         var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
         new StaticMethodCall(name, literals).AcceptTranslator(Interpreter);
 
-        return Interpreter.ReturnedValue; ;
+        return Interpreter.ReturnedValue;
     }
 
     /// <summary>
