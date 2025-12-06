@@ -10,6 +10,7 @@
         <entry key="AddyScript.Gui/SearchView.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/Styles/EditorStyles.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
         <entry key="AddyScript.Gui/Styles/EditprStyles.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
+        <entry key="AddyScript.Gui/TerminalWindow.axaml" value="AddyScript.Gui/AddyScript.Gui.csproj" />
       </map>
     </option>
   </component>

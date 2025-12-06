@@ -695,9 +695,11 @@ public partial class MainWindow : Window
 
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
-        MessageBoxManager
-            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
-            .ShowAsync();
+        // MessageBoxManager
+        //     .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
+        //     .ShowAsync();
+        var terminalWindow = new TerminalWindow();
+        terminalWindow.ShowDialog(this);
     }
 
     public void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)

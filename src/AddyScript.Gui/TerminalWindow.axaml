@@ -1,0 +1,21 @@
+<Window x:Class="AddyScript.Gui.TerminalWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="800"
+        Height="500"
+        Background="{DynamicResource WindowBackground}"
+        Icon="/Assets/Images/Icons/AddyScript.ico"
+        Loaded="WindowLoaded">
+  
+  <DockPanel>
+    <TextBox Name="TerminalBox"
+             FontFamily="Cascadia Code, Consolas, Courier New, Menlo, Monospace"
+             FontSize="14"
+             IsReadOnly="True"
+             AcceptsReturn="True"
+             IsTabStop="False"
+             TextWrapping="Wrap"
+             Margin="10"
+             KeyUp="TerminalBoxKeyUp"/>
+  </DockPanel>
+</Window>
