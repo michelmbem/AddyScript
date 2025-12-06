@@ -32,7 +32,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The statement to be executed if <i>Test</i> returns <b>false</b>.
         /// </summary>
-        public Statement AlternativeAction { get; private set; }
+        public Statement AlternativeAction { get; private init; }
 
         /// <summary>
         /// Translates this node.

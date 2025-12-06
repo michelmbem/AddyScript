@@ -35,10 +35,10 @@ namespace AddyScript.Ast.Statements
         /// <returns>A reference to <see cref="PropertyInitializer"/></returns>
         public PropertyInitializer GetPropertyInitializer(string propertyName)
         {
-            if (PropertyInitializers != null)
-                foreach (PropertyInitializer property in PropertyInitializers)
-                    if (property.Name == propertyName)
-                        return property;
+            if (PropertyInitializers == null) return null;
+            
+            foreach (PropertyInitializer property in PropertyInitializers)
+                if (property.Name == propertyName) return property;
 
             return null;
         }
