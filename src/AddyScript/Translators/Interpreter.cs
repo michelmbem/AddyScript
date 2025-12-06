@@ -2338,7 +2338,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         
         if (sx.InnerException is { } inex)
             ex.SetProperty("__name", new String(inex.GetType().Name));
-        
+        else
+            ex.SetProperty("__name", new String(Class.Exception.Name));
+
         ex.SetProperty("__message", new String(sx.Message));
         ex.SetProperty("__source", new String(fileName));
         ex.SetProperty("__line", new Integer(sx.Element.Start.LineNumber));

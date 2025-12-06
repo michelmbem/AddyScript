@@ -109,7 +109,7 @@ namespace AddyScript.Ast.Expressions
             // Assuming both lowerBound and upperBound cannot be null at the same time!
             if (lowerBoundCheck == null) return upperBoundCheck;
             if (upperBoundCheck == null) return lowerBoundCheck;
-            return new BinaryExpression(BinaryOperator.AndAlso, lowerBoundCheck, upperBoundCheck);  
+            return new BinaryExpression(BinaryOperator.AndAlso, lowerBoundCheck, upperBoundCheck);
         }
     }
 
@@ -128,42 +128,49 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         public string TypeName => typeName;
 
-        public override Expression GetMatchTest(Expression arg)
+        public override Expression GetMatchTest(Expression arg) => string.IsNullOrWhiteSpace(typeName)
+            ? new UnaryExpression(UnaryOperator.Not, new TypeVerification(arg, Class.Void.Name))
+            : new TypeVerification(arg, typeName);
+    }
+
+    public class PropertyMatcher(string propertyName, Pattern pattern) : ScriptElement
+    {
+        public string PropertyName => propertyName;
+
+        public Pattern Pattern => pattern;
+
+        public Expression GetMatchTest(Expression ownerRef)
         {
-            return new TypeVerification(arg, typeName);
+            var propRef = new PropertyRef(ownerRef, propertyName);
+            var propIsVoid = new TypeVerification(propRef, Class.Void.Name);
+            var propIsNotVoid = new UnaryExpression(UnaryOperator.Not, propIsVoid);
+            return new BinaryExpression(BinaryOperator.AndAlso, propIsNotVoid, pattern.GetMatchTest(propRef));
         }
     }
 
 
     /// <summary>
     /// A subclass of <see cref="Pattern"/> that checks if the value to match is of the same type than a particular object
-    /// and have equal values for some properties.
+    /// and have properties that matches the given patterns.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of <see cref="ObjectPattern"/>.
     /// </remarks>
     /// <param name="typeName">The name of the type values should be for this <see cref="Pattern"/> to match them</param>
-    /// <param name="example">An object that will be compared property by property to any object to be matched</param>
-    public class ObjectPattern(string typeName, DataItem example) : TypePattern(typeName)
+    /// <param name="propertyMatchers">A set of patterns that some properties of the given object should match</param>
+    public class ObjectPattern(string typeName, PropertyMatcher[] propertyMatchers) : TypePattern(typeName)
     {
         /// <summary>
-        /// An object that will be compared property by property to any object to be matched.
+        /// A set of patterns that some properties of the given object should match.
         /// </summary>
-        public DataItem Example => example;
+        public PropertyMatcher[] PropertyMatchers => propertyMatchers;
 
         public override Expression GetMatchTest(Expression arg)
         {
             Expression matchTest = base.GetMatchTest(arg);
 
-            foreach (var exampleProp in example.AsDynamicObject)
-            {
-                var propRef = new PropertyRef(arg, exampleProp.Key);
-                var voidCheck = new UnaryExpression(UnaryOperator.Not, new TypeVerification(propRef, "void"));
-                var propCmp = new BinaryExpression(BinaryOperator.Equal, propRef, new Literal(exampleProp.Value));
-                var propTest = new BinaryExpression(BinaryOperator.AndAlso, voidCheck, propCmp);
-
-                matchTest = new BinaryExpression(BinaryOperator.AndAlso, matchTest, propTest);
-            }
+            foreach (var matcher in propertyMatchers)
+                matchTest = new BinaryExpression(BinaryOperator.AndAlso, matchTest, matcher.GetMatchTest(arg));
 
             return matchTest;
         }
@@ -194,19 +201,32 @@ namespace AddyScript.Ast.Expressions
 
 
     /// <summary>
+    /// A subclass of <see cref="Pattern"/> that wraps other patterns into parentheses.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of <see cref="GroupingPattern"/>.
+    /// </remarks>
+    /// <param name="child">The pattern wrapped by this <see cref="GroupingPattern"/></param>
+    public class GroupingPattern(Pattern child) : Pattern
+    {
+        /// <summary>
+        /// The pattern wrapped by this <see cref="GroupingPattern"/>.
+        /// </summary>
+        public Pattern Child => child;
+
+        public override Expression GetMatchTest(Expression arg) => child.GetMatchTest(arg);
+    }
+
+
+    /// <summary>
     /// A subclass of <see cref="Pattern"/> that negates its child patterns.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of <see cref="NegativePattern"/>.
     /// </remarks>
-    /// <param name="child">The child pattern</param>
-    public class NegativePattern(Pattern child) : Pattern
+    /// <param name="child">The pattern to negate</param>
+    public class NegativePattern(Pattern child) : GroupingPattern(child)
     {
-        /// <summary>
-        /// The child of this <see cref="NegativePattern"/>.
-        /// </summary>
-        public Pattern Child => child;
-
         public override Expression GetMatchTest(Expression arg) =>
             new UnaryExpression(UnaryOperator.Not, child.GetMatchTest(arg));
     }

@@ -21,12 +21,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// Represents the set of statements that run before enterring the loop.
         /// </summary>
-        public Statement[] Initializers { get; private set; } = initializers;
+        public Statement[] Initializers => initializers;
 
         /// <summary>
         /// Represents the set of statements that run at the end of each iteration.
         /// </summary>
-        public Expression[] Updaters { get; private set; } = updaters;
+        public Expression[] Updaters => updaters;
 
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the inner function to call.
         /// </summary>
-        public InnerFunction Function { get; private set; } = function;
+        public InnerFunction Function => function;
 
         /// <summary>
         /// Translates this node.

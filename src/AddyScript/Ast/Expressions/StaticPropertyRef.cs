@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The qualified property's name.
         /// </summary>
-        public QualifiedName Name { get; private set; } = name;
+        public QualifiedName Name => name;
 
 
         /// <summary>

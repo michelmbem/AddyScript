@@ -14,12 +14,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The property's name.
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// The value assigned to the property.
         /// </summary>
-        public Expression Expression { get; private set; } = expr;
+        public Expression Expression => expr;
 
         #region Overrides
 

@@ -16,7 +16,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The expressions that are listed between the braces.
         /// </summary>
-        public MapItemInitializer[] ItemInitializers { get; private set; } = itemInitializers;
+        public MapItemInitializer[] ItemInitializers => itemInitializers;
 
         /// <summary>
         /// Translates this node.

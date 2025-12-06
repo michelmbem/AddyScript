@@ -13,11 +13,11 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The expression that's tested for the action to be executed.
         /// </summary>
-        public Expression Test { get; private set; } = test;
+        public Expression Test => test;
 
         /// <summary>
         /// The statement that's conditionally or repeatedly executed.
         /// </summary>
-        public Statement Action { get; private set; } = action;
+        public Statement Action => action;
     }
 }

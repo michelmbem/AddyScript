@@ -14,11 +14,11 @@
         /// <summary>
         /// The pattern to match against
         /// </summary>
-        public Pattern Pattern { get; private set; } = pattern;
+        public Pattern Pattern => pattern;
 
         /// <summary>
         /// The expression returned in case of a positive match
         /// </summary>
-        public Expression Expression { get; private set; } = expression;
+        public Expression Expression => expression;
     }
 }

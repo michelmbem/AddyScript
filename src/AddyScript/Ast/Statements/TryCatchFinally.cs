@@ -20,22 +20,22 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The try block.
         /// </summary>
-        public Block TryBlock { get; private set; } = tryBlock;
+        public Block TryBlock => tryBlock;
 
         /// <summary>
         /// The name of the caught exception.
         /// </summary>
-        public string ExceptionName { get; private set; } = exceptionName;
+        public string ExceptionName => exceptionName;
 
         /// <summary>
         /// The catch block. At most one is allowed.
         /// </summary>
-        public Block CatchBlock { get; private set; } = catchBlock;
+        public Block CatchBlock => catchBlock;
 
         /// <summary>
         /// The optional finally block.
         /// </summary>
-        public Block FinallyBlock { get; private set; } = finallyBlock;
+        public Block FinallyBlock => finallyBlock;
 
         /// <summary>
         /// The optional resource that should be disposed upon completion.

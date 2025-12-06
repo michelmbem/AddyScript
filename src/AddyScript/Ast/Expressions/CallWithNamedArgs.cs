@@ -18,6 +18,6 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the collection of named arguments passed to the function or method.
         /// </summary>
-        public Dictionary<string, Expression> NamedArgs { get; private set; } = namedArgs;
+        public Dictionary<string, Expression> NamedArgs => namedArgs;
     }
 }

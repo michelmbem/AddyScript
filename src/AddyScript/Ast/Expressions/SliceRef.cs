@@ -19,17 +19,17 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// >The collection to which this item belongs.
         /// </summary>
-        public Expression Owner { get; private set; } = owner;
+        public Expression Owner => owner;
 
         /// <summary>
         /// The lower bound of the items range.
         /// </summary>
-        public Expression LowerBound { get; private set; } = lowerBound;
+        public Expression LowerBound => lowerBound;
 
         /// <summary>
         /// The upper bound of the items range.
         /// </summary>
-        public Expression UpperBound { get; private set; } = upperBound;
+        public Expression UpperBound => upperBound;
 
         /// <summary>
         /// Determines whether to stop null reference propagation or not.

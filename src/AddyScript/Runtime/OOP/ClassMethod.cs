@@ -62,7 +62,7 @@ public class ClassMethod(string name, Scope scope, Modifier modifier, Function f
     /// <summary>
     /// Encapsulates the logic of the method.
     /// </summary>
-    public Function Function { get; } = function;
+    public Function Function => function;
 
     /// <summary>
     /// Gets the name of the method that's mapped to an overloaded unary operator.

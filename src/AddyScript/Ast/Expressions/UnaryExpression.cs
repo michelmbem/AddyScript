@@ -17,12 +17,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the operator of this unary expession.
         /// </summary>
-        public UnaryOperator Operator { get; private set; } = oper;
+        public UnaryOperator Operator => oper;
 
         /// <summary>
         /// Represents the operand of this unary expession.
         /// </summary>
-        public Expression Operand { get; private set; } = expr;
+        public Expression Operand => expr;
 
         /// <summary>
         /// Translates this node.

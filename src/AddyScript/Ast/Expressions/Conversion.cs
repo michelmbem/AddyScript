@@ -17,7 +17,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The expression to convert.
         /// </summary>
-        public Expression Expression { get; private set; } = expr;
+        public Expression Expression => expr;
 
         /// <summary>
         /// Translates this node.

@@ -16,7 +16,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The label following the goto.
         /// </summary>
-        public string LabelName { get; private set; } = labelName;
+        public string LabelName => labelName;
 
         /// <summary>
         /// Translates this node.

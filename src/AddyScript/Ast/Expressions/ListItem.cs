@@ -10,11 +10,11 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The item's value.
         /// </summary>
-        public Expression Expression { get; private set; } = expr;
+        public Expression Expression => expr;
 
         /// <summary>
         /// Tells if <see cref="Expression"/> represents a collection that should be spread.
         /// </summary>
-        public bool Spread { get; private set; } = spread;
+        public bool Spread => spread;
     }
 }

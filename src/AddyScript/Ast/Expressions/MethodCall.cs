@@ -35,7 +35,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Holds the value of 'this'.
         /// </summary>
-        public Expression Target { get; private set; } = target;
+        public Expression Target => target;
 
         /// <summary>
         /// Determines whether to stop null reference propagation or not.

@@ -18,12 +18,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// >The collection to which this item belongs.
         /// </summary>
-        public Expression Owner { get; private set; } = owner;
+        public Expression Owner => owner;
 
         /// <summary>
         /// The expression used to evaluate the index.
         /// </summary>
-        public Expression Index { get; private set; } = index;
+        public Expression Index => index;
 
         /// <summary>
         /// Determines whether to stop null reference propagation or not.

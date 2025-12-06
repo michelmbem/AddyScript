@@ -24,27 +24,27 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// Determines which accessors to generate when they are not explicitly provided.
         /// </summary>
-        public PropertyAccess Access { get; } = access;
+        public PropertyAccess Access => access;
 
         /// <summary>
         /// The scope of an eventually generated read accessor.
         /// </summary>
-        public Scope ReaderScope { get; } = readerScope;
+        public Scope ReaderScope => readerScope;
 
         /// <summary>
         /// The property's read accessor.
         /// </summary>
-        public Block ReaderBody { get; } = readerBody;
+        public Block ReaderBody => readerBody;
 
         /// <summary>
         /// The scope of an eventually generated write accessor.
         /// </summary>
-        public Scope WriterScope { get; } = writerScope;
+        public Scope WriterScope => writerScope;
 
         /// <summary>
         /// The property's write accessor.
         /// </summary>
-        public Block WriterBody { get; } = writerBody;
+        public Block WriterBody => writerBody;
 
         /// <summary>
         /// Gets if this property has a read accessor or not.

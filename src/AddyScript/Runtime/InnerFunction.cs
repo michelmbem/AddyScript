@@ -168,17 +168,17 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// The name of this function.
     /// </summary>
-    public string Name { get; private set; } = name;
+    public string Name => name;
 
     /// <summary>
     /// The set of parameters required for a call to this function.
     /// </summary>
-    public Parameter[] Parameters { get; private set; } = parameters;
+    public Parameter[] Parameters => parameters;
 
     /// <summary>
     /// The logic of this function.
     /// </summary>
-    public InnerFunctionLogic Logic { get; private set; } = logic;
+    public InnerFunctionLogic Logic => logic;
 
     #endregion
 

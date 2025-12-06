@@ -31,7 +31,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the expression to be used to get a function.
         /// </summary>
-        public Expression Callee { get; private set; } = callee;
+        public Expression Callee => callee;
 
         /// <summary>
         /// Translates this node.

@@ -1165,11 +1165,15 @@ public class XmlGenerator : ITranslator
             tmpElement.SetAttribute("TypeName", objectPat.TypeName);
             parent.AppendChild(tmpElement);
 
-            XmlElement exampleElement = document.CreateElement("Example");
-            tmpElement.AppendChild(exampleElement);
+            XmlElement matchersElement = document.CreateElement("PropertyMatchers");
+            tmpElement.AppendChild(matchersElement);
 
-            foreach (var exampleProp in objectPat.Example.AsDynamicObject)
-                exampleElement.SetAttribute(exampleProp.Key, exampleProp.Value.ToString());
+            foreach (var matcher in objectPat.PropertyMatchers)
+            {
+                XmlElement propertyElement = document.CreateElement(matcher.PropertyName);
+                ProcessPattern(propertyElement, matcher.Pattern);
+                matchersElement.AppendChild(propertyElement);
+            }
         }
         else if (pattern is TypePattern typePat)
         {
@@ -1196,6 +1200,16 @@ public class XmlGenerator : ITranslator
 
             XmlElement childElement = document.CreateElement("Child");
             ProcessPattern(childElement, negPat.Child);
+            tmpElement.AppendChild(childElement);
+
+            parent.AppendChild(tmpElement);
+        }
+        else if (pattern is GroupingPattern groupPat)
+        {
+            XmlElement tmpElement = document.CreateElement("GroupingPattern");
+
+            XmlElement childElement = document.CreateElement("Child");
+            ProcessPattern(childElement, groupPat.Child);
             tmpElement.AppendChild(childElement);
 
             parent.AppendChild(tmpElement);

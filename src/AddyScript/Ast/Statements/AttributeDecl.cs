@@ -21,12 +21,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The attribute's name.
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// A set of initializers for the properties of the declared attribute.
         /// </summary>
-        public PropertyInitializer[] PropertyInitializers { get; private set; } = initializers;
+        public PropertyInitializer[] PropertyInitializers => initializers;
 
         /// <summary>
         /// Gets a property initializer in an attribute by its name.

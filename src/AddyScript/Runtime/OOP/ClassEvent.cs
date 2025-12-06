@@ -22,7 +22,7 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     /// <summary>
     /// The signature of any closure that could be used to handle this event.
     /// </summary>
-    public Parameter[] Parameters { get; private set; } = parameters;
+    public Parameter[] Parameters => parameters;
 
     /// <summary>
     /// Gets the name of the field that will automatically be generated

@@ -24,12 +24,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The parameters of this method.
         /// </summary>
-        public ParameterDecl[] Parameters { get; private set; } = parameters;
+        public ParameterDecl[] Parameters => parameters;
 
         /// <summary>
         /// The body of this method.
         /// </summary>
-        public Block Body { get; private set; } = body;
+        public Block Body => body;
 
         /// <summary>
         /// Gets if the method being declared has the same signature than an existing one.

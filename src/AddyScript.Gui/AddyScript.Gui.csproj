@@ -12,6 +12,7 @@
 
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
       <TargetFramework>net8.0-windows</TargetFramework>
+	  <ApplicationIcon>Assets\Images\Icons\AddyScript.ico</ApplicationIcon>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">

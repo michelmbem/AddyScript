@@ -18,12 +18,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The object to which this field belongs.
         /// </summary>
-        public Expression Owner { get; } = owner;
+        public Expression Owner => owner;
 
         /// <summary>
         /// The property's name.
         /// </summary>
-        public string PropertyName { get; } = propertyName;
+        public string PropertyName => propertyName;
 
         /// <summary>
         /// Determines whether to stop null reference propagation or not.

@@ -21,6 +21,6 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The address of the statement that follows the label.
         /// </summary>
-        public int Address { get; private set; } = address;
+        public int Address => address;
     }
 }

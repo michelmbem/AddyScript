@@ -21,17 +21,17 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The test expression.
         /// </summary>
-        public Expression Test { get; private set; } = test;
+        public Expression Test => test;
 
         /// <summary>
         /// The case labels.
         /// </summary>
-        public CaseLabel[] Cases { get; private set; } = cases;
+        public CaseLabel[] Cases => cases;
 
         /// <summary>
         /// The default case label.
         /// </summary>
-        public int DefaultCase { get; private set; } = defCase;
+        public int DefaultCase => defCase;
 
         /// <summary>
         /// Translates this node.

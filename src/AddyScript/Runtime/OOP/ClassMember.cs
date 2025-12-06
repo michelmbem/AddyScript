@@ -19,17 +19,17 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// <summary>
     /// The member's name.
     /// </summary>
-    public string Name { get; } = name;
+    public string Name => name;
 
     /// <summary>
     /// The scope of this member.
     /// </summary>
-    public Scope Scope { get; } = scope;
+    public Scope Scope => scope;
 
     /// <summary>
     /// Determines whether this member is abstract, final, static or none.
     /// </summary>
-    public Modifier Modifier { get; } = modifier;
+    public Modifier Modifier => modifier;
 
     /// <summary>
     /// Represents the class that holds this member (the class in which the member is declared).

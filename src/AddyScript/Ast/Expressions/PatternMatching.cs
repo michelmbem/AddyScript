@@ -17,12 +17,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The expression against which to match patterns.
         /// </summary>
-        public Expression Expression { get; private set; } = expression;
+        public Expression Expression => expression;
 
         /// <summary>
         /// The patterns to match with associated expressions.
         /// </summary>
-        public MatchCase[] MatchCases { get; private set; } = cases;
+        public MatchCase[] MatchCases => cases;
 
         /// <summary>
         /// Translates this node.

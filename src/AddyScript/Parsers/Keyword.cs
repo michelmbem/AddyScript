@@ -117,12 +117,12 @@ public class Keyword(TokenID tokenID, object value = null)
     /// <summary>
     /// The keyword's <see cref="TokenID"/>.
     /// </summary>
-    public TokenID TokenID { get; } = tokenID;
+    public TokenID TokenID => tokenID;
 
     /// <summary>
     /// The keyword's value (if any).
     /// </summary>
-    public object Value { get; } = value;
+    public object Value => value;
 
     #endregion
 

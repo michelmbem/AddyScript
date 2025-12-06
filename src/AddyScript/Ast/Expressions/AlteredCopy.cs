@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the object that's being copied.
         /// </summary>
-        public Expression Original { get; private set; } = original;
+        public Expression Original => original;
 
         /// <summary>
         /// Translates this node.

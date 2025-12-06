@@ -17,12 +17,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The literal string that will be used as a pattern to build the final string.
         /// </summary>
-        public string Pattern { get; private set; } = pattern;
+        public string Pattern => pattern;
 
         /// <summary>
         /// The expressions that will be evaluated to get the dynamic parts of the final string.
         /// </summary>
-        public Expression[] Substitions { get; private set; } = substitutions;
+        public Expression[] Substitions => substitutions;
 
         /// <summary>
         /// Translates this node.

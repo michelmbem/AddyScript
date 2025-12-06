@@ -22,17 +22,17 @@ public class InvocationContext(Class methodHolder, DataItem methodTarget, string
     /// <summary>
     /// The invoked method's holding class. May be null for global functions.
     /// </summary>
-    public Class MethodHolder { get; private set; } = methodHolder;
+    public Class MethodHolder => methodHolder;
 
     /// <summary>
     /// The method's target instance. May be null for global functions or static methods.
     /// </summary>
-    public DataItem MethodTarget { get; private set; } = methodTarget;
+    public DataItem MethodTarget => methodTarget;
 
     /// <summary>
     /// The invoked method's or function's name. May be null for lambda expressions and anonymous functions.
     /// </summary>
-    public string MethodName { get; private set; } = methodName;
+    public string MethodName => methodName;
 
     /// <summary>
     /// Gets if the invoked method is a constructor or not.

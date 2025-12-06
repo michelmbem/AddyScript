@@ -21,12 +21,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The parameters of this function.
         /// </summary>
-        public ParameterDecl[] Parameters { get; private set; } = parameters;
+        public ParameterDecl[] Parameters => parameters;
 
         /// <summary>
         /// The body of this function.
         /// </summary>
-        public Block Body { get; private set; } = body;
+        public Block Body => body;
 
         /// <summary>
         /// Verifies that an inline function is a lambda expression or not.

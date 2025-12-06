@@ -1248,14 +1248,23 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 if (typeName == AlwaysPattern.Symbol)
                     pattern = new AlwaysPattern();
                 else if (TryMatch(TokenID.LeftBrace))
-                    pattern = new ObjectPattern(typeName, MatchCaseObjectPatternExample(ref last));
+                    pattern = MatchCaseObjectPattern(typeName, ref last);
                 else
                     pattern = new TypePattern(typeName);
                 break;
             }
             case TokenID.LeftBrace:
-                pattern = new ObjectPattern(Class.Object.Name, MatchCaseObjectPatternExample(ref last));
+                pattern = MatchCaseObjectPattern(null, ref last);
                 break;
+            case TokenID.LeftParenthesis:
+            {
+                Token first = token;
+                Consume(1);
+                pattern = new GroupingPattern(MatchCasePattern());
+                last = Match(TokenID.RightParenthesis);
+                pattern.SetLocation(first.Start, last.End);
+                break;
+            }
             case TokenID.KW_When when predicateAllowed:
                 Consume(1);
                 Expression predicate = RequiredExpression();
@@ -1314,6 +1323,24 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
+    /// Parses an object pattern from the input stream, matching the specified type name and updating the token
+    /// reference to the last token consumed.
+    /// </summary>
+    /// <param name="typeName">The name of the type to associate with the parsed object pattern.</param>
+    /// <param name="last">When this method returns, contains a reference to the last token consumed during parsing.</param>
+    /// <returns>An ObjectPattern instance representing the parsed object pattern with the specified type name.</returns>
+    private ObjectPattern MatchCaseObjectPattern(string typeName, ref Token last)
+    {
+        Token first = Match(TokenID.LeftBrace);
+        PropertyMatcher[] matchers = List(ObjectPatternPropertyMatcher, false, null);
+        last = Match(TokenID.RightBrace);
+
+        var objPattern = new ObjectPattern(typeName, [.. matchers]);
+        objPattern.SetLocation(first.Start, last.End);
+        return objPattern;
+    }
+
+    /// <summary>
     /// Reads a literal value of one of the types which are allowed for patterns.
     /// </summary>
     /// <param name="negate">Determines if a negative signe was initially met for the value</param>
@@ -1331,46 +1358,22 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes the <see cref="ObjectPattern.Example"/> member.
+    /// Recognizes a <see cref="PropertyMatcher"/>.
     /// </summary>
-    /// <returns>An <see cref="object"/> with literal property values</returns>
-    private DataItem MatchCaseObjectPatternExample(ref Token last)
+    /// <returns>A <see cref="PropertyMatcher"/></returns>
+    private PropertyMatcher ObjectPatternPropertyMatcher()
     {
-        Dictionary<string, DataItem> fieldBag = [];
-        bool negative = false, loop = true;
+        if (!TryMatch(TokenID.Identifier)) return null;
 
-        Match(TokenID.LeftBrace);
+        Token first = token;
+        string fieldName = first.ToString();
+        Consume(1);
+        Match(TokenID.Colon);
+        Pattern fieldPattern = MatchCasePattern();
 
-        while (loop)
-        {
-            string fieldName = Match(TokenID.Identifier).ToString();
-            Match(TokenID.Equal);
-
-            Token fieldValueToken;
-            if (TryMatchAny(TokenID.Plus, TokenID.Minus) && LookAhead(t => t.IsNumeric, out int pos))
-            {
-                negative = token.TokenID == TokenID.Minus;
-                Consume(pos - 1);
-                fieldValueToken = token;
-                Consume(1);
-            }
-            else
-                fieldValueToken = MatchAny(TokenID.LT_Integer, TokenID.LT_Long, TokenID.LT_Float,
-                                           TokenID.LT_Decimal, TokenID.LT_Date, TokenID.LT_String);
-            
-            DataItem fieldValue = DataItemFactory.CreateDataItem(fieldValueToken.Value);
-            if (negative) fieldValue = fieldValue.UnaryOperation(UnaryOperator.Minus);
-            fieldBag.Add(fieldName, fieldValue);
-
-            if (TryMatch(TokenID.Comma))
-                Consume(1);
-            else
-                loop = false;
-        }
-
-        last = Match(TokenID.RightBrace);
-
-        return new Runtime.DataItems.Object(fieldBag);
+        var matcher = new PropertyMatcher(fieldName, fieldPattern);
+        matcher.SetLocation(first.Start, fieldPattern.End);
+        return matcher;
     }
 
     /// <summary>

@@ -38,8 +38,8 @@ o = new {name = 'my object', size = 18, color = 'blue'};
 res = o switch {
 	null => 'null',
 	5 => 'five',
-	{height = 150, color = 'blue'} => 'a blue and 150 tall object',
-	{name = 'my object', size = 18} => 'my object of size 18'
+	{height : 150, color : 'blue'} => 'a blue and 150 tall object',
+	{name : 'my object', size : 18} => 'my object of size 18'
 };
 println($'o is {o}');
 println($'result with o: {res}');
@@ -47,7 +47,8 @@ println();
 
 res = PI switch {
 	3.14 => 'three-point-fourteen',
-	0 or 1 or 2..4 or 5..8 or 9 => 'in the set {0 or 1 or 2 to 4 or 5 to 8 or 9}',
+	0..3 or 4..9 => 'from 0 to 3 or from 4 to 9',
+	3.. and not (4.. or float) => '>= 3 and < 4 but not a float',
 	float => 'a floatting-point number'
 };
 println($'result with PI: {res}');
@@ -79,7 +80,7 @@ println();
 l = [
 	new Employee('Franklin Kenyata', 44, 5000, `2010-01-14`),
 	new Employee('Jeanette Diabaté', 32, 3500, `2014-09-30`),
-	new Developper('Dereck Musa', 44, 4200, `2010-01-14`, ['C++', 'C#', 'Java']),
+	new Developper('Dereck Musa', 44, 4200, `2010-07-28`, ['C++', 'C#', 'Java']),
 	null,
 	new Exception('this is an exception')
 ];
@@ -90,9 +91,9 @@ l.add(l[2] with { name = 'Kim Ondo', age = 36, languages = ['Python', 'TypeScrip
 l.each(|item| => {
 	res = item switch {
 		null => 'this item is null',
-		Employee {age = 44, dateHired = `2010-01-14`} =>
-			$'{item.name} is 44 years old, he/she was hired on 2010-01-14 and earns ${item.salary}/month',
-		_ => 'neither null nor a 44 years old employee hired on 2010-01-14'
+		Employee {age : 44, dateHired : {year: 2010}} =>
+			$'{item.name} is 44 years old employee hired in 2010 that earns ${item.salary}/month',
+		_ => 'neither null nor a 44 years old employee hired in 2010'
 	};
 	println($'item = {item}');
 	println($'result with item: {res}');
@@ -100,11 +101,9 @@ l.each(|item| => {
 });
 println();
 
-if ((kim = l[-1]) is Employee {name = 'Kim Ondo'})
-{
-	println($'{kim.name} is a {kim.languages.join(" and ")} developper');
-	println();
-}
+l.where(|item| => item is Employee {languages : {}})
+	.each(|item| => println($'{item.name} is a {item.languages.join(" and ")} developper'));
+println();
 
 try {
 	randint(-5, 5) switch {

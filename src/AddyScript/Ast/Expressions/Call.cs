@@ -16,7 +16,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the list of arguments passed to the function or method.
         /// </summary>
-        public ListItem[] Arguments { get; private set; } = arguments;
+        public ListItem[] Arguments => arguments;
 
         /// <summary>
         /// Converts an array of expressions to an array of <see cref="ListItem"/>s.

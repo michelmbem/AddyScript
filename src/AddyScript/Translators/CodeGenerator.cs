@@ -1152,16 +1152,16 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             textWriter.Write("{ ");
 
             bool firstProp = true;
-            foreach (var exampleProp in objectPat.Example.AsDynamicObject)
+            foreach (var matcher in objectPat.PropertyMatchers)
             {
                 if (firstProp)
                     firstProp = false;
                 else
                     textWriter.Write(", ");
 
-                textWriter.Write(exampleProp.Key);
-                textWriter.Write(" = ");
-                DumpDataItem(exampleProp.Value);
+                textWriter.Write(matcher.PropertyName);
+                textWriter.Write(" : ");
+                DumpMatchCasePattern(matcher.Pattern);
             }
 
             textWriter.Write(" }");
@@ -1177,6 +1177,12 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         {
             textWriter.Write("not ");
             DumpMatchCasePattern(negPat.Child);
+        }
+        else if (pattern is GroupingPattern groupPat)
+        {
+            textWriter.Write('(');
+            DumpMatchCasePattern(groupPat.Child);
+            textWriter.Write(')');
         }
         else if (pattern is CompositePattern compPat)
         {

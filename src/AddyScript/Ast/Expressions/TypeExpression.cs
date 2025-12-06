@@ -13,6 +13,6 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The type's name.
         /// </summary>
-        public string TypeName { get; private set; } = typeName;
+        public string TypeName => typeName;
     }
 }

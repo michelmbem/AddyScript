@@ -29,47 +29,47 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The class's name
         /// </summary>
-        public string ClassName { get; private set; } = className;
+        public string ClassName => className;
 
         /// <summary>
         /// The superclass's name
         /// </summary>
-        public string SuperClassName { get; private set; } = superClassName;
+        public string SuperClassName => superClassName;
 
         /// <summary>
         /// Determines how the class supports inheritance and member access.
         /// </summary>
-        public Modifier Modifier { get; private set; } = modifier;
+        public Modifier Modifier => modifier;
 
         /// <summary>
         /// The constructor of the class.
         /// </summary>
-        public ClassMethodDecl Constructor { get; private set; } = constructor;
+        public ClassMethodDecl Constructor => constructor;
 
         /// <summary>
         /// The indexer of the class.
         /// </summary>
-        public ClassPropertyDecl Indexer { get; private set; } = indexer;
+        public ClassPropertyDecl Indexer => indexer;
 
         /// <summary>
         /// The fields of the class.
         /// </summary>
-        public ClassFieldDecl[] Fields { get; private set; } = fields;
+        public ClassFieldDecl[] Fields => fields;
 
         /// <summary>
         /// The properties of the class.
         /// </summary>
-        public ClassPropertyDecl[] Properties { get; private set; } = properties;
+        public ClassPropertyDecl[] Properties => properties;
 
         /// <summary>
         /// The methods of the class.
         /// </summary>
-        public ClassMethodDecl[] Methods { get; private set; } = methods;
+        public ClassMethodDecl[] Methods => methods;
 
         /// <summary>
         /// The events of the class.
         /// </summary>
-        public ClassEventDecl[] Events { get; private set; } = events;
+        public ClassEventDecl[] Events => events;
 
         /// <summary>
         /// Gets an array of all the members of the class

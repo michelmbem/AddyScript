@@ -31,5 +31,5 @@ public class RuntimeError : ScriptError
 
     public AstNode AstNode => (AstNode) Element;
 
-    public DataItem Thrown { get; private set; }
+    public DataItem Thrown { get; }
 }

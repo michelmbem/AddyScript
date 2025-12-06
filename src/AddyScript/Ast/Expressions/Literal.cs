@@ -17,7 +17,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The literal value wrapped by this instance.
         /// </summary>
-        public DataItem Value { get; private set; } = value ?? Void.Value;
+        public DataItem Value => value ?? Void.Value;
 
         /// <summary>
         /// Translates this node.

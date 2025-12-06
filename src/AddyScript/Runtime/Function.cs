@@ -46,7 +46,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// The parameters of this function.
     /// </summary>
-    public Parameter[] Parameters { get; } = parameters;
+    public Parameter[] Parameters => parameters;
 
     /// <summary>
     /// The body of this function if it is user defined.
