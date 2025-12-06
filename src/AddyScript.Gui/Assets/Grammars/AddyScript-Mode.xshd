@@ -23,14 +23,12 @@
     <Color name="Modifiers" fontWeight="bold" foreground="Red" exampleText="static final a = 10"/>
     <Color name="Visibility" fontWeight="bold" foreground="SaddleBrown" exampleText="public toString(fmt = '')"/>
     
-    <Property name="DocCommentMarker" value="///" />
-    
     <RuleSet name="CommentMarkerSet">
-        <Keywords fontWeight="bold" foreground="Red">
+        <Keywords fontWeight="bold" foreground="Orange">
             <Word>TODO</Word>
             <Word>FIXME</Word>
         </Keywords>
-        <Keywords fontWeight="bold" foreground="#E0E000">
+        <Keywords fontWeight="bold" foreground="Yellow">
             <Word>HACK</Word>
             <Word>UNDONE</Word>
         </Keywords>
@@ -56,14 +54,6 @@
                         (region|endregion|error|warning|pragma)\b
                     </Begin>
                 </Span>
-            </RuleSet>
-        </Span>
-        
-        <Span color="Comment">
-            <Begin color="XmlDoc/DocComment">///(?!/)</Begin>
-            <RuleSet>
-                <Import ruleSet="XmlDoc/DocCommentSet"/>
-                <Import ruleSet="CommentMarkerSet"/>
             </RuleSet>
         </Span>
         
@@ -307,9 +297,9 @@
 
         <!-- Mark previous rule-->
         <Rule color="MethodCall">
-        \b
-        [\d\w_]+  # an identifier
-        (?=\s*\() # followed by (
+            (?&lt;!\bnew\s+)\b    # no initial new keyword
+            [\d\w_]+  # an identifier
+            (?=\s*\() # followed by (
         </Rule>
         
         <!-- Digits -->

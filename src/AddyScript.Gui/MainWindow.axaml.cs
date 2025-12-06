@@ -501,14 +501,6 @@ public partial class MainWindow : Window
             ? string.Empty
             : document.GetText(wordStart, wordEnd - wordStart);
     }
-    
-    /// <summary>
-    /// Gets the "word" at a given offset.
-    /// </summary>
-    /// <param name="position">The location where to find at</param>
-    /// <returns>A string</returns>
-    private string GetWordAtPosition(TextViewPosition position) =>
-        GetWordAtOffset(Editor.Document.GetOffset(position.Line, position.Column));
 
     /// <summary>
     /// Opens the completion window with the given data.
@@ -525,7 +517,12 @@ public partial class MainWindow : Window
             completionWindow.CompletionList.CompletionData.Add(dataItem);
         }
 
-        completionWindow.Closed += (s, e) => completionWindow = null;
+        completionWindow.Closed += (s, e) =>
+        {
+            completionWindow = null;
+            Editor.TextArea.Focus();
+        };
+        
         completionWindow.Show();
     }
 
@@ -1027,8 +1024,11 @@ public partial class MainWindow : Window
         dwellTimer.Stop();
 
         if (hoverPosition == null) return;
+        
+        int hoverOffset = Editor.Document.GetOffset(hoverPosition.Value.Location);
+        if (InCommentOrString(hoverOffset)) return;
 
-        string hoverWord = GetWordAtPosition(hoverPosition.Value);
+        string hoverWord = GetWordAtOffset(hoverOffset);
         if (!CallTipProvider.IsDefined(hoverWord)) return;
 
         CallTipInfo callTip = CallTipProvider.GetCallTip(hoverWord);

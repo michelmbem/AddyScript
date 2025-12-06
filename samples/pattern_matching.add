@@ -48,7 +48,7 @@ println();
 res = PI switch {
 	3.14 => 'three-point-fourteen',
 	0..3 or 4..9 => 'from 0 to 3 or from 4 to 9',
-	3.. and not (4.. or float) => '>= 3 and < 4 but not a float',
+	3.. and not (4.. or float) => '>= 3 but neither >= 4 nor a float',
 	float => 'a floatting-point number'
 };
 println($'result with PI: {res}');
