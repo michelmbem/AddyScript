@@ -141,11 +141,10 @@
             </SplitButton>
         </StackPanel>
         <Border Grid.Row="1" Classes="editor-wrapper">
-            <ae:TextEditor
-                Name="Editor"
-                FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
-                FontSize="14"
-                ShowLineNumbers="True">
+            <ae:TextEditor Name="Editor"
+                           FontFamily="Consolas, Menlo, Ubuntu Mono, Anonymous Pro, Monospace"
+                           FontSize="14"
+                           ShowLineNumbers="True">
                 <ae:TextEditor.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="InsertSnippetMenuItem"
