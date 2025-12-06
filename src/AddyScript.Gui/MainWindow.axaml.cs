@@ -395,8 +395,8 @@ public partial class MainWindow : Window
     private bool InCommentOrString(int position)
     {
         // Retrieves the highlighter
-        var highlighter = Editor.TextArea.GetService(typeof(IHighlighter)) as IHighlighter;
-        if (highlighter == null) return false;
+        if (Editor.TextArea.GetService(typeof(IHighlighter)) is not IHighlighter highlighter)
+            return false;
 
         // Retrieves the highlighted line
         DocumentLine line = Editor.Document.GetLineByOffset(position);
@@ -407,7 +407,7 @@ public partial class MainWindow : Window
         return highlightedLine.Sections.Any(s =>
             s.Offset <= position &&
             position < s.Offset + s.Length &&
-            (s.Color?.Name == "Comment" || s.Color?.Name == "String")
+            s.Color?.Name is "Comment" or "String"
         );
     }
 
