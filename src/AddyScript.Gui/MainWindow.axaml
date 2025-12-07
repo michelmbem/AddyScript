@@ -7,7 +7,7 @@
         Height="650"
         Background="{DynamicResource WindowBackground}"
         Icon="/Assets/Images/Icons/AddyScript.ico"
-        Loaded="WindowLoaded"
+        Activated="WindowActivated"
         KeyDown="WindowKeyDown"
         Closing="WindowClosing">
     
@@ -142,7 +142,7 @@
         </StackPanel>
         <Border Grid.Row="1" Classes="editor-wrapper">
             <ae:TextEditor Name="Editor"
-                           FontFamily="Cascadia Code, Consolas, Courier New, Menlo, Monospace"
+                           FontFamily="Consolas, Menlo, Ubuntu Mono, Monospace"
                            FontSize="14"
                            ShowLineNumbers="True">
                 <ae:TextEditor.ContextMenu>

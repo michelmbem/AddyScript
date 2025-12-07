@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
@@ -26,6 +25,7 @@ using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Search;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Pty.Net;
 using MBI = MsBox.Avalonia.Enums.Icon;
 using SR = AddyScript.Gui.Properties.Resources;
 
@@ -626,22 +626,9 @@ public partial class MainWindow : Window
 
     #region Window events
 
-    private void WindowLoaded(object sender, RoutedEventArgs e)
+    private void WindowActivated(object sender, EventArgs e)
     {
         Editor.TextArea.Focus();
-    }
-
-    private async void WindowClosing(object sender, WindowClosingEventArgs e)
-    {
-        if (Saved) return;
-
-        e.Cancel = true;
-
-        if (await PromptToSave())
-        {
-            Closing -= WindowClosing;
-            Close();
-        }
     }
 
     private void WindowKeyDown(object sender, KeyEventArgs e)
@@ -661,6 +648,17 @@ public partial class MainWindow : Window
             ReformatMenuItemClick(null, null);
             e.Handled = true;
         }
+    }
+
+    private async void WindowClosing(object sender, WindowClosingEventArgs e)
+    {
+        if (Saved) return;
+        
+        e.Cancel = true;
+        if (!await PromptToSave()) return;
+        
+        Closing -= WindowClosing;
+        Close();
     }
 
     #endregion
@@ -695,11 +693,9 @@ public partial class MainWindow : Window
 
     public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
-        // MessageBoxManager
-        //     .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
-        //     .ShowAsync();
-        var terminalWindow = new TerminalWindow();
-        terminalWindow.ShowDialog(this);
+        MessageBoxManager
+            .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
+            .ShowAsync();
     }
 
     public void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)
@@ -809,7 +805,7 @@ public partial class MainWindow : Window
             document.UncommentLine(Editor.TextArea.Caret.Line);
     }
 
-    public void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
+    public async void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
     {
         /****************************************************************************
          * Parsing and running the script is delegated to asis.
@@ -828,41 +824,60 @@ public partial class MainWindow : Window
             if (!Saved) Save(scriptPath);
         }
 
-        var argsBuilder = new StringBuilder().Append("-f ").Append(scriptPath.EscapeAsCmdLineArg());
+
+        var logPath = Path.ChangeExtension(Path.GetRandomFileName(), ".log");
+        List<string> argsList = ["-f", scriptPath, "-l", logPath];
 
         foreach (var directory in App.SearchPaths)
-            argsBuilder.Append(" -d ").Append(directory.EscapeAsCmdLineArg());
+        {
+            argsList.Add("-d");
+            argsList.Add(directory);
+        }
 
         foreach (var assemblyName in App.References)
-            argsBuilder.Append(" -r ").Append(assemblyName.EscapeAsCmdLineArg());
-
-        var logPath = Path.ChangeExtension(Path.GetTempFileName(), ".log");
-        argsBuilder.Append(" -l ").Append(logPath.EscapeAsCmdLineArg());
+        {
+            argsList.Add("-r");
+            argsList.Add(assemblyName);
+        }
 
         ClearErrors();
 
         try
         {
-            var asis = Process.Start("asis", argsBuilder.ToString());
-            asis!.WaitForExit();
+            var options = new PtyOptions
+            {
+                Name = $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
+                Rows = 30,
+                Cols = 120,
+                App = "./asis",
+                CommandLine = [..argsList],
+                Cwd = Environment.CurrentDirectory,
+            };
 
-            if (asis.ExitCode <= 0) return;
+            var terminalWindow = new TerminalWindow
+            {
+                Title = options.Name,
+                PtyOptions =  options
+            };
+            
+            await terminalWindow.ShowDialog(this);
+            if (terminalWindow.ExitCode == 0) return;
 
             using var logReader = File.OpenText(logPath);
-            if (logReader.ReadLine() != scriptPath) return;
+            if (await logReader.ReadLineAsync() != scriptPath) return;
 
-            var parts = logReader.ReadLine()!.Split(',');
+            var parts = (await logReader.ReadLineAsync())!.Split(',');
             var start = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
-            parts = logReader.ReadLine()!.Split(',');
+            parts = (await logReader.ReadLineAsync())!.Split(',');
             var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
-            var errorMessage = logReader.ReadLine();
+            var errorMessage = await logReader.ReadLineAsync();
             ReportError(errorMessage, start, end);
         }
         catch (Exception ex)
         {
-            MessageBoxManager
+            await MessageBoxManager
                 .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
                 .ShowAsync();
         }
