@@ -13,8 +13,6 @@
                    FontSize="14"
                    Foreground="#EEEEEE"
                    Background="#111111"
-                   IsTabStop="False"
-                   IsReadOnly="True"
                    ShowLineNumbers="False"
                    WordWrap="True"
                    Padding="10"/>

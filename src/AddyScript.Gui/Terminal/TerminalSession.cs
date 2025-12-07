@@ -1,13 +1,12 @@
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Pty.Net;
 
 namespace AddyScript.Gui.Terminal;
 
-public partial class TerminalSession
+public class TerminalSession
 {
     private static readonly Encoding TextEncoding = new UTF8Encoding(false);
     private readonly CancellationToken timeoutToken = new CancellationTokenSource(-1).Token;
@@ -27,20 +26,15 @@ public partial class TerminalSession
             while (!timeoutToken.IsCancellationRequested)
             {
                 var read = await ptyConnection.ReaderStream.ReadAsync(buffer, 0, buffer.Length);
-                if (read > 0) DataReceived?.Invoke(buffer[..read]);
+                if (read <= 0) continue;
+
+                var text = TextEncoding.GetString(buffer, 0, read);
+                DataReceived?.Invoke(text);
             }
         });
     }
-    
+
     public int ExitCode => ptyConnection.ExitCode;
-
-    public static string GetString(byte[] bytes, int index, int count)
-    {
-        var text = TextEncoding.GetString(bytes, index, count).Replace("\r", string.Empty);
-        return GetAnsiCharRegex().Replace(text, string.Empty);
-    }
-
-    public static string GetString(byte[] bytes) => GetString(bytes, 0, bytes.Length);
 
     public void Send(byte[] bytes)
     {
@@ -52,10 +46,7 @@ public partial class TerminalSession
 
     public void Resize(int rows, int cols) => ptyConnection.Resize(rows, cols);
 
-    public event Action<byte[]> DataReceived;
+    public event Action<string> DataReceived;
 
     public event Action<int> ProcessExited;
-
-    [GeneratedRegex(@"[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))")]
-    private static partial Regex GetAnsiCharRegex();
 }
