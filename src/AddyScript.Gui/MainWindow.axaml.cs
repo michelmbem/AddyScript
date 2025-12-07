@@ -204,7 +204,8 @@ public partial class MainWindow : Window
     /// <param name="path"></param>
     public void Open(string path)
     {
-        var document = new TextDocument(File.ReadAllText(path));
+        string content = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var document = new TextDocument(content);
         document.Changed += EditorDocumentChanged;
         Editor.Document = document;
         FilePath = path;
@@ -812,11 +813,10 @@ public partial class MainWindow : Window
          * *************************************************************************/
         
         string scriptPath;
-        
         if (string.IsNullOrEmpty(filePath))
         {
-            scriptPath = Path.ChangeExtension(Path.GetTempFileName(), ".add");
-            File.WriteAllText(scriptPath, Editor.Text);
+            scriptPath = Path.ChangeExtension(Path.GetRandomFileName(), ".add");
+            await File.WriteAllTextAsync(scriptPath, Editor.Text);
         }
         else
         {

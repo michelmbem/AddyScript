@@ -1,20 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
 
 namespace AddyScript.Gui.Terminal;
 
-public partial class AnsiParser(Color defaultFg, Color defaultBg)
+public record ColoredSpan(int StartOffset, int Length, Color Foreground, Color Background);
+
+public partial class AnsiParser(Color fg, Color bg)
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
-
+    private Color currentFg = fg;
+    private Color currentBg = bg;
 
     public List<ColoredSpan> Spans { get; } = [];
-
-    private Color currentFg = defaultFg;
-    private Color currentBg = defaultBg;
 
     public string Parse(string input, int baseOffset)
     {
@@ -26,7 +27,8 @@ public partial class AnsiParser(Color defaultFg, Color defaultBg)
             sb.Append(input.AsSpan(logicalPos, match.Index - logicalPos));
             logicalPos = match.Index + match.Length;
 
-            string[] codes = match.Groups["code"].Value.Split(';');
+            //string[] codes = match.Groups["code"].Value.Split(';');
+            string[] codes = match.Value.Split(';');
             ApplyCodes(codes);
         }
 
@@ -37,27 +39,23 @@ public partial class AnsiParser(Color defaultFg, Color defaultBg)
 
         // Record spans
         if (cleaned.Length > 0)
-        {
-            Spans.Add(new ColoredSpan
-            {
-                StartOffset = baseOffset,
-                Length = cleaned.Length,
-                Foreground = currentFg,
-                Background = currentBg
-            });
-        }
+            Spans.Add(new ColoredSpan(baseOffset, cleaned.Length, currentFg, currentBg));
 
         return cleaned;
     }
 
     private void ApplyCodes(string[] codes)
     {
+        using var log = File.AppendText("ansi.log");
+
         foreach (var c in codes)
         {
+            log.WriteLine(c);
+
             if (c == "0") // reset
             {
-                currentFg = defaultFg;
-                currentBg = defaultFg;
+                currentFg = fg;
+                currentBg = fg;
             }
             else if (int.TryParse(c, out int code))
             {
