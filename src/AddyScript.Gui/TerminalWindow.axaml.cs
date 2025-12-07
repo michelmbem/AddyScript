@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using AddyScript.Gui.Terminal;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -23,7 +24,7 @@ public partial class TerminalWindow : Window
         textArea.KeyUp += TerminalViewKeyUp;
     }
     
-    public PtyOptions PtyOptions { get; set; }
+    public PtyOptions PtyOptions { get; init; }
     
     public int ExitCode => session?.ExitCode ?? -1;
 
@@ -41,21 +42,9 @@ public partial class TerminalWindow : Window
         
         if (PtyOptions == null) return;
         
-        session = new TerminalSession(PtyOptions);
+        session = new Terminal.TerminalSession(PtyOptions);
         session.DataReceived += TerminalDataReceived;
         session.ProcessExited += TerminalProcessExited;
-    }
-
-    private void WindowClosing(object sender, WindowClosingEventArgs e)
-    {
-        try
-        {
-            session.Close();
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
     }
     
     #endregion
@@ -313,7 +302,7 @@ public partial class TerminalWindow : Window
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
             
-            if (ArraysEqual(data, BackSpaceSequence))
+            if (ArraysEqual(data, BackSpaceSequence) || ArraysEqual(data, EscapeSequences.CmdDel))
             {
                 var prevIndex = caret.Offset - 1;
                 if (prevIndex < 0) return;
@@ -322,7 +311,7 @@ public partial class TerminalWindow : Window
             }
             else
             {
-                document.Insert(document.TextLength, session.GetString(data));
+                document.Insert(document.TextLength, TerminalSession.GetString(data));
                 caret.Offset = document.TextLength;
             }
             
@@ -332,7 +321,6 @@ public partial class TerminalWindow : Window
 
     private void TerminalProcessExited(int exitCode)
     {
-        Closing -= WindowClosing;
         Dispatcher.UIThread.Post(Close);
     }
     

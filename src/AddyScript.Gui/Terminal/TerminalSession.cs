@@ -5,12 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Pty.Net;
 
-namespace AddyScript.Gui;
+namespace AddyScript.Gui.Terminal;
 
 public partial class TerminalSession
 {
-    private readonly CancellationToken timeoutToken = new CancellationTokenSource(int.MaxValue).Token;
-    private readonly Encoding textEncoding = new UTF8Encoding(false);
+    private static readonly Encoding TextEncoding = new UTF8Encoding(false);
+    private readonly CancellationToken timeoutToken = new CancellationTokenSource(-1).Token;
     private readonly IPtyConnection ptyConnection;
 
     public TerminalSession(PtyOptions options)
@@ -34,13 +34,13 @@ public partial class TerminalSession
     
     public int ExitCode => ptyConnection.ExitCode;
 
-    public string GetString(byte[] bytes, int index, int count)
+    public static string GetString(byte[] bytes, int index, int count)
     {
-        var text = textEncoding.GetString(bytes, index, count).Replace("\r", string.Empty);
+        var text = TextEncoding.GetString(bytes, index, count).Replace("\r", string.Empty);
         return GetAnsiCharRegex().Replace(text, string.Empty);
     }
 
-    public string GetString(byte[] bytes) => GetString(bytes, 0, bytes.Length);
+    public static string GetString(byte[] bytes) => GetString(bytes, 0, bytes.Length);
 
     public void Send(byte[] bytes)
     {
@@ -48,11 +48,9 @@ public partial class TerminalSession
         ptyConnection.WriterStream.Flush();
     }
 
-    public void Send(string text) => Send(textEncoding.GetBytes(text));
+    public void Send(string text) => Send(TextEncoding.GetBytes(text));
 
     public void Resize(int rows, int cols) => ptyConnection.Resize(rows, cols);
-
-    public void Close() => ptyConnection.Dispose();
 
     public event Action<byte[]> DataReceived;
 

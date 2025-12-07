@@ -1,6 +1,6 @@
-namespace AddyScript.Gui;
+namespace AddyScript.Gui.Terminal;
 
-public class EscapeSequences
+public static class EscapeSequences
 {
     public static readonly byte[] CmdNewline = [10];
     public static readonly byte[] CmdRet = [13];
