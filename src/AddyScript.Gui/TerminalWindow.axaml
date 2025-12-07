@@ -1,0 +1,25 @@
+<Window x:Class="AddyScript.Gui.TerminalWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+        Width="800"
+        Height="500"
+        Background="Ivory"
+        Icon="/Assets/Images/Icons/AddyScript.ico"
+        Activated="WindowActivated"
+        Closing="WindowClosing">
+  
+  <DockPanel>
+    <ae:TextEditor Name="TerminalView"
+                   FontFamily="Courier New, Courier, Monospace"
+                   FontSize="14"
+                   Foreground="Ivory"
+                   Background="DarkOliveGreen"
+                   IsTabStop="False"
+                   IsReadOnly="True"
+                   ShowLineNumbers="False"
+                   WordWrap="True"
+                   Margin="4"
+                   Padding="6"/>
+  </DockPanel>
+</Window>
