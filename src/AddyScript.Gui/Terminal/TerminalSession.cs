@@ -36,15 +36,16 @@ public class TerminalSession
 
     public int ExitCode => ptyConnection.ExitCode;
 
-    public void Send(byte[] bytes)
+    public void Send(string text)
     {
+        byte[] bytes = TextEncoding.GetBytes(text);
         ptyConnection.WriterStream.Write(bytes, 0, bytes.Length);
         ptyConnection.WriterStream.Flush();
     }
 
-    public void Send(string text) => Send(TextEncoding.GetBytes(text));
-
     public void Resize(int rows, int cols) => ptyConnection.Resize(rows, cols);
+    
+    public void Close() => ptyConnection.Dispose();
 
     public event Action<string> DataReceived;
 

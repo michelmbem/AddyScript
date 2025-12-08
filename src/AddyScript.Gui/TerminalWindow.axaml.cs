@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using AddyScript.Gui.Terminal;
 using Avalonia.Controls;
@@ -13,8 +14,8 @@ namespace AddyScript.Gui;
 
 public partial class TerminalWindow : Window
 {
-    private readonly AnsiParser ansiParser = new(Colors.WhiteSmoke, Color.FromUInt32(0xFF111111));
-    private readonly TerminalColorizer colorizer = new();
+    private readonly AnsiParser ansiParser;
+    private readonly TerminalColorizer colorizer;
     
     private TerminalSession session;
     private int inputStartOffset;
@@ -23,6 +24,9 @@ public partial class TerminalWindow : Window
     public TerminalWindow()
     {
         InitializeComponent();
+        
+        ansiParser = new AnsiParser(TerminalView.Foreground, TerminalView.Background);
+        colorizer = new TerminalColorizer();
 
         TextArea textArea = TerminalView.TextArea;
         textArea.TextView.LineTransformers.Add(colorizer);
@@ -83,7 +87,6 @@ public partial class TerminalWindow : Window
             string cleanText = ansiParser.Parse(text, inputStartOffset);
             document.Insert(inputStartOffset, cleanText);
             colorizer.Spans.AddRange(ansiParser.Spans);
-            ansiParser.Spans.Clear();
             
             int docLength = document.TextLength;
             inputStartOffset = caret.Offset = docLength;

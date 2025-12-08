@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
 
 namespace AddyScript.Gui.Terminal;
 
-public record ColoredSpan(int StartOffset, int Length, Color Foreground, Color Background);
+public record ColoredSpan(int StartOffset, int Length, IBrush Foreground, IBrush Background)
+{
+    public int EndOffset => StartOffset + Length;
+}
 
-public partial class AnsiParser(Color fg, Color bg)
+public partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
-    private Color currentFg = fg;
-    private Color currentBg = bg;
+    private IBrush currentFg = defaultFg;
+    private IBrush currentBg = defaultBg;
 
     public List<ColoredSpan> Spans { get; } = [];
 
@@ -22,65 +24,85 @@ public partial class AnsiParser(Color fg, Color bg)
         var sb = new StringBuilder();
         int logicalPos = 0;
 
+        Spans.Clear();
+        
         foreach (Match match in AnsiRegex.Matches(input))
         {
-            sb.Append(input.AsSpan(logicalPos, match.Index - logicalPos));
+            int spanLength = match.Index - logicalPos;
+            if (spanLength > 0)
+            {
+                Spans.Add(new (baseOffset + sb.Length, spanLength, currentFg, currentBg));
+                sb.Append(input.AsSpan(logicalPos, spanLength));
+            }
+            
             logicalPos = match.Index + match.Length;
-
-            //string[] codes = match.Groups["code"].Value.Split(';');
-            string[] codes = match.Value.Split(';');
-            ApplyCodes(codes);
+            
+            if (SplitCodes(match.Value, out var codes))
+                ApplyCodes(codes);
         }
 
-        // Add remaining text
-        sb.Append(input.AsSpan(logicalPos));
-
-        string cleaned = sb.ToString();
-
-        // Record spans
-        if (cleaned.Length > 0)
-            Spans.Add(new ColoredSpan(baseOffset, cleaned.Length, currentFg, currentBg));
-
-        return cleaned;
-    }
-
-    private void ApplyCodes(string[] codes)
-    {
-        using var log = File.AppendText("ansi.log");
-
-        foreach (var c in codes)
+        if (logicalPos < input.Length)
         {
-            log.WriteLine(c);
-
-            if (c == "0") // reset
-            {
-                currentFg = fg;
-                currentBg = fg;
-            }
-            else if (int.TryParse(c, out int code))
-            {
-                if (code >= 30 && code <= 37)
-                    currentFg = BasicAnsiColor(code - 30);
-
-                if (code >= 40 && code <= 47)
-                    currentBg = BasicAnsiColor(code - 40);
-            }
+            Spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
+            sb.Append(input.AsSpan(logicalPos));
         }
-    }
 
-    private Color BasicAnsiColor(int i) => i switch
-    {
-        0 => Colors.Black,
-        1 => Colors.Red,
-        2 => Colors.Green,
-        3 => Colors.Yellow,
-        4 => Colors.Blue,
-        5 => Colors.Magenta,
-        6 => Colors.Cyan,
-        7 => Colors.White,
-        _ => Colors.White
-    };
+        return sb.ToString();
+    }
     
     [GeneratedRegex(@"[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))")]
     private static partial Regex GetAnsiRegex();
+
+    private static bool SplitCodes(string codeString, out string[] codes)
+    {
+        codes = null;
+        
+        int lBraceIndex = codeString.IndexOf('[');
+        if (lBraceIndex < 0) return false;
+        
+        int lowerMIndex = codeString.IndexOf('m', lBraceIndex);
+        if (lowerMIndex <= lBraceIndex) return false;
+        
+        codes = codeString.Substring(lBraceIndex + 1, lowerMIndex - lBraceIndex - 1).Split(';');
+        return true;
+    }
+
+    private static IBrush AnsiColor(int code) => code switch
+    {
+        0 => Brushes.Black,
+        1 => Brushes.Red,
+        2 => Brushes.Green,
+        3 => Brushes.Yellow,
+        4 => Brushes.Blue,
+        5 => Brushes.Magenta,
+        6 => Brushes.Cyan,
+        7 => Brushes.White,
+        _ => null
+    };
+
+    private void ApplyCodes(string[] codes)
+    {
+        if (!int.TryParse(codes[0], out var code)) return;
+
+        switch (code)
+        {
+            case 0:
+            case 39 when codes.Length > 1 && int.TryParse(codes[1], out var code1) && code1 == 49:
+                currentFg = defaultFg;
+                currentBg = defaultBg;
+                break;
+            case >= 30 and <= 37:
+                currentFg = AnsiColor(code - 30) ?? defaultFg;
+                break;
+            case >= 40 and <= 47:
+                currentBg = AnsiColor(code - 40) ?? defaultBg;
+                break;
+            case >= 90 and <= 97:
+                currentFg = AnsiColor(code - 90) ?? defaultFg;
+                break;
+            case >= 100 and <= 107:
+                currentBg = AnsiColor(code - 100) ?? defaultBg;
+                break;
+        }
+    }
 }

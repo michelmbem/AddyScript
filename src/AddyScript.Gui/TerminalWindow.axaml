@@ -10,9 +10,9 @@
   <DockPanel>
     <ae:TextEditor Name="TerminalView"
                    FontFamily="Courier New, Courier, Monospace"
-                   FontSize="14"
-                   Foreground="#EEEEEE"
-                   Background="#111111"
+                   FontSize="16"
+                   Foreground="{DynamicResource TerminalForeground}"
+                   Background="{DynamicResource TerminalBackground}"
                    ShowLineNumbers="False"
                    WordWrap="True"
                    Padding="10"/>

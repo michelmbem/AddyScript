@@ -6,19 +6,22 @@
 
   <Application.Styles>
     <FluentTheme />
-    <StyleInclude Source="Styles/EditorStyles.axaml"></StyleInclude>
+    <StyleInclude Source="Styles/EditorStyles.axaml" />
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
   </Application.Styles>
 
   <Application.Resources>
-    <SolidColorBrush x:Key="WindowBackground" Color="DarkOrange"></SolidColorBrush>
-    <SolidColorBrush x:Key="EditorBackground" Color="White"></SolidColorBrush>
-    <SolidColorBrush x:Key="ToolbarButtonForeground" Color="WhiteSmoke"></SolidColorBrush>
-    <SolidColorBrush x:Key="ToolbarButtonBackground" Color="Transparent"></SolidColorBrush>
-    <SolidColorBrush x:Key="HoverToolbarButtonForeground" Color="LightYellow"></SolidColorBrush>
-    <SolidColorBrush x:Key="HoverToolbarButtonBackground" Color="Orange"></SolidColorBrush>
-    <SolidColorBrush x:Key="InactiveToolbarButtonForeground" Color="LightGray"></SolidColorBrush>
-    <SolidColorBrush x:Key="InactiveToolbarButtonBackground" Color="#11111111"></SolidColorBrush>
-    <SolidColorBrush x:Key="DividerFill" Color="Silver"></SolidColorBrush>
+    <SolidColorBrush x:Key="WindowBackground" Color="DarkOrange" />
+    <SolidColorBrush x:Key="EditorBackground" Color="White" />
+    <SolidColorBrush x:Key="ToolbarButtonForeground" Color="WhiteSmoke" />
+    <SolidColorBrush x:Key="ToolbarButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="HoverToolbarButtonForeground" Color="LightYellow" />
+    <SolidColorBrush x:Key="HoverToolbarButtonBackground" Color="Orange" />
+    <SolidColorBrush x:Key="InactiveToolbarButtonForeground" Color="LightGray" />
+    <SolidColorBrush x:Key="InactiveToolbarButtonBackground" Color="#11111111" />
+    <SolidColorBrush x:Key="DividerFill" Color="Silver" />
+    <SolidColorBrush x:Key="TerminalForeground" Color="#E7E7E7" />
+    <SolidColorBrush x:Key="TerminalBackground" Color="#171717" />
+    <SolidColorBrush x:Key="PopupBackground" Color="#DDEEEEEE" />
   </Application.Resources>
 </Application>

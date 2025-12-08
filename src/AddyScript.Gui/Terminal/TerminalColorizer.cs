@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Avalonia.Media;
+using System.Linq;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Rendering;
 
@@ -10,23 +10,26 @@ public class TerminalColorizer : DocumentColorizingTransformer
 {
     public readonly List<ColoredSpan> Spans = [];
 
+    private static bool IsOverlap(ColoredSpan span, DocumentLine line) =>
+        (span.StartOffset >= line.Offset && span.EndOffset <= line.EndOffset) ||
+        (span.StartOffset < line.Offset && span.EndOffset > line.EndOffset) ||
+        (span.StartOffset < line.Offset && span.EndOffset > line.Offset && span.EndOffset <= line.EndOffset) ||
+        (span.StartOffset > line.Offset && span.StartOffset < line.EndOffset && span.EndOffset > line.EndOffset);
+
     protected override void ColorizeLine(DocumentLine line)
     {
-        int lineStart = line.Offset;
-
-        foreach (var span in Spans)
-        {
-            if (span.StartOffset >= line.Offset + line.Length ||
-                span.StartOffset + span.Length <= line.Offset) continue;
-
-            int start = Math.Max(span.StartOffset, lineStart);
-            int end = Math.Min(span.StartOffset + span.Length, lineStart + line.Length);
-
-            ChangeLinePart(start, end, element =>
+        Spans.Where(span => IsOverlap(span, line))
+            .ToList()
+            .ForEach(span =>
             {
-                element.TextRunProperties.SetForegroundBrush(new SolidColorBrush(span.Foreground));
-                element.TextRunProperties.SetBackgroundBrush(new SolidColorBrush(span.Background));
+                var start = Math.Max(span.StartOffset, line.Offset);
+                var end = Math.Min(span.EndOffset, line.EndOffset);
+
+                ChangeLinePart(start, end, element =>
+                {
+                    element.TextRunProperties.SetForegroundBrush(span.Foreground);
+                    element.TextRunProperties.SetBackgroundBrush(span.Background);
+                });
             });
-        }
     }
 }

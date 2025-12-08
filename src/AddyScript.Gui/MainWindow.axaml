@@ -15,7 +15,7 @@
         <Popup Name="InfoPopup"
                Placement="Pointer"
                IsLightDismissEnabled="False">
-            <Border Background="#DDEEEEEE"
+            <Border Background="{DynamicResource PopupBackground}"
                     BorderBrush="{DynamicResource WindowBackground}"
                     BorderThickness="1"
                     Padding="5">

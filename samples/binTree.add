@@ -29,7 +29,14 @@ function printTree(node, bookmark = null, prefix = "")
 	if (node === null) return;
 	
 	printLineLead(node, prefix);
-	setForeground(node === bookmark ? "Yellow" : "Red");
+	
+	if (node === bookmark) {
+		setForeground("Yellow");
+		setBackground("Green");
+	} else {
+		setForeground("Red");
+	}
+	
 	println(node.value);
 	resetColor();
 	
