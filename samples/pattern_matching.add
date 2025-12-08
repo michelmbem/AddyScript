@@ -70,8 +70,8 @@ println();
 const number_regex = @'[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?';
 
 res = readln('type some text: ') switch {
-	when __value matches number_regex && ((decimal)__value) > 0 => $'{__value} is a positive number',
-	when __value matches number_regex => $'{__value} is just a number',
+	_ when __value matches number_regex && ((decimal)__value) > 0 => $'{__value} is a positive number',
+	_ when __value matches number_regex => $'{__value} is just a number',
 	_ => $'{__value} is not a number'
 };
 println($'result: {res}');

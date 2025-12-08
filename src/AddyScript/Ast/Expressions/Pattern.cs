@@ -1,4 +1,3 @@
-using AddyScript.Ast.Statements;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 
@@ -44,10 +43,8 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         public const string Symbol = "null";
 
-        public override Expression GetMatchTest(Expression arg)
-        {
-            return new BinaryExpression(BinaryOperator.Identical, arg, new Literal());
-        }
+        public override Expression GetMatchTest(Expression arg) =>
+            new BinaryExpression(BinaryOperator.Identical, arg, new Literal());
     }
 
 
@@ -65,10 +62,8 @@ namespace AddyScript.Ast.Expressions
         /// </summary>
         public DataItem Value => value;
 
-        public override Expression GetMatchTest(Expression arg)
-        {
-            return new BinaryExpression(BinaryOperator.Equal, arg, new Literal(value));
-        }
+        public override Expression GetMatchTest(Expression arg) =>
+            new BinaryExpression(BinaryOperator.Equal, arg, new Literal(value));
     }
 
 
@@ -107,7 +102,7 @@ namespace AddyScript.Ast.Expressions
                 : null;
 
             // Assuming both lowerBound and upperBound cannot be null at the same time!
-            if (lowerBoundCheck == null) return upperBoundCheck;
+            if (lowerBoundCheck == null) return upperBoundCheck!;
             if (upperBoundCheck == null) return lowerBoundCheck;
             return new BinaryExpression(BinaryOperator.AndAlso, lowerBoundCheck, upperBoundCheck);
         }
@@ -173,29 +168,6 @@ namespace AddyScript.Ast.Expressions
                 matchTest = new BinaryExpression(BinaryOperator.AndAlso, matchTest, matcher.GetMatchTest(arg));
 
             return matchTest;
-        }
-    }
-
-
-    /// <summary>
-    /// A subclass of <see cref="Pattern"/> that uses a predicate to match values.
-    /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of <see cref="PredicatePattern"/>.
-    /// </remarks>
-    /// <param name="predicate">The predicate that this <see cref="Pattern"/> invokes to match a value</param>
-    public class PredicatePattern(Expression predicate) : Pattern
-    {
-        /// <summary>
-        /// The predicate that this <see cref="Pattern"/> invokes to match a value.
-        /// </summary>
-        public Expression Predicate => predicate;
-
-        public override Expression GetMatchTest(Expression arg)
-        {
-            var parameter = new ParameterDecl(ClassProperty.WRITER_PARAMETER_NAME, false, false, null, true);
-            var inlineFn = new InlineFunction([parameter], Block.WithReturn(predicate));
-            return new AnonymousCall(inlineFn, [new ListItem(arg)], null);
         }
     }
 

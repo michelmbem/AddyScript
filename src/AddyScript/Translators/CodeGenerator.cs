@@ -1122,6 +1122,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpMatchCase(MatchCase matchCase)
     {
         DumpMatchCasePattern(matchCase.Pattern);
+        if (matchCase.Guard != null)
+        {
+            textWriter.Write(" when ");
+            matchCase.Guard.AcceptTranslator(this);
+        }
         textWriter.Write(" => ");
         DumpMatchExpression(matchCase.Expression);
     }
@@ -1168,11 +1173,6 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
         else if (pattern is TypePattern typePat)
             textWriter.Write(typePat.TypeName);
-        else if (pattern is PredicatePattern predPat)
-        {
-            textWriter.Write("when ");
-            predPat.Predicate.AcceptTranslator(this);
-        }
         else if (pattern is NegativePattern negPat)
         {
             textWriter.Write("not ");

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Text;
-using Complex64 = System.Numerics.Complex;
-
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
-using AddyScript.Runtime.OOP;
+using Complex64 = System.Numerics.Complex;
 using Void = AddyScript.Runtime.DataItems.Void;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
@@ -158,7 +156,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 Consume(1);
                 var container = Required(Term, Resources.ExpressionRequired);
                 Expression element = expr;
-                expr = new BinaryExpression(BinaryOperator.Contains, container, element);
+                expr = new BinaryExpression(BinaryOperator.Contains, container, element) {IsParenthesized = true};
                 if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
                 expr.SetLocation(element.Start, container.End);
                 break;
@@ -1130,10 +1128,17 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Pattern pattern = MatchCasePattern();
         if (pattern == null) return null;
 
+        Expression guard = null;
+        if (TryMatch(TokenID.KW_When))
+        {
+            Consume(1);
+            guard = RequiredExpression();
+        }
+
         Match(TokenID.Arrow);
         Expression expr = MatchCaseExpression();
 
-        var matchCase = new MatchCase(pattern, expr);
+        var matchCase = new MatchCase(pattern, expr) {Guard = guard};
         matchCase.SetLocation(pattern.Start, expr.End);
         return matchCase;
     }
@@ -1145,7 +1150,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private Pattern MatchCasePattern()
     {
         var pairs = new Queue<(Pattern, bool)>();
-        bool conditionAllowed = true; // indicates that 'not', 'and', 'or', 'when' are allowed
         bool inclusiveCmp = false; // inclusive composition ('and' instead of 'or')
         bool morePatterns; // look-up for more pattern => chaining
 
@@ -1156,17 +1160,15 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             Token first = token, last = first;
             bool negate = false;
 
-            if (conditionAllowed && token.TokenID == TokenID.KW_Not)
+            if (token.TokenID == TokenID.KW_Not)
             {
                 negate = true;
-                conditionAllowed = false;
                 Consume(1);
                 SkipComments();
             }
 
-            Pattern pattern = MatchCaseSimplePattern(conditionAllowed, ref last);
-            conditionAllowed &= pattern is not PredicatePattern;
-
+            Pattern pattern = MatchCaseSimplePattern(ref last);
+            
             if (pattern != null)
             {
                 if (negate) pattern = new NegativePattern(pattern);
@@ -1176,21 +1178,16 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             else if (negate) // 'not' used without a following pattern
                 throw new SyntaxError(FileName, first);
 
-            morePatterns = false;
-            if (!conditionAllowed) continue;
-
             SkipComments();
-            switch (token.TokenID)
+
+            if (token.TokenID is TokenID.KW_And or TokenID.KW_Or)
             {
-                case TokenID.KW_And or TokenID.KW_Or:
-                    morePatterns = true;
-                    inclusiveCmp = token.TokenID == TokenID.KW_And;
-                    Consume(1);
-                    break;
-                case TokenID.KW_When:
-                    morePatterns = inclusiveCmp = true;
-                    break;
+                morePatterns = true;
+                inclusiveCmp = token.TokenID == TokenID.KW_And;
+                Consume(1);
             }
+            else
+                morePatterns = false;
         }
         while (morePatterns);
 
@@ -1215,7 +1212,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <param name="last">A reference to the last terminal symbol that should be returned</param>
     /// <returns>A <see cref="Pattern"/></returns>
     /// <exception cref="SyntaxError">If an invalid symbol is met</exception>
-    private Pattern MatchCaseSimplePattern(bool predicateAllowed, ref Token last)
+    private Pattern MatchCaseSimplePattern(ref Token last)
     {
         Pattern pattern = null;
 
@@ -1265,12 +1262,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 pattern.SetLocation(first.Start, last.End);
                 break;
             }
-            case TokenID.KW_When when predicateAllowed:
-                Consume(1);
-                Expression predicate = RequiredExpression();
-                pattern = new PredicatePattern(predicate);
-                last.CopyLocation(predicate);
-                break;
         }
 
         return pattern;

@@ -1667,27 +1667,30 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         try
         {
             patMatch.Expression.AcceptTranslator(this);
-
             var testArg = new Literal(returnedValue);
 
             foreach (MatchCase matchCase in patMatch.MatchCases)
-                if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)))
-                {
-                    var frameItems = new Dictionary<string, IFrameItem> {
-                        [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
-                    };
+            {
+                var frameItems = new Dictionary<string, IFrameItem> {
+                    [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
+                };
+                
+                currentFrame.PushBlock(frameItems);
 
-                    try
+                try
+                {
+                    if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)) &&
+                        (matchCase.Guard == null || IsTrue(matchCase.Guard)))
                     {
-                        currentFrame.PushBlock(frameItems);
                         matchCase.Expression.AcceptTranslator(this);
                         return;
                     }
-                    finally
-                    {
-                        currentFrame.PopBlock();
-                    }
                 }
+                finally
+                {
+                    currentFrame.PopBlock();
+                }
+            }
 
             returnedValue = Void.Value;
         }

@@ -852,7 +852,7 @@ public partial class MainWindow : Window
             var terminalWindow = new TerminalWindow
             {
                 Title = options.Name,
-                PtyOptions =  options
+                Options =  options
             };
             
             await terminalWindow.ShowDialog(this);

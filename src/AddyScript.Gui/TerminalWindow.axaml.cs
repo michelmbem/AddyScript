@@ -1,10 +1,7 @@
 using System;
-using System.IO;
-using System.Text;
 using AddyScript.Gui.Terminal;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Media;
 using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
@@ -14,44 +11,44 @@ namespace AddyScript.Gui;
 
 public partial class TerminalWindow : Window
 {
-    private readonly AnsiParser ansiParser;
+    private readonly AnsiParser parser;
     private readonly TerminalColorizer colorizer;
-    
-    private TerminalSession session;
-    private int inputStartOffset;
-    private char lastChar;
+
+    private TerminalSession terminal;
+    private int inputOffset;
+    private char trailingChar;
 
     public TerminalWindow()
     {
         InitializeComponent();
-        
-        ansiParser = new AnsiParser(TerminalView.Foreground, TerminalView.Background);
+
+        parser = new AnsiParser(TerminalView.Foreground, TerminalView.Background);
         colorizer = new TerminalColorizer();
 
         TextArea textArea = TerminalView.TextArea;
         textArea.TextView.LineTransformers.Add(colorizer);
-        textArea.Caret.PositionChanged += TerminalViewCaretPositionChanged;
+        textArea.Caret.PositionChanged += TerminalViewCaretMoved;
         textArea.KeyUp += TerminalViewKeyUp;
     }
 
-    public PtyOptions PtyOptions { get; init; }
-    
-    public int ExitCode => session?.ExitCode ?? -1;
+    public PtyOptions Options { get; init; }
+
+    public int ExitCode => terminal?.ExitCode ?? -1;
 
     private void WindowActivated(object sender, EventArgs e)
-    {   
+    {
         TerminalView.TextArea.Focus();
-        
-        if (PtyOptions == null) return;
-        
-        session = new TerminalSession(PtyOptions);
-        session.DataReceived += TerminalDataReceived;
-        session.ProcessExited += TerminalProcessExited;
+
+        if (Options == null) return;
+
+        terminal = new TerminalSession(Options);
+        terminal.DataReceived += TerminalDataReceived;
+        terminal.ProcessExited += TerminalProcessExited;
     }
 
-    private void TerminalViewCaretPositionChanged(object sender, EventArgs e)
+    private void TerminalViewCaretMoved(object sender, EventArgs e)
     {
-        TerminalView.IsReadOnly = TerminalView.TextArea.Caret.Offset < inputStartOffset;
+        TerminalView.IsReadOnly = TerminalView.TextArea.Caret.Offset < inputOffset;
     }
 
     private void TerminalViewKeyUp(object sender, KeyEventArgs e)
@@ -59,20 +56,23 @@ public partial class TerminalWindow : Window
         TextArea textArea = TerminalView.TextArea;
         TextDocument document = textArea.Document;
         Caret caret = textArea.Caret;
-            
-        if (e.Key == Key.Enter)
-        {
-            var inputLength = document.TextLength - inputStartOffset;
-            if (inputLength <= 0) return;
 
-            var inputText = document.GetText(inputStartOffset, inputLength).TrimEnd('\r', '\n');
-            document.Remove(inputStartOffset, inputLength);
-            session.Send(inputText + "\n");
-        }
-        else if (e.Key == Key.Back && caret.Offset < inputStartOffset)
+        switch (e.Key)
         {
-            document.Insert(caret.Offset, lastChar.ToString());
-            caret.Offset = inputStartOffset;
+            case Key.Enter:
+            {
+                var inputLength = document.TextLength - inputOffset;
+                if (inputLength <= 0) return;
+
+                var inputText = document.GetText(inputOffset, inputLength).TrimEnd('\r', '\n');
+                document.Remove(inputOffset, inputLength);
+                terminal.Send(inputText + "\n");
+                break;
+            }
+            case Key.Back when caret.Offset == inputOffset - 1:
+                document.Insert(caret.Offset, trailingChar.ToString());
+                caret.Offset = inputOffset;
+                break;
         }
     }
 
@@ -83,14 +83,14 @@ public partial class TerminalWindow : Window
             TextArea textArea = TerminalView.TextArea;
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
-            
-            string cleanText = ansiParser.Parse(text, inputStartOffset);
-            document.Insert(inputStartOffset, cleanText);
-            colorizer.Spans.AddRange(ansiParser.Spans);
-            
+
+            string cleanText = parser.Parse(text, inputOffset);
+            document.Insert(inputOffset, cleanText);
+            colorizer.Spans.AddRange(parser.Spans);
+
             int docLength = document.TextLength;
-            inputStartOffset = caret.Offset = docLength;
-            lastChar = docLength > 0 ? document.GetCharAt(docLength - 1) : '\0';
+            inputOffset = caret.Offset = docLength;
+            trailingChar = docLength > 0 ? document.GetCharAt(docLength - 1) : '\0';
             caret.BringCaretToView();
         });
     }

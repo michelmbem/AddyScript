@@ -24,10 +24,7 @@ public class XmlGenerator : ITranslator
         document.InsertBefore(declaration, document.DocumentElement);
     }
 
-    public XmlDocument Document
-    {
-        get { return document; }
-    }
+    public XmlDocument Document => document;
 
     #region Members of ITranslator
 
@@ -1131,104 +1128,111 @@ public class XmlGenerator : ITranslator
         currentElement = document.CreateElement("Expression");
         matchCase.Expression.AcceptTranslator(this);
         tmpElement.AppendChild(currentElement);
+        
+        if (matchCase.Guard != null)
+        {
+            currentElement = document.CreateElement("Guard");
+            matchCase.Guard.AcceptTranslator(this);
+            tmpElement.AppendChild(currentElement);
+        }
 
         currentElement = savedElement;
     }
 
     private void ProcessPattern(XmlElement parent, Pattern pattern)
     {
-        if (pattern is AlwaysPattern)
-            parent.AppendChild(document.CreateElement("AlwaysPattern"));
-        else if (pattern is NullPattern)
-            parent.AppendChild(document.CreateElement("NullPattern"));
-        else if (pattern is ValuePattern valuePat)
+        switch (pattern)
         {
-            XmlElement tmpElement = document.CreateElement("ValuePattern");
-            tmpElement.SetAttribute("Value", valuePat.Value.ToString());
-            parent.AppendChild(tmpElement);
-        }
-        else if (pattern is RangePattern rangePat)
-        {
-            XmlElement tmpElement = document.CreateElement("RangePattern");
-            parent.AppendChild(tmpElement);
-
-            if (rangePat.LowerBound != null)
-                tmpElement.SetAttribute("LowerBound", rangePat.LowerBound.ToString());
-
-            if (rangePat.UpperBound != null)
-                tmpElement.SetAttribute("UpperBound", rangePat.UpperBound.ToString());
-        }
-        else if (pattern is ObjectPattern objectPat)
-        {
-            // We check ObjectPattern before TypePattern to avoid problems with inheritance!!
-            XmlElement tmpElement = document.CreateElement("ObjectPattern");
-            tmpElement.SetAttribute("TypeName", objectPat.TypeName);
-            parent.AppendChild(tmpElement);
-
-            XmlElement matchersElement = document.CreateElement("PropertyMatchers");
-            tmpElement.AppendChild(matchersElement);
-
-            foreach (var matcher in objectPat.PropertyMatchers)
+            case AlwaysPattern:
+                parent.AppendChild(document.CreateElement("AlwaysPattern"));
+                break;
+            case NullPattern:
+                parent.AppendChild(document.CreateElement("NullPattern"));
+                break;
+            case ValuePattern valuePat:
             {
-                XmlElement propertyElement = document.CreateElement(matcher.PropertyName);
-                ProcessPattern(propertyElement, matcher.Pattern);
-                matchersElement.AppendChild(propertyElement);
+                XmlElement tmpElement = document.CreateElement("ValuePattern");
+                tmpElement.SetAttribute("Value", valuePat.Value.ToString());
+                parent.AppendChild(tmpElement);
+                break;
             }
-        }
-        else if (pattern is TypePattern typePat)
-        {
-            XmlElement tmpElement = document.CreateElement("TypePattern");
-            tmpElement.SetAttribute("TypeName", typePat.TypeName);
-            parent.AppendChild(tmpElement);
-        }
-        else if (pattern is PredicatePattern predPat)
-        {
-            XmlElement tmpElement = document.CreateElement("PredicatePattern");
-            parent.AppendChild(tmpElement);
+            case RangePattern rangePat:
+            {
+                XmlElement tmpElement = document.CreateElement("RangePattern");
+                parent.AppendChild(tmpElement);
 
-            XmlElement savedElement = currentElement;
+                if (rangePat.LowerBound != null)
+                    tmpElement.SetAttribute("LowerBound", rangePat.LowerBound.ToString());
 
-            currentElement = document.CreateElement("Predicate");
-            predPat.Predicate.AcceptTranslator(this);
-            tmpElement.AppendChild(currentElement);
+                if (rangePat.UpperBound != null)
+                    tmpElement.SetAttribute("UpperBound", rangePat.UpperBound.ToString());
+                break;
+            }
+            case ObjectPattern objectPat:
+            {
+                // We check ObjectPattern before TypePattern to avoid problems with inheritance!!
+                XmlElement tmpElement = document.CreateElement("ObjectPattern");
+                tmpElement.SetAttribute("TypeName", objectPat.TypeName);
+                parent.AppendChild(tmpElement);
 
-            currentElement = savedElement;
-        }
-        else if (pattern is NegativePattern negPat)
-        {
-            XmlElement tmpElement = document.CreateElement("NegativePattern");
+                XmlElement matchersElement = document.CreateElement("PropertyMatchers");
+                tmpElement.AppendChild(matchersElement);
 
-            XmlElement childElement = document.CreateElement("Child");
-            ProcessPattern(childElement, negPat.Child);
-            tmpElement.AppendChild(childElement);
+                foreach (var matcher in objectPat.PropertyMatchers)
+                {
+                    XmlElement propertyElement = document.CreateElement(matcher.PropertyName);
+                    ProcessPattern(propertyElement, matcher.Pattern);
+                    matchersElement.AppendChild(propertyElement);
+                }
 
-            parent.AppendChild(tmpElement);
-        }
-        else if (pattern is GroupingPattern groupPat)
-        {
-            XmlElement tmpElement = document.CreateElement("GroupingPattern");
+                break;
+            }
+            case TypePattern typePat:
+            {
+                XmlElement tmpElement = document.CreateElement("TypePattern");
+                tmpElement.SetAttribute("TypeName", typePat.TypeName);
+                parent.AppendChild(tmpElement);
+                break;
+            }
+            case NegativePattern negPat:
+            {
+                XmlElement tmpElement = document.CreateElement("NegativePattern");
 
-            XmlElement childElement = document.CreateElement("Child");
-            ProcessPattern(childElement, groupPat.Child);
-            tmpElement.AppendChild(childElement);
+                XmlElement childElement = document.CreateElement("Child");
+                ProcessPattern(childElement, negPat.Child);
+                tmpElement.AppendChild(childElement);
 
-            parent.AppendChild(tmpElement);
-        }
-        else if (pattern is CompositePattern compPat)
-        {
-            XmlElement tmpElement = document.CreateElement("CompositePattern");
-            tmpElement.SetAttribute("Inclusive", compPat.Inclusive.ToString());
+                parent.AppendChild(tmpElement);
+                break;
+            }
+            case GroupingPattern groupPat:
+            {
+                XmlElement tmpElement = document.CreateElement("GroupingPattern");
 
-            XmlElement childElement = document.CreateElement("Left");
-            ProcessPattern(childElement, compPat.Left);
-            tmpElement.AppendChild(childElement);
+                XmlElement childElement = document.CreateElement("Child");
+                ProcessPattern(childElement, groupPat.Child);
+                tmpElement.AppendChild(childElement);
+
+                parent.AppendChild(tmpElement);
+                break;
+            }
+            case CompositePattern compPat:
+            {
+                XmlElement tmpElement = document.CreateElement("CompositePattern");
+                tmpElement.SetAttribute("Inclusive", compPat.Inclusive.ToString());
+
+                XmlElement childElement = document.CreateElement("Left");
+                ProcessPattern(childElement, compPat.Left);
+                tmpElement.AppendChild(childElement);
 
 
-            childElement = document.CreateElement("Right");
-            ProcessPattern(childElement, compPat.Right);
-            tmpElement.AppendChild(childElement);
+                childElement = document.CreateElement("Right");
+                ProcessPattern(childElement, compPat.Right);
+                tmpElement.AppendChild(childElement);
 
-            parent.AppendChild(tmpElement);
+                parent.AppendChild(tmpElement);
+                break;
+            }
         }
     }
 
