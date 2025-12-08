@@ -1606,7 +1606,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             if (tcf.FinallyBlock != null)
             {
-                var (prevValue, prevCode, prevGoto) = (returnedValue, jumpCode, lastGoto);
+                var (prevRetValue, prevJumpCode, prevGoto) = (returnedValue, jumpCode, lastGoto);
 
                 try
                 {
@@ -1621,7 +1621,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 }
                 finally
                 {
-                    (returnedValue, jumpCode, lastGoto) = (prevValue, prevCode, prevGoto);
+                    // Any return or jump within the finally block is ignored
+                    (returnedValue, jumpCode, lastGoto) = (prevRetValue, prevJumpCode, prevGoto);
                 }
             }
 
@@ -1667,29 +1668,28 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         try
         {
             patMatch.Expression.AcceptTranslator(this);
+
             var testArg = new Literal(returnedValue);
-
-            foreach (MatchCase matchCase in patMatch.MatchCases)
+            var frameItems = new Dictionary<string, IFrameItem>
             {
-                var frameItems = new Dictionary<string, IFrameItem> {
-                    [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
-                };
-                
-                currentFrame.PushBlock(frameItems);
+                [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
+            };
 
-                try
-                {
+            currentFrame.PushBlock(frameItems);
+
+            try
+            {
+                foreach (MatchCase matchCase in patMatch.MatchCases)
                     if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)) &&
                         (matchCase.Guard == null || IsTrue(matchCase.Guard)))
                     {
                         matchCase.Expression.AcceptTranslator(this);
                         return;
                     }
-                }
-                finally
-                {
-                    currentFrame.PopBlock();
-                }
+            }
+            finally
+            {
+                currentFrame.PopBlock();
             }
 
             returnedValue = Void.Value;
@@ -2741,8 +2741,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             case JumpCode.Goto:
                 if (!labels.TryGetValue(lastGoto.LabelName, out var label))
                     return canJumpOut
-                        ? int.MaxValue
-                        : throw new RuntimeError(fileName, lastGoto,
+                         ? int.MaxValue
+                         : throw new RuntimeError(fileName, lastGoto,
                             string.Format(Resources.MissingLabel, lastGoto.LabelName));
                 
                 jumpCode = JumpCode.None;

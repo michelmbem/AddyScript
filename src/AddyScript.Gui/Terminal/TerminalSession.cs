@@ -8,7 +8,7 @@ namespace AddyScript.Gui.Terminal;
 
 public class TerminalSession
 {
-    private static readonly Encoding TextEncoding = new UTF8Encoding(false);
+    private static readonly UTF8Encoding Encoding = new (false);
     private readonly CancellationToken timeoutToken = new CancellationTokenSource(-1).Token;
     private readonly IPtyConnection ptyConnection;
 
@@ -25,10 +25,10 @@ public class TerminalSession
 
             while (!timeoutToken.IsCancellationRequested)
             {
-                var read = await ptyConnection.ReaderStream.ReadAsync(buffer, 0, buffer.Length);
+                var read = await ptyConnection.ReaderStream.ReadAsync(buffer);
                 if (read <= 0) continue;
 
-                var text = TextEncoding.GetString(buffer, 0, read);
+                var text = Encoding.GetString(buffer, 0, read);
                 DataReceived?.Invoke(text);
             }
         });
@@ -38,12 +38,12 @@ public class TerminalSession
 
     public void Send(string text)
     {
-        byte[] bytes = TextEncoding.GetBytes(text);
-        ptyConnection.WriterStream.Write(bytes, 0, bytes.Length);
+        var bytes = Encoding.GetBytes(text);
+        ptyConnection.WriterStream.Write(bytes);
         ptyConnection.WriterStream.Flush();
     }
 
-    public void Resize(int rows, int cols) => ptyConnection.Resize(rows, cols);
+    public void Resize(int cols, int rows) => ptyConnection.Resize(cols, rows);
     
     public void Close() => ptyConnection.Dispose();
 

@@ -72,7 +72,7 @@ public partial class MainWindow : Window
         options.AllowToggleOverstrikeMode = true;
         options.EnableTextDragDrop = true;
         options.ShowBoxForControlCharacters = true;
-        options.ColumnRulerPositions = [80, 120];
+        options.ColumnRulerPositions = [120];
         options.HighlightCurrentLine = true;
 
         TextArea textArea = Editor.TextArea;
