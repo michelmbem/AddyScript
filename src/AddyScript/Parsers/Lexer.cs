@@ -32,11 +32,9 @@ public class Lexer
     public Lexer(TextReader input)
     {
         this.input = input;
-
-        if (input is StreamReader sr && sr.BaseStream is FileStream fs)
-            FileName = fs.Name;
-        else
-            FileName = ":memory:";
+        FileName = input is StreamReader { BaseStream: FileStream fs }
+                 ? fs.Name
+                 : ":memory:";
     }
 
     /// <summary>
@@ -88,7 +86,11 @@ public class Lexer
             '$' => DollarSign(),
             '`' => Backtick(),
             'b' or 'B' => LetterB(),
-            _ => IsLegalFirstIdChar(ch) ? Identifier() : char.IsDigit(ch) ? LiteralNumber() : Unknown(),
+            _ => IsLegalFirstIdChar(ch)
+                ? Identifier()
+                : char.IsDigit(ch)
+                    ? LiteralNumber()
+                    : Unknown(),
         };
     }
 
@@ -253,7 +255,7 @@ public class Lexer
         {
             ch = Ll(1);
 
-            if (ch == '\r' || ch == '\n' || ch == EOF)
+            if (ch is '\r' or '\n' or EOF)
                 return MakeToken(TokenID.Unknown, wrapper + strBldr.ToString(), false);
 
             if (ch == wrapper)
@@ -772,24 +774,19 @@ public class Lexer
         Consume(1);
         char ch = Ll(1);
 
-        switch (ch)
+        return ch switch
         {
-            case 'l' or 'L':
-                return MakeToken(TokenID.LT_Long, BigInteger.Zero, true);
-            case 'f' or 'F':
-                return MakeToken(TokenID.LT_Float, 0D, true);
-            case 'd' or 'D':
-                return MakeToken(TokenID.LT_Decimal, BigDecimal.Zero, true);
-            case 'i' or 'I':
-                return MakeToken(TokenID.LT_Complex, Complex.Zero, true);
-            case '.':
-                return char.IsDigit(Ll(2)) ? LiteralNumber() : MakeToken(TokenID.LT_Integer, 0, false);
-            case 'x' or 'X':
-                return HexNumber();
-            default:
-                if (char.IsDigit(ch)) return LiteralNumber();
-                return MakeToken(TokenID.LT_Integer, 0, false);
-        }
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Zero, true),
+            'f' or 'F' => MakeToken(TokenID.LT_Float, 0D, true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Zero, true),
+            'i' or 'I' => MakeToken(TokenID.LT_Complex, Complex.Zero, true),
+            'x' or 'X' => HexNumber(),
+            '.' => char.IsDigit(Ll(2))
+                 ? LiteralNumber()
+                 : MakeToken(TokenID.LT_Integer, 0, false),
+            _ when char.IsDigit(ch) => LiteralNumber(),
+            _ => MakeToken(TokenID.LT_Integer, 0, false)
+        };
     }
 
     /// <summary>
@@ -839,7 +836,7 @@ public class Lexer
         Consume(1);
 
         char wrapper = Ll(1);
-        if (wrapper is not '\'' or '"')
+        if (wrapper is not ('\'' or '"'))
             return MakeToken(TokenID.Unknown, "@", false);
 
         // Skip the wrapper
@@ -950,8 +947,8 @@ public class Lexer
         return ch == EOF
              ? MakeToken(TokenID.Unknown, "`" + sb, false)
              : DateTime.TryParse(sb.ToString(), out DateTime aDateTime)
-             ? MakeToken(TokenID.LT_Date, aDateTime, true)
-             : MakeToken(TokenID.Unknown, "`" + sb + "`", true);
+                 ? MakeToken(TokenID.LT_Date, aDateTime, true)
+                 : MakeToken(TokenID.Unknown, "`" + sb + "`", true);
     }
 
     /// <summary>
@@ -960,15 +957,11 @@ public class Lexer
     /// <returns>A literal blob, an identifier or a keyword</returns>
     private Token LetterB()
     {
-        char ch = Ll(2);
-
-        if (ch is '\'' or '"')
-        {
-            Consume(1);
-            return MakeToken(TokenID.LT_Blob, StringUtil.String2ByteArray((string)LiteralString().Value), false);
-        }
-
-        return Identifier();
+        if (Ll(2) is not ('\'' or '"')) return Identifier();
+        
+        Consume(1);
+        var blob = StringUtil.String2ByteArray((string)LiteralString().Value);
+        return MakeToken(TokenID.LT_Blob, blob, false);
     }
 
     /// <summary>
@@ -1053,7 +1046,7 @@ public class Lexer
     /// <b>true</b> if <paramref name="c"/> is a decimal digit or a letter between 'A' and 'F'. <b>false</b> otherwise.
     /// </returns>
     public static bool IsHexDigit(char c) =>
-        ('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f');
+        c is >= '0' and <= '9' or >= 'A' and <= 'F' or >= 'a' and <= 'f';
 
     /// <summary>
     /// Gets if a character can figure at the beginning of an identifier.
