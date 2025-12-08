@@ -518,12 +518,7 @@ public partial class MainWindow : Window
             completionWindow.CompletionList.CompletionData.Add(dataItem);
         }
 
-        completionWindow.Closed += (s, e) =>
-        {
-            completionWindow = null;
-            Editor.TextArea.Focus();
-        };
-        
+        completionWindow.Closed += (_, _) => completionWindow = null;
         completionWindow.Show();
     }
 
