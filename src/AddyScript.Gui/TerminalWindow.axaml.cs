@@ -84,9 +84,9 @@ public partial class TerminalWindow : Window
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
 
-            string cleanText = parser.Parse(text, inputOffset);
-            document.Insert(inputOffset, cleanText);
-            colorizer.Spans.AddRange(parser.Spans);
+            TerminalText tt = parser.Parse(text, inputOffset);
+            document.Insert(inputOffset, tt.Text);
+            colorizer.Spans.AddRange(tt.Spans);
 
             int docLength = document.TextLength;
             inputOffset = caret.Offset = docLength;

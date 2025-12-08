@@ -11,27 +11,26 @@ public record ColoredSpan(int StartOffset, int Length, IBrush Foreground, IBrush
     public int EndOffset => StartOffset + Length;
 }
 
+public record TerminalText(string Text, List<ColoredSpan> Spans);
+
 public partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
     private IBrush currentFg = defaultFg;
     private IBrush currentBg = defaultBg;
 
-    public List<ColoredSpan> Spans { get; } = [];
-
-    public string Parse(string input, int baseOffset)
+    public TerminalText Parse(string input, int baseOffset)
     {
         var sb = new StringBuilder();
+        List<ColoredSpan> spans = [];
         int logicalPos = 0;
-
-        Spans.Clear();
         
         foreach (Match match in AnsiRegex.Matches(input))
         {
             int spanLength = match.Index - logicalPos;
             if (spanLength > 0)
             {
-                Spans.Add(new (baseOffset + sb.Length, spanLength, currentFg, currentBg));
+                spans.Add(new (baseOffset + sb.Length, spanLength, currentFg, currentBg));
                 sb.Append(input.AsSpan(logicalPos, spanLength));
             }
             
@@ -43,11 +42,11 @@ public partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 
         if (logicalPos < input.Length)
         {
-            Spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
+            spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
             sb.Append(input.AsSpan(logicalPos));
         }
 
-        return sb.ToString();
+        return new (sb.ToString(), spans);
     }
     
     [GeneratedRegex(@"[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))")]
