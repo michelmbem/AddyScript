@@ -38,10 +38,10 @@ public class ClassField : ClassMember
     /// <summary>
     /// Gets if this field is static.
     /// </summary>
-    public bool IsStatic => Modifier == Modifier.Static || Modifier == Modifier.StaticFinal;
+    public bool IsStatic => Modifier is Modifier.Static or Modifier.StaticFinal;
 
     /// <summary>
     /// Gets if this field is final.
     /// </summary>
-    public bool IsFinal => Modifier == Modifier.Final || Modifier == Modifier.StaticFinal;
+    public bool IsFinal => Modifier is Modifier.Final or Modifier.StaticFinal;
 }

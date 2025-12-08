@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The value that follows the <b>case</b> keyword in the script.
         /// </summary>
-        public DataItem Value { get; private set; } = value;
+        public DataItem Value => value;
 
         /// <summary>
         /// Gets the implicit name of a <see cref="CaseLabel"/> given its <see cref="Value"/>.

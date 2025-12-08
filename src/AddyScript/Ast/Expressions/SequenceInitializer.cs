@@ -13,6 +13,6 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The <see cref="ListItem"/> that are listed between the delimiters.
         /// </summary>
-        public ListItem[] Items { get; private set; } = items;
+        public ListItem[] Items => items;
     }
 }

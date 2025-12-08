@@ -20,7 +20,7 @@ namespace AddyScript.Ast
         /// <summary>
         /// The program's source file's name.
         /// </summary>
-        public string FileName { get; private set; } = fileName;
+        public string FileName => fileName;
 
         /// <summary>
         /// Program's AST nodes.

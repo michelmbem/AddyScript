@@ -133,6 +133,15 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The scope cannot be redefined for both accessors of a property.
+        /// </summary>
+        internal static string BothAccessorsCantRedefineScope {
+            get {
+                return ResourceManager.GetString("BothAccessorsCantRedefineScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The given expression is not a closure.
         /// </summary>
         internal static string CalleeIsNotClosure {
@@ -439,29 +448,11 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à A read accessor has already been defined for the property.
-        /// </summary>
-        internal static string DuplicatedReadAccessor {
-            get {
-                return ResourceManager.GetString("DuplicatedReadAccessor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Each variable must be declared once in its scope.
         /// </summary>
         internal static string DuplicatedVariable {
             get {
                 return ResourceManager.GetString("DuplicatedVariable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à A write accessor has already been defined for the property.
-        /// </summary>
-        internal static string DuplicatedWriteAccessor {
-            get {
-                return ResourceManager.GetString("DuplicatedWriteAccessor", resourceCulture);
             }
         }
         
@@ -1214,7 +1205,7 @@ namespace AddyScript.Properties {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à A type name is expected.
+        ///   Recherche une chaîne localisée semblable à A type name or pattern is expected.
         /// </summary>
         internal static string TypeNameExpected {
             get {

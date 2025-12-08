@@ -1,4 +1,4 @@
-﻿using AddyScript.Ast.Expressions;
+using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 
 
@@ -19,98 +19,64 @@ public class ClassProperty : ClassMember
     /// <param name="name">The property's name</param>
     /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
     /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
-    /// <param name="reader">The property's read accessor</param>
-    /// <param name="writer">The property's write accessor</param>
-    public ClassProperty(string name, Scope scope, Modifier modifier, ClassMethod reader, ClassMethod writer)
-        : base(name, scope, modifier)
+    /// <param name="access">The desired property access mode. Used for automatic accessors generation</param>
+    /// <param name="readerScope">The read accessor scope</param>
+    /// <param name="readerBody">The read accessor body</param>
+    /// <param name="writerScope">The write accessor scope</param>
+    /// <param name="writerBody">The write accessor body</param>
+    public ClassProperty(string name, Scope scope, Modifier modifier, PropertyAccess access,
+                         Scope readerScope, Block readerBody, Scope writerScope, Block writerBody) :
+        base(name, scope, modifier)
     {
-        Reader = reader;
-        Writer = writer;
+        if (readerBody != null || (access & PropertyAccess.Read) != PropertyAccess.None)
+        {
+            Parameter[] readerParameters = IsIndexer ? [new(ForEachLoop.DEFAULT_KEY_NAME)] : [];
+            Reader = new ClassMethod(GetReaderName(name), readerScope, modifier, new (readerParameters, readerBody));
+        }
+
+        if (writerBody == null && (access & PropertyAccess.Write) == PropertyAccess.None) return;
+        
+        Parameter[] writerParameters = IsIndexer
+            ? [new(ForEachLoop.DEFAULT_KEY_NAME), new(WRITER_PARAMETER_NAME)]
+            : [new(WRITER_PARAMETER_NAME)];
+
+        Writer = new ClassMethod(GetWriterName(name), writerScope, modifier, new(writerParameters, writerBody));
     }
 
     /// <summary>
-    /// Initializes an instance of ClassProperty that encapsulates a field.
+    /// Initializes a new instance of ClassProperty.
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
     /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
-    /// <param name="fieldName">The backing field's name</param>
-    /// <param name="access">Determines which accessors to generate</param>
-    /// <param name="readerScope">The read accessor's scope</param>
-    /// <param name="writerScope">The write accessor's scope</param>
-    public ClassProperty(string name, Scope scope, Modifier modifier, string fieldName,
-                         PropertyAccess access, Scope readerScope, Scope writerScope)
-        : base(name, scope, modifier)
-    {
-        BackingFieldName = fieldName;
-        Access = access;
-        ReaderScope = readerScope;
-        WriterScope = writerScope;
-    }
-
-    /// <summary>
-    /// Initializes an instance of ClassProperty that encapsulates a field.
-    /// </summary>
-    /// <param name="name">The property's name</param>
-    /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
-    /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
-    /// <param name="fieldName">The backing field's name</param>
-    /// <param name="access">Determines which accessors to generate</param>
-    public ClassProperty(string name, Scope scope, Modifier modifier, string fieldName, PropertyAccess access)
-        : this(name, scope, modifier, fieldName, access, scope, scope)
+    /// <param name="readerBody">The read accessor body</param>
+    /// <param name="writerBody">The write accessor body</param>
+    public ClassProperty(string name, Scope scope, Modifier modifier, Block readerBody, Block writerBody = null) :
+        this(name, scope, modifier, PropertyAccess.None, scope, readerBody, scope, writerBody)
     {
     }
 
     /// <summary>
-    /// Initializes an instance of ClassProperty that encapsulates a field.
+    /// Initializes a new instance of ClassProperty.
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
     /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
-    /// <param name="access">Determines which accessors to generate</param>
-    /// <param name="readerScope">The read accessor's scope</param>
-    /// <param name="writerScope">The write accessor's scope</param>
-    public ClassProperty(string name, Scope scope, Modifier modifier,
-                         PropertyAccess access, Scope readerScope, Scope writerScope)
-        : this(name, scope, modifier, "__" + name, access, readerScope, writerScope)
+    /// <param name="access">The desired property access mode. Used for automatic accessors generation</param>
+    public ClassProperty(string name, Scope scope, Modifier modifier, PropertyAccess access = PropertyAccess.ReadWrite) :
+        this(name, scope, modifier, access, scope, null, scope, null)
     {
-        IsAuto = true;
     }
 
     /// <summary>
     /// The property's read accessor.
     /// </summary>
-    public ClassMethod Reader { get; private set; }
+    public ClassMethod Reader { get;  }
 
     /// <summary>
     /// The property's write accessor.
     /// </summary>
-    public ClassMethod Writer { get; private set; }
-
-    /// <summary>
-    /// Gets if the property has automatically generated accessors and backing field or not.
-    /// </summary>
-    public bool IsAuto { get; private set; }
-
-    /// <summary>
-    /// Gets the name that should be assigned to an eventually generated backing field.
-    /// </summary>
-    public string BackingFieldName { get; private set; }
-
-    /// <summary>
-    /// Determines which accessors to generate when they are not explicitly provided.
-    /// </summary>
-    public PropertyAccess Access { get; private set; }
-
-    /// <summary>
-    /// The scope of an eventually generated read aacessor.
-    /// </summary>
-    public Scope ReaderScope { get; private set; }
-
-    /// <summary>
-    /// The scope of an eventually generated write aacessor.
-    /// </summary>
-    public Scope WriterScope { get; private set; }
+    public ClassMethod Writer { get; }
 
     /// <summary>
     /// Gets if this property has a read accessor or not.
@@ -132,84 +98,81 @@ public class ClassProperty : ClassMember
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <returns>A <see cref="string"/></returns>
-    public static string GetReaderName(string name)
-    {
-        return "__read_" + name;
-    }
+    public static string GetReaderName(string name) => $"__read_{name}";
 
     /// <summary>
     /// Creates a suitable name for a write-accessor, given the property's name.
     /// </summary>
     /// <param name="name">The property's name</param>
     /// <returns>A <see cref="string"/></returns>
-    public static string GetWriterName(string name)
+    public static string GetWriterName(string name) => $"__write_{name}";
+
+    /// <summary>
+    /// Handles automatic accessors logic generation.
+    /// </summary>
+    public bool GenerateAccessors(out string backingFieldName)
     {
-        return "__write_" + name;
+        bool generated = false;
+        backingFieldName = $"__{Name}";
+
+        if (Reader != null && Reader.Function.Body == null)
+        {
+            Reader.Function.Body = GenerateReaderBody(backingFieldName);
+            generated = true;
+        }
+
+        if (Writer != null && Writer.Function.Body == null)
+        {
+            Writer.Function.Body = GenerateWriterBody(backingFieldName);
+            generated = true;
+        }
+
+        return generated;
     }
 
     /// <summary>
-    /// Generates accessors for an auto property.
+    /// Generates the read accessor's body.
     /// </summary>
-    public void GenerateAccessors()
+    /// <param name="backingFieldName">The backing field name</param>
+    /// <returns>A <see cref="Block"/></returns>
+    private Block GenerateReaderBody(string backingFieldName)
     {
-        if ((Access & PropertyAccess.Read) != PropertyAccess.None)
-            Reader = CreateReader();
-
-        if ((Access & PropertyAccess.Write) != PropertyAccess.None)
-            Writer = CreateWriter();
-    }
-
-    /// <summary>
-    /// Automatically creates a reader for a field
-    /// </summary>
-    /// <returns>A <see cref="ClassMethod"/></returns>
-    private ClassMethod CreateReader()
-    {
-        Block readerBody = null;
         switch (Modifier)
         {
             case Modifier.Abstract:
-                break;
+                return null;
             case Modifier.Static:
-                var qName = new QualifiedName(Holder.Name, BackingFieldName);
-                readerBody = Block.Return(new StaticPropertyRef(qName));
-                break;
+            {
+                var qName = new QualifiedName(Holder.Name, backingFieldName);
+                return Block.WithReturn(new StaticPropertyRef(qName));
+            }
             default:
-                readerBody = Block.Return(PropertyRef.This(BackingFieldName));
-                break;
+                return Block.WithReturn(PropertyRef.OfSelf(backingFieldName));
         }
-
-        var function = new Function([], readerBody);
-
-        return new ClassMethod(GetReaderName(Name), ReaderScope, Modifier, function);
     }
 
     /// <summary>
-    /// Automatically creates a writer for a field
+    /// Generates the write accessor's body.
     /// </summary>
-    /// <returns>A <see cref="ClassMethod"/></returns>
-    private ClassMethod CreateWriter()
+    /// <param name="backingFieldName">The backing field name</param>
+    /// <returns>A <see cref="Block"/></returns>
+    private Block GenerateWriterBody(string backingFieldName)
     {
-        Block writerBody = null;
         switch (Modifier)
         {
             case Modifier.Abstract:
-                break;
+                return null;
             case Modifier.Static:
-                var qName = new QualifiedName(Holder.Name, BackingFieldName);
-                writerBody = new Block(new Assignment(new StaticPropertyRef(qName),
-                                                      new VariableRef(WRITER_PARAMETER_NAME)),
-                                       new Return());
-                break;
+            {
+                var qName = new QualifiedName(Holder.Name, backingFieldName);
+                return new Block(new Assignment(new StaticPropertyRef(qName),
+                                                new VariableRef(WRITER_PARAMETER_NAME)),
+                                 new Return());
+            }
             default:
-                writerBody = new Block(new Assignment(PropertyRef.This(BackingFieldName),
-                                                      new VariableRef(WRITER_PARAMETER_NAME)),
-                                       new Return());
-                break;
+                return new Block(new Assignment(PropertyRef.OfSelf(backingFieldName),
+                                                new VariableRef(WRITER_PARAMETER_NAME)),
+                                 new Return());
         }
-
-        var function = new Function([new Parameter(WRITER_PARAMETER_NAME)], writerBody);
-
-        return new ClassMethod(GetWriterName(Name), WriterScope, Modifier, function);
     }
 }

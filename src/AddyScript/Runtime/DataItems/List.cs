@@ -16,9 +16,9 @@ public sealed class List : DataItem
 
     public List() => list = [];
 
-    public List(int capacity) => list = new(capacity);
+    public List(int capacity) => list = new (capacity);
 
-    public List(IEnumerable<DataItem> initialContent) => list = new(initialContent);
+    public List(IEnumerable<DataItem> initialContent) => list = new (initialContent);
 
     public override Class Class => Class.List;
 
@@ -26,11 +26,11 @@ public sealed class List : DataItem
 
     public override List<DataItem> AsList => list;
 
-    public override HashSet<DataItem> AsHashSet => new(list);
+    public override HashSet<DataItem> AsHashSet => new (list);
 
-    public override Queue<DataItem> AsQueue => new(list);
+    public override Queue<DataItem> AsQueue => new (list);
 
-    public override Stack<DataItem> AsStack => new(list);
+    public override Stack<DataItem> AsStack => new (list);
 
     public override object AsNativeObject => list;
 

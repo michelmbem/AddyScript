@@ -16,32 +16,22 @@ class Rectangle : Geometry
 	
 	public property width { read; private write; }
 	
-	public function perimeter()
-	{
-		return 2 * (this.length + this.width);
-	}
+	public function perimeter() => 2 * (this.length + this.width);
 	
-	public function surface()
-	{
-		return this.length * this.width;
-	}
+	public function surface() => this.length * this.width;
 	
-	public function toString(fmt = '')
-	{
-		return $'Rectangle {{ length: {this.length}, width: {this.width} }}';
-	}
+	public function toString(fmt = '') =>
+		$'Rectangle {{ length: {this.length}, width: {this.width} }}';
 }
 
 class Square : Rectangle
 {
-	public constructor(side) : super(side, side)
+	public constructor(side)
+		 : super(side, side)
 	{
 	}
 	
-	public function toString(fmt = '')
-	{
-		return $'Square {{ side: {this.length} }}';
-	}
+	public function toString(fmt = '') => $'Square {{ side: {this.length} }}';
 }
 
 class Ellipse : Geometry
@@ -55,32 +45,22 @@ class Ellipse : Geometry
 	
 	public property b { read; private write; }
 	
-	public function perimeter()
-	{
-		return 2 * PI * sqrt((this.a ** 2 + this.b ** 2) / 2);
-	}
+	public function perimeter() => 2 * PI * sqrt((this.a ** 2 + this.b ** 2) / 2);
 	
-	public function surface()
-	{
-		return PI * this.a * this.b;
-	}
+	public function surface() => PI * this.a * this.b;
 	
-	public function toString(fmt = '')
-	{
-		return $'Ellipse {{ semi-major-axis: {this.a}, semi-minor-axis: {this.b} }}';
-	}
+	public function toString(fmt = '') =>
+		$'Ellipse {{ semi-major-axis: {this.a}, semi-minor-axis: {this.b} }}';
 }
 
 class Circle : Ellipse
 {
-	public constructor(radius) : super(radius, radius)
+	public constructor(radius)
+		 : super(radius, radius)
 	{
 	}
 	
-	public function toString(fmt = '')
-	{
-		return $'Circle {{ radius: {this.a} }}';
-	}
+	public function toString(fmt = '') => $'Circle {{ radius: {this.a} }}';
 }
 
 geoms = [null] * 5;

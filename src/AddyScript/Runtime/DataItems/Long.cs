@@ -12,9 +12,9 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Long(BigInteger value) : DataItem
 {
-    public Long Opposite => new(-value);
+    public Long Opposite => new (-value);
 
-    public Long Complement => new(~value);
+    public Long Complement => new (~value);
 
     public override Class Class => Class.Long;
 
@@ -24,13 +24,13 @@ public sealed class Long(BigInteger value) : DataItem
 
     public override BigInteger AsBigInteger => value;
 
-    public override Rational32 AsRational32 => new((int)value);
+    public override Rational32 AsRational32 => new ((int)value);
 
     public override double AsDouble => (double)value;
 
-    public override BigDecimal AsBigDecimal => new(value);
+    public override BigDecimal AsBigDecimal => new (value);
 
-    public override Complex64 AsComplex64 => new((double)value, 0);
+    public override Complex64 AsComplex64 => new ((double)value, 0);
 
     public override object AsNativeObject => value;
 

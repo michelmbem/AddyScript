@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
@@ -778,7 +778,7 @@ public partial struct BigDecimal
         if (decs <= scale) return this;
 
         BigInteger powers = BigInteger.Pow(BigIntegerTen, decs - scale);
-        return new(unscaled * powers, decs);
+        return new (unscaled * powers, decs);
     }
 
     private readonly BigDecimal Deflate()
@@ -797,12 +797,12 @@ public partial struct BigDecimal
             --decs;
         }
 
-        return new(i, decs);
+        return new (i, decs);
     }
 
     private readonly BigDecimal Opposite()
     {
-        return new(-unscaled, scale);
+        return new (-unscaled, scale);
     }
 
     private static int Compare(BigDecimal a, BigDecimal b)

@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The field name.
         /// </summary>
-        public string PropertyName { get; private set; } = propertyName;
+        public string PropertyName => propertyName;
 
         /// <summary>
         /// Operates assignment to this reference.

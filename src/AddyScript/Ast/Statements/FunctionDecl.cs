@@ -22,7 +22,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The body of this function if it is user defined.
         /// </summary>
-        public Block Body { get; private set; } = body;
+        public Block Body => body;
 
         /// <summary>
         /// Create a <see cref="Function"/> from this instance.

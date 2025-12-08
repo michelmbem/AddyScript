@@ -31,7 +31,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents the name of the function to invoke.
         /// </summary>
-        public string FunctionName { get; private set; } = functionName;
+        public string FunctionName => functionName;
 
         /// <summary>
         /// Translates this node.

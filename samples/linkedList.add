@@ -1,30 +1,32 @@
-function addList(&lst, elem)
+function listAdd(&node, elem)
 {
-	if (lst === null)
-		lst = new {value = elem, next = null};
+	if (node === null)
+		node = new {value = elem, next = null};
 	else
-		addList(lst.next, elem);
+		listAdd(node.next, elem);
+	
+	return node;
 }
 
-function listSize(lst)
-{
-	return lst === null ? 0 : 1 + listSize(lst.next);
-}
+function listSize(node) =>
+	node === null ? 0 : 1 + listSize(node.next);
 
-function printList(lst)
+function printList(node)
 {
-	if (lst === null)
+	if (node === null)
 		println("END");
 	else
 	{
-		print("{0}->", lst.value);
-		printList(lst.next);
+		print("{0}->", node.value);
+		printList(node.next);
 	}
 }
 
-lst = null;
-for (i = 1; i < MAXINT; i *= 2) addList(lst, i);
-println("List size: " + listSize(lst));
-print("List content: ");
-printList(lst);
-readln();
+if (__name == "main") {
+	node = null;
+	for (i = 1; i < MAXINT; i *= 2) listAdd(node, i);
+	println("List size: " + listSize(node));
+	print("List content: ");
+	printList(node);
+	readln();
+}

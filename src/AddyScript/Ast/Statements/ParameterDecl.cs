@@ -21,22 +21,22 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The parameter's name.
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// Determines if the parameter is passed by reference or not.
         /// </summary>
-        public bool ByRef { get; private set; } = byRef;
+        public bool ByRef => byRef;
 
         /// <summary>
         /// Determines if the parameter is a variably sized arguments list or not.
         /// </summary>
-        public bool VaList { get; private set; } = vaList;
+        public bool VaList => vaList;
 
         /// <summary>
         /// The parameter's default value if any.
         /// </summary>
-        public DataItem DefaultValue { get; private set; } = defaultValue;
+        public DataItem DefaultValue => defaultValue;
 
         /// <summary>
         /// Tells if empty values are allowed for this parameter or not.

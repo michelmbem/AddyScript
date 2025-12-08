@@ -21,12 +21,12 @@ public class StaticTypeMember(Type type, string memberName)
     /// <summary>
     /// A CLR type.
     /// </summary>
-    public Type Type { get; private set; } = type;
+    public Type Type => type;
 
     /// <summary>
     /// The name of a type's member.
     /// </summary>
-    public string MemberName { get; private set; } = memberName;
+    public string MemberName => memberName;
 
     /// <summary>
     /// Gets the value of a field or property.

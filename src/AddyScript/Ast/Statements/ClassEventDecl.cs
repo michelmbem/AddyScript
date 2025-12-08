@@ -22,7 +22,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The signature of any closure that could be used to handle this event.
         /// </summary>
-        public ParameterDecl[] Parameters { get; private set; } = parameters;
+        public ParameterDecl[] Parameters => parameters;
 
         /// <summary>
         /// Creates a <see cref="ClassMember"/> from this instance.

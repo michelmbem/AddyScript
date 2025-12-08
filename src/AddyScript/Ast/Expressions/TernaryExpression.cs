@@ -25,17 +25,17 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The test expression
         /// </summary>
-        public Expression Test { get; private set; }
+        public Expression Test { get; }
 
         /// <summary>
         /// The Expression to be evaluated if the test returns true
         /// </summary>
-        public Expression TruePart { get; private set; }
+        public Expression TruePart { get; }
 
         /// <summary>
         /// The Expression to be evaluated if the test returns false
         /// </summary>
-        public Expression FalsePart { get; private set; }
+        public Expression FalsePart { get; }
 
         /// <summary>
         /// Translates this node.

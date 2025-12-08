@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using AddyScript.Runtime.OOP;
 
@@ -10,23 +10,23 @@ public sealed class Queue : DataItem
 {
     private readonly Queue<DataItem> queue;
 
-    public Queue() => queue = new();
+    public Queue() => queue = new ();
 
-    public Queue(int capacity) => queue = new(capacity);
+    public Queue(int capacity) => queue = new (capacity);
 
-    public Queue(IEnumerable<DataItem> initialContent) => queue = new(initialContent);
+    public Queue(IEnumerable<DataItem> initialContent) => queue = new (initialContent);
 
     public override Class Class => Class.Queue;
 
     public override DataItem[] AsArray => [.. queue];
 
-    public override List<DataItem> AsList => new(queue);
+    public override List<DataItem> AsList => new (queue);
 
-    public override HashSet<DataItem> AsHashSet => new(queue);
+    public override HashSet<DataItem> AsHashSet => new (queue);
 
     public override Queue<DataItem> AsQueue => queue;
 
-    public override Stack<DataItem> AsStack => new(queue);
+    public override Stack<DataItem> AsStack => new (queue);
 
     public override object AsNativeObject => queue;
 

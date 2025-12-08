@@ -23,12 +23,12 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     /// <summary>
     /// The token's ID.
     /// </summary>
-    public TokenID TokenID { get; private set; } = tokenID;
+    public TokenID TokenID => tokenID;
 
     /// <summary>
     /// The optionally wrapped value of this token.
     /// </summary>
-    public object Value { get; private set; } = value;
+    public object Value => value;
 
     /// <summary>
     /// Gets if a token represent a literal number.

@@ -21,8 +21,7 @@ public class Lexer
     private const int MAX_BUFFER_SIZE = 512;
 
     private readonly TextReader input;
-    private readonly string fileName;
-    private readonly StringBuilder buffer = new();
+    private readonly StringBuilder buffer = new ();
     private int charIndex, offset, lineOffset, lineNumber;
     private int startOffset, startLineOffset, startLineNumber;
 
@@ -33,17 +32,15 @@ public class Lexer
     public Lexer(TextReader input)
     {
         this.input = input;
-
-        if (input is StreamReader sr && sr.BaseStream is FileStream fs)
-            fileName = fs.Name;
-        else
-            fileName = ":memory:";
+        FileName = input is StreamReader { BaseStream: FileStream fs }
+                 ? fs.Name
+                 : ":memory:";
     }
 
     /// <summary>
     /// Gets the name of the source file that's being parsed.
     /// </summary>
-    public string FileName => fileName;
+    public string FileName { get; }
 
     /// <summary>
     /// Iterates through the character stream until a token is
@@ -58,38 +55,42 @@ public class Lexer
 
         return ch switch
         {
-            EOF => Token(TokenID.EndOfFile, null, true),
-            ',' => Token(TokenID.Comma, null, true),
-            ';' => Token(TokenID.SemiColon, null, true),
-            '(' => Token(TokenID.LeftParenthesis, null, true),
-            ')' => Token(TokenID.RightParenthesis, null, true),
-            '[' => Token(TokenID.LeftBracket, null, true),
-            ']' => Token(TokenID.RightBracket, null, true),
-            '{' => Token(TokenID.LeftBrace, null, true),
-            '}' => Token(TokenID.RightBrace, null, true),
-            '~' => Token(TokenID.Tilda, null, true),
+            EOF => MakeToken(TokenID.EndOfFile, null, true),
+            ',' => MakeToken(TokenID.Comma, null, true),
+            ';' => MakeToken(TokenID.SemiColon, null, true),
+            '(' => MakeToken(TokenID.LeftParenthesis, null, true),
+            ')' => MakeToken(TokenID.RightParenthesis, null, true),
+            '[' => MakeToken(TokenID.LeftBracket, null, true),
+            ']' => MakeToken(TokenID.RightBracket, null, true),
+            '{' => MakeToken(TokenID.LeftBrace, null, true),
+            '}' => MakeToken(TokenID.RightBrace, null, true),
+            '~' => MakeToken(TokenID.Tilda, null, true),
             ':' => Colon(),
-            '?' => Question(),
+            '?' => QuestionMark(),
             '.' => Dot(),
-            '=' => Equal(),
-            '!' => Exclamation(),
+            '=' => EqualSign(),
+            '!' => ExclamationMark(),
             '<' => Lt(),
             '>' => Gt(),
-            '+' => Plus(),
-            '-' => Minus(),
+            '+' => PlusSign(),
+            '-' => MinusSign(),
             '*' => Asterisk(),
-            '/' => Slash(),
-            '%' => Percent(),
+            '/' => ForwardSlash(),
+            '%' => PercentSign(),
             '&' => Ampersand(),
-            '|' => Vbar(),
-            '^' => Circumflex(),
+            '|' => Verticalbar(),
+            '^' => CircumflexAccent(),
             '0' => Zero(),
-            '@' => Verbatim(),
+            '@' => VerbatimString(),
             '\'' or '"' => LiteralString(),
-            '$' => Dollar(),
+            '$' => DollarSign(),
             '`' => Backtick(),
             'b' or 'B' => LetterB(),
-            _ => IsLegalFirstIdChar(ch) ? Identifier() : char.IsDigit(ch) ? Number() : Unknown(),
+            _ => IsLegalFirstIdChar(ch)
+                ? Identifier()
+                : char.IsDigit(ch)
+                    ? LiteralNumber()
+                    : Unknown(),
         };
     }
 
@@ -110,7 +111,7 @@ public class Lexer
     /// <param name="value">The token's value</param>
     /// <param name="consume">Tells if the current character must be skipped or not</param>
     /// <returns>A <see cref="Token"/></returns>
-    private Token Token(TokenID tokenID, object value, bool consume)
+    private Token MakeToken(TokenID tokenID, object value, bool consume)
     {
         var start = new ScriptLocation(startOffset, startLineOffset, startLineNumber);
         if (consume) Consume(1);
@@ -122,10 +123,11 @@ public class Lexer
     /// Gets a token representing a literal number.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a literal number</returns>
-    private Token Number()
+    private Token LiteralNumber()
     {
         /* Tries to match the following pattern:
          * ([0-9](_?[0-9])*)+(\.([0-9](_?[0-9])*)+)?([Ee]?[+-]?([0-9](_?[0-9])*)+)?[LlFfDd]?
+         * The sequence [0-9](_?[0-9])* is macthed by IntegralNumber.
          * Whenever the sequence starts with a dot, it's prepended a literal zero.
          */
         var nbrBldr = new StringBuilder();
@@ -137,35 +139,22 @@ public class Lexer
         while (char.IsDigit(ch))
         {
             prependZero = false;
-            nbrBldr.Append(ch);
-            Consume(1);
-            ch = Ll(1);
-            if (ch == '_' && char.IsDigit(Ll(2)))
-            {
-                Consume(1);
-                ch = Ll(1);
-            }
+            ch = ReadDigit(nbrBldr, ch);
         }
 
         // Decimal part: (\.([0-9](_?[0-9])*)+)?
         if (ch == '.' && char.IsDigit(Ll(2)))
         {
-            isReal = true;
             if (prependZero) nbrBldr.Append('0');
+
+            isReal = true;
             nbrBldr.Append(ch).Append(Ll(2));
             Consume(2);
             ch = Ll(1);
 
             while (char.IsDigit(ch))
             {
-                nbrBldr.Append(ch);
-                Consume(1);
-                ch = Ll(1);
-                if (ch == '_' && char.IsDigit(Ll(2)))
-                {
-                    Consume(1);
-                    ch = Ll(1);
-                }
+                ch = ReadDigit(nbrBldr, ch);
             }
         }
 
@@ -173,6 +162,7 @@ public class Lexer
         if (ch == 'e' || ch == 'E')
         {
             bool error = true;
+
             isReal = true;
             nbrBldr.Append(ch);
             Consume(1);
@@ -188,17 +178,10 @@ public class Lexer
             while (char.IsDigit(ch))
             {
                 error = false;
-                nbrBldr.Append(ch);
-                Consume(1);
-                ch = Ll(1);
-                if (ch == '_' && char.IsDigit(Ll(2)))
-                {
-                    Consume(1);
-                    ch = Ll(1);
-                }
+                ch = ReadDigit(nbrBldr, ch);
             }
 
-            if (error) return Token(TokenID.Unknown, nbrBldr.ToString(), false);
+            if (error) return MakeToken(TokenID.Unknown, nbrBldr.ToString(), false);
         }
 
         // Suffix part: [LlFfDd]?
@@ -208,31 +191,51 @@ public class Lexer
             return Ll(1) switch
             {
                 'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
-                            ? Token(TokenID.LT_Float, aDouble, true)
-                            : Token(TokenID.Unknown, nbrStr, true),
+                            ? MakeToken(TokenID.LT_Float, aDouble, true)
+                            : MakeToken(TokenID.Unknown, nbrStr, true),
                 'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
-                            ? Token(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                            : Token(TokenID.Unknown, nbrStr, true),
-                'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
+                            ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
+                            : MakeToken(TokenID.Unknown, nbrStr, true),
+                'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
                 _ => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
-                   ? Token(TokenID.LT_Float, aDouble, false)
-                   : Token(TokenID.Unknown, nbrStr, false),
+                   ? MakeToken(TokenID.LT_Float, aDouble, false)
+                   : MakeToken(TokenID.Unknown, nbrStr, false),
             };
 
         return Ll(1) switch
         {
-            'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(nbrStr), true),
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(nbrStr), true),
             'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
-                        ? Token(TokenID.LT_Float, aDouble, true)
-                        : Token(TokenID.Unknown, nbrStr, true),
+                        ? MakeToken(TokenID.LT_Float, aDouble, true)
+                        : MakeToken(TokenID.Unknown, nbrStr, true),
             'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
-                        ? Token(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                        : Token(TokenID.Unknown, nbrStr, true),
-            'd' or 'D' => Token(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
+                        ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
+                        : MakeToken(TokenID.Unknown, nbrStr, true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
             _ => int.TryParse(nbrStr, NumberStyles.Integer, ci, out int anInt)
-               ? Token(TokenID.LT_Integer, anInt, false)
-               : Token(TokenID.LT_Long, BigInteger.Parse(nbrStr), false),
+               ? MakeToken(TokenID.LT_Integer, anInt, false)
+               : MakeToken(TokenID.LT_Long, BigInteger.Parse(nbrStr), false),
         };
+    }
+
+    /// <summary>
+    /// Reads a decimal digit from the input stream. Eventually skips underscores.
+    /// </summary>
+    /// <param name="buffer">The <see cref="StringBuilder"/> where to store the digits</param>
+    /// <param name="c">The char read from the input stream</param>
+    private char ReadDigit(StringBuilder buffer, char c)
+    {
+        buffer.Append(c);
+        Consume(1);
+        c = Ll(1);
+
+        if (c == '_' && char.IsDigit(Ll(2)))
+        {
+            Consume(1);
+            c = Ll(1);
+        }
+
+        return c;
     }
 
     /// <summary>
@@ -252,13 +255,13 @@ public class Lexer
         {
             ch = Ll(1);
 
-            if (ch == '\r' || ch == '\n' || ch == EOF)
-                return Token(TokenID.Unknown, wrapper + strBldr.ToString(), false);
+            if (ch is '\r' or '\n' or EOF)
+                return MakeToken(TokenID.Unknown, wrapper + strBldr.ToString(), false);
 
             if (ch == wrapper)
                 loop = false;
             else if (ch == '\\')
-                strBldr.Append(Escape());
+                strBldr.Append(EscapeSequence());
             else
             {
                 strBldr.Append(ch);
@@ -266,16 +269,16 @@ public class Lexer
             }
         }
 
-        return Token(TokenID.LT_String, strBldr.ToString(), true);
+        return MakeToken(TokenID.LT_String, strBldr.ToString(), true);
     }
 
     /// <summary>
     /// Extract an escape sequence from the character stream.
     /// </summary>
     /// <returns>A <see cref="string"/></returns>
-    private string Escape()
+    private string EscapeSequence()
     {
-        Consume(1);
+        Consume(1); // Skip the initial \
 
         char ch = Ll(1);
 
@@ -309,9 +312,9 @@ public class Lexer
                 Consume(1);
                 return "\v";
             case 'x' or 'X':
-                return EscapeHex(2);
+                return HexadecimalSequence(2);
             case 'u' or 'U':
-                return EscapeHex(4);
+                return HexadecimalSequence(4);
             default:
                 return "\\";
         }
@@ -321,10 +324,10 @@ public class Lexer
     /// Extracts an hexadecimal escape sequence from the character stream.
     /// </summary>
     /// <param name="max">The maximum length of the escape sequence</param>
-    /// <returns>A <see cref="string"/></returns>
-    private string EscapeHex(int max)
+    /// <returns>A <see cref="string"/> made of hexadecimal digits</returns>
+    private string HexadecimalSequence(int max)
     {
-        var escBldr = new StringBuilder();
+        var hexBldr = new StringBuilder();
         bool ok = true;
         char ch;
 
@@ -333,8 +336,8 @@ public class Lexer
         {
             ch = Ll(i + 2);
 
-            if (('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))
-                escBldr.Append(ch);
+            if (IsHexDigit(ch))
+                hexBldr.Append(ch);
             else
                 ok = false;
         }
@@ -343,7 +346,7 @@ public class Lexer
 
         if (ok)
         {
-            int value = int.Parse(escBldr.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            int value = int.Parse(hexBldr.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             Consume(max + 1);
             result = ((char)value).ToString();
         }
@@ -379,7 +382,7 @@ public class Lexer
                 Consume(1);
             }
             else if (ch == '\\')
-                idBldr.Append(Escape());
+                idBldr.Append(EscapeSequence());
             else
                 loop = false;
         }
@@ -389,10 +392,10 @@ public class Lexer
         if (Keyword.IsDefined(word))
         {
             Keyword kw = Keyword.Get(word);
-            return Token(kw.TokenID, kw.Value, false);
+            return MakeToken(kw.TokenID, kw.Value, false);
         }
         
-        return Token(TokenID.Identifier, word, false);
+        return MakeToken(TokenID.Identifier, word, false);
     }
 
     /// <summary>
@@ -401,7 +404,7 @@ public class Lexer
     /// <returns>A <see cref="Token"/> with no particular meaning</returns>
     private Token Unknown()
     {
-        return Token(TokenID.Unknown, Ll(1).ToString(), true);
+        return MakeToken(TokenID.Unknown, Ll(1).ToString(), true);
     }
 
     /// <summary>
@@ -414,8 +417,8 @@ public class Lexer
 
         return Ll(1) switch
         {
-            ':' => Token(TokenID.DoubleColon, null, true),
-            _ => Token(TokenID.Colon, null, false),
+            ':' => MakeToken(TokenID.DoubleColon, null, true),
+            _ => MakeToken(TokenID.Colon, null, false),
         };
     }
 
@@ -423,26 +426,26 @@ public class Lexer
     /// Gets a token representing a symbol that starts with a question mark.
     /// </summary>
     /// <returns>One between <b>?.</b>, <b>??</b> and <b>?</b></returns>
-    private Token Question()
+    private Token QuestionMark()
     {
         Consume(1);
 
         switch (Ll(1))
         {
             case '.':
-                return Token(TokenID.QuestionDot, null, true);
+                return MakeToken(TokenID.QuestionDot, null, true);
             case '[':
-                return Token(TokenID.QuestionBracket, null, true);
+                return MakeToken(TokenID.QuestionBracket, null, true);
             case '?':
                 Consume(1);
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.DoubleQuestionEqual, null, true),
-                    _ => Token(TokenID.DoubleQuestion, null, false),
+                    '=' => MakeToken(TokenID.DoubleQuestionEqual, null, true),
+                    _ => MakeToken(TokenID.DoubleQuestion, null, false),
                 };
             default:
-                return Token(TokenID.Question, null, false);
+                return MakeToken(TokenID.Question, null, false);
         }
     }
 
@@ -457,17 +460,17 @@ public class Lexer
         if (nextCh == '.')
         {
             Consume(2);
-            return Token(TokenID.DoubleDot, null, false);
+            return MakeToken(TokenID.DoubleDot, null, false);
         }
 
-        return char.IsDigit(nextCh) ? Number() : Token(TokenID.Dot, null, true);
+        return char.IsDigit(nextCh) ? LiteralNumber() : MakeToken(TokenID.Dot, null, true);
     }
 
     /// <summary>
     /// Gets a token representing a symbol that starts with the equal sign.
     /// </summary>
     /// <returns>One between <b>===</b>, <b>==</b>, <b>=></b> and <b>=</b></returns>
-    private Token Equal()
+    private Token EqualSign()
     {
         Consume(1);
 
@@ -478,13 +481,13 @@ public class Lexer
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.TripleEqual, null, true),
-                    _ => Token(TokenID.DoubleEqual, null, false),
+                    '=' => MakeToken(TokenID.TripleEqual, null, true),
+                    _ => MakeToken(TokenID.DoubleEqual, null, false),
                 };
             case '>':
-                return Token(TokenID.Arrow, null, true);
+                return MakeToken(TokenID.Arrow, null, true);
             default:
-                return Token(TokenID.Equal, null, false);
+                return MakeToken(TokenID.Equal, null, false);
         }
     }
 
@@ -492,7 +495,7 @@ public class Lexer
     /// Gets a token representing a symbol that starts with an exclamation mark.
     /// </summary>
     /// <returns>One between <b>!=</b> and <b>!</b></returns>
-    private Token Exclamation()
+    private Token ExclamationMark()
     {
         Consume(1);
 
@@ -503,11 +506,11 @@ public class Lexer
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.ExclamationDoubleEqual, null, true),
-                    _ => Token(TokenID.ExclamationEqual, null, false),
+                    '=' => MakeToken(TokenID.ExclamationDoubleEqual, null, true),
+                    _ => MakeToken(TokenID.ExclamationEqual, null, false),
                 };
             default:
-                return Token(TokenID.Exclamation, null, false);
+                return MakeToken(TokenID.Exclamation, null, false);
         }
     }
 
@@ -526,13 +529,13 @@ public class Lexer
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.DoubleLessThanEqual, null, true),
-                    _ => Token(TokenID.DoubleLessThan, null, false),
+                    '=' => MakeToken(TokenID.DoubleLessThanEqual, null, true),
+                    _ => MakeToken(TokenID.DoubleLessThan, null, false),
                 };
             case '=':
-                return Token(TokenID.LessThanEqual, null, true);
+                return MakeToken(TokenID.LessThanEqual, null, true);
             default:
-                return Token(TokenID.LessThan, null, false);
+                return MakeToken(TokenID.LessThan, null, false);
         }
     }
 
@@ -551,13 +554,13 @@ public class Lexer
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.DoubleGreaterThanEqual, null, true),
-                    _ => Token(TokenID.DoubleGreaterThan, null, false),
+                    '=' => MakeToken(TokenID.DoubleGreaterThanEqual, null, true),
+                    _ => MakeToken(TokenID.DoubleGreaterThan, null, false),
                 };
             case '=':
-                return Token(TokenID.GreaterThanEqual, null, true);
+                return MakeToken(TokenID.GreaterThanEqual, null, true);
             default:
-                return Token(TokenID.GreaterThan, null, false);
+                return MakeToken(TokenID.GreaterThan, null, false);
         }
     }
 
@@ -565,15 +568,15 @@ public class Lexer
     /// Gets a token representing a symbol that starts with the + sign.
     /// </summary>
     /// <returns>One between <b>++</b>, <b>+=</b> and <b>+</b></returns>
-    private Token Plus()
+    private Token PlusSign()
     {
         Consume(1);
 
         return Ll(1) switch
         {
-            '+' => Token(TokenID.DoublePlus, null, true),
-            '=' => Token(TokenID.PlusEqual, null, true),
-            _ => Token(TokenID.Plus, null, false),
+            '+' => MakeToken(TokenID.DoublePlus, null, true),
+            '=' => MakeToken(TokenID.PlusEqual, null, true),
+            _ => MakeToken(TokenID.Plus, null, false),
         };
     }
 
@@ -581,15 +584,15 @@ public class Lexer
     /// Gets a token representing a symbol that starts with the - sign.
     /// </summary>
     /// <returns>One between <b>--</b>, <b>-=</b> and <b>-</b></returns>
-    private Token Minus()
+    private Token MinusSign()
     {
         Consume(1);
 
         return Ll(1) switch
         {
-            '-' => Token(TokenID.DoubleMinus, null, true),
-            '=' => Token(TokenID.MinusEqual, null, true),
-            _ => Token(TokenID.Minus, null, false),
+            '-' => MakeToken(TokenID.DoubleMinus, null, true),
+            '=' => MakeToken(TokenID.MinusEqual, null, true),
+            _ => MakeToken(TokenID.Minus, null, false),
         };
     }
 
@@ -608,21 +611,21 @@ public class Lexer
 
                 return Ll(1) switch
                 {
-                    '=' => Token(TokenID.DoubleAsteriskEqual, null, true),
-                    _ => Token(TokenID.DoubleAsterisk, null, false),
+                    '=' => MakeToken(TokenID.DoubleAsteriskEqual, null, true),
+                    _ => MakeToken(TokenID.DoubleAsterisk, null, false),
                 };
             case '=':
-                return Token(TokenID.AsteriskEqual, null, true);
+                return MakeToken(TokenID.AsteriskEqual, null, true);
             default:
-                return Token(TokenID.Asterisk, null, false);
+                return MakeToken(TokenID.Asterisk, null, false);
         }
     }
 
     /// <summary>
-    /// Gets a token representing a symbol that starts with a slash.
+    /// Gets a token representing a symbol that starts with a forward slash.
     /// </summary>
     /// <returns>One between <b>/=</b>, <b>/</b> and comments</returns>
-    private Token Slash()
+    private Token ForwardSlash()
     {
         Consume(1);
 
@@ -630,15 +633,15 @@ public class Lexer
         {
             '/' => LineComment(),
             '*' => BlockComment(),
-            '=' => Token(TokenID.SlashEqual, null, true),
-            _ => Token(TokenID.Slash, null, false),
+            '=' => MakeToken(TokenID.SlashEqual, null, true),
+            _ => MakeToken(TokenID.Slash, null, false),
         };
     }
 
     /// <summary>
-    /// Gets a token representing a line-end comment.
+    /// Gets a token representing a line comment.
     /// </summary>
-    /// <returns>A <see cref="Token"/> representing a line-end comment</returns>
+    /// <returns>A <see cref="Token"/> representing a line comment</returns>
     private Token LineComment()
     {
         var cmntBldr = new StringBuilder();
@@ -660,7 +663,7 @@ public class Lexer
             }
         }
 
-        return Token(TokenID.LineComment, cmntBldr.ToString(), false);
+        return MakeToken(TokenID.LineComment, cmntBldr.ToString(), false);
     }
 
     /// <summary>
@@ -697,21 +700,21 @@ public class Lexer
             }
         }
 
-        return Token(TokenID.BlockComment, cmntBldr.ToString(), true);
+        return MakeToken(TokenID.BlockComment, cmntBldr.ToString(), true);
     }
 
     /// <summary>
     /// Gets a token representing a symbol that starts with the % symbol.
     /// </summary>
     /// <returns>One between <b>%=</b> and <b>%</b></returns>
-    private Token Percent()
+    private Token PercentSign()
     {
         Consume(1);
 
         return Ll(1) switch
         {
-            '=' => Token(TokenID.PercentEqual, null, true),
-            _ => Token(TokenID.Percent, null, false),
+            '=' => MakeToken(TokenID.PercentEqual, null, true),
+            _ => MakeToken(TokenID.Percent, null, false),
         };
     }
 
@@ -725,9 +728,9 @@ public class Lexer
 
         return Ll(1) switch
         {
-            '&' => Token(TokenID.DoubleAmpersand, null, true),
-            '=' => Token(TokenID.AmpersandEqual, null, true),
-            _ => Token(TokenID.Ampersand, null, false),
+            '&' => MakeToken(TokenID.DoubleAmpersand, null, true),
+            '=' => MakeToken(TokenID.AmpersandEqual, null, true),
+            _ => MakeToken(TokenID.Ampersand, null, false),
         };
     }
 
@@ -735,15 +738,15 @@ public class Lexer
     /// Gets a token representing a symbol that starts with the | symbol.
     /// </summary>
     /// <returns>One between <b>||</b>, <b>|=</b> and <b>|</b></returns>
-    private Token Vbar()
+    private Token Verticalbar()
     {
         Consume(1);
 
         return Ll(1) switch
         {
-            '|' => Token(TokenID.DoubleVerticalBar, null, true),
-            '=' => Token(TokenID.VerticalBarEqual, null, true),
-            _ => Token(TokenID.VerticalBar, null, false),
+            '|' => MakeToken(TokenID.DoubleVerticalBar, null, true),
+            '=' => MakeToken(TokenID.VerticalBarEqual, null, true),
+            _ => MakeToken(TokenID.VerticalBar, null, false),
         };
     }
 
@@ -751,14 +754,14 @@ public class Lexer
     /// Gets a token representing a symbol that starts with the ^ symbol.
     /// </summary>
     /// <returns>One between <b>^=</b> and <b>^</b></returns>
-    private Token Circumflex()
+    private Token CircumflexAccent()
     {
         Consume(1);
 
         return Ll(1) switch
         {
-            '=' => Token(TokenID.CircumflexEqual, null, true),
-            _ => Token(TokenID.Circumflex, null, false),
+            '=' => MakeToken(TokenID.CircumflexEqual, null, true),
+            _ => MakeToken(TokenID.Circumflex, null, false),
         };
     }
 
@@ -769,27 +772,21 @@ public class Lexer
     private Token Zero()
     {
         Consume(1);
-
         char ch = Ll(1);
 
-        switch (ch)
+        return ch switch
         {
-            case 'l' or 'L':
-                return Token(TokenID.LT_Long, BigInteger.Zero, true);
-            case 'f' or 'F':
-                return Token(TokenID.LT_Float, 0D, true);
-            case 'd' or 'D':
-                return Token(TokenID.LT_Decimal, BigDecimal.Zero, true);
-            case 'i' or 'I':
-                return Token(TokenID.LT_Complex, Complex.Zero, true);
-            case '.':
-                return char.IsDigit(Ll(2)) ? Number() : Token(TokenID.LT_Integer, 0, false);
-            case 'x' or 'X':
-                return HexNumber();
-            default:
-                if (char.IsDigit(ch)) return Number();
-                return Token(TokenID.LT_Integer, 0, false);
-        }
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Zero, true),
+            'f' or 'F' => MakeToken(TokenID.LT_Float, 0D, true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Zero, true),
+            'i' or 'I' => MakeToken(TokenID.LT_Complex, Complex.Zero, true),
+            'x' or 'X' => HexNumber(),
+            '.' => char.IsDigit(Ll(2))
+                 ? LiteralNumber()
+                 : MakeToken(TokenID.LT_Integer, 0, false),
+            _ when char.IsDigit(ch) => LiteralNumber(),
+            _ => MakeToken(TokenID.LT_Integer, 0, false)
+        };
     }
 
     /// <summary>
@@ -809,7 +806,7 @@ public class Lexer
         {
             ch = Ll(1);
 
-            if (('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))
+            if (IsHexDigit(ch))
             {
                 hexNbrBldr.Append(ch);
                 Consume(1);
@@ -822,30 +819,30 @@ public class Lexer
 
         return Ll(1) switch
         {
-            'l' or 'L' => Token(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), true),
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), true),
             _ => int.TryParse(hexNumStr, NumberStyles.HexNumber, ci, out int anInt)
-               ? Token(TokenID.LT_Integer, anInt, false)
-               : Token(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), false),
+               ? MakeToken(TokenID.LT_Integer, anInt, false)
+               : MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), false),
         };
     }
 
     /// <summary>
-    /// Recognizes a verbatim string (one that starts with '@').
+    /// Recognizes a verbatim string (one that starts with '@' and can span on multiple lines).
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a literal string</returns>
-    private Token Verbatim()
+    private Token VerbatimString()
     {
-        // Skip '@'
+        // Skip the initial '@' sign
         Consume(1);
 
         char wrapper = Ll(1);
-        if (!(wrapper == '\'' || wrapper == '"'))
-            return Token(TokenID.Unknown, "@", false);
+        if (wrapper is not ('\'' or '"'))
+            return MakeToken(TokenID.Unknown, "@", false);
 
-        // Skip wrapper
+        // Skip the wrapper
         Consume(1);
 
-        var sb = new StringBuilder();
+        var strBldr = new StringBuilder();
         bool loop = true;
         char ch;
 
@@ -854,31 +851,31 @@ public class Lexer
             ch = Ll(1);
 
             if (ch == EOF)
-                return Token(TokenID.Unknown, "@" + wrapper + sb, false);
+                return MakeToken(TokenID.Unknown, "@" + wrapper + strBldr, false);
 
             if (ch == wrapper)
                 if (Ll(2) == ch)
                 {
-                    sb.Append(ch);
+                    strBldr.Append(ch);
                     Consume(2);
                 }
                 else
                     loop = false;
             else
             {
-                sb.Append(ch);
+                strBldr.Append(ch);
                 Consume(1);
             }
         }
 
-        return Token(TokenID.LT_String, sb.ToString(), true);
+        return MakeToken(TokenID.LT_String, strBldr.ToString(), true);
     }
 
     /// <summary>
     /// Gets a token representing a symbol that starts with the $ symbol.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a format string or a special identifier</returns>
-    private Token Dollar()
+    private Token DollarSign()
     {
         // Skip '$'
         Consume(1);
@@ -896,17 +893,17 @@ public class Lexer
                 tmpTok = LiteralString();
                 break;
             case '@':
-                tmpTok = Verbatim();
+                tmpTok = VerbatimString();
                 break;
         }
 
         if (tmpTok != null)
             return tmpTok.TokenID == TokenID.Unknown
                  ? tmpTok
-                 : Token(TokenID.MutableString, tmpTok.ToString(), false);
+                 : MakeToken(TokenID.MutableString, tmpTok.ToString(), false);
 
         // Try to recognize a special identifier
-        var sb = new StringBuilder();
+        var idBldr = new StringBuilder();
         bool loop = true;
 
         while (loop)
@@ -915,18 +912,18 @@ public class Lexer
 
             if (IsLegalIdChar(ch))
             {
-                sb.Append(ch);
+                idBldr.Append(ch);
                 Consume(1);
             }
             else if (ch == '\\')
-                sb.Append(Escape());
+                idBldr.Append(EscapeSequence());
             else
                 loop = false;
         }
 
-        return sb.Length > 0
-             ? Token(TokenID.Identifier, sb.ToString(), false)
-             : Token(TokenID.Unknown, "$", false);
+        return idBldr.Length > 0
+             ? MakeToken(TokenID.Identifier, idBldr.ToString(), false)
+             : MakeToken(TokenID.Unknown, "$", false);
     }
 
     /// <summary>
@@ -948,27 +945,23 @@ public class Lexer
         }
 
         return ch == EOF
-             ? Token(TokenID.Unknown, "`" + sb, false)
+             ? MakeToken(TokenID.Unknown, "`" + sb, false)
              : DateTime.TryParse(sb.ToString(), out DateTime aDateTime)
-             ? Token(TokenID.LT_Date, aDateTime, true)
-             : Token(TokenID.Unknown, "`" + sb + "`", true);
+                 ? MakeToken(TokenID.LT_Date, aDateTime, true)
+                 : MakeToken(TokenID.Unknown, "`" + sb + "`", true);
     }
 
     /// <summary>
     /// Gets a token representing a symbol that starts with <b>b</b> or <b>B</b>.
     /// </summary>
-    /// <returns>A banary string</returns>
+    /// <returns>A literal blob, an identifier or a keyword</returns>
     private Token LetterB()
     {
-        char ch = Ll(2);
-
-        if (ch == '\'' || ch == '"')
-        {
-            Consume(1);
-            return Token(TokenID.LT_Blob, StringUtil.String2ByteArray((string)LiteralString().Value), false);
-        }
-
-        return Identifier();
+        if (Ll(2) is not ('\'' or '"')) return Identifier();
+        
+        Consume(1);
+        var blob = StringUtil.String2ByteArray((string)LiteralString().Value);
+        return MakeToken(TokenID.LT_Blob, blob, false);
     }
 
     /// <summary>
@@ -1046,26 +1039,27 @@ public class Lexer
     }
 
     /// <summary>
+    /// Checks whether a character is a valid base-16 digit or not.
+    /// </summary>
+    /// <param name="c">The character to check</param>
+    /// <returns>
+    /// <b>true</b> if <paramref name="c"/> is a decimal digit or a letter between 'A' and 'F'. <b>false</b> otherwise.
+    /// </returns>
+    public static bool IsHexDigit(char c) =>
+        c is >= '0' and <= '9' or >= 'A' and <= 'F' or >= 'a' and <= 'f';
+
+    /// <summary>
     /// Gets if a character can figure at the beginning of an identifier.
     /// </summary>
     /// <param name="ch">The given character</param>
     /// <returns><b>true</b> if the character is a letter or the underscore; <b>false</b> otherwise</returns>
-    public static bool IsLegalFirstIdChar(char ch)
-    {
-        return char.IsLetter(ch) ||
-               ch == '_' ||
-               (0xc0 <= ch && ch < 0xd7) ||
-               (0xd7 < ch && ch < 0xf7) ||
-               (0xf7 < ch && ch <= 0xff);
-    }
+    public static bool IsLegalFirstIdChar(char ch) =>
+        char.IsLetter(ch) || ch == '_' || (0xc0 <= ch && ch < 0xd7) || (0xd7 < ch && ch < 0xf7) || (0xf7 < ch && ch <= 0xff);
 
     /// <summary>
     /// Gets if a character can figure in an identifier.
     /// </summary>
     /// <param name="ch">The given character</param>
     /// <returns><b>true</b> if the character is a letter, a digit or the underscore; <b>false</b> otherwise</returns>
-    public static bool IsLegalIdChar(char ch)
-    {
-        return IsLegalFirstIdChar(ch) || char.IsDigit(ch);
-    }
+    public static bool IsLegalIdChar(char ch) => IsLegalFirstIdChar(ch) || char.IsDigit(ch);
 }

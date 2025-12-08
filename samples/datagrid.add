@@ -1,10 +1,10 @@
 import std::dbo;
 import System::Windows::Forms;
 
-const PROVIDER = "oledb";
-const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../../samples/data/nwind.mdb";
-//const PROVIDER = "mssql";
-//const CONNECTION_STRING = "Data Source=(local);Initial Catalog=Northwind;Integrated Security=Yes";
+//const PROVIDER = "oledb";
+//const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../../samples/data/nwind.mdb";
+const PROVIDER = "mssql";
+const CONNECTION_STRING = "Data Source=(local);Initial Catalog=Northwind;Integrated Security=Yes";
 
 function createColumn($property, header = '', type = "text", width = 100, readonly = false)
 {

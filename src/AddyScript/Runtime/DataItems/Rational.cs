@@ -26,7 +26,7 @@ public sealed class Rational : DataItem
         return rational.Denominator == 1 ? new Integer(rational.Numerator) : new Rational(rational);
     }
 
-    public Rational Opposite => new(-value);
+    public Rational Opposite => new (-value);
 
     public DataItem Inverse => Simplify(value.Inverse());
 
@@ -36,15 +36,15 @@ public sealed class Rational : DataItem
 
     public override int AsInt32 => (int)value;
 
-    public override BigInteger AsBigInteger => new((int)value);
+    public override BigInteger AsBigInteger => new ((int)value);
 
     public override Rational32 AsRational32 => value;
 
     public override double AsDouble => (double)value;
 
-    public override BigDecimal AsBigDecimal => new((decimal)value);
+    public override BigDecimal AsBigDecimal => new ((decimal)value);
 
-    public override Complex64 AsComplex64 => new((double)value, 0);
+    public override Complex64 AsComplex64 => new ((double)value, 0);
 
     public override object AsNativeObject => value;
 

@@ -1,4 +1,4 @@
-﻿namespace AddyScript.Parsers;
+namespace AddyScript.Parsers;
 
 
 /// <summary>
@@ -79,6 +79,9 @@ public enum TokenID
     KW_Else,
     KW_Switch,
     KW_Case,
+    KW_When,
+    KW_And,
+    KW_Or,
     KW_Default,
     KW_For,
     KW_ForEach,
@@ -88,13 +91,11 @@ public enum TokenID
     KW_Continue,
     KW_Break,
     KW_Goto,
-    KW_Yield,
     KW_Return,
+    KW_Yield,
     KW_Throw,
     KW_Function,
     KW_Extern,
-    KW_Ref,
-    KW_Params,
     KW_Class,
     KW_Constructor,
     KW_Property,

@@ -6,9 +6,9 @@ namespace AddyScript.Runtime.Utilities
 {
     public class BinaryFormatter(Endianness endianness, Stream stream) : IDisposable
     {
-        public Endianness Endianness { get; private set; } = endianness;
+        public Endianness Endianness => endianness;
 
-        public Stream Stream { get; private set; } = stream;
+        public Stream Stream => stream;
 
         public static void SwapBytes(byte[] buffer)
         {

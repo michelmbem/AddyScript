@@ -22,7 +22,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The wrapped <b>throw</b> statement.
         /// </summary>
-        public Throw Throw { get; private set; }
+        public Throw Throw { get; }
 
         /// <summary>
         /// Translates this node.

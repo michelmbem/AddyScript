@@ -14,8 +14,7 @@ else
 {
 	for (i = 0; i < n; ++i)
 	{
-		print($"item no. {i + 1} = ");
-		t.add((float)readln());
+		t.add((float)readln($"item no. {i + 1} = "));
 	}
 	
 	s = sum(t); // s = t.aggregate(0, |a, v| => a + v);

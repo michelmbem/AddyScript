@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 
 using AddyScript.Runtime.OOP;
@@ -11,21 +11,21 @@ public sealed class Stack : DataItem
 {
     private readonly Stack<DataItem> stack;
 
-    public Stack() => stack = new();
+    public Stack() => stack = new ();
 
-    public Stack(int capacity) => stack = new(capacity);
+    public Stack(int capacity) => stack = new (capacity);
 
-    public Stack(IEnumerable<DataItem> initialContent) => stack = new(initialContent);
+    public Stack(IEnumerable<DataItem> initialContent) => stack = new (initialContent);
 
     public override Class Class => Class.Stack;
 
     public override DataItem[] AsArray => [.. stack];
 
-    public override List<DataItem> AsList => new(stack);
+    public override List<DataItem> AsList => new (stack);
 
-    public override HashSet<DataItem> AsHashSet => new(stack);
+    public override HashSet<DataItem> AsHashSet => new (stack);
 
-    public override Queue<DataItem> AsQueue => new(stack);
+    public override Queue<DataItem> AsQueue => new (stack);
 
     public override Stack<DataItem> AsStack => stack;
 

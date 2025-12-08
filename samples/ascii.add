@@ -2,7 +2,7 @@ import sys::console;
 
 setForeground('Yellow');
 println('******** THE ASCII CODE ********');
-println('');
+println();
 
 print('  ');
 for (i = 0; i < 16; i++)
@@ -19,7 +19,7 @@ for (i = 0; i < 16; i++)
 	print('{0:X} ', i);
 	resetColor();
 	
-	if (!({0, 1, 8, 9} contains i))
+	if (i is not 0 or 1 or 8 or 9)
     {
         for (j = 0; j < 16; j++)
         {

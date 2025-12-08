@@ -25,12 +25,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The variable used to iterate through keys.
         /// </summary>
-        public string KeyName { get; private set; } = keyName;
+        public string KeyName => keyName;
 
         /// <summary>
         /// The variable used to iterate through values.
         /// </summary>
-        public string ValueName { get; private set; } = valueName;
+        public string ValueName => valueName;
 
         /// <summary>
         /// Translates this node.

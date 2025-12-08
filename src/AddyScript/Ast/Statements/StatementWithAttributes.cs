@@ -17,10 +17,10 @@ namespace AddyScript.Ast.Statements
         /// <returns><see cref="AttributeDecl"/></returns>
         public AttributeDecl GetAttribute(string name)
         {
-            if (Attributes != null)
-                foreach (AttributeDecl attribute in Attributes)
-                    if (attribute.Name == name)
-                        return attribute;
+            if (Attributes == null) return null;
+            
+            foreach (AttributeDecl attribute in Attributes)
+                if (attribute.Name == name) return attribute;
 
             return null;
         }

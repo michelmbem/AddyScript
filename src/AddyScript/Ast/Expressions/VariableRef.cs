@@ -17,7 +17,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The name of the referred variable
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// Operates assignment to this reference.

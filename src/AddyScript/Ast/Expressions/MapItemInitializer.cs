@@ -14,12 +14,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The item's key.
         /// </summary>
-        public Expression Key { get; private set; } = key;
+        public Expression Key => key;
 
         /// <summary>
         /// The item's value.
         /// </summary>
-        public Expression Value { get; private set; } = value;
+        public Expression Value => value;
 
         #region Overrides
 

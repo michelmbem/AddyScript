@@ -88,9 +88,9 @@ public class PackFormatItem
 
 public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items)
 {
-    public Endianness Endianness { get; private set; } = endianness;
+    public Endianness Endianness => endianness;
 
-    public List<PackFormatItem> Items { get; private set; } = new List<PackFormatItem>(items);
+    public List<PackFormatItem> Items => new List<PackFormatItem>(items);
 
     public int Length
     {

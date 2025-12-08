@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -316,7 +316,7 @@
     <value>Trop d'arguments pour un appel à {0}</value>
   </data>
   <data name="TypeNameExpected" xml:space="preserve">
-    <value>Nom de type réquis</value>
+    <value>Nom de type ou gabarit réquis</value>
   </data>
   <data name="UnableToFindMethod" xml:space="preserve">
     <value>Impossible de trouver la méthode correspondante dans {0}</value>
@@ -436,12 +436,6 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="AccessorScopeMustBeMoreRestrictive" xml:space="preserve">
     <value>La portée d'un accesseur doit être plus restrictive que la portée de la propriété</value>
   </data>
-  <data name="DuplicatedReadAccessor" xml:space="preserve">
-    <value>Un accesseur en lecture a déjà été défini pour la propriété</value>
-  </data>
-  <data name="DuplicatedWriteAccessor" xml:space="preserve">
-    <value>Un accesseur en écriture a déjà été défini pour la propriété</value>
-  </data>
   <data name="InvalidOperandCount" xml:space="preserve">
     <value>Nombre d'opérandes invalide pour l'opérateur {0}</value>
   </data>
@@ -546,5 +540,8 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   </data>
   <data name="CannotComputeGcdForNegative" xml:space="preserve">
     <value>Impossible de calculer le PGDC de nombres négatifs</value>
+  </data>
+  <data name="BothAccessorsCantRedefineScope" xml:space="preserve">
+    <value>La portée ne peut pas être redéfinie pour les deux accesseurs d'une propriété</value>
   </data>
 </root>

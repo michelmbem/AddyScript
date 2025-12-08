@@ -791,48 +791,28 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
         textWriter.Write(" property {0}", property.IsIndexer ? "[]" : SafeName(property.Name));
 
-        if (property.IsAuto || property.Modifier == Modifier.Abstract)
-            DumpAutoProperty(property);
-        else
-            DumpExpandedProperty(property);
-
-        textWriter.WriteLine();
-    }
-
-    private void DumpAutoProperty(ClassPropertyDecl property)
-    {
-        if (property.Access == PropertyAccess.ReadWrite && property.ReaderScope == property.WriterScope)
-            textWriter.WriteLine(';');
-        else
+        if (property.ReaderBody == null && property.WriterBody == null)
         {
-            textWriter.Write(" {");
-
-            if ((property.Access & PropertyAccess.Read) != PropertyAccess.None)
+            if (property.Access == PropertyAccess.ReadWrite &&
+                property.ReaderScope == property.Scope &&
+                property.WriterScope == property.Scope)
             {
-                if (property.ReaderScope != property.Scope)
-                    textWriter.Write(" {0}", property.ReaderScope.ToString().ToLower());
-                textWriter.Write(" read;");
+                textWriter.WriteLine(';');
             }
-
-            if ((property.Access & PropertyAccess.Write) != PropertyAccess.None)
+            else
             {
-                if (property.WriterScope != property.Scope)
-                    textWriter.Write(" {0}", property.WriterScope.ToString().ToLower());
-                textWriter.Write(" write;");
+                textWriter.Write(" { ");
+
+                if (property.CanRead)
+                    DumpPropertyAccessor(property.Scope, property.ReaderScope,
+                                         property.ReaderBody, Parser.PROPERTY_READER_START, true);
+
+                if (property.CanWrite)
+                    DumpPropertyAccessor(property.Scope, property.WriterScope,
+                                         property.WriterBody, Parser.PROPERTY_WRITER_START, true);
+
+                textWriter.WriteLine('}');
             }
-
-            textWriter.WriteLine(" }");
-        }
-    }
-
-    private void DumpExpandedProperty(ClassPropertyDecl property)
-    {
-        if (property.CanRead && !property.CanWrite && property.ReaderBody.Statements.Length == 1 &&
-            property.ReaderBody.Statements[0] is Return ret && ret.Expression != null)
-        {
-            textWriter.Write(" => ");
-            ret.Expression.AcceptTranslator(this);
-            textWriter.WriteLine(';');
         }
         else
         {
@@ -841,26 +821,34 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             ++textWriter.Indentation;
 
             if (property.CanRead)
-            {
-                if (property.ReaderScope != property.Scope)
-                    textWriter.Write("{0} ", property.ReaderScope.ToString().ToLower());
-
-                textWriter.Write("read");
-                DumpFunctionBody(property.ReaderBody);
-            }
+                DumpPropertyAccessor(property.Scope, property.ReaderScope,
+                                     property.ReaderBody, Parser.PROPERTY_READER_START, false);
 
             if (property.CanWrite)
-            {
-                if (property.WriterScope != property.Scope)
-                    textWriter.Write("{0} ", property.WriterScope.ToString().ToLower());
-
-                textWriter.Write("write");
-                DumpFunctionBody(property.WriterBody);
-            }
+                DumpPropertyAccessor(property.Scope, property.WriterScope,
+                                     property.WriterBody, Parser.PROPERTY_WRITER_START, false);
 
             --textWriter.Indentation;
-            textWriter.Write('}');
+            textWriter.WriteLine('}');
         }
+
+        textWriter.WriteLine();
+    }
+
+    private void DumpPropertyAccessor(Scope propertyScope, Scope accessorScope,
+                                      Block accessorBody, string keyword, bool inline)
+    {
+        if (accessorScope != propertyScope)
+            textWriter.Write("{0} ", accessorScope.ToString().ToLower());
+
+        textWriter.Write(keyword);
+
+        if (accessorBody != null)
+            DumpFunctionBody(accessorBody);
+        else if (inline)
+            textWriter.Write("; ");
+        else
+            textWriter.WriteLine(';');
     }
 
     private void DumpMethod(ClassMethodDecl method)
@@ -903,8 +891,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     private void DumpFunctionBody(Block body)
     {
-        if (body.Statements.Length == 1 && body.Statements[0] is Return ret &&
-            ret.Expression != null)
+        if (body.Statements?[0] is Return ret && ret.Expression != null)
         {
             textWriter.Write(" => ");
             ret.Expression.AcceptTranslator(this);
@@ -1135,6 +1122,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpMatchCase(MatchCase matchCase)
     {
         DumpMatchCasePattern(matchCase.Pattern);
+        if (matchCase.Guard != null)
+        {
+            textWriter.Write(" when ");
+            matchCase.Guard.AcceptTranslator(this);
+        }
         textWriter.Write(" => ");
         DumpMatchExpression(matchCase.Expression);
     }
@@ -1165,37 +1157,38 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             textWriter.Write("{ ");
 
             bool firstProp = true;
-            foreach (var exampleProp in objectPat.Example.AsDynamicObject)
+            foreach (var matcher in objectPat.PropertyMatchers)
             {
                 if (firstProp)
                     firstProp = false;
                 else
                     textWriter.Write(", ");
 
-                textWriter.Write(exampleProp.Key);
-                textWriter.Write(" = ");
-                DumpDataItem(exampleProp.Value);
+                textWriter.Write(matcher.PropertyName);
+                textWriter.Write(" : ");
+                DumpMatchCasePattern(matcher.Pattern);
             }
 
             textWriter.Write(" }");
         }
         else if (pattern is TypePattern typePat)
             textWriter.Write(typePat.TypeName);
-        else if (pattern is PredicatePattern predPat)
+        else if (pattern is NegativePattern negPat)
         {
-            textWriter.Write(predPat.ParameterName);
-            textWriter.Write(": ");
-            predPat.Predicate.AcceptTranslator(this);
+            textWriter.Write("not ");
+            DumpMatchCasePattern(negPat.Child);
+        }
+        else if (pattern is GroupingPattern groupPat)
+        {
+            textWriter.Write('(');
+            DumpMatchCasePattern(groupPat.Child);
+            textWriter.Write(')');
         }
         else if (pattern is CompositePattern compPat)
         {
-            DumpMatchCasePattern(compPat.Components[0]);
-
-            for (int i = 1; i < compPat.Components.Length; ++i)
-            {
-                textWriter.Write(", ");
-                DumpMatchCasePattern(compPat.Components[i]);
-            }
+            DumpMatchCasePattern(compPat.Left);
+            textWriter.Write(compPat.Inclusive ? " and " : " or ");
+            DumpMatchCasePattern(compPat.Right);
         }
     }
 

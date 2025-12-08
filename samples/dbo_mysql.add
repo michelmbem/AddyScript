@@ -1,6 +1,6 @@
 import std::dbo;
 
-try (dbo = new DBO('mysql', 'Server=localhost;Port=3307;User=root;Database=world'))
+try (dbo = new DBO('mysql', 'Server=localhost;Port=3306;User=root;Password=;Database=world'))
 {
 	pairs = dbo.query('SELECT city.name, country.name FROM city JOIN country ON city.countryCode = country.code ORDER BY country.name, city.name');
 	citiesByCountry = pairs.groupBy(|p| => p[1]);

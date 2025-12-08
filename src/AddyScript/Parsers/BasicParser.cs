@@ -255,7 +255,7 @@ public abstract class BasicParser
     protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length <= 0) throw new SyntaxError(FileName, token, errorMessage);
+        if (elements.Length == 0) throw new SyntaxError(FileName, token, errorMessage);
         return elements;
     }
 
@@ -352,10 +352,10 @@ public abstract class BasicParser
     /// </summary>
     protected class ParseTimeClass(Modifier modifier, string name, string parentName, ParseTimeClass next)
     {
-        public Modifier Modifier { get; private set; } = modifier;
-        public string Name { get; private set; } = name;
-        public string ParentName { get; private set; } = parentName;
-        public ParseTimeClass Next { get; private set; } = next;
+        public Modifier Modifier => modifier;
+        public string Name => name;
+        public string ParentName => parentName;
+        public ParseTimeClass Next => next;
     }
 
     #endregion
@@ -377,11 +377,11 @@ public abstract class BasicParser
             PushBlock(false);
         }
 
-        public string Name { get; private set; }
-        public bool IsMethod { get; private set; }
-        public bool IsContructor { get; private set; }
-        public bool IsStatic { get; private set; }
-        public ParseTimeFunction Next { get; private set; }
+        public string Name { get; }
+        public bool IsMethod { get; }
+        public bool IsContructor { get; }
+        public bool IsStatic { get; }
+        public ParseTimeFunction Next { get; }
         public ParseTimeBlock CurrentBlock { get; private set; }
         public int Loops { get; set; }
         public int SwitchBlocks { get; set; }
@@ -411,9 +411,9 @@ public abstract class BasicParser
     /// </summary>
     protected class ParseTimeBlock(bool asExpression, ParseTimeBlock next)
     {
-        public bool AsExpression { get; private set; } = asExpression;
-        public ParseTimeBlock Next { get; private set; } = next;
-        public List<ParseTimeLabel> Labels { get; private set; } = [];
+        public bool AsExpression => asExpression;
+        public ParseTimeBlock Next => next;
+        public List<ParseTimeLabel> Labels => [];
 
         public Dictionary<string, Label> ConvertLabels(Statement[] statements)
         {

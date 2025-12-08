@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The expression used to evaluate the index.
         /// </summary>
-        public Expression Index { get; private set; } = index;
+        public Expression Index => index;
 
 
         /// <summary>

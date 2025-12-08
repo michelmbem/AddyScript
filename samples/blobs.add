@@ -20,11 +20,11 @@ println($'b2 = {b2:x}; b2.length = {b2.length}, b1 == b2 ? {b1 == b2}');
 println();
 
 b2 = blob::fromHexString('48656C6C6F20667269656E647321');
-println($'b2 in base-16 = {b2.toHexString()}, b2.length = {b2.length}, b1 == b2 ? {b1 == b2}');
+println($'b2 in base 16 = {b2.toHexString()}, b2.length = {b2.length}, b1 == b2 ? {b1 == b2}');
 println();
 
 b1 = blob::fromBase64String('SGVsbG8gZnJpZW5kcyE=');
-println($'b1 in base-64 = {b1.toBase64String()}, b1.length = {b1.length}, b1 == b2? {b1 == b2}');
+println($'b1 in base 64 = {b1.toBase64String()}, b1.length = {b1.length}, b1 == b2? {b1 == b2}');
 println();
 
 readln();

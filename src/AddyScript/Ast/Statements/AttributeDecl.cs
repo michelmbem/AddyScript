@@ -4,7 +4,7 @@ using AddyScript.Ast.Expressions;
 namespace AddyScript.Ast.Statements
 {
     /// <summary>
-    /// Attribute's deckaration, used to attach additional informations to an element in the code.
+    /// Attribute's declaration, used to attach additional informations to an element in the code.
     /// </summary>
     /// <remarks>
     /// Initializes a new instance of AttributeDecl.
@@ -21,12 +21,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The attribute's name.
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// A set of initializers for the properties of the declared attribute.
         /// </summary>
-        public PropertyInitializer[] PropertyInitializers { get; private set; } = initializers;
+        public PropertyInitializer[] PropertyInitializers => initializers;
 
         /// <summary>
         /// Gets a property initializer in an attribute by its name.
@@ -35,10 +35,10 @@ namespace AddyScript.Ast.Statements
         /// <returns>A reference to <see cref="PropertyInitializer"/></returns>
         public PropertyInitializer GetPropertyInitializer(string propertyName)
         {
-            if (PropertyInitializers != null)
-                foreach (PropertyInitializer property in PropertyInitializers)
-                    if (property.Name == propertyName)
-                        return property;
+            if (PropertyInitializers == null) return null;
+            
+            foreach (PropertyInitializer property in PropertyInitializers)
+                if (property.Name == propertyName) return property;
 
             return null;
         }

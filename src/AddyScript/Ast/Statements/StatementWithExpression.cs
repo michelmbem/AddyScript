@@ -16,6 +16,6 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The expression that's attached to this statement.
         /// </summary>
-        public Expression Expression { get; private set; } = expression;
+        public Expression Expression => expression;
     }
 }

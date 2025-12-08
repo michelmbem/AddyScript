@@ -18,7 +18,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The set of (name, value) couples used to initialize variables.
         /// </summary>
-        public PropertyInitializer[] Initializers { get; private set; } = initializers;
+        public PropertyInitializer[] Initializers => initializers;
 
         /// <summary>
         /// A factory method to quickly create an instance with a single initializer.

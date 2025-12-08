@@ -17,9 +17,9 @@ public sealed class Map : DataItem
 
     public Map() => dict = [];
 
-    public Map(int capacity) => dict = new(capacity);
+    public Map(int capacity) => dict = new (capacity);
 
-    public Map(Dictionary<DataItem, DataItem> initialContent) => dict = new(initialContent);
+    public Map(Dictionary<DataItem, DataItem> initialContent) => dict = new (initialContent);
 
     public override Class Class => Class.Map;
 

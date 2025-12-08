@@ -20,7 +20,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// Represents a wrapper around the target native function.
         /// </summary>
-        public MethodInfo Method { get; private set; } = method;
+        public MethodInfo Method => method;
 
         /// <summary>
         /// Translates this node.

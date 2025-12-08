@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 
@@ -12,7 +12,7 @@ namespace AddyScript.Runtime.OOP;
 public class ClassMemberSet<T> : List<T>
     where T : ClassMember
 {
-    private readonly Dictionary<string, T> dictionary = new Dictionary<string, T>();
+    private readonly Dictionary<string, T> dictionary = [];
 
     public ClassMemberSet()
     {
@@ -27,17 +27,14 @@ public class ClassMemberSet<T> : List<T>
         AddRange(items);
     }
 
-    public T this[string name]
-    {
-        get { return dictionary[name]; }
-    }
+    public T this[string name] => dictionary[name];
 
     public new void Add(T item)
     {
         ArgumentNullException.ThrowIfNull(item);
 
         if (dictionary.ContainsKey(item.Name))
-            throw new ArgumentException("Item '" + item.Name + "' already exists in the collection");
+            throw new ArgumentException($"Item '{item.Name}' already exists in the collection");
         
         base.Add(item);
         dictionary.Add(item.Name, item);
@@ -46,28 +43,15 @@ public class ClassMemberSet<T> : List<T>
     public new void AddRange(IEnumerable<T> items)
     {
         if (items == null) return;
-
         foreach (T item in items)
             Add(item);
     }
 
-    public bool Contains(string name)
-    {
-        return dictionary.ContainsKey(name);
-    }
+    public bool Contains(string name) => dictionary.ContainsKey(name);
 
-    public int IndexOf(string name)
-    {
-        return IndexOf(dictionary[name]);
-    }
+    public int IndexOf(string name) => IndexOf(dictionary[name]);
 
-    public new bool Remove(T item)
-    {
-        return base.Remove(item) && dictionary.Remove(item.Name);
-    }
+    public new bool Remove(T item) => base.Remove(item) && dictionary.Remove(item.Name);
 
-    public bool Remove(string name)
-    {
-        return Remove(dictionary[name]);
-    }
+    public bool Remove(string name) => Remove(dictionary[name]);
 }

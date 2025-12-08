@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using AddyScript.Runtime.OOP;
 
@@ -9,12 +9,17 @@ namespace AddyScript.Parsers;
 /// <summary>
 /// Represents a keyword.
 /// </summary>
-public class Keyword
+/// <remarks>
+/// Initializes ab instance of <see cref="Keyword"/>
+/// </remarks>
+/// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
+/// <param name="value">The keyword's value (if any)</param>
+public class Keyword(TokenID tokenID, object value = null)
 {
     /// <summary>
-    /// A repository for the keywords.
+    /// A registry for the keywords.
     /// </summary>
-    private static readonly Dictionary<string, Keyword> keywords = new Dictionary<string,Keyword>();
+    private static readonly Dictionary<string, Keyword> Registry = [];
 
     #region Class Initializer
 
@@ -33,18 +38,16 @@ public class Keyword
         Register("default", TokenID.KW_Default);
         Register("for", TokenID.KW_For);
         Register("foreach", TokenID.KW_ForEach);
-        Register("in", TokenID.KW_In);
         Register("while", TokenID.KW_While);
         Register("do", TokenID.KW_Do);
         Register("continue", TokenID.KW_Continue);
         Register("break", TokenID.KW_Break);
         Register("goto", TokenID.KW_Goto);
         Register("import", TokenID.KW_Import);
-        Register("as", TokenID.KW_As);
         Register("extern", TokenID.KW_Extern);
         Register("function", TokenID.KW_Function);
-        Register("yield", TokenID.KW_Yield);
         Register("return", TokenID.KW_Return);
+        Register("yield", TokenID.KW_Yield);
         Register("class", TokenID.KW_Class);
         Register("constructor", TokenID.KW_Constructor);
         Register("property", TokenID.KW_Property);
@@ -52,13 +55,13 @@ public class Keyword
         Register("event", TokenID.KW_Event);
         Register("this", TokenID.KW_This);
         Register("super", TokenID.KW_Super);
-        Register("new", TokenID.KW_New);
 
         Register("throw", TokenID.KW_Throw);
         Register("try", TokenID.KW_Try);
         Register("catch", TokenID.KW_Catch);
         Register("finally", TokenID.KW_Finally);
         
+        Register("as", TokenID.KW_As);
         Register("typeof", TokenID.KW_TypeOf);
         Register("is", TokenID.KW_Is);
         Register("not", TokenID.KW_Not);
@@ -66,6 +69,11 @@ public class Keyword
         Register("endswith", TokenID.KW_EndsWith);
         Register("contains", TokenID.KW_Contains);
         Register("matches", TokenID.KW_Matches);
+        Register("in", TokenID.KW_In);
+        Register("when", TokenID.KW_When);
+        Register("and", TokenID.KW_And);
+        Register("or", TokenID.KW_Or);
+        Register("new", TokenID.KW_New);
         Register("with", TokenID.KW_With);
 
         Register("public", TokenID.Scope, Scope.Public);
@@ -104,41 +112,17 @@ public class Keyword
 
     #endregion
 
-    #region Constructors
-
-    /// <summary>
-    /// Initializes ab instance of <see cref="Keyword"/>
-    /// </summary>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    /// <param name="value">The keyword's value (if any)</param>
-    public Keyword(TokenID tokenID, object value)
-    {
-        TokenID = tokenID;
-        Value = value;
-    }
-
-    /// <summary>
-    /// Initializes ab instance of <see cref="Keyword"/>
-    /// </summary>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    public Keyword(TokenID tokenID)
-    {
-        TokenID = tokenID;
-    }
-
-    #endregion
-
     #region Properties
 
     /// <summary>
     /// The keyword's <see cref="TokenID"/>.
     /// </summary>
-    public TokenID TokenID { get; private set; }
+    public TokenID TokenID => tokenID;
 
     /// <summary>
     /// The keyword's value (if any).
     /// </summary>
-    public object Value { get; private set; }
+    public object Value => value;
 
     #endregion
 
@@ -150,40 +134,22 @@ public class Keyword
     /// <param name="text">The textual representation of the keyword</param>
     /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
     /// <param name="value">The keyword's value (if any)</param>
-    private static void Register(string text, TokenID tokenID, object value)
-    {
-        keywords.Add(text, new Keyword(tokenID, value));
-    }
-
-    /// <summary>
-    /// Registers a keyword in the repository.
-    /// </summary>
-    /// <param name="text">The textual representation of the keyword</param>
-    /// <param name="tokenID">The keyword's <see cref="TokenID"/></param>
-    private static void Register(string text, TokenID tokenID)
-    {
-        keywords.Add(text, new Keyword(tokenID));
-    }
+    private static void Register(string text, TokenID tokenID, object value = null) =>
+        Registry.Add(text, new Keyword(tokenID, value));
 
     /// <summary>
     /// Gets if the given string matches a registered keyword.
     /// </summary>
     /// <param name="text">The textual representation of the keyword</param>
     /// <returns>A <see cref="bool"/></returns>
-    public static bool IsDefined(string text)
-    {
-        return keywords.ContainsKey(text);
-    }
+    public static bool IsDefined(string text) => Registry.ContainsKey(text);
 
     /// <summary>
     /// Gets the keyword matching the given string.
     /// </summary>
     /// <param name="text">The textual representation of the keyword</param>
     /// <returns>A <see cref="Keyword"/></returns>
-    public static Keyword Get(string text)
-    {
-        return keywords[text];
-    }
+    public static Keyword Get(string text) => Registry[text];
 
     #endregion
 }

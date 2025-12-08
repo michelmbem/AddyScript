@@ -17,12 +17,12 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// The expressions used to initialize the real part of the complex number.
         /// </summary>
-        public Expression RealPartInitializer { get; private set; } = realInit;
+        public Expression RealPartInitializer => realInit;
 
         /// <summary>
         /// The expressions used to initialize the imaginary part of the complex number.
         /// </summary>
-        public Expression ImaginaryPartInitializer { get; private set; } = imagInit;
+        public Expression ImaginaryPartInitializer => imagInit;
 
         /// <summary>
         /// Translates this node.

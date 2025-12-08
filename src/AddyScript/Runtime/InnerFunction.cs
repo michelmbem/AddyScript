@@ -168,17 +168,17 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// The name of this function.
     /// </summary>
-    public string Name { get; private set; } = name;
+    public string Name => name;
 
     /// <summary>
     /// The set of parameters required for a call to this function.
     /// </summary>
-    public Parameter[] Parameters { get; private set; } = parameters;
+    public Parameter[] Parameters => parameters;
 
     /// <summary>
     /// The logic of this function.
     /// </summary>
-    public InnerFunctionLogic Logic { get; private set; } = logic;
+    public InnerFunctionLogic Logic => logic;
 
     #endregion
 
@@ -1489,7 +1489,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             int uBound = self.Parameters.Length;
             if (self.Parameters[^1].VaList) --uBound;
 
-            parameters = [.. self.Parameters[0..uBound], new(nameArg.ToString(), arguments[2]), .. self.Parameters[uBound..]];
+            parameters = [.. self.Parameters[0..uBound], new (nameArg.ToString(), arguments[2]), .. self.Parameters[uBound..]];
         }
         else
         {
@@ -1511,12 +1511,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets a character from its Unicode rank.
     /// </summary>
-    public static readonly InnerFunction Char = new ("chr", [new("ascii")], CharLogic);
+    public static readonly InnerFunction Char = new ("chr", [new ("ascii")], CharLogic);
 
     /// <summary>
     /// Gets the Unicode rank of a character.
     /// </summary>
-    public static readonly InnerFunction Order = new ("ord", [new("char")], OrderLogic);
+    public static readonly InnerFunction Order = new ("ord", [new ("char")], OrderLogic);
 
     /// <summary>
     /// Generates an random floatting-point number between 0 and 1.
@@ -1526,132 +1526,132 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Generates an random integer comprised between the given boundaries.
     /// </summary>
-    public static readonly InnerFunction RandomInteger = new ("randint", [new("min"), new("max", new Integer(0))], RandomIntegerLogic);
+    public static readonly InnerFunction RandomInteger = new ("randint", [new ("min"), new ("max", new Integer(0))], RandomIntegerLogic);
 
     /// <summary>
     /// Computes the sine of a number.
     /// </summary>
-    public static readonly InnerFunction Sine = new ("sin", [new("x")], SineLogic);
+    public static readonly InnerFunction Sine = new ("sin", [new ("x")], SineLogic);
 
     /// <summary>
     /// Computes the cosine of a number.
     /// </summary>
-    public static readonly InnerFunction Cosine = new ("cos", [new("x")], CosineLogic);
+    public static readonly InnerFunction Cosine = new ("cos", [new ("x")], CosineLogic);
 
     /// <summary>
     /// Computes the tangent of a number.
     /// </summary>
-    public static readonly InnerFunction Tangent = new ("tan", [new("x")], TangentLogic);
+    public static readonly InnerFunction Tangent = new ("tan", [new ("x")], TangentLogic);
 
     /// <summary>
     /// Computes the arc sine of a number.
     /// </summary>
-    public static readonly InnerFunction ArcSine = new ("asin", [new("x")], ArcSineLogic);
+    public static readonly InnerFunction ArcSine = new ("asin", [new ("x")], ArcSineLogic);
 
     /// <summary>
     /// Computes the arc cosine of a number.
     /// </summary>
-    public static readonly InnerFunction ArcCosine = new ("acos", [new("x")], ArcCosineLogic);
+    public static readonly InnerFunction ArcCosine = new ("acos", [new ("x")], ArcCosineLogic);
 
     /// <summary>
     /// Computes the arc tangent of a number.
     /// </summary>
-    public static readonly InnerFunction ArcTangent = new ("atan", [new("x")], ArcTangentLogic);
+    public static readonly InnerFunction ArcTangent = new ("atan", [new ("x")], ArcTangentLogic);
 
     /// <summary>
     /// Computes the arc tangent of the ratio of two numbers.
     /// </summary>
-    public static readonly InnerFunction ArcTangent2 = new ("atan2", [new("y"), new("x")], ArcTangent2Logic);
+    public static readonly InnerFunction ArcTangent2 = new ("atan2", [new ("y"), new ("x")], ArcTangent2Logic);
 
     /// <summary>
     /// Computes the hyperbolic sine of a number.
     /// </summary>
-    public static readonly InnerFunction SineHyperbolic = new ("sinh", [new("x")], SineHyperbolicLogic);
+    public static readonly InnerFunction SineHyperbolic = new ("sinh", [new ("x")], SineHyperbolicLogic);
 
     /// <summary>
     /// Computes the hyperbolic cosine of a number.
     /// </summary>
-    public static readonly InnerFunction CosineHyperbolic = new ("cosh", [new("x")], CosineHyperbolicLogic);
+    public static readonly InnerFunction CosineHyperbolic = new ("cosh", [new ("x")], CosineHyperbolicLogic);
 
     /// <summary>
     /// Computes the hyperbolic tangent of a number.
     /// </summary>
-    public static readonly InnerFunction TangentHyperbolic = new ("tanh", [new("x")], TangentHyperbolicLogic);
+    public static readonly InnerFunction TangentHyperbolic = new ("tanh", [new ("x")], TangentHyperbolicLogic);
 
     /// <summary>
     /// Converts degrees to radians.
     /// </summary>
-    public static readonly InnerFunction DegreesToRadians = new ("deg2rad", [new("x")], DegreesToRadiansLogic);
+    public static readonly InnerFunction DegreesToRadians = new ("deg2rad", [new ("x")], DegreesToRadiansLogic);
 
     /// <summary>
     /// Converts radians to degrees.
     /// </summary>
-    public static readonly InnerFunction RadiansToDegrees = new ("rad2deg", [new("x")], RadiansToDegreesLogic);
+    public static readonly InnerFunction RadiansToDegrees = new ("rad2deg", [new ("x")], RadiansToDegreesLogic);
 
     /// <summary>
     /// Computes the natural logarithm of a number.
     /// </summary>
-    public static readonly InnerFunction Logarithm = new ("log", [new("x")], LogarithmLogic);
+    public static readonly InnerFunction Logarithm = new ("log", [new ("x")], LogarithmLogic);
 
     /// <summary>
     /// Computes the logarithm on base 10 of a number.
     /// </summary>
-    public static readonly InnerFunction LogarithmBase10 = new ("log10", [new("x")], LogarithmBase10Logic);
+    public static readonly InnerFunction LogarithmBase10 = new ("log10", [new ("x")], LogarithmBase10Logic);
 
     /// <summary>
     /// Computes the logarithm of a number on the given base.
     /// </summary>
-    public static readonly InnerFunction LogarithmBaseN = new ("log2", [new("x"), new("base", new Float(2.0))], LogarithmBaseNLogic);
+    public static readonly InnerFunction LogarithmBaseN = new ("log2", [new ("x"), new ("base", new Float(2.0))], LogarithmBaseNLogic);
 
     /// <summary>
     /// Computes the exponential of a number.
     /// </summary>
-    public static readonly InnerFunction Exponential = new ("exp", [new("x")], ExponentialLogic);
+    public static readonly InnerFunction Exponential = new ("exp", [new ("x")], ExponentialLogic);
 
     /// <summary>
     /// Computes the squared root of a number.
     /// </summary>
-    public static readonly InnerFunction SquareRoot = new ("sqrt", [new("x")], SquareRootLogic);
+    public static readonly InnerFunction SquareRoot = new ("sqrt", [new ("x")], SquareRootLogic);
 
     /// <summary>
     /// Determines the sign (-1, 0 or 1) of a number.
     /// </summary>
-    public static readonly InnerFunction Sign = new ("sign", [new("value")], SignLogic);
+    public static readonly InnerFunction Sign = new ("sign", [new ("value")], SignLogic);
 
     /// <summary>
     /// Determines the absolute value of a number.
     /// </summary>
-    public static readonly InnerFunction AbsoluteValue = new ("abs", [new("value")], AbsoluteValueLogic);
+    public static readonly InnerFunction AbsoluteValue = new ("abs", [new ("value")], AbsoluteValueLogic);
 
     /// <summary>
     /// Truncates a number.
     /// </summary>
-    public static readonly InnerFunction Truncate = new ("trunc", [new("x")], TruncateLogic);
+    public static readonly InnerFunction Truncate = new ("trunc", [new ("x")], TruncateLogic);
 
     /// <summary>
     /// Determines the floor of a number.
     /// </summary>
-    public static readonly InnerFunction Floor = new ("floor", [new("x")], FloorLogic);
+    public static readonly InnerFunction Floor = new ("floor", [new ("x")], FloorLogic);
 
     /// <summary>
     /// Determines the ceiling of a number
     /// </summary>
-    public static readonly InnerFunction Ceiling = new ("ceil", [new("x")], CeilingLogic);
+    public static readonly InnerFunction Ceiling = new ("ceil", [new ("x")], CeilingLogic);
 
     /// <summary>
     /// Rounds off a number.
     /// </summary>
-    public static readonly InnerFunction Round = new ("round", [new("value"), new("precision", new Integer(0))], RoundLogic);
+    public static readonly InnerFunction Round = new ("round", [new ("value"), new ("precision", new Integer(0))], RoundLogic);
 
     /// <summary>
     /// Determines the minimum of two number.
     /// </summary>
-    public static readonly InnerFunction Minimum = new ("min", [new("values", false, true, null)], MinimumLogic);
+    public static readonly InnerFunction Minimum = new ("min", [new ("values", false, true, null)], MinimumLogic);
 
     /// <summary>
     /// Determines the maximum of two number.
     /// </summary>
-    public static readonly InnerFunction Maximum = new ("max", [new("values", false, true, null)], MaximumLogic);
+    public static readonly InnerFunction Maximum = new ("max", [new ("values", false, true, null)], MaximumLogic);
 
     /// <summary>
     /// Gets the current date.
@@ -1661,37 +1661,37 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Format a string with the given mask.
     /// </summary>
-    public static readonly InnerFunction Format = new ("format", [new("mask"), new("values", false, true, null)], FormatLogic);
+    public static readonly InnerFunction Format = new ("format", [new ("mask"), new ("values", false, true, null)], FormatLogic);
 
     /// <summary>
     /// Reads a line of text from the standard input device.
     /// </summary>
-    public static readonly InnerFunction ReadLine = new ("readln", [new("prompt", new String(""))], ReadLineLogic);
+    public static readonly InnerFunction ReadLine = new ("readln", [new ("prompt", new String(""))], ReadLineLogic);
 
     /// <summary>
     /// Prints some text to the standard output device.
     /// </summary>
-    public static readonly InnerFunction Print = new ("print", [new("mask"), new("values", false, true, null)], PrintLogic);
+    public static readonly InnerFunction Print = new ("print", [new ("mask"), new ("values", false, true, null)], PrintLogic);
 
     /// <summary>
     /// Prints a line of text to the standard output device.
     /// </summary>
-    public static readonly InnerFunction PrintLine = new ("println", [new("mask", new String("")), new("values", false, true, null)], PrintLineLogic);
+    public static readonly InnerFunction PrintLine = new ("println", [new ("mask", new String("")), new ("values", false, true, null)], PrintLineLogic);
 
     /// <summary>
     /// Evaluates the expression contained in a string.
     /// </summary>
-    public static readonly InnerFunction Evaluate = new ("eval", [new("expression")], EvaluateLogic);
+    public static readonly InnerFunction Evaluate = new ("eval", [new ("expression")], EvaluateLogic);
 
     /// <summary>
     /// Packs several values in a binary string: a way to create structured data objects.
     /// </summary>
-    public static readonly InnerFunction Pack = new ("pack", [new("fmt"), new("values", false, true, null)], PackLogic);
+    public static readonly InnerFunction Pack = new ("pack", [new ("fmt"), new ("values", false, true, null)], PackLogic);
 
     /// <summary>
     /// Unpacks the values combined in a binary string following the given format.
     /// </summary>
-    public static readonly InnerFunction UnPack = new ("unpack", [new("fmt"), new("str")], UnPackLogic);
+    public static readonly InnerFunction UnPack = new ("unpack", [new ("fmt"), new ("str")], UnPackLogic);
 
     #endregion
 
@@ -1700,32 +1700,32 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Checks that both arguments are equal.
     /// </summary>
-    public static readonly InnerFunction EqualsFunction = new ("equals", [new("self"), new("other")], EqualsLogic);
+    public static readonly InnerFunction EqualsFunction = new ("equals", [new ("self"), new ("other")], EqualsLogic);
 
     /// <summary>
     /// Gets the hashcode of its argument.
     /// </summary>
-    public static readonly InnerFunction HashCodeFunction = new ("hashCode", [new("self")], HashCodeLogic);
+    public static readonly InnerFunction HashCodeFunction = new ("hashCode", [new ("self")], HashCodeLogic);
 
     /// <summary>
     /// Compares its arguments.
     /// </summary>
-    public static readonly InnerFunction CompareToFunction = new ("compareTo", [new("self"), new("other")], CompareToLogic);
+    public static readonly InnerFunction CompareToFunction = new ("compareTo", [new ("self"), new ("other")], CompareToLogic);
 
     /// <summary>
     /// Gets the textual representation of its argument.
     /// </summary>
-    public static readonly InnerFunction ToStringFunction = new ("toString", [new("self"), new("format", new String(""))], ToStringLogic);
+    public static readonly InnerFunction ToStringFunction = new ("toString", [new ("self"), new ("format", new String(""))], ToStringLogic);
 
     /// <summary>
     /// Creates a deep copy of its argument.
     /// </summary>
-    public static readonly InnerFunction CloneFunction = new ("clone", [new("self")], CloneLogic);
+    public static readonly InnerFunction CloneFunction = new ("clone", [new ("self")], CloneLogic);
 
     /// <summary>
     /// Releases the unmanaged resources allocated to its argument.
     /// </summary>
-    public static readonly InnerFunction DisposeFunction = new ("dispose", [new("self")], DisposeLogic);
+    public static readonly InnerFunction DisposeFunction = new ("dispose", [new ("self")], DisposeLogic);
 
     #endregion
 
@@ -1734,7 +1734,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Computes the inverse of a rational number.
     /// </summary>
-    public static readonly InnerFunction RationalInverse = new ("inverse", [new("self")], RationalInverseLogic);
+    public static readonly InnerFunction RationalInverse = new ("inverse", [new ("self")], RationalInverseLogic);
 
     #endregion
 
@@ -1743,12 +1743,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a complex number.
     /// </summary>
-    public static readonly InnerFunction ComplexOf = new("of", [new("real"), new("imag")], ComplexOfLogic);
+    public static readonly InnerFunction ComplexOf = new ("of", [new ("real"), new ("imag")], ComplexOfLogic);
 
     /// <summary>
     /// Computes the conjugate of a complex number.
     /// </summary>
-    public static readonly InnerFunction ComplexConjugate = new ("conjugate", [new("self")], ComplexConjugateLogic);
+    public static readonly InnerFunction ComplexConjugate = new ("conjugate", [new ("self")], ComplexConjugateLogic);
 
     #endregion
 
@@ -1757,17 +1757,17 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a date from the given values.
     /// </summary>
-    public static readonly InnerFunction DateOf = new ("of", [new("values", false, true, null)], DateOfLogic);
+    public static readonly InnerFunction DateOf = new ("of", [new ("values", false, true, null)], DateOfLogic);
 
     /// <summary>
     /// Adds some time units to a date.
     /// </summary>
-    public static readonly InnerFunction DateAdd = new ("add", [new("self"), new("value"), new("unit")], DateAddLogic);
+    public static readonly InnerFunction DateAdd = new ("add", [new ("self"), new ("value"), new ("unit")], DateAddLogic);
 
     /// <summary>
     /// Computes the difference between two dates.
     /// </summary>
-    public static readonly InnerFunction DateSubtract = new ("subtract", [new("self"), new("other"), new("unit")], DateSubtractLogic);
+    public static readonly InnerFunction DateSubtract = new ("subtract", [new ("self"), new ("other"), new ("unit")], DateSubtractLogic);
 
     #endregion
 
@@ -1776,82 +1776,82 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Searches for a string in another string.
     /// </summary>
-    public static readonly InnerFunction StringIndexOf = new ("indexOf", [new("self"), new("value"), new("start", new Integer(0)), new("length", new Integer(0))], StringIndexOfLogic);
+    public static readonly InnerFunction StringIndexOf = new ("indexOf", [new ("self"), new ("value"), new ("start", new Integer(0)), new ("length", new Integer(0))], StringIndexOfLogic);
 
     /// <summary>
     /// Reversely searches for a string in another string.
     /// </summary>
-    public static readonly InnerFunction StringLastIndexOf = new ("lastIndexOf", [new("self"), new("value"), new("start", new Integer(-1)), new("length", new Integer(0))], StringLastIndexOfLogic);
+    public static readonly InnerFunction StringLastIndexOf = new ("lastIndexOf", [new ("self"), new ("value"), new ("start", new Integer(-1)), new ("length", new Integer(0))], StringLastIndexOfLogic);
 
     /// <summary>
     /// Converts all characters in a string to lowercase equivalent.
     /// </summary>
-    public static readonly InnerFunction StringToLower = new ("toLower", [new("self")], StringToLowerLogic);
+    public static readonly InnerFunction StringToLower = new ("toLower", [new ("self")], StringToLowerLogic);
 
     /// <summary>
     /// Converts all characters in a string to uppercase equivalent.
     /// </summary>
-    public static readonly InnerFunction StringToUpper = new ("toUpper", [new("self")], StringToUpperLogic);
+    public static readonly InnerFunction StringToUpper = new ("toUpper", [new ("self")], StringToUpperLogic);
 
     /// <summary>
     /// Capitalzes a string.
     /// </summary>
-    public static readonly InnerFunction StringCapitalize = new ("capitalize", [new("self")], StringCapitalizeLogic);
+    public static readonly InnerFunction StringCapitalize = new ("capitalize", [new ("self")], StringCapitalizeLogic);
 
     /// <summary>
     /// Uncapitalizes a string.
     /// </summary>
-    public static readonly InnerFunction StringUncapitalize = new ("uncapitalize", [new("self")], StringUncapitalizeLogic);
+    public static readonly InnerFunction StringUncapitalize = new ("uncapitalize", [new ("self")], StringUncapitalizeLogic);
 
     /// <summary>
     /// Extract a substring.
     /// </summary>
-    public static readonly InnerFunction StringSubstring = new ("substring", [new("self"), new("start"), new("length", new Integer(0))], StringSubstringLogic);
+    public static readonly InnerFunction StringSubstring = new ("substring", [new ("self"), new ("start"), new ("length", new Integer(0))], StringSubstringLogic);
 
     /// <summary>
     /// Inserts a string in another at a given position.
     /// </summary>
-    public static readonly InnerFunction StringInsert = new ("insert", [new("self"), new("index"), new("value")], StringInsertLogic);
+    public static readonly InnerFunction StringInsert = new ("insert", [new ("self"), new ("index"), new ("value")], StringInsertLogic);
 
     /// <summary>
     /// Deletes a sequence of characters from within a string.
     /// </summary>
-    public static readonly InnerFunction StringRemove = new ("remove", [new("self"), new("index"), new("count", new Integer(0))], StringRemoveLogic);
+    public static readonly InnerFunction StringRemove = new ("remove", [new ("self"), new ("index"), new ("count", new Integer(0))], StringRemoveLogic);
 
     /// <summary>
     /// Replaces of occurences of some substring with another substring.
     /// </summary>
-    public static readonly InnerFunction StringReplace = new ("replace", [new("self"), new("pattern"), new("value")], StringReplaceLogic);
+    public static readonly InnerFunction StringReplace = new ("replace", [new ("self"), new ("pattern"), new ("value")], StringReplaceLogic);
 
     /// <summary>
     /// Removes the given characters from the left of a string.
     /// </summary>
-    public static readonly InnerFunction StringTrimLeft = new ("ltrim", [new("self"), new("chars", new String(" "))], StringTrimLeftLogic);
+    public static readonly InnerFunction StringTrimLeft = new ("ltrim", [new ("self"), new ("chars", new String(" "))], StringTrimLeftLogic);
 
     /// <summary>
     /// Removes the given characters from the right of a string.
     /// </summary>
-    public static readonly InnerFunction StringTrimRight = new ("rtrim", [new("self"), new("chars", new String(" "))], StringTrimRightLogic);
+    public static readonly InnerFunction StringTrimRight = new ("rtrim", [new ("self"), new ("chars", new String(" "))], StringTrimRightLogic);
 
     /// <summary>
     /// Removes the given characters around a string.
     /// </summary>
-    public static readonly InnerFunction StringTrim = new ("trim", [new("self"), new("chars", new String(" "))], StringTrimLogic);
+    public static readonly InnerFunction StringTrim = new ("trim", [new ("self"), new ("chars", new String(" "))], StringTrimLogic);
 
     /// <summary>
     /// Adds the given characters to the left of a string until it reaches the given width.
     /// </summary>
-    public static readonly InnerFunction StringPadLeft = new ("lpad", [new("self"), new("width"), new("padding", new String(" "))], StringPadLeftLogic);
+    public static readonly InnerFunction StringPadLeft = new ("lpad", [new ("self"), new ("width"), new ("padding", new String(" "))], StringPadLeftLogic);
 
     /// <summary>
     /// Adds the given characters to the right of a string until it reaches the given width.
     /// </summary>
-    public static readonly InnerFunction StringPadRight = new ("rpad", [new("self"), new("width"), new("padding", new String(" "))], StringPadRightLogic);
+    public static readonly InnerFunction StringPadRight = new ("rpad", [new ("self"), new ("width"), new ("padding", new String(" "))], StringPadRightLogic);
 
     /// <summary>
     /// Split a string into substrings separated by the given pattern.
     /// </summary>
-    public static readonly InnerFunction StringSplit = new ("split", [new("self"), new("pattern", new String("/\\s+/"))], StringSplitLogic);
+    public static readonly InnerFunction StringSplit = new ("split", [new ("self"), new ("pattern", new String("/\\s+/"))], StringSplitLogic);
 
     #endregion
 
@@ -1860,52 +1860,52 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a blob with the given number of bytes.
     /// </summary>
-    public static readonly InnerFunction BlobOf = new("of", [new("length")], BlobOfLogic);
+    public static readonly InnerFunction BlobOf = new ("of", [new ("length")], BlobOfLogic);
 
     /// <summary>
     /// Creates from the given hexadecimal string.
     /// </summary>
-    public static readonly InnerFunction BlobFromHexString = new("fromHexString", [new("str")], BlobFromHexStringLogic);
+    public static readonly InnerFunction BlobFromHexString = new ("fromHexString", [new ("str")], BlobFromHexStringLogic);
 
     /// <summary>
     /// Converts a blob to a hexadecimal string.
     /// </summary>
-    public static readonly InnerFunction BlobToHexString = new("toHexString", [new("self")], BlobToHexStringLogic);
+    public static readonly InnerFunction BlobToHexString = new ("toHexString", [new ("self")], BlobToHexStringLogic);
 
     /// <summary>
     /// Creates from the given base 64 string.
     /// </summary>
-    public static readonly InnerFunction BlobFromBase64String = new("fromBase64String", [new("str")], BlobFromBase64StringLogic);
+    public static readonly InnerFunction BlobFromBase64String = new ("fromBase64String", [new ("str")], BlobFromBase64StringLogic);
 
     /// <summary>
     /// Converts a blob to a base 64 string.
     /// </summary>
-    public static readonly InnerFunction BlobToBase64String = new("toBase64String", [new("self")], BlobToBase64StringLogic);
+    public static readonly InnerFunction BlobToBase64String = new ("toBase64String", [new ("self")], BlobToBase64StringLogic);
 
     /// <summary>
     /// Searches for a string in another string.
     /// </summary>
-    public static readonly InnerFunction BlobIndexOf = new("indexOf", [new("self"), new("value"), new("start", new Integer(0)), new("length", new Integer(0))], BlobIndexOfLogic);
+    public static readonly InnerFunction BlobIndexOf = new ("indexOf", [new ("self"), new ("value"), new ("start", new Integer(0)), new ("length", new Integer(0))], BlobIndexOfLogic);
 
     /// <summary>
     /// Reversely searches for a string in another string.
     /// </summary>
-    public static readonly InnerFunction BlobLastIndexOf = new("lastIndexOf", [new("self"), new("value"), new("start", new Integer(-1)), new("length", new Integer(0))], BlobLastIndexOfLogic);
+    public static readonly InnerFunction BlobLastIndexOf = new ("lastIndexOf", [new ("self"), new ("value"), new ("start", new Integer(-1)), new ("length", new Integer(0))], BlobLastIndexOfLogic);
 
     /// <summary>
     /// Fills a blob with the given value.
     /// </summary>
-    public static readonly InnerFunction BlobFill = new("fill", [new("self"), new("fillByte"), new("start", new Integer(0)), new("length", new Integer(0))], BlobFillLogic);
+    public static readonly InnerFunction BlobFill = new ("fill", [new ("self"), new ("fillByte"), new ("start", new Integer(0)), new ("length", new Integer(0))], BlobFillLogic);
 
     /// <summary>
     /// Copies a blob to another.
     /// </summary>
-    public static readonly InnerFunction BlobCopyTo = new("copyTo", [new("self"), new("other"), new("srcIndex", new Integer(0)), new("destIndex", new Integer(0)), new("length", new Integer(0))], BlobCopyToLogic);
+    public static readonly InnerFunction BlobCopyTo = new ("copyTo", [new ("self"), new ("other"), new ("srcIndex", new Integer(0)), new ("destIndex", new Integer(0)), new ("length", new Integer(0))], BlobCopyToLogic);
 
     /// <summary>
     /// Resizes a blob preserving its content.
     /// </summary>
-    public static readonly InnerFunction BlobResize = new("resize", [new("self"), new("newSize")], BlobResizeLogic);
+    public static readonly InnerFunction BlobResize = new ("resize", [new ("self"), new ("newSize")], BlobResizeLogic);
 
     #endregion
 
@@ -1914,12 +1914,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets the first index of an item in a list.
     /// </summary>
-    public static readonly InnerFunction TupleIndexOf = new("indexOf", [new("self"), new("value"), new("start", new Integer(0)), new("count", new Integer(0))], TupleIndexOfLogic);
+    public static readonly InnerFunction TupleIndexOf = new ("indexOf", [new ("self"), new ("value"), new ("start", new Integer(0)), new ("count", new Integer(0))], TupleIndexOfLogic);
 
     /// <summary>
     /// Gets the last index of an item in a list.
     /// </summary>
-    public static readonly InnerFunction TupleLastIndexOf = new("lastIndexOf", [new("self"), new("value"), new("start", new Integer(-1)), new("count", new Integer(0))], TupleLastIndexOfLogic);
+    public static readonly InnerFunction TupleLastIndexOf = new ("lastIndexOf", [new ("self"), new ("value"), new ("start", new Integer(-1)), new ("count", new Integer(0))], TupleLastIndexOfLogic);
 
     #endregion
 
@@ -1928,87 +1928,87 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Joins several strings into one.
     /// </summary>
-    public static readonly InnerFunction ListJoin = new ("join", [new("self"), new("separator", new String(""))], ListJoinLogic);
+    public static readonly InnerFunction ListJoin = new ("join", [new ("self"), new ("separator", new String(""))], ListJoinLogic);
 
     /// <summary>
     /// Adds an item in a list.
     /// </summary>
-    public static readonly InnerFunction ListAdd = new ("add", [new("self"), new("value")], ListAddLogic);
+    public static readonly InnerFunction ListAdd = new ("add", [new ("self"), new ("value")], ListAddLogic);
 
     /// <summary>
     /// Inserts an item in a list at the specified position.
     /// </summary>
-    public static readonly InnerFunction ListInsert = new ("insert", [new("self"), new("index"), new("value")], ListInsertLogic);
+    public static readonly InnerFunction ListInsert = new ("insert", [new ("self"), new ("index"), new ("value")], ListInsertLogic);
 
     /// <summary>
     /// Inserts a list in anoter list at the specified position.
     /// </summary>
-    public static readonly InnerFunction ListInsertAll = new ("insertAll", [new("self"), new("index"), new("other")], ListInsertAllLogic);
+    public static readonly InnerFunction ListInsertAll = new ("insertAll", [new ("self"), new ("index"), new ("other")], ListInsertAllLogic);
 
     /// <summary>
     /// Gets the first index of an item in a list.
     /// </summary>
-    public static readonly InnerFunction ListIndexOf = new ("indexOf", [new("self"), new("value"), new("start", new Integer(0)), new("count", new Integer(0))], ListIndexOfLogic);
+    public static readonly InnerFunction ListIndexOf = new ("indexOf", [new ("self"), new ("value"), new ("start", new Integer(0)), new ("count", new Integer(0))], ListIndexOfLogic);
 
     /// <summary>
     /// Gets the last index of an item in a list.
     /// </summary>
-    public static readonly InnerFunction ListLastIndexOf = new ("lastIndexOf", [new("self"), new("value"), new("start", new Integer(-1)), new("count", new Integer(0))], ListLastIndexOfLogic);
+    public static readonly InnerFunction ListLastIndexOf = new ("lastIndexOf", [new ("self"), new ("value"), new ("start", new Integer(-1)), new ("count", new Integer(0))], ListLastIndexOfLogic);
 
     /// <summary>
     /// Makes a binary search on a sorted list.
     /// </summary>
-    public static readonly InnerFunction ListBinarySearch = new ("bsearch", [new("self"), new("value"), new("start")], ListBinarySearchLogic);
+    public static readonly InnerFunction ListBinarySearch = new ("bsearch", [new ("self"), new ("value"), new ("start")], ListBinarySearchLogic);
 
     /// <summary>
     /// Gets the number of occurences of a value in a list.
     /// </summary>
-    public static readonly InnerFunction ListFrequencyOf = new ("frequencyOf", [new("self"), new("value"), new("start", new Integer(0)), new("count", new Integer(0))], ListFrequencyOfLogic);
+    public static readonly InnerFunction ListFrequencyOf = new ("frequencyOf", [new ("self"), new ("value"), new ("start", new Integer(0)), new ("count", new Integer(0))], ListFrequencyOfLogic);
 
     /// <summary>
     /// Removes an item from a list.
     /// </summary>
-    public static readonly InnerFunction ListRemove = new ("remove", [new("self"), new("value")], ListRemoveLogic);
+    public static readonly InnerFunction ListRemove = new ("remove", [new ("self"), new ("value")], ListRemoveLogic);
 
     /// <summary>
     /// Removes an item  or a range of items from a list at the given position.
     /// </summary>
-    public static readonly InnerFunction ListRemoveAt = new ("removeAt", [new("self"), new("index"), new("count", new Integer(1))], ListRemoveAtLogic);
+    public static readonly InnerFunction ListRemoveAt = new ("removeAt", [new ("self"), new ("index"), new ("count", new Integer(1))], ListRemoveAtLogic);
 
     /// <summary>
     /// Clears the content of a list.
     /// </summary>
-    public static readonly InnerFunction ListClear = new ("clear", [new("self")], ListClearLogic);
+    public static readonly InnerFunction ListClear = new ("clear", [new ("self")], ListClearLogic);
 
     /// <summary>
     /// Sorts a list in ascending order.
     /// </summary>
-    public static readonly InnerFunction ListSort = new ("sort", [new("self"), new("comparison", Void.Value)], ListSortLogic);
+    public static readonly InnerFunction ListSort = new ("sort", [new ("self"), new ("comparison", Void.Value)], ListSortLogic);
 
     /// <summary>
     /// Gets the inverse of a list.
     /// </summary>
-    public static readonly InnerFunction ListInverse = new ("inverse", [new("self")], ListInverseLogic);
+    public static readonly InnerFunction ListInverse = new ("inverse", [new ("self")], ListInverseLogic);
 
     /// <summary>
     /// Gets a sublist of a list.
     /// </summary>
-    public static readonly InnerFunction ListSublist = new ("sublist", [new("self"), new("index"), new("count")], ListSublistLogic);
+    public static readonly InnerFunction ListSublist = new ("sublist", [new ("self"), new ("index"), new ("count")], ListSublistLogic);
 
     /// <summary>
     /// Gets a copy of the calling list where any item is unique.
     /// </summary>
-    public static readonly InnerFunction ListUnique = new ("unique", [new("self")], ListUniqueLogic);
+    public static readonly InnerFunction ListUnique = new ("unique", [new ("self")], ListUniqueLogic);
 
     /// <summary>
     /// Maps a list to another.
     /// </summary>
-    public static readonly InnerFunction ListMapTo = new ("mapTo", [new("self"), new("other")], ListMapToLogic);
+    public static readonly InnerFunction ListMapTo = new ("mapTo", [new ("self"), new ("other")], ListMapToLogic);
 
     /// <summary>
     /// Sorts a list in a random order.
     /// </summary>
-    public static readonly InnerFunction ListShuffle = new ("shuffle", [new("self")], ListShuffleLogic);
+    public static readonly InnerFunction ListShuffle = new ("shuffle", [new ("self")], ListShuffleLogic);
 
     #endregion
 
@@ -2017,17 +2017,17 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Adds an item in a set.
     /// </summary>
-    public static readonly InnerFunction SetAdd = new ("add", [new("self"), new("value")], SetAddLogic);
+    public static readonly InnerFunction SetAdd = new ("add", [new ("self"), new ("value")], SetAddLogic);
 
     /// <summary>
     /// Removes an item from a set.
     /// </summary>
-    public static readonly InnerFunction SetRemove = new ("remove", [new("self"), new("value")], SetRemoveLogic);
+    public static readonly InnerFunction SetRemove = new ("remove", [new ("self"), new ("value")], SetRemoveLogic);
 
     /// <summary>
     /// Clears the content of a set.
     /// </summary>
-    public static readonly InnerFunction SetClear = new ("clear", [new("self")], SetClearLogic);
+    public static readonly InnerFunction SetClear = new ("clear", [new ("self")], SetClearLogic);
 
     #endregion
 
@@ -2036,22 +2036,22 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a queue with the given initial content.
     /// </summary>
-    public static readonly InnerFunction QueueOf = new ("of", [new("values", false, true, null)], QueueOfLogic);
+    public static readonly InnerFunction QueueOf = new ("of", [new ("values", false, true, null)], QueueOfLogic);
 
     /// <summary>
     /// Enqueues an item in a set.
     /// </summary>
-    public static readonly InnerFunction QueueEnqueue = new ("enqueue", [new("self"), new("value")], QueueEnqueueLogic);
+    public static readonly InnerFunction QueueEnqueue = new ("enqueue", [new ("self"), new ("value")], QueueEnqueueLogic);
 
     /// <summary>
     /// Dequeues an item from a set.
     /// </summary>
-    public static readonly InnerFunction QueueDequeue = new ("dequeue", [new("self")], QueueDequeueLogic);
+    public static readonly InnerFunction QueueDequeue = new ("dequeue", [new ("self")], QueueDequeueLogic);
 
     /// <summary>
     /// Clears the content of a set.
     /// </summary>
-    public static readonly InnerFunction QueueClear = new ("clear", [new("self")], QueueClearLogic);
+    public static readonly InnerFunction QueueClear = new ("clear", [new ("self")], QueueClearLogic);
 
     #endregion
 
@@ -2060,22 +2060,22 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a stack with the given initial content.
     /// </summary>
-    public static readonly InnerFunction StackOf = new ("of", [new("values", false, true, null)], StackOfLogic);
+    public static readonly InnerFunction StackOf = new ("of", [new ("values", false, true, null)], StackOfLogic);
 
     /// <summary>
     /// Pushs an item in a set.
     /// </summary>
-    public static readonly InnerFunction StackPush = new ("push", [new("self"), new("value")], StackPushLogic);
+    public static readonly InnerFunction StackPush = new ("push", [new ("self"), new ("value")], StackPushLogic);
 
     /// <summary>
     /// Pops an item from a set.
     /// </summary>
-    public static readonly InnerFunction StackPop = new ("pop", [new("self")], StackPopLogic);
+    public static readonly InnerFunction StackPop = new ("pop", [new ("self")], StackPopLogic);
 
     /// <summary>
     /// Clears the content of a set.
     /// </summary>
-    public static readonly InnerFunction StackClear = new ("clear", [new("self")], StackClearLogic);
+    public static readonly InnerFunction StackClear = new ("clear", [new ("self")], StackClearLogic);
 
     #endregion
 
@@ -2084,52 +2084,52 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Gets a value from a map and if absent, returns a default value.
     /// </summary>
-    public static readonly InnerFunction MapGet = new("get", [new("self"), new("key"), new("defaultValue")], MapGetLogic);
+    public static readonly InnerFunction MapGet = new ("get", [new ("self"), new ("key"), new ("defaultValue")], MapGetLogic);
 
     /// <summary>
     /// Updates the value of an existing key in a map. Returns true of the map was effectively updated, false otherwise.
     /// </summary>
-    public static readonly InnerFunction MapUpdate = new("update", [new("self"), new("key"), new("value")], MapUpdateLogic);
+    public static readonly InnerFunction MapUpdate = new ("update", [new ("self"), new ("key"), new ("value")], MapUpdateLogic);
 
     /// <summary>
     /// Adds key-value pair in a map. Throws an error if the key was already present in the map.
     /// </summary>
-    public static readonly InnerFunction MapAdd = new("add", [new("self"), new("key"), new("value")], MapAddLogic);
+    public static readonly InnerFunction MapAdd = new ("add", [new ("self"), new ("key"), new ("value")], MapAddLogic);
 
     /// <summary>
     /// Checks if a map contains some value.
     /// </summary>
-    public static readonly InnerFunction MapContainsValue = new("containsValue", [new("self"), new("value")], MapContainsValueLogic);
+    public static readonly InnerFunction MapContainsValue = new ("containsValue", [new ("self"), new ("value")], MapContainsValueLogic);
 
     /// <summary>
     /// Gets the number of occurences of a value in a map.
     /// </summary>
-    public static readonly InnerFunction MapFrequencyOf = new("frequencyOf", [new("self"), new("value")], MapFrequencyOfLogic);
+    public static readonly InnerFunction MapFrequencyOf = new ("frequencyOf", [new ("self"), new ("value")], MapFrequencyOfLogic);
 
     /// <summary>
     /// Gets the set of distinct keys to which a value is bound in a map.
     /// </summary>
-    public static readonly InnerFunction MapKeysOf = new("keysOf", [new("self"), new("value")], MapKeysOfLogic);
+    public static readonly InnerFunction MapKeysOf = new ("keysOf", [new ("self"), new ("value")], MapKeysOfLogic);
 
     /// <summary>
     /// Creates a new map from the given one where key-value pairs are reversed.
     /// </summary>
-    public static readonly InnerFunction MapInverse = new("inverse", [new("self")], MapInverseLogic);
+    public static readonly InnerFunction MapInverse = new ("inverse", [new ("self")], MapInverseLogic);
 
     /// <summary>
     /// Remove a key-value pair from a map.
     /// </summary>
-    public static readonly InnerFunction MapRemove = new("remove", [new("self"), new("key")], MapRemoveLogic);
+    public static readonly InnerFunction MapRemove = new ("remove", [new ("self"), new ("key")], MapRemoveLogic);
 
     /// <summary>
     /// Remove a set of key-value pairs from a map.
     /// </summary>
-    public static readonly InnerFunction MapRemoveAll = new("removeAll", [new("self"), new("keys")], MapRemoveAllLogic);
+    public static readonly InnerFunction MapRemoveAll = new ("removeAll", [new ("self"), new ("keys")], MapRemoveAllLogic);
 
     /// <summary>
     /// Empties a map.
     /// </summary>
-    public static readonly InnerFunction MapClear = new("clear", [new("self")], MapClearLogic);
+    public static readonly InnerFunction MapClear = new ("clear", [new ("self")], MapClearLogic);
 
     #endregion
 
@@ -2138,7 +2138,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Binds an optional parameter to a function.
     /// </summary>
-    public static readonly InnerFunction ClosureBind = new("bind", [new("self"), new("parameterName"), new("defaultValue")], ClosureBindLogic);
+    public static readonly InnerFunction ClosureBind = new ("bind", [new ("self"), new ("parameterName"), new ("defaultValue")], ClosureBindLogic);
 
     #endregion
 
@@ -2153,7 +2153,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public Function ToFunction()
     {
         var arguments = Parameters.Select(p => new VariableRef(p.Name)).ToArray();
-        return new Function(Parameters, Block.Return(new InnerFunctionCall(this, arguments)));
+        return new Function(Parameters, Block.WithReturn(new InnerFunctionCall(this, arguments)));
     }
 
     /// <summary>
@@ -2168,7 +2168,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                                   .Prepend(new SelfReference())
                                   .ToArray();
 
-        return new Function(Parameters[1..], Block.Return(new InnerFunctionCall(this, arguments)));
+        return new Function(Parameters[1..], Block.WithReturn(new InnerFunctionCall(this, arguments)));
     }
 
     /// <summary>

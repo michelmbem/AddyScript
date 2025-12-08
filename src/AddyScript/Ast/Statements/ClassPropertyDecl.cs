@@ -1,4 +1,3 @@
-﻿using AddyScript.Runtime;
 using AddyScript.Runtime.OOP;
 
 
@@ -7,76 +6,57 @@ namespace AddyScript.Ast.Statements
     /// <summary>
     /// Represents the declaration of class property.
     /// </summary>
-    public class ClassPropertyDecl : ClassMemberDecl
+    /// <remarks>
+    /// Initializes a new instance of ClassPropertyDecl.
+    /// </remarks>
+    /// <param name="name">The property's name</param>
+    /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
+    /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
+    /// <param name="access">The desired property access mode. Used for automatic accessors generation</param>
+    /// <param name="readerScope">The read accessor scope</param>
+    /// <param name="readerBody">The read accessor body</param>
+    /// <param name="writerScope">The write accessor scope</param>
+    /// <param name="writerBody">The write accessor body</param>
+    public class ClassPropertyDecl(string name, Scope scope, Modifier modifier, PropertyAccess access,
+                                   Scope readerScope, Block readerBody, Scope writerScope, Block writerBody) :
+        ClassMemberDecl(name, scope, modifier)
     {
         /// <summary>
-        /// Initializes a new instance of ClassPropertyDecl.
+        /// Determines which accessors to generate when they are not explicitly provided.
         /// </summary>
-        /// <param name="name">The property's name</param>
-        /// <param name="scope">The scope of this property</param>
-        /// <param name="modifier">Determines whether this property is abstract, final, static or not</param>
-        /// <param name="readerBody">The property's read accessor's body</param>
-        /// <param name="writerBody">The property's write accessor's body</param>
-        public ClassPropertyDecl(string name, Scope scope, Modifier modifier, Block readerBody, Block writerBody)
-            : base(name, scope, modifier)
-        {
-            ReaderBody = readerBody;
-            WriterBody = writerBody;
-        }
+        public PropertyAccess Access => access;
 
         /// <summary>
-        /// Initializes a new instance of ClassPropertyDecl.
+        /// The scope of an eventually generated read accessor.
         /// </summary>
-        /// <param name="name">The property's name</param>
-        /// <param name="scope">The property's scope; it may be <b>private</b>, <b>protected</b> or <b>public</b></param>
-        /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
-        /// <param name="access">Determines which accessors to generate</param>
-        public ClassPropertyDecl(string name, Scope scope, Modifier modifier, PropertyAccess access)
-            : base(name, scope, modifier)
-        {
-            IsAuto = true;
-            Access = access;
-        }
+        public Scope ReaderScope => readerScope;
 
         /// <summary>
         /// The property's read accessor.
         /// </summary>
-        public Block ReaderBody { get; private set; }
+        public Block ReaderBody => readerBody;
+
+        /// <summary>
+        /// The scope of an eventually generated write accessor.
+        /// </summary>
+        public Scope WriterScope => writerScope;
 
         /// <summary>
         /// The property's write accessor.
         /// </summary>
-        public Block WriterBody { get; private set; }
-
-        /// <summary>
-        /// Gets if the property has automatically generated accessors and backing field or not.
-        /// </summary>
-        public bool IsAuto { get; private set; }
-
-        /// <summary>
-        /// Determines which accessors to generate when they are not explicitly provided.
-        /// </summary>
-        public PropertyAccess Access { get; private set; }
-
-        /// <summary>
-        /// The scope of an eventually generated read aacessor.
-        /// </summary>
-        public Scope ReaderScope { get; set; }
-
-        /// <summary>
-        /// The scope of an eventually generated write aacessor.
-        /// </summary>
-        public Scope WriterScope { get; set; }
+        public Block WriterBody => writerBody;
 
         /// <summary>
         /// Gets if this property has a read accessor or not.
         /// </summary>
-        public bool CanRead => ReaderBody != null;
+        public bool CanRead =>
+            ReaderBody != null || (access & PropertyAccess.Read) != PropertyAccess.None;
 
         /// <summary>
         /// Gets if this property has a write accessor or not.
         /// </summary>
-        public bool CanWrite => WriterBody != null;
+        public bool CanWrite =>
+            WriterBody != null || (access & PropertyAccess.Write) != PropertyAccess.None;
 
         /// <summary>
         /// Gets if this property is an indexer or not.
@@ -99,41 +79,7 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// Creates a <see cref="ClassMember"/> from this instance.
         /// </summary>
-        public override ClassMember ToClassMember()
-        {
-            ClassProperty property;
-
-            if (IsAuto || Modifier == Modifier.Abstract)
-                property = new ClassProperty(Name, Scope, Modifier, Access, ReaderScope, WriterScope);
-            else
-            {
-                ClassMethod reader = null, writer = null;
-
-                if (ReaderBody != null)
-                {
-                    Parameter[] readerParameters = IsIndexer
-                                                 ? [new Parameter(ForEachLoop.DEFAULT_KEY_NAME)]
-                                                 : [];
-
-                    reader = new ClassMethod(ClassProperty.GetReaderName(Name), Scope, Modifier,
-                                             new Function(readerParameters, ReaderBody));
-                }
-
-                if (WriterBody != null)
-                {
-                    Parameter[] writerParameters = IsIndexer
-                                                 ? [new Parameter(ForEachLoop.DEFAULT_KEY_NAME),
-                                                    new Parameter(ClassProperty.WRITER_PARAMETER_NAME)]
-                                                 : [new Parameter(ClassProperty.WRITER_PARAMETER_NAME)];
-
-                    writer = new ClassMethod(ClassProperty.GetWriterName(Name), Scope, Modifier,
-                                             new Function(writerParameters, WriterBody));
-                }
-
-                property = new ClassProperty(Name, Scope, Modifier, reader, writer);
-            }
-
-            return property;
-        }
+        public override ClassMember ToClassMember() =>
+            new ClassProperty(Name, Scope, Modifier, Access, ReaderScope, ReaderBody, WriterScope, WriterBody);
     }
 }

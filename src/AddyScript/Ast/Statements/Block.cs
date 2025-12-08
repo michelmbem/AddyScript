@@ -35,14 +35,14 @@ namespace AddyScript.Ast.Statements
         /// Creates a block with a single return statement in it.
         /// </summary>
         /// <returns>Nothing</returns>
-        public static Block Return() => new (new Return());
+        public static Block WithReturn() => new (new Return());
 
         /// <summary>
         /// Creates a block with a single return statement in it.
         /// </summary>
         /// <param name="expression">The expression to be returned</param>
         /// <returns>An <see cref="Expression"/></returns>
-        public static Block Return(Expression expression) => new (new Return(expression));
+        public static Block WithReturn(Expression expression) => new (new Return(expression));
 
         /// <summary>
         /// Appends a statement to the block.

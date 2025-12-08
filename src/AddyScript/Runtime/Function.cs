@@ -27,7 +27,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// Represents the empty function (one that does nothing).
     /// </summary>
-    public static readonly Function Empty = new ([], Block.Return());
+    public static readonly Function Empty = new ([], Block.WithReturn());
 
     /// <summary>
     /// Maps method names to corresponding instances of <see cref="Function"/>.
@@ -46,12 +46,12 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// The parameters of this function.
     /// </summary>
-    public Parameter[] Parameters { get; private set; } = parameters;
+    public Parameter[] Parameters => parameters;
 
     /// <summary>
     /// The body of this function if it is user defined.
     /// </summary>
-    public Block Body { get; private set; } = body;
+    public Block Body { get; set; } = body;
 
     /// <summary>
     /// The function's attributes.
@@ -99,16 +99,8 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <summary>
     /// The maximum number of arguments required by a call to this function.
     /// </summary>
-    public int MaxNumArgs
-    {
-        get
-        {
-            if (Parameters.Length > 0 && Parameters[Parameters.Length - 1].VaList)
-                return int.MaxValue;
-
-            return Parameters.Length;
-        }
-    }
+    public int MaxNumArgs =>
+        Parameters.Length > 0 && Parameters[^1].VaList ? int.MaxValue : Parameters.Length;
 
     /// <summary>
     /// Updates the captured items after any call.

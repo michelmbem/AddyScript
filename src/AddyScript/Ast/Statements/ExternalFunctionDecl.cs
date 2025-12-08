@@ -17,12 +17,12 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The function's name
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// The function's parameters
         /// </summary>
-        public ParameterDecl[] Parameters { get; private set; } = parameters;
+        public ParameterDecl[] Parameters => parameters;
 
         /// <summary>
         /// Translates this node.

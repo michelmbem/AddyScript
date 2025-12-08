@@ -12,13 +12,18 @@
     {
 
         /// <summary>
-        /// The pattern to match against
+        /// The pattern to match against.
         /// </summary>
-        public Pattern Pattern { get; private set; } = pattern;
+        public Pattern Pattern => pattern;
 
         /// <summary>
         /// The expression returned in case of a positive match
         /// </summary>
-        public Expression Expression { get; private set; } = expression;
+        public Expression Expression => expression;
+
+        /// <summary>
+        /// An optional predicate that must also evaluate to <b>true</b> for the case to match.
+        /// </summary>
+        public Expression Guard { get; set; }
     }
 }

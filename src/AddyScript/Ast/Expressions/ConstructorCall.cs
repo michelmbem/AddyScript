@@ -35,7 +35,7 @@ namespace AddyScript.Ast.Expressions
         /// <summary>
         /// A set of property initializers for the newly created object.
         /// </summary>
-        public PropertyInitializer[] PropertyInitializers { get; private set; } = initializers;
+        public PropertyInitializer[] PropertyInitializers => initializers;
 
         /// <summary>
         /// Translates this node.

@@ -18,17 +18,17 @@ namespace AddyScript.Ast.Statements
         /// <summary>
         /// The member's name.
         /// </summary>
-        public string Name { get; private set; } = name;
+        public string Name => name;
 
         /// <summary>
         /// The scope of this member.
         /// </summary>
-        public Scope Scope { get; private set; } = scope;
+        public Scope Scope => scope;
 
         /// <summary>
         /// Determines whether this member is abstract, final, static or none.
         /// </summary>
-        public Modifier Modifier { get; private set; } = modifier;
+        public Modifier Modifier => modifier;
 
         /// <summary>
         /// Creates a <see cref="ClassMember"/> from this instance.

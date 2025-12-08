@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,11 +9,11 @@ namespace AddyScript.Translators.Utility;
 
 public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
 {
-    private readonly Stack<string> prefixStack = new();
-    private readonly StringBuilder prefixBuilder = new();
     private readonly TextWriter innerWriter = innerWriter;
-    private bool lineStart = true;
+    private readonly Stack<string> prefixStack = new ();
+    private readonly StringBuilder prefixBuilder = new ();
     private string linePrefix = string.Empty;
+    private bool atLineStart = true;
 
     public int Indentation { get; set; }
 
@@ -35,19 +35,13 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// Clears all buffers for the current writer and causes any buffered data to be written to the underlying device.
     /// </summary>
     /// <filterpriority>1</filterpriority>
-    public override void Flush()
-    {
-        innerWriter.Flush();
-    }
+    public override void Flush() => innerWriter.Flush();
 
     /// <summary>
     /// Closes the current writer and releases any system resources associated with the writer.
     /// </summary>
     /// <filterpriority>1</filterpriority>
-    public override void Close()
-    {
-        innerWriter.Close();
-    }
+    public override void Close() => innerWriter.Close();
 
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="T:System.IO.TextWriter" /> and optionally releases the managed resources.
@@ -67,20 +61,21 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
     public override void Write(char value)
     {
-        if (lineStart)
+        if (atLineStart)
         {
-            for (int i = 0; i < Indentation; i++)
+            for (int i = 0; i < Indentation; ++i)
                 innerWriter.Write('\t');
+
             innerWriter.Write(linePrefix);
         }
 
         innerWriter.Write(value);
-        lineStart = value == '\n';
+        atLineStart = value == '\n';
 
-        if (lineStart)
+        if (atLineStart)
             prefixBuilder.Clear();
         else
-            prefixBuilder.Append(char.IsWhiteSpace(value) ? value : ' ');
+            prefixBuilder.Append(value is ' ' or '\t' ? value : ' ');
     }
 
     /// <summary>
@@ -118,10 +113,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The Boolean to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(bool value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(bool value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of a 4-byte signed integer to the text stream.
@@ -129,10 +121,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 4-byte signed integer to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(int value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(int value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of a 4-byte unsigned integer to the text stream.
@@ -140,10 +129,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 4-byte unsigned integer to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(uint value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(uint value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of an 8-byte signed integer to the text stream.
@@ -151,10 +137,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 8-byte signed integer to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(long value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(long value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of an 8-byte unsigned integer to the text stream.
@@ -162,10 +145,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 8-byte unsigned integer to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(ulong value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(ulong value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of a 4-byte floating-point value to the text stream.
@@ -173,10 +153,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 4-byte floating-point value to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(float value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(float value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of an 8-byte floating-point value to the text stream.
@@ -184,10 +161,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The 8-byte floating-point value to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(double value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(double value) => Write(value.ToString());
 
     /// <summary>
     /// Writes the text representation of a decimal value to the text stream.
@@ -195,10 +169,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The decimal value to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(decimal value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(decimal value) => Write(value.ToString());
 
     /// <summary>
     /// Writes a string to the text stream.
@@ -218,10 +189,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="value">The object to write. </param>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void Write(object value)
-    {
-        Write(value.ToString());
-    }
+    public override void Write(object value) => Write(value.ToString());
 
     /// <summary>
     /// Writes out a formatted string, using the same semantics as <see cref="M:System.String.Format(System.String,System.Object)" />.
@@ -232,10 +200,8 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
     /// <exception cref="T:System.FormatException">The format specification in format is invalid.-or- The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted. </exception><filterpriority>1</filterpriority>
-    public override void Write(string format, object arg0)
-    {
+    public override void Write(string format, object arg0) =>
         Write(string.Format(format, arg0));
-    }
 
     /// <summary>
     /// Writes out a formatted string, using the same semantics as <see cref="M:System.String.Format(System.String,System.Object)" />.
@@ -247,10 +213,8 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
     /// <exception cref="T:System.FormatException">The format specification in format is invalid.-or- The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted. </exception><filterpriority>1</filterpriority>
-    public override void Write(string format, object arg0, object arg1)
-    {
+    public override void Write(string format, object arg0, object arg1) =>
         Write(string.Format(format, arg0, arg1));
-    }
 
     /// <summary>
     /// Writes out a formatted string, using the same semantics as <see cref="M:System.String.Format(System.String,System.Object)" />.
@@ -263,10 +227,8 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
     /// <exception cref="T:System.FormatException">The format specification in format is invalid.-or- The number indicating an argument to be formatted is less than zero, or larger than or equal to the number of provided objects to be formatted. </exception><filterpriority>1</filterpriority>
-    public override void Write(string format, object arg0, object arg1, object arg2)
-    {
+    public override void Write(string format, object arg0, object arg1, object arg2) =>
         Write(string.Format(format, arg0, arg1, arg2));
-    }
 
     /// <summary>
     /// Writes out a formatted string, using the same semantics as <see cref="M:System.String.Format(System.String,System.Object)" />.
@@ -277,10 +239,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
     /// <exception cref="T:System.FormatException">The format specification in format is invalid.-or- The number indicating an argument to be formatted is less than zero, or larger than or equal to <paramref name="arg" />. Length. </exception><filterpriority>1</filterpriority>
-    public override void Write(string format, object[] arg)
-    {
-        Write(string.Format(format, arg));
-    }
+    public override void Write(string format, object[] arg) => Write(string.Format(format, arg));
 
     /// <summary>
     /// Writes a line terminator to the text stream.
@@ -290,10 +249,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// </returns>
     /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter" /> is closed. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
-    public override void WriteLine()
-    {
-        Write(NewLine);
-    }
+    public override void WriteLine() => Write(NewLine);
 
     /// <summary>
     /// Writes a character followed by a line terminator to the text stream.
@@ -529,10 +485,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// An <see cref="IFormatProvider" /> object for a specific culture, or the formatting of the current culture if no other culture is specified.
     /// </returns>
     /// <filterpriority>2</filterpriority>
-    public override IFormatProvider FormatProvider
-    {
-        get { return innerWriter.FormatProvider; }
-    }
+    public override IFormatProvider FormatProvider => innerWriter.FormatProvider;
 
     /// <summary>
     /// When overridden in a derived class, returns the <see cref="T:System.Text.Encoding" /> in which the output is written.
@@ -541,10 +494,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// The Encoding in which the output is written.
     /// </returns>
     /// <filterpriority>1</filterpriority>
-    public override Encoding Encoding
-    {
-        get { return innerWriter.Encoding; }
-    }
+    public override Encoding Encoding => innerWriter.Encoding;
 
     /// <summary>
     /// Gets or sets the line terminator string used by the current TextWriter.
@@ -555,8 +505,8 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <filterpriority>2</filterpriority>
     public override string NewLine
     {
-        get { return innerWriter.NewLine; }
-        set { innerWriter.NewLine = value; }
+        get => innerWriter.NewLine;
+        set => innerWriter.NewLine = value;
     }
 
     #endregion

@@ -1,9 +1,9 @@
-//**************************************************************************************************
-// "Anonymous Function Call" is a part of AddyScript's syntax that allows any expression to be used
-// as a function. The expression must, however, be evaluated as a closure. Such an expression can be
-// a call to a function that returns a closure, a reference to an element of a list of closures, or
-// an inline function/lambda expression defined and invoked in-place.
-//**************************************************************************************************
+/**************************************************************************************************
+* "Anonymous Function Call" is a part of AddyScript's syntax that allows any expression to be used
+* as a function. The expression must, however, be evaluated as a closure. Such an expression can be
+* a call to a function that returns a closure, a reference to an element of a list of closures, or
+* an inline function/lambda expression defined and invoked in-place.
+**************************************************************************************************/
 
 // fn returns a closure
 function f(n)

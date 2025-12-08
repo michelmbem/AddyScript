@@ -20,8 +20,8 @@ class Product
 	
 	public function hashCode() => this.id.hashCode();
 	
-	public function toString(fmt = '')
-		=> $'Product {{id = {this.id}, name = "{this.name}", price = {this.price:c}}}';
+	public function toString(fmt = '') =>
+		$'Product {{id = {this.id}, name = "{this.name}", price = {this.price:c}}}';
 }
 
 products = [
@@ -43,7 +43,7 @@ println();
 s = {..products};
 
 println('items in the set:');
-println(((list)s).join(NEWLINE));
+s.each(println);
 println();
 
 distincts = products.aggregate([], |acc, val| => {
