@@ -8,6 +8,7 @@ using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
 using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
+using AddyScript.Gui.Terminal;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -25,7 +26,6 @@ using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Search;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using Pty.Net;
 using MBI = MsBox.Avalonia.Enums.Icon;
 using SR = AddyScript.Gui.Properties.Resources;
 
@@ -37,8 +37,8 @@ public partial class MainWindow : Window
 
     private const string HELP_LINK = App.REPO_URL + "/blob/master/docs/README.md";
 
-    private readonly MarkerMargin markerMargin = new ();
-    private readonly FoldingStrategy foldingStrategy = new ();
+    private readonly MarkerMargin markerMargin = new();
+    private readonly FoldingStrategy foldingStrategy = new();
     private readonly Stack<CallTipInfo> callTipStack = [];
 
     private FoldingManager foldingManager;
@@ -67,7 +67,7 @@ public partial class MainWindow : Window
     private void InitializeStyling()
     {
         Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("AddyScript");
-        
+
         TextEditorOptions options = Editor.Options;
         options.AllowToggleOverstrikeMode = true;
         options.EnableTextDragDrop = true;
@@ -82,7 +82,7 @@ public partial class MainWindow : Window
         textArea.SelectionChanged += EditorSelectionChanged;
         textArea.TextEntering += EditorTextEntering;
         textArea.TextEntered += EditorTextEntered;
-        
+
         textMarkerService = new TextMarkerService(Editor);
         TextView textView = textArea.TextView;
         textView.BackgroundRenderers.Add(textMarkerService);
@@ -100,7 +100,7 @@ public partial class MainWindow : Window
 
         idleTimer.Tick += EditorIdle;
         idleTimer.Start();
-        
+
         // Dwell timer
         dwellTimer = new DispatcherTimer()
         {
@@ -204,7 +204,7 @@ public partial class MainWindow : Window
     /// <param name="path"></param>
     public void Open(string path)
     {
-        string content = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var content = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
         var document = new TextDocument(content);
         document.Changed += EditorDocumentChanged;
         Editor.Document = document;
@@ -433,8 +433,8 @@ public partial class MainWindow : Window
             CaretPositioningMode.WordStart);
 
         return wordStart < 0 || wordStart >= caretOffset
-             ? string.Empty
-             : document.GetText(wordStart, caretOffset - wordStart);
+            ? string.Empty
+            : document.GetText(wordStart, caretOffset - wordStart);
     }
 
     /// <summary>
@@ -467,10 +467,10 @@ public partial class MainWindow : Window
             CaretPositioningMode.WordBorder);
 
         return wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart
-             ? string.Empty
-             : document.GetText(wordStart, wordEnd - wordStart);
+            ? string.Empty
+            : document.GetText(wordStart, wordEnd - wordStart);
     }
-    
+
     /// <summary>
     /// Gets the "word" at a given offset.
     /// </summary>
@@ -512,7 +512,7 @@ public partial class MainWindow : Window
         where T : ICompletionData
     {
         completionWindow = new CompletionWindow(Editor.TextArea);
-        
+
         foreach (var dataItem in completionData)
         {
             completionWindow.CompletionList.CompletionData.Add(dataItem);
@@ -558,7 +558,7 @@ public partial class MainWindow : Window
             Provider = new SimpleOverloadProvider(CurrentCallTip)
         };
 
-        insightWindow.Closed += (s, e) =>  insightWindow = null;
+        insightWindow.Closed += (s, e) => insightWindow = null;
         insightWindow.Show();
     }
 
@@ -585,7 +585,7 @@ public partial class MainWindow : Window
     private void OpenSearchPanel(bool replaceMode)
     {
         Editor.SearchPanel?.Uninstall();
-        
+
         var searchPanel = SearchPanel.Install(Editor);
         var selection = Editor.TextArea.Selection;
         searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
@@ -602,10 +602,10 @@ public partial class MainWindow : Window
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
-        textMarkerService.AddMarker(new (start.Offset, end.Offset) { ToolTip = errorMessage });
+        textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
         Editor.TextArea.TextView.Repaint();
     }
-    
+
     /// <summary>
     /// Deletes all error markers.
     /// </summary>
@@ -649,10 +649,10 @@ public partial class MainWindow : Window
     private async void WindowClosing(object sender, WindowClosingEventArgs e)
     {
         if (Saved) return;
-        
+
         e.Cancel = true;
         if (!await PromptToSave()) return;
-        
+
         Closing -= WindowClosing;
         Close();
     }
@@ -806,7 +806,7 @@ public partial class MainWindow : Window
         /****************************************************************************
          * Parsing and running the script is delegated to asis.
          * *************************************************************************/
-        
+
         string scriptPath;
         if (string.IsNullOrEmpty(filePath))
         {
@@ -839,24 +839,13 @@ public partial class MainWindow : Window
 
         try
         {
-            var options = new PtyOptions
-            {
-                Name = $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
-                Rows = 30,
-                Cols = 120,
-                App = "./asis",
-                CommandLine = [..argsList],
-                Cwd = Environment.CurrentDirectory,
-            };
+            int exitCode = await TerminalLauncher.Launch(
+                this,
+                $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
+                "./asis",
+                [..argsList]);
 
-            var terminalWindow = new TerminalWindow
-            {
-                Title = options.Name,
-                Options =  options
-            };
-            
-            await terminalWindow.ShowDialog(this);
-            if (terminalWindow.ExitCode == 0) return;
+            if (exitCode == 0) return;
 
             using var logReader = File.OpenText(logPath);
             if (await logReader.ReadLineAsync() != scriptPath) return;
@@ -934,8 +923,8 @@ public partial class MainWindow : Window
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
         /****************************************************************************
-        * Tries to popup an keywordMenu menu or to display a calltip
-        * *************************************************************************/
+         * Tries to popup an keywordMenu menu or to display a calltip
+         * *************************************************************************/
 
         if (InCommentOrString(Editor.CaretOffset)) return;
 
@@ -1002,7 +991,7 @@ public partial class MainWindow : Window
         }
 
         if (vp == hoverPosition) return;
-        
+
         hoverPosition = vp;
         InfoPopup.IsOpen = false;
         dwellTimer.Stop();
@@ -1022,7 +1011,7 @@ public partial class MainWindow : Window
     {
         if (updateFolding)
             foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
-        
+
         var clipboard = GetTopLevel(this)?.Clipboard;
         if (clipboard == null) return;
 
@@ -1036,7 +1025,7 @@ public partial class MainWindow : Window
         dwellTimer.Stop();
 
         if (hoverPosition == null) return;
-        
+
         int hoverOffset = Editor.Document.GetOffset(hoverPosition.Value.Location);
         if (InCommentOrString(hoverOffset)) return;
 
