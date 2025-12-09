@@ -11,7 +11,6 @@ internal class MarkerMargin : AbstractMargin
 {
     private const int WIDTH = 14;
     private static readonly IImage Bullet = ImageFactory.LoadFontIcon("fa-ban", WIDTH, Colors.Red);
-    
     private readonly Dictionary<int, string> markers = [];
 
     public void AddMarker(int line, string tooltip)

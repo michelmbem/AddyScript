@@ -6,7 +6,7 @@ using AvaloniaEdit.Rendering;
 
 namespace AddyScript.Gui.Terminal;
 
-public class TerminalColorizer : DocumentColorizingTransformer
+internal class TerminalColorizer : DocumentColorizingTransformer
 {
     public readonly List<ColoredSpan> Spans = [];
 

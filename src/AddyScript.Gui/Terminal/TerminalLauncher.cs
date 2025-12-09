@@ -7,7 +7,7 @@ using Pty.Net;
 
 namespace AddyScript.Gui.Terminal;
 
-public static class TerminalLauncher
+internal static class TerminalLauncher
 {
     public static async Task<int> Launch(Window owner, string title, string command, string[] args) =>
         RuntimeInformation.IsOSPlatform(OSPlatform.Windows)

@@ -6,7 +6,7 @@ using Pty.Net;
 
 namespace AddyScript.Gui.Terminal;
 
-public class TerminalSession
+internal class TerminalSession
 {
     private static readonly UTF8Encoding Encoding = new (false);
     private readonly CancellationToken timeoutToken = new CancellationTokenSource(-1).Token;

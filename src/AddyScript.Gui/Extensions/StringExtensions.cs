@@ -49,7 +49,7 @@ public static class StringExtensions
         if (end <= 0) return string.Empty;
 
         int start = end - 1;
-        while ((start >= 0) && (value[start] is ' ' or '\t'))
+        while (start >= 0 && value[start] is ' ' or '\t')
             --start;
 
         return value[(start + 1)..end];

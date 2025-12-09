@@ -11,15 +11,15 @@ namespace AddyScript.Gui.Markers;
 
 internal class TextMarker(int offset, int endOffset, IBrush color = null) : ISegment
 {
-    public int Offset { get; } = offset;
-    
-    public int EndOffset { get; } = endOffset;
-    
+    public int Offset => offset;
+
+    public int EndOffset => endOffset;
+
     public int Length => EndOffset - Offset;
 
-    public IBrush Color { get; } = color ?? Brushes.Red ;
-    
-    public string ToolTip { get; set; }
+    public IBrush Color => color ?? Brushes.Red;
+
+    public string ToolTip { get; init; }
 }
 
 internal class TextMarkerService(TextEditor editor) : IBackgroundRenderer
@@ -28,22 +28,22 @@ internal class TextMarkerService(TextEditor editor) : IBackgroundRenderer
 
     public KnownLayer Layer => KnownLayer.Selection;
 
-    public void Draw(TextView textView, DrawingContext context)
+    public void Draw(TextView textView, DrawingContext drawingContext)
     {
         if (!textView.VisualLinesValid) return;
 
         foreach (var marker in markers)
         {
-            foreach (var r in BackgroundGeometryBuilder.GetRectsForSegment(textView, marker))
+            foreach (var rect in BackgroundGeometryBuilder.GetRectsForSegment(textView, marker))
             {
-                var underline = new Rect(r.X, r.Bottom - 2, r.Width, 2);
-                context.DrawSquiggle(underline, marker.Color);
+                var underline = new Rect(rect.X, rect.Bottom - 2, rect.Width, 2);
+                drawingContext.DrawSquiggle(underline, marker.Color);
             }
         }
     }
 
     public void AddMarker(TextMarker marker) => markers.Add(marker);
-    
+
     public void ClearMarkers() => markers.Clear();
 
     public TextMarker GetMarkerAt(TextViewPosition? position)

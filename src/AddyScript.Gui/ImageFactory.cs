@@ -21,7 +21,7 @@ internal static class ImageFactory
         
         icon.Measure(Size.Infinity);
         icon.Arrange(new Rect(icon.DesiredSize));
-
-        return icon.RenderToBitmap(size, size);
+        
+        return icon.RenderToBitmap(size);
     }
 }

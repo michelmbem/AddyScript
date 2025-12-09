@@ -6,14 +6,14 @@ using Avalonia.Media;
 
 namespace AddyScript.Gui.Terminal;
 
-public record ColoredSpan(int StartOffset, int Length, IBrush Foreground, IBrush Background)
+internal record ColoredSpan(int StartOffset, int Length, IBrush Foreground, IBrush Background)
 {
     public int EndOffset => StartOffset + Length;
 }
 
-public record TerminalText(string Text, List<ColoredSpan> Spans);
+internal record TerminalText(string Text, List<ColoredSpan> Spans);
 
-public partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
+internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
     private IBrush currentFg = defaultFg;
