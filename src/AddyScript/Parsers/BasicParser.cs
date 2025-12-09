@@ -120,11 +120,11 @@ public abstract class BasicParser
     {
         SkipComments();
 
-        if (!predicate.Invoke(token)) throw new SyntaxError(FileName, token);
+        if (!predicate.Invoke(token))
+            throw new SyntaxError(FileName, token);
 
         Token matched = token;
         Consume(1);
-
         return matched;
     }
 
@@ -135,10 +135,8 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> that the next non-comment <see cref="Token"/> should have</param>
     /// <returns>The matched <see cref="Token"/></returns>
-    protected Token Match(TokenID requiredID)
-    {
-        return Match(t => t.TokenID == requiredID);
-    }
+    protected Token Match(TokenID requiredID) =>
+        Match(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to have one of the required <see cref="TokenID"/>s.<br/>
@@ -147,10 +145,8 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredIDs">The set of <see cref="TokenID"/>s to search in</param>
     /// <returns>The matched <see cref="Token"/></returns>
-    protected Token MatchAny(params TokenID[] requiredIDs)
-    {
-        return Match(t => requiredIDs.Any(id => id == t.TokenID));
-    }
+    protected Token MatchAny(params TokenID[] requiredIDs) =>
+        Match(t => requiredIDs.Any(id => id == t.TokenID));
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment satisfies a particular <paramref name="predicate"/>.<br/>
@@ -168,20 +164,16 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> we may want to match</param>
     /// <returns><b>true</b> if the token's ID matches the given <see cref="TokenID"/>; <b>false</b> otherwise</returns>
-    protected bool TryMatch(TokenID requiredID)
-    {
-        return TryMatch(t => t.TokenID == requiredID);
-    }
+    protected bool TryMatch(TokenID requiredID) =>
+        TryMatch(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment has one of the given <see cref="TokenID"/>s.
     /// </summary>
     /// <param name="requiredIDs">The set of <see cref="TokenID"/>s to search in</param>
     /// <returns><b>true</b> if the token's ID matches one of the given <see cref="TokenID"/>s; <b>false</b> otherwise</returns>
-    protected bool TryMatchAny(params TokenID[] requiredIDs)
-    {
-        return TryMatch(t => requiredIDs.Any(id => id == t.TokenID));
-    }
+    protected bool TryMatchAny(params TokenID[] requiredIDs) =>
+        TryMatch(t => requiredIDs.Any(id => id == t.TokenID));
 
     /// <summary>
     /// Searches the <see cref="Token"/> stream for a symbol that is not a comment and satisfies a particular
@@ -206,10 +198,8 @@ public abstract class BasicParser
     /// <param name="lookupID">The <see cref="TokenID"/> to find</param>
     /// <param name="k">The position of the matched <see cref="Token"/> if any</param>
     /// <returns><b>true</b> if a matched <see cref="Token"/> is met ahead; <b>false</b> otherwise</returns>
-    protected bool LookAhead(TokenID lookupID, out int k)
-    {
-        return LookAhead(t => t.TokenID == lookupID, out k);
-    }
+    protected bool LookAhead(TokenID lookupID, out int k) =>
+        LookAhead(t => t.TokenID == lookupID, out k);
 
     /// <summary>
     /// Executes some parsing method and verifies that the returned value is non-null.
@@ -220,10 +210,8 @@ public abstract class BasicParser
     /// The message of the exception thrown whenever <paramref name="recognizer"/> returns null
     /// </param>
     /// <returns>A non-null instance of the desired type</returns>
-    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
-    {
-        return recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
-    }
+    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement =>
+        recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
 
     /// <summary>
     /// Recognizes a sequence of non-terminal symbols of the same type.
@@ -255,7 +243,8 @@ public abstract class BasicParser
     protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length == 0) throw new SyntaxError(FileName, token, errorMessage);
+        if (elements.Length == 0)
+            throw new SyntaxError(FileName, token, errorMessage);
         return elements;
     }
 
@@ -267,7 +256,8 @@ public abstract class BasicParser
     /// <param name="checkUnicity">Tells if each symbol must be unique</param>
     /// <param name="errorMessage">The message of the exception thrown if a symbol is duplicated in the list</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage) where T : ScriptElement
+    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage)
+        where T : ScriptElement
     {
         T element = recognizer();
         if (element == null) return [];
@@ -343,7 +333,7 @@ public abstract class BasicParser
     /// </summary>
     /// <typeparam name="T">The returned symbol's type</typeparam>
     /// <returns>An instance of the desired type</returns>
-    protected delegate T Recognizer<T>() where T : ScriptElement;
+    protected delegate T Recognizer<out T>() where T : ScriptElement;
 
     #region ParseTimeClass
 
