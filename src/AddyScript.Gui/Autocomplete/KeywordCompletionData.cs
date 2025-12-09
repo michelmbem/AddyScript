@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
 using AvaloniaEdit.CodeCompletion;
@@ -20,9 +21,20 @@ internal enum KeywordType
 
 internal partial class KeywordCompletionData(string keyword, KeywordType type) : ICompletionData
 {
+    private static readonly Dictionary<KeywordType, IImage> KeywordIcons = new()
+    {
+        [KeywordType.Statement] = ImageFactory.LoadFontIcon("mdi-label-outline"),
+        [KeywordType.DataType] = ImageFactory.LoadFontIcon("mdi-shape-outline"),
+        [KeywordType.Constant] = ImageFactory.LoadFontIcon("mdi-application-variable-outline"),
+        [KeywordType.Function] = ImageFactory.LoadFontIcon("mdi-function-variant"),
+        [KeywordType.Operator] = ImageFactory.LoadFontIcon("mdi-plus-minus"),
+        [KeywordType.Contextual] = ImageFactory.LoadFontIcon("mdi-label"),
+    };
+
     static KeywordCompletionData()
     {
-        const string keywords = """
+        const string keywords =
+            """
             abs?3 abstract?0 acos?3 and?4 as?4 asin?3 atan?3 atan2?3 blob?1 bool?1 break?0 case?0 catch?0 ceil?3
             chr?3 class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
             default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0
@@ -35,32 +47,17 @@ internal partial class KeywordCompletionData(string keyword, KeywordType type) :
             while?0 with?4 write?5 yield?0
             """;
 
-        List<KeywordCompletionData> all = [];
-
-        foreach (string keyword in KeywordSplitRegex().Split(keywords))
-        {
-            if (keyword.Length == 0) continue;
-
-            string[] parts = keyword.Split('?');
-            int typeOrdinal = int.Parse(parts[1]);
-            all.Add(new (parts[0], (KeywordType)typeOrdinal));
-        }
-
-        All = all;
+        All = (from keyword in KeywordSplitRegex().Split(keywords)
+               where keyword.Length > 0
+               select keyword.Split('?') into parts
+               let typeOrdinal = int.Parse(parts[1])
+               select new KeywordCompletionData(parts[0], (KeywordType)typeOrdinal))
+            .ToList();
     }
 
     public static List<KeywordCompletionData> All { get; }
 
-    public IImage Image => type switch
-    {
-        KeywordType.Statement => ImageFactory.LoadFontIcon("mdi-label-outline"),
-        KeywordType.DataType => ImageFactory.LoadFontIcon("mdi-shape-outline"),
-        KeywordType.Constant => ImageFactory.LoadFontIcon("mdi-application-variable-outline"),
-        KeywordType.Function => ImageFactory.LoadFontIcon("mdi-function-variant"),
-        KeywordType.Operator => ImageFactory.LoadFontIcon("mdi-plus-minus"),
-        KeywordType.Contextual => ImageFactory.LoadFontIcon("mdi-label"),
-        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-    };
+    public IImage Image => KeywordIcons[type];
 
     public string Text => keyword;
 
@@ -82,10 +79,10 @@ internal partial class KeywordCompletionData(string keyword, KeywordType type) :
         int offset = completionSegment.Offset;
 
         int wordStart = TextUtilities.GetNextCaretPosition(
-           document,
-           offset,
-           LogicalDirection.Backward,
-           CaretPositioningMode.WordStart);
+            document,
+            offset,
+            LogicalDirection.Backward,
+            CaretPositioningMode.WordStart);
 
         int wordEnd = TextUtilities.GetNextCaretPosition(
             document,
