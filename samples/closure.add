@@ -3,6 +3,25 @@ class Toto
 	private static m = 1;
 	private n = 10;
 	
+	public static function useClosures()
+	{
+		println('Toto_getClosureStatic');
+		println('---------------------');
+		Toto_getClosureStatic = Toto::getClosureStatic;
+		k = Toto_getClosureStatic();
+		for (i = 0; i < 10; i += 2)
+			print(k(i) + ' ');
+		println('\n');
+		
+		println('Toto_getClosure');
+		println('---------------');
+		Toto_getClosure = new Toto().getClosure;
+		l = Toto_getClosure();
+		for (i = 0; i < 10; i += 2)
+			print(l(i) + ' ');
+		println();
+	}
+	
 	public static function getClosureStatic()
 	{
 		return |x| => Toto::m += x;
@@ -52,6 +71,8 @@ println('----------');
 j = getClosure();
 for (i = 0; i < 10; i += 2)
 	print(j(i) + ' ');
-println();
+println('\n');
+
+Toto::useClosures();
 
 readln();

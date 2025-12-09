@@ -896,22 +896,22 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                             propValue = field.IsStatic ? field.SharedValue : owner.GetProperty(field.Name);
                             break;
                         case ClassMethod method:
-                            {
-                                var parameters = method.Function.Parameters;
-                                var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
-                                var fn = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(owner), method.Name, args)));
-                                propValue = new Closure(fn);
-                            }
+                        {
+                            var parameters = method.Function.Parameters;
+                            var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
+                            var fn = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(owner), method.Name, args)));
+                            propValue = new Closure(fn);
                             break;
+                        }
                         default: // member is surely a ClassProperty
-                            {
-                                var property = (ClassProperty)member;
-                                if (!property.CanRead) throw new RuntimeError(fileName, propertyRef, Resources.CannotReadProperty);
+                        {
+                            var property = (ClassProperty)member;
+                            if (!property.CanRead) throw new RuntimeError(fileName, propertyRef, Resources.CannotReadProperty);
 
-                                CheckAccess(property.Reader, propertyRef);
-                                Invoke(property.Reader.Function, property.Name, property.Holder, owner);
-                            }
+                            CheckAccess(property.Reader, propertyRef);
+                            Invoke(property.Reader.Function, property.Name, property.Holder, owner);
                             return;
+                        }
                     }
                     break;
 
