@@ -1,7 +1,7 @@
+using System.Text;
 using AddyScript.Runtime;
 using AddyScript.Runtime.OOP;
 using AddyScript.Translators;
-using System.Text;
 
 namespace AddyScript.Gui.CallTips;
 
@@ -12,9 +12,9 @@ internal class ParameterInfo(string text, bool infinite)
     {
     }
 
-    public string Text { get; private init; } = text;
+    public string Text => text;
 
-    public bool Infinite { get; private init; } = infinite;
+    public bool Infinite => infinite;
 
     private static string ParameterText(Parameter parameter)
     {

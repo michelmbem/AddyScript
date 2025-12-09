@@ -1,25 +1,25 @@
-using Avalonia.Media;
-using AvaloniaEdit.Document;
-using AvaloniaEdit.Editing;
 using System;
 using System.Collections.Generic;
 using AddyScript.Gui.Extensions;
+using Avalonia.Media;
+using AvaloniaEdit.CodeCompletion;
+using AvaloniaEdit.Document;
+using AvaloniaEdit.Editing;
 
 namespace AddyScript.Gui.Autocomplete;
 
-internal class CodeSnippetData(string title, string snippet, string description) :
-    AbstractCompletionData(SnippetIcon, title, snippet, description)
+internal class CodeSnippetCompletionData(string title, string snippet, string description) : ICompletionData
 {
     private static readonly IImage SnippetIcon = ImageFactory.LoadFontIcon("fa-code");
 
-    static CodeSnippetData()
+    static CodeSnippetCompletionData()
     {
         string[][] snippets =
             [
-                ["if", "if (true) ^;"],
-                ["else", "else ^;"],
-                ["if-block", "if (true) {\n\t^\n}"],
-                ["else-block", "else {\n\t^\n}"],
+                ["simple-if", "if (true) ^;"],
+                ["simple-else", "else ^;"],
+                ["block-if", "if (true) {\n\t^\n}"],
+                ["block-else", "else {\n\t^\n}"],
                 ["switch", "switch (0) {\n\tcase 0:\n\t\t^\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
                 ["for", "for (;;) {\n\t^\n}"],
                 ["foreach", "foreach (item in []) {\n\t^\n}"],
@@ -37,21 +37,35 @@ internal class CodeSnippetData(string title, string snippet, string description)
                 ["import-as", "import ^ as alias;"],
             ];
 
+        List<CodeSnippetCompletionData> all = [];
+
         foreach (string[] snippet in snippets)
         {
             string description = $"Insert a code snippet like \"{snippet[1].Replace("^", "/*...*/")}\"";
-            All.Add(new (snippet[0], snippet[1], description));
+            all.Add(new (snippet[0], snippet[1], description));
         }
+
+        All = all;
     }
 
-    public static List<CodeSnippetData> All { get; } = [];
+    public static List<CodeSnippetCompletionData> All { get; }
 
-    public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
+    public IImage Image => SnippetIcon;
+
+    public string Text => snippet;
+
+    public object Content => title;
+
+    public object Description => description;
+
+    public double Priority => 0;
+
+    public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
     {
         string indentation = textArea.Document.GetIndentation(textArea.Caret.Line);
         string textToInsert = Text.IndentLines(indentation, true);
         int caretOffset = textToInsert.IndexOf('^');
-        int segmentOffset = segment.Offset;
+        int segmentOffset = completionSegment.Offset;
 
         if (caretOffset < 0)
             caretOffset = textToInsert.Length;

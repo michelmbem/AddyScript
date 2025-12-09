@@ -27,6 +27,80 @@ public partial class App : Application
     
     #region Utility Static Methods
 
+    /// <summary>
+    /// Opens a new main window and displays its contents, optionally loading a file if a path is provided.
+    /// </summary>
+    /// <remarks>
+    /// If multiple windows are open, the first opened window becomes the application's main
+    /// window. When a window is closed, the main window is reassigned if necessary.
+    /// </remarks>
+    /// <param name="filePath">The path to the file to open in the new window. If null, the window opens without loading a file.</param>
+    public static void OpenWindow(string filePath = null)
+    {
+        var desktop = (IClassicDesktopStyleApplicationLifetime) Current?.ApplicationLifetime;
+
+        var window = new MainWindow();
+        window.Open(filePath);
+        window.Show();
+        window.Activate();
+
+        window.Closed += (_, _) =>
+        {
+            Windows.Remove(window);
+
+            if (desktop!.MainWindow == window && Windows.Count > 0)
+                desktop.MainWindow = Windows[0];
+        };
+
+        Windows.Add(window);
+        desktop!.MainWindow ??= window;
+    }
+    
+    /// <summary>
+    /// Registers the AddyScript syntax highlighting definition with the highlighting manager.
+    /// </summary>
+    /// <remarks>
+    /// This method loads the AddyScript highlighting definition from an embedded resource and
+    /// associates it with the ".add" and ".txt" file extensions. It should be called before attempting to use
+    /// AddyScript syntax highlighting in the application.
+    /// </remarks>
+    private static void RegisterGrammar()
+    {
+        // Correct URI format avares://<assembly-name>/path/to/resource
+        var uri = new Uri("avares://asgui/Assets/Grammars/AddyScript-Mode.xshd");
+        using var stream = AssetLoader.Open(uri);
+        using var reader = new XmlTextReader(stream);
+        
+        // Load the definition
+        var asHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        
+        // Register it with the highlighting manager
+        HighlightingManager.Instance.RegisterHighlighting(
+            "AddyScript",
+            [".add", ".txt"],
+            asHighlighting);
+    }
+
+    /// <summary>
+    /// Parses command-line arguments to configure search paths, assembly references, and initial files for script
+    /// execution.
+    /// </summary>
+    /// <remarks>
+    /// If no search paths or references are specified, default values are used. The method updates
+    /// the SearchPaths and References properties with the parsed values.
+    /// </remarks>
+    /// <param name="args">
+    /// An array of command-line argument strings to be parsed. Options include '-d' for specifying a search directory
+    /// and '-r' for specifying an assembly reference. All other arguments are treated as initial file names.
+    /// </param>
+    /// <returns>
+    /// An array of strings containing the initial file names specified in the command-line arguments.
+    /// The array is empty if no file names are provided.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if an invalid option is encountered, if a required argument for '-d' or '-r' is missing, if the specified
+    /// directory does not exist, or if the specified assembly cannot be loaded.
+    /// </exception>
     private static string[] ParseCmdLineArgs(string[] args)
     {
         List<string> searchPaths = [];
@@ -93,53 +167,12 @@ public partial class App : Application
 
         SearchPaths = [.. searchPaths];
         References = [.. references];
-        
+
         return [.. initialFiles];
     }
 
-    public static void OpenWindow(string filePath = null)
-    {
-        var desktop = (IClassicDesktopStyleApplicationLifetime) Current?.ApplicationLifetime;
-        var window = new MainWindow();
-        
-        if (string.IsNullOrWhiteSpace(filePath))
-            window.Reset();
-        else
-            window.Open(filePath);
-
-        Windows.Add(window);
-        window.Closed += (_, _) =>
-        {
-            Windows.Remove(window);
-            
-            if (desktop!.MainWindow == window && Windows.Count > 0)
-                desktop.MainWindow = Windows[^1];
-        };
-        
-        window.Show();
-        window.Activate();
-        desktop!.MainWindow ??= window;  
-    }
-    
-    private static void RegisterGrammar()
-    {
-        // Correct URI format avares://<assembly-name>/path/to/resource
-        var uri = new Uri("avares://asgui/Assets/Grammars/AddyScript-Mode.xshd");
-        using var stream = AssetLoader.Open(uri);
-        using var reader = new XmlTextReader(stream);
-        
-        // Load the definition
-        var asHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-        
-        // Register it with the highlighting manager
-        HighlightingManager.Instance.RegisterHighlighting(
-            "AddyScript",
-            [".add", ".txt"], 
-            asHighlighting);
-    }
-    
     #endregion
-    
+
     #region Overrides
 
     public override void Initialize()
@@ -154,7 +187,7 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var initialFiles = ParseCmdLineArgs(desktop.Args);
-            
+
             if (initialFiles.Length > 0)
                 foreach (var file in initialFiles)
                     OpenWindow(file);

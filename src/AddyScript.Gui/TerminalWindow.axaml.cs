@@ -88,9 +88,8 @@ public partial class TerminalWindow : Window
             document.Insert(inputOffset, tt.Text);
             colorizer.Spans.AddRange(tt.Spans);
 
-            int docLength = document.TextLength;
-            inputOffset = caret.Offset = docLength;
-            trailingChar = docLength > 0 ? document.GetCharAt(docLength - 1) : '\0';
+            inputOffset = caret.Offset = document.TextLength;
+            trailingChar = inputOffset > 0 ? document.GetCharAt(inputOffset - 1) : '\0';
             caret.BringCaretToView();
         });
     }

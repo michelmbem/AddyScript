@@ -32,7 +32,7 @@ function printTree(node, bookmark = null, prefix = "")
 	
 	if (node === bookmark) {
 		setForeground("Yellow");
-		setBackground("Green");
+		setBackground("Blue");
 	} else {
 		setForeground("Red");
 	}

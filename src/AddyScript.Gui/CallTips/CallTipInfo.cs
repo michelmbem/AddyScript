@@ -1,11 +1,12 @@
-using AddyScript.Runtime;
-using Avalonia.Controls;
-using Avalonia.Layout;
-using Avalonia.Media;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AddyScript.Runtime;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
+
 using Projektanker.Icons.Avalonia;
 
 namespace AddyScript.Gui.CallTips;
@@ -15,9 +16,7 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
     private int activeParameterIndex;
     
     public CallTipInfo(InnerFunction innerFunction) :
-        this(innerFunction.Name, innerFunction.Parameters
-            .Select(p => new ParameterInfo(p))
-            .ToList())
+        this(innerFunction.Name, [.. innerFunction.Parameters.Select(p => new ParameterInfo(p))])
     {
     }
 

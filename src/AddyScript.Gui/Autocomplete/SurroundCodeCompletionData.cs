@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using AddyScript.Gui.Extensions;
 using Avalonia.Media;
+using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
 
 namespace AddyScript.Gui.Autocomplete;
 
-internal class SurroundCodeData(string title, string snippet, string description) :
-    AbstractCompletionData(SurroundIcon, title, snippet, description)
+internal class SurroundCodeCompletionData(string title, string template, string description) : ICompletionData
 {
     private const string SELECTION_PLACEHOLDER = "$selection$";
     private static readonly IImage SurroundIcon = ImageFactory.LoadFontIcon("mdi-code-braces");
 
-    static SurroundCodeData()
+    static SurroundCodeCompletionData()
     {
         string[][] templates =
             [
@@ -35,6 +35,8 @@ internal class SurroundCodeData(string title, string snippet, string description
                 ["function", "function myFunc(arg1, arg2) {\n\t$selection$\n}"],
             ];
 
+        List<SurroundCodeCompletionData> all = [];
+
         foreach (string[] template in templates)
         {
             var kind = template[0] switch
@@ -44,19 +46,32 @@ internal class SurroundCodeData(string title, string snippet, string description
                 _ => $"a {template[0]} statement",
             };
             
-            All.Add(new (template[0], template[1], $"Wrap selection in {kind}"));
+            all.Add(new (template[0], template[1], $"Wrap selection in {kind}"));
         }
+
+        All = all;
     }
 
-    public static List<SurroundCodeData> All { get; } = [];
+    public static List<SurroundCodeCompletionData> All { get; }
 
-    public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
+    public IImage Image => SurroundIcon;
+
+    public string Text => template;
+
+    public object Content => title;
+
+    public object Description => description;
+
+    public double Priority => 0;
+
+    public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
     {
         Selection selection = textArea.Selection;
         string selIndentation = textArea.Document.GetIndentation(selection.StartPosition.Line);
         string leadingSpace = Text.LeadingWhitespace(SELECTION_PLACEHOLDER);
-        string replacementText = Text.IndentLines(selIndentation, true)
-            .Replace(leadingSpace + SELECTION_PLACEHOLDER, selection.GetText().IndentLines(leadingSpace));
+        string strippedFragment = leadingSpace + SELECTION_PLACEHOLDER;
+        string insertedFragment = selection.GetText().IndentLines(leadingSpace);
+        string replacementText = Text.IndentLines(selIndentation, true).Replace(strippedFragment, insertedFragment);
         selection.ReplaceSelectionWithText(replacementText);
     }
 }

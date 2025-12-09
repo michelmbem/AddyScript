@@ -3,9 +3,9 @@ using AvaloniaEdit.Document;
 namespace AddyScript.Gui.Extensions;
 
 /// <summary>
-/// A set of additional methods for the <see cref="TextDocument"/> class.
+/// Provides extension methods for manipulating and analyzing <see cref="TextDocument"/>s.
 /// </summary>
-public static class TextDocumentExtensions
+internal static class TextDocumentExtensions
 {
     /// <summary>
     /// Gets the indentation size of the given line.

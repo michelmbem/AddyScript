@@ -14,10 +14,7 @@ class Range
 		this.step = step;
 	}
 	
-	public property size
-	{
-		read => (int)((this.end - this.start) / this.step);
-	}
+	public property size => (int)((this.end - this.start) / this.step);
 	
 	public property []
 	{
@@ -48,29 +45,29 @@ class Range
 	* This is a complementary method to make a range
 	* behave like any other collection.
 	*/
-	public function each(action) {
+	public function each(action)
+	{
 		var item;
 		foreach (item in this) action(item);
 		return this;
 	}
 	
-	public function toList() {
+	public function toList()
+	{
 		var item, res = [];
 		foreach (item in this) res.add(item);
 		return res;
 	}
 	
-	public function toSet() {
+	public function toSet()
+	{
 		var item, res = {};
 		foreach (item in this) res.add(item);
 		return res;
 	}
 }
 
-function xrange(start, end = 0, step = 1)
-{
-	return new Range(start, end, step);
-}
+function xrange(start, end = 0, step = 1) => new Range(start, end, step);
 
 if (__name == 'main')
 {

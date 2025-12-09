@@ -4,16 +4,21 @@ using Avalonia.Media;
 namespace AddyScript.Gui.Extensions;
 
 /// <summary>
-/// A set of additional methods for the <see cref="DrawingContext"/> class.
+/// Provides extension methods for drawing custom shapes on a <see cref="DrawingContext"/>.
 /// </summary>
 internal static class DrawingContextExtensions
 {
     /// <summary>
-    /// Draws a squiggle in the given rectangle.
+    /// Draws a squiggly line horizontally across the specified rectangle using the provided brush.
     /// </summary>
-    /// <param name="ctx">The target drawing context</param>
-    /// <param name="rect">The region in which to draw</param>
-    /// <param name="brush">The line color</param>
+    /// <remarks>
+    /// The squiggle is drawn along the bottom edge of the rectangle, alternating up and down to
+    /// create a wavy effect. The thickness of the line is fixed at 1 unit. This method does not fill the rectangle; it
+    /// only draws the squiggly outline.
+    /// </remarks>
+    /// <param name="ctx">The drawing context to which the squiggle will be rendered.</param>
+    /// <param name="rect">The rectangle that defines the horizontal bounds and position of the squiggle.</param>
+    /// <param name="brush">The brush used to draw the squiggle line.</param>
     public static void DrawSquiggle(this DrawingContext ctx, Rect rect, IBrush brush)
     {
         double y = rect.Bottom - 1;

@@ -3,9 +3,9 @@ using System;
 namespace AddyScript.Gui.Extensions;
 
 /// <summary>
-/// A set of extension methods for the <b>string</b> type.
+/// Provides extension methods for working with strings.
 /// </summary>
-public static class StringExtensions
+internal static class StringExtensions
 {
     /// <summary>
     /// Escapes a string to be used as a command line argument.

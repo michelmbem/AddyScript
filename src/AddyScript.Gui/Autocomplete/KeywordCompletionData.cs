@@ -1,9 +1,10 @@
-using Avalonia.Media;
-using AvaloniaEdit.Document;
-using AvaloniaEdit.Editing;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Avalonia.Media;
+using AvaloniaEdit.CodeCompletion;
+using AvaloniaEdit.Document;
+using AvaloniaEdit.Editing;
 
 namespace AddyScript.Gui.Autocomplete;
 
@@ -17,10 +18,9 @@ internal enum KeywordType
     Contextual
 }
 
-internal partial class KeywordData(string word, KeywordType type) :
-    AbstractCompletionData(KeywordTypeIcon(type), word, word, null)
+internal partial class KeywordCompletionData(string keyword, KeywordType type) : ICompletionData
 {
-    static KeywordData()
+    static KeywordCompletionData()
     {
         const string keywords = """
             abs?3 abstract?0 acos?3 and?4 as?4 asin?3 atan?3 atan2?3 blob?1 bool?1 break?0 case?0 catch?0 ceil?3
@@ -35,27 +35,23 @@ internal partial class KeywordData(string word, KeywordType type) :
             while?0 with?4 write?5 yield?0
             """;
 
+        List<KeywordCompletionData> all = [];
+
         foreach (string keyword in KeywordSplitRegex().Split(keywords))
         {
             if (keyword.Length == 0) continue;
 
             string[] parts = keyword.Split('?');
             int typeOrdinal = int.Parse(parts[1]);
-
-            All.Add(new (parts[0], (KeywordType)typeOrdinal));
-            All.Sort((a, b) => string.Compare(a.Text, b.Text, StringComparison.InvariantCultureIgnoreCase));
+            all.Add(new (parts[0], (KeywordType)typeOrdinal));
         }
+
+        All = all;
     }
 
-    public static List<KeywordData> All { get; } = [];
+    public static List<KeywordCompletionData> All { get; }
 
-    public static List<KeywordData> AllMatching(string prefix) =>
-        All.FindAll(k => k.Text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
-
-    [GeneratedRegex(@"\s+")]
-    private static partial Regex KeywordSplitRegex();
-
-    private static IImage KeywordTypeIcon(KeywordType type) => type switch
+    public IImage Image => type switch
     {
         KeywordType.Statement => ImageFactory.LoadFontIcon("mdi-label-outline"),
         KeywordType.DataType => ImageFactory.LoadFontIcon("mdi-shape-outline"),
@@ -66,10 +62,24 @@ internal partial class KeywordData(string word, KeywordType type) :
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
-    public override void Complete(TextArea textArea, ISegment segment, EventArgs args)
+    public string Text => keyword;
+
+    public object Content => keyword;
+
+    public object Description => null;
+
+    public double Priority => 0;
+
+    public static List<KeywordCompletionData> AllMatching(string prefix) =>
+        All.FindAll(item => item.Text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex KeywordSplitRegex();
+
+    public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
     {
         TextDocument document = textArea.Document;
-        int offset = segment.Offset;
+        int offset = completionSegment.Offset;
 
         int wordStart = TextUtilities.GetNextCaretPosition(
            document,

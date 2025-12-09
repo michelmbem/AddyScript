@@ -7,9 +7,9 @@ using Avalonia.Media.Imaging;
 namespace AddyScript.Gui.Extensions;
 
 /// <summary>
-/// A set of additional methods for the <see cref="Control"/> class.
+/// Provides extension methods for working with controls and visual elements.
 /// </summary>
-public static class ControlExtensions
+internal static class ControlExtensions
 {
     /// <summary>
     /// Standard DPI

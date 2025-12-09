@@ -175,49 +175,60 @@ public partial class MainWindow : Window
     #region Utility
 
     /// <summary>
-    /// Checks if a <see cref="KeyEventArgs"/> instance matches the given configuration.
+    /// Creates a new instance of the TextDocument class using the contents of the specified file path.
     /// </summary>
-    /// <param name="e">The <see cref="KeyEventArgs"/> to check</param>
-    /// <param name="key">The expected <see cref="Key"/> member</param>
-    /// <param name="modifiers">Tells whether one or any of the Control/Alt/System/Shift keys should be pressed or not</param>
-    /// <returns><b>true</b> is <paramref name="e"/> matches the configuration. <b>false</b> otherwise</returns>
-    private static bool IsHotKey(KeyEventArgs e, Key key, KeyModifiers modifiers = KeyModifiers.None) =>
-        e.Key == key && (e.KeyModifiers & modifiers) == modifiers;
-
-    /// <summary>
-    /// Resets the environment.
-    /// </summary>
-    public void Reset()
+    /// <remarks>
+    /// The returned document is initialized with an event handler for change notifications. The
+    /// caller is responsible for managing the document's lifecycle.
+    /// </remarks>
+    /// <param name="path">
+    /// The path to the file whose contents will be loaded into the document. If the path is null, empty, or the file
+    /// does not exist, an empty document is created.
+    /// </param>
+    /// <returns>
+    /// A TextDocument containing the contents of the specified file, or an empty document if the file is not found or
+    /// the path is invalid.
+    /// </returns>
+    private TextDocument CreateDocument(string path)
     {
-        var document = new TextDocument();
-        document.Changed += EditorDocumentChanged;
-        Editor.Document = document;
-        FilePath = null;
-        Saved = true;
-        InitializeFolding();
-        UpdateWindowBars();
-    }
+        var content = !string.IsNullOrWhiteSpace(path) && File.Exists(path)
+                    ? File.ReadAllText(path)
+                    : string.Empty;
 
-    /// <summary>
-    /// Loads a script into the editor.
-    /// </summary>
-    /// <param name="path"></param>
-    public void Open(string path)
-    {
-        var content = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
         var document = new TextDocument(content);
         document.Changed += EditorDocumentChanged;
-        Editor.Document = document;
+        return document;
+    }
+
+    /// <summary>
+    /// Opens the specified file and loads its contents into the editor or resets the editor to its initial state.
+    /// </summary>
+    /// <remarks>
+    /// After calling this method, the editor's document is replaced with the contents of the
+    /// specified file if any, or simply cleared if the file was unspecified not found.
+    /// The editor state is updated accordingly. Any unsaved changes in the previous document will
+    /// be lost. This method resets the saved state and updates window UI elements to reflect the newly opened
+    /// file.
+    /// </remarks>
+    /// <param name="path">The path to the file to open, or <b>null</b> for a reset.</param>
+    public void Open(string path)
+    {
+        Editor.Document = CreateDocument(path);
         FilePath = path;
         Saved = true;
+
         InitializeFolding();
         UpdateWindowBars();
     }
 
     /// <summary>
-    /// Saves a script to a file.
+    /// Saves the current document to the specified file path.
     /// </summary>
-    /// <param name="path"></param>
+    /// <remarks>
+    /// If the file at the specified path already exists, it will be overwritten. After a successful
+    /// save, the document's state is updated to reflect the new file path and saved status.
+    /// </remarks>
+    /// <param name="path">The file system path where the document will be saved. Cannot be null or empty.</param>
     public void Save(string path)
     {
         File.WriteAllText(path, Editor.Document.Text);
@@ -235,8 +246,13 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Displays an Open File dialog and opens the selected file.
+    /// Asynchronously displays a file picker dialog to allow the user to select one or more files to open.
     /// </summary>
+    /// <remarks>
+    /// Only files matching the supported file types are shown in the picker. If no files are
+    /// selected, no action is taken. For each selected file, a new window is opened to display its contents.
+    /// </remarks>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task OpenAsync()
     {
         var files = await StorageProvider.OpenFilePickerAsync(
@@ -251,64 +267,81 @@ public partial class MainWindow : Window
                 ]
             });
 
-        if (files.Count > 0)
-        {
-            App.OpenWindow(files[0].Path.LocalPath);
-            CloseIfEmpty();
-        }
+
+        if (files.Count == 0) return;
+
+        foreach (var file in files)
+            App.OpenWindow(file.Path.LocalPath);
+
+        CloseIfEmpty();
     }
 
     /// <summary>
-    /// Saves the script. If no file is associated, displays a Save File dialog.
+    /// Saves the current document asynchronously. If the file path is not set, prompts for a location to save the
+    /// document.
     /// </summary>
+    /// <returns>A task that represents the asynchronous save operation.</returns>
     private async Task SaveAsync()
     {
-        if (string.IsNullOrEmpty(filePath))
+        if (string.IsNullOrWhiteSpace(filePath))
             await SaveAsAsync();
         else
-            Save(FilePath);
+            Save(filePath);
     }
 
     /// <summary>
-    /// Displays a Save File dialog and saves the script to the selected file.
+    /// Displays a file save dialog and saves the current data to the selected file asynchronously.
     /// </summary>
+    /// <remarks>
+    /// If the user cancels the save dialog, no file is saved. The method uses the default file
+    /// extension and file type filters specified in the save dialog options.</remarks>
+    /// <returns>A task that represents the asynchronous save operation.
+    /// </returns>
     private async Task SaveAsAsync()
     {
-        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = SR.SaveFileDialogTitle,
-            DefaultExtension = ".add",
-            FileTypeChoices =
-            [
-                new FilePickerFileType(SR.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
-                FilePickerFileTypes.All
-            ]
-        });
+        var file = await StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title = SR.SaveFileDialogTitle,
+                DefaultExtension = ".add",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType(SR.FileDialogFilter) { Patterns = ["*.add", "*.txt"] },
+                    FilePickerFileTypes.All
+                ]
+            });
 
         if (file is not null)
             Save(file.Path.LocalPath);
     }
 
     /// <summary>
-    /// Exports the script as an XML representation.
+    /// Displays a file save dialog to export the current script as an XML file asynchronously.
     /// </summary>
+    /// <remarks>
+    /// If the user cancels the save dialog, no file is created and the operation completes without
+    /// exporting. After a successful export, the resulting XML file is opened with the default associated application.
+    /// Any errors encountered during export are displayed to the user in a message box.
+    /// </remarks>
+    /// <returns>A task that represents the asynchronous export operation.</returns>
     private async Task ExportXmlAsync()
     {
         try
         {
-            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = SR.ExportXmlTitle,
-                DefaultExtension = ".xml",
-                FileTypeChoices =
-                [
-                    new FilePickerFileType(SR.XmlFileFilter) { Patterns = ["*.xml"] },
-                    FilePickerFileTypes.All
-                ],
-                SuggestedFileName = !string.IsNullOrEmpty(filePath)
-                    ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
-                    : "untitled.xml"
-            });
+            var file = await StorageProvider.SaveFilePickerAsync(
+                new FilePickerSaveOptions
+                {
+                    Title = SR.ExportXmlTitle,
+                    DefaultExtension = ".xml",
+                    FileTypeChoices =
+                    [
+                        new FilePickerFileType(SR.XmlFileFilter) { Patterns = ["*.xml"] },
+                        FilePickerFileTypes.All
+                    ],
+                    SuggestedFileName = !string.IsNullOrWhiteSpace(filePath)
+                                      ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
+                                      : "untitled.xml"
+                });
 
             if (file is null) return;
 
@@ -325,9 +358,17 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Prompts the user to save the script before leaving.
+    /// Prompts the user to save changes and processes the user's response asynchronously.
     /// </summary>
-    /// <returns>true to continue; false to cancel the current action</returns>
+    /// <remarks>
+    /// This method displays a dialog box asking the user whether to save changes. If the user
+    /// selects Yes, the changes are saved before continuing. If the user selects Cancel, the operation is
+    /// aborted.
+    /// </remarks>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is <see langword="true"/> if the user chooses
+    /// to continue (either by saving or not saving); <see langword="false"/> if the user cancels the operation.
+    /// </returns>
     private async Task<bool> PromptToSave()
     {
         var answer = await MessageBoxManager
@@ -347,8 +388,12 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Updates some items in the toolbar and the statusbar.
+    /// Updates the state of the window's UI bars to reflect the current document state.
     /// </summary>
+    /// <remarks>
+    /// Call this method after making changes to the document to ensure that undo/redo controls and
+    /// caret-related UI elements are updated accordingly.
+    /// </remarks>
     private void UpdateWindowBars()
     {
         Editor.Document.UndoStack.ClearAll();
@@ -357,9 +402,14 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Updates the 'Undo', 'Redo' toolbar buttons as well as
-    ///  the part of the status bar where the file size is displayed.
+    /// Updates the enabled state of undo, redo, and run toolbar buttons and menu items, and refreshes the text length
+    /// status label based on the current state of the editor.
     /// </summary>
+    /// <remarks>
+    /// This method should be called after any operation that may affect the editor's undo or redo
+    /// availability, or the document's text length. It also updates the saved state if no further undo operations are
+    /// possible.
+    /// </remarks>
     private void UpdateUndoRedoFileSize()
     {
         ToolbarUndoButton.IsEnabled = UndoMenuItem.IsEnabled = Editor.CanUndo;
@@ -372,9 +422,14 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Updates the 'Cut', 'Copy' toolbar buttons as well as
-    /// the part of the status bar where the caret info are shown.
+    /// Updates the enabled state of cut, copy, and related UI elements, and refreshes the caret status display based on
+    /// the current editor selection and caret position.
     /// </summary>
+    /// <remarks>
+    /// Call this method after changes to the editor selection or caret position to ensure that the
+    /// cut, copy, and surround menu items, as well as the caret status label, accurately reflect the current editor
+    /// state.
+    /// </remarks>
     private void UpdateCutCopyCaretInfo()
     {
         ToolbarCutButton.IsEnabled = CutMenuItem.IsEnabled = Editor.CanCut;
@@ -389,10 +444,15 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Verifies that a given position is between the boundaries of a comment or a string.
+    /// Determines whether the specified character position is within a comment or string literal in the editor's
+    /// document.
     /// </summary>
-    /// <param name="position">The given position</param>
-    /// <returns><b>true</b> if the caret is in a comment or a string literal. <b>false</b> otherwise</returns>
+    /// <remarks>
+    /// This method relies on the current syntax highlighting state of the editor. If syntax
+    /// highlighting is unavailable, the method returns false.
+    /// </remarks>
+    /// <param name="position">The zero-based character offset within the document to check.</param>
+    /// <returns>true if the specified position is inside a comment or string literal; otherwise, false.</returns>
     private bool InCommentOrString(int position)
     {
         // Retrieves the highlighter
@@ -405,17 +465,20 @@ public partial class MainWindow : Window
         HighlightedLine highlightedLine = highlighter.HighlightLine(line.LineNumber);
 
         // Check if line's coloration at the given position is a comment or a string
-        return highlightedLine.Sections.Any(s =>
-            s.Offset <= position &&
-            position < s.Offset + s.Length &&
-            s.Color?.Name is "Comment" or "String"
+        return highlightedLine.Sections.Any(section =>
+            section.Offset <= position &&
+            position < section.Offset + section.Length &&
+            section.Color?.Name is "Comment" or "String"
         );
     }
 
     /// <summary>
-    /// Retrieves the "word" at the caret position.
+    /// Retrieves the word immediately preceding the caret position in the editor.
     /// </summary>
-    /// <returns>A string</returns>
+    /// <returns>
+    /// A string containing the word directly before the caret. Returns an empty string if the caret is at the beginning
+    /// of the document or not positioned after a word.
+    /// </returns>
     private string GetCurrentWord()
     {
         int caretOffset = Editor.CaretOffset;
@@ -433,14 +496,17 @@ public partial class MainWindow : Window
             CaretPositioningMode.WordStart);
 
         return wordStart < 0 || wordStart >= caretOffset
-            ? string.Empty
-            : document.GetText(wordStart, caretOffset - wordStart);
+             ? string.Empty
+             : document.GetText(wordStart, caretOffset - wordStart);
     }
 
     /// <summary>
-    /// Gets the "word" that precedes the "word" at caret position.
+    /// Retrieves the second word to the left of the caret position in the editor.
     /// </summary>
-    /// <returns>A string</returns>
+    /// <returns>
+    /// A string containing the second word to the left of the caret position.
+    /// Returns an empty string if there is no word to the left or if that word is the first.
+    /// </returns>
     private string GetWordAtLeft()
     {
         TextDocument document = Editor.Document;
@@ -467,15 +533,21 @@ public partial class MainWindow : Window
             CaretPositioningMode.WordBorder);
 
         return wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart
-            ? string.Empty
-            : document.GetText(wordStart, wordEnd - wordStart);
+             ? string.Empty
+             : document.GetText(wordStart, wordEnd - wordStart);
     }
 
     /// <summary>
-    /// Gets the "word" at a given offset.
+    /// Retrieves the word in the document that contains the specified character offset.
     /// </summary>
-    /// <param name="offset">The location where to find at</param>
-    /// <returns>A string</returns>
+    /// <param name="offset">
+    /// The zero-based character offset within the document for which to find the containing word.
+    /// Must be greater than 0 and less than the document's text length.
+    /// </param>
+    /// <returns>
+    /// A string containing the word at the specified offset, or an empty string if the offset
+    /// is at the start or end of the document, or if no word is found at the offset.
+    /// </returns>
     private string GetWordAtOffset(int offset)
     {
         TextDocument document = Editor.Document;
@@ -504,10 +576,14 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Opens the completion window with the given data.
+    /// Displays a completion window populated with the specified completion data in the editor's text area.
     /// </summary>
-    /// <typeparam name="T">The type of the completion data</typeparam>
-    /// <param name="completionData">The completion data to display in the menu</param>
+    /// <remarks>
+    /// The completion window allows users to select from the provided completion items. If a
+    /// completion window is already open, it will be replaced by the new one.
+    /// </remarks>
+    /// <typeparam name="T">The type of completion data to display. Must implement the ICompletionData interface.</typeparam>
+    /// <param name="completionData">The collection of completion data items to display in the completion window. Cannot be null.</param>
     private void ShowCompletionWindow<T>(IEnumerable<T> completionData)
         where T : ICompletionData
     {
@@ -523,15 +599,15 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Checks if the completion window is open.
+    /// Determines whether the completion window is currently open.
     /// </summary>
-    /// <returns><b>true</b> if the completion window is non-null and visible. <b>false</b> otherwise</returns>
+    /// <returns><see langword="true"/> if the completion window is open; otherwise, <see langword="false"/>.</returns>
     private bool IsCompletionWindowOpen() => completionWindow?.IsOpen == true;
 
     /// <summary>
-    /// Pushes a new CallTipInfo on top of the stack.
+    /// Adds the specified call tip to the call tip stack and resets its state for reuse.
     /// </summary>
-    /// <param name="callTip">The new CallTipInfo</param>
+    /// <param name="callTip">The call tip information to be pushed onto the stack. Cannot be null.</param>
     private void PushCallTip(CallTipInfo callTip)
     {
         callTipStack.Push(callTip);
@@ -539,9 +615,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Pops a CallTipInfo from the stack.
+    /// Removes the most recent call tip from the stack.
     /// </summary>
-    /// <returns><b>true</b> if there is still at least one CallTipInfo in the stack. <b>false</b> otherwise</returns>
+    /// <returns>true if there are remaining call tips on the stack after the removal; otherwise, false.</returns>
     private bool PopCallTip()
     {
         callTipStack.Pop();
@@ -549,8 +625,13 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Shows a call tip according to the current callTipInfo.
+    /// Displays a call tip window showing overload information for the current method or function at the caret
+    /// position.
     /// </summary>
+    /// <remarks>
+    /// The call tip window provides parameter and overload details to assist with code completion
+    /// and editing. If a call tip window is already open, it will be replaced with the new information.
+    /// </remarks>
     private void ShowCallTip()
     {
         insightWindow = new OverloadInsightWindow(Editor.TextArea)
@@ -563,10 +644,10 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Displays an informational popup with the specified text.
+    /// Displays an informational popup with the specified header and text.
     /// </summary>
-    /// <param name="header">The text to display in the popup header.</param>
-    /// <param name="text">The text to display in the popup body.</param>
+    /// <param name="header">The text to display as the header of the popup. Cannot be null.</param>
+    /// <param name="text">The informational message to display in the popup. Cannot be null.</param>
     private void ShowInfoPopup(string header, string text)
     {
         dwellTimer.Stop();
@@ -579,9 +660,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Opens the search panel in either search or replace mode.
+    /// Opens the search panel in the editor, optionally enabling replace mode based on the specified parameter.
     /// </summary>
-    /// <param name="replaceMode">Whether the search panel should be open in replace mode or not</param>
+    /// <param name="replaceMode">true to open the search panel in replace mode; otherwise, false to open it in search-only mode.</param>
     private void OpenSearchPanel(bool replaceMode)
     {
         Editor.SearchPanel?.Uninstall();
@@ -594,21 +675,25 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Displays an error message related to a script execution.
+    /// Reports an error by marking the specified range in the script and displaying an error message to the user.
     /// </summary>
-    /// <param name="errorMessage">The error message</param>
-    /// <param name="start">Initial location of the erroneous symbol in code</param>
-    /// <param name="end">Ending location of the erroneous symbol in code</param>
+    /// <param name="errorMessage">The error message to display for the marked script range. Cannot be null.</param>
+    /// <param name="start">The starting location in the script where the error is reported. Specifies the beginning of the error range.</param>
+    /// <param name="end">The ending location in the script where the error is reported. Specifies the end of the error range.</param>
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
-        textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
+        textMarkerService.AddMarker(new (start.Offset, end.Offset) { ToolTip = errorMessage });
         Editor.TextArea.TextView.Repaint();
     }
 
     /// <summary>
-    /// Deletes all error markers.
+    /// Clears all error markers from the editor view.
     /// </summary>
+    /// <remarks>
+    /// Call this method to remove any visual error indicators currently displayed in the editor.
+    /// This is typically used to reset the error state after errors have been resolved or dismissed.
+    /// </remarks>
     private void ClearErrors()
     {
         markerMargin.ClearMarkers();
@@ -629,21 +714,16 @@ public partial class MainWindow : Window
 
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
-        if (IsHotKey(e, Key.I, KeyModifiers.Meta))
-        {
+        if (e.IsHotKey(Key.I, KeyModifiers.Meta))
             InsertSnippetMenuItemClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.I, KeyModifiers.Meta | KeyModifiers.Shift))
-        {
+        else if (e.IsHotKey(Key.I, KeyModifiers.Meta | KeyModifiers.Shift))
             SurroundWithMenuItemClick(null, null);
-            e.Handled = true;
-        }
-        else if (IsHotKey(e, Key.R, KeyModifiers.Meta))
-        {
+        else if (e.IsHotKey(Key.R, KeyModifiers.Meta))
             ReformatMenuItemClick(null, null);
-            e.Handled = true;
-        }
+        else
+            return;
+
+        e.Handled = true;
     }
 
     private async void WindowClosing(object sender, WindowClosingEventArgs e)
@@ -922,9 +1002,9 @@ public partial class MainWindow : Window
 
     private void EditorTextEntered(object sender, TextInputEventArgs e)
     {
-        /****************************************************************************
-         * Tries to popup an keywordMenu menu or to display a calltip
-         * *************************************************************************/
+        /**********************************************************************************
+         * Tries to display a completion window populated with keywords or a calltip window
+         * ********************************************************************************/
 
         if (InCommentOrString(Editor.CaretOffset)) return;
 
@@ -934,7 +1014,7 @@ public partial class MainWindow : Window
         {
             if (IsCompletionWindowOpen()) return;
 
-            var matchedKeywords = KeywordData.AllMatching(GetCurrentWord());
+            var matchedKeywords = KeywordCompletionData.AllMatching(GetCurrentWord());
             if (matchedKeywords.Count == 0) return;
 
             ShowCompletionWindow(matchedKeywords);
@@ -1042,12 +1122,12 @@ public partial class MainWindow : Window
 
     private void InsertSnippetMenuItemClick(object sender, RoutedEventArgs e)
     {
-        ShowCompletionWindow(CodeSnippetData.All);
+        ShowCompletionWindow(CodeSnippetCompletionData.All);
     }
 
     private void SurroundWithMenuItemClick(object sender, RoutedEventArgs e)
     {
-        ShowCompletionWindow(SurroundCodeData.All);
+        ShowCompletionWindow(SurroundCodeCompletionData.All);
     }
 
     private void DeleteMenuItemClick(object sender, RoutedEventArgs e)

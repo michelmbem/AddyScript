@@ -1,18 +1,24 @@
-function compare(a, b)
-{
-    return sign(a - b);
-}
+function identity(x) => x;
 
-function swap(&a, &b)
-{
-	(a, b) = (b, a);
-}
+function str2bool(str) => (bool)str;
 
-function range(begin, end = 0, incr = 1)
+function str2int(str) => (int)str;
+
+function str2long(str) => (long)str;
+
+function str2float(str) => (float)str;
+
+function str2dec(str) => (decimal)str;
+
+function compare(a, b) => sign(a - b);
+
+function swap(&a, &b) => (a, b) = (b, a);
+
+function range(start, end = 0, incr = 1)
 {
 	if (incr <= 0) throw 'the increment must be positive';
-	if (begin > end) swap(begin, end);
-	var i = begin, l = [];
+	if (start > end) swap(start, end);
+	var i = start, l = [];
 	for (; i < end; i += incr) l.add(i);
 	return l;
 }
@@ -29,19 +35,17 @@ function randstr(len)
 {
 	const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 	var s = new System::Text::StringBuilder(), n = alphabet.length;
-	len.times(|i| => s.Append(alphabet[randint(n)]));
+	len.times(|_| => s.Append(alphabet[randint(n)]));
 	return s.ToString();
 }
 
-function readlst(prompt = 'values : ', separator = @'\s+', converter = null)
-{
-	return readln(prompt).split(separator)
-						 .where(|x| => x.length > 0)
-						 .select(converter ?? |x| => x);
-}
+function readlst(prompt = 'values : ', separator = @'\s+', converter = null) => readln(prompt)
+	.split(separator)
+	.where(|x| => x.length > 0)
+	.select(converter ?? identity);
 
 if (__name == 'main') {
-	l = readlst(converter: |x| => (float)x) ?? randlst(randint(20), 100);
+	l = readlst(converter: str2float) ?? randlst(randint(20), 100);
 	s = l.aggregate(.0, |x, i| => x += i);
 	m = s / l.size;
 	println('l = ' + l);
