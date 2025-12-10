@@ -134,15 +134,15 @@ public partial class MainWindow : Window
         {
             filePath = value;
 
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrWhiteSpace(filePath))
             {
-                FileNameStatusLabel.Content = "Untitled";
-                Title = AssemblyInfo.Title;
+                FileNameStatusLabel.Content = SR.Untitled;
+                Title = $"{SR.Untitled} - {AssemblyInfo.Title}";
             }
             else
             {
-                FileNameStatusLabel.Content = value;
-                Title = $"{Path.GetFileName(value)} - {AssemblyInfo.Title}";
+                FileNameStatusLabel.Content = filePath;
+                Title = $"{Path.GetFileName(filePath)} - {AssemblyInfo.Title}";
             }
         }
     }
@@ -192,8 +192,8 @@ public partial class MainWindow : Window
     private TextDocument CreateDocument(string path)
     {
         var content = !string.IsNullOrWhiteSpace(path) && File.Exists(path)
-                    ? File.ReadAllText(path)
-                    : string.Empty;
+            ? File.ReadAllText(path)
+            : string.Empty;
 
         var document = new TextDocument(content);
         document.Changed += EditorDocumentChanged;
@@ -338,9 +338,9 @@ public partial class MainWindow : Window
                         new FilePickerFileType(SR.XmlFileFilter) { Patterns = ["*.xml"] },
                         FilePickerFileTypes.All
                     ],
-                    SuggestedFileName = !string.IsNullOrWhiteSpace(filePath)
-                                      ? Path.GetFileNameWithoutExtension(filePath) + ".xml"
-                                      : "untitled.xml"
+                    SuggestedFileName = !string.IsNullOrWhiteSpace(FilePath)
+                        ? Path.GetFileNameWithoutExtension(FilePath) + ".xml"
+                        : "untitled.xml"
                 });
 
             if (file is null) return;
@@ -372,8 +372,8 @@ public partial class MainWindow : Window
     private async Task<bool> PromptToSave()
     {
         var answer = await MessageBoxManager
-            .GetMessageBoxStandard(Title!, SR.PromptToSave, ButtonEnum.YesNoCancel, MBI.Question)
-            .ShowAsync();
+           .GetMessageBoxStandard(Title!, SR.PromptToSave, ButtonEnum.YesNoCancel, MBI.Question)
+           .ShowAsync();
 
         switch (answer)
         {
@@ -466,10 +466,9 @@ public partial class MainWindow : Window
 
         // Check if line's coloration at the given position is a comment or a string
         return highlightedLine.Sections.Any(section =>
-            section.Offset <= position &&
-            position < section.Offset + section.Length &&
-            section.Color?.Name is "Comment" or "String"
-        );
+                section.Offset <= position &&
+                position < section.Offset + section.Length &&
+                section.Color?.Name is "Comment" or "String");
     }
 
     /// <summary>
@@ -571,8 +570,8 @@ public partial class MainWindow : Window
             CaretPositioningMode.WordBorder);
 
         return wordStart < 0 || wordEnd < 0 || wordEnd <= wordStart
-            ? string.Empty
-            : document.GetText(wordStart, wordEnd - wordStart);
+             ? string.Empty
+             : document.GetText(wordStart, wordEnd - wordStart);
     }
 
     /// <summary>
@@ -683,7 +682,7 @@ public partial class MainWindow : Window
     private void ReportError(string errorMessage, ScriptLocation start, ScriptLocation end)
     {
         markerMargin.AddMarker(start.LineNumber + 1, errorMessage);
-        textMarkerService.AddMarker(new (start.Offset, end.Offset) { ToolTip = errorMessage });
+        textMarkerService.AddMarker(new(start.Offset, end.Offset) { ToolTip = errorMessage });
         Editor.TextArea.TextView.Repaint();
     }
 
@@ -741,18 +740,18 @@ public partial class MainWindow : Window
 
     #region Toolbar events
 
-    public void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarNewButtonClick(object sender, RoutedEventArgs e)
     {
         App.OpenWindow();
         CloseIfEmpty();
     }
 
-    public void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarOpenButtonClick(object sender, RoutedEventArgs e)
     {
         _ = OpenAsync();
     }
 
-    public void ToolbarSaveButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarSaveButtonClick(object sender, RoutedEventArgs e)
     {
         _ = SaveAsync();
     }
@@ -767,34 +766,34 @@ public partial class MainWindow : Window
         _ = ExportXmlAsync();
     }
 
-    public void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarPrintButtonClick(object sender, RoutedEventArgs e)
     {
         MessageBoxManager
             .GetMessageBoxStandard(Title!, SR.MissingFunctionality, ButtonEnum.Ok, MBI.Warning)
             .ShowAsync();
     }
 
-    public void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarUndoButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Undo();
     }
 
-    public void ToolbarRedoButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarRedoButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Redo();
     }
 
-    public void ToolbarCutButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarCutButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Cut();
     }
 
-    public void ToolbarCopyButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarCopyButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Copy();
     }
 
-    public void ToolbarPasteButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarPasteButtonClick(object sender, RoutedEventArgs e)
     {
         Editor.Paste();
     }
@@ -881,14 +880,14 @@ public partial class MainWindow : Window
             document.UncommentLine(Editor.TextArea.Caret.Line);
     }
 
-    public async void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
+    private async void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
     {
         /****************************************************************************
          * Parsing and running the script is delegated to asis.
          * *************************************************************************/
 
         string scriptPath;
-        if (string.IsNullOrEmpty(filePath))
+        if (string.IsNullOrWhiteSpace(filePath))
         {
             scriptPath = Path.ChangeExtension(Path.GetRandomFileName(), ".add");
             await File.WriteAllTextAsync(scriptPath, Editor.Text);
@@ -942,8 +941,8 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             await MessageBoxManager
-                .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
-                .ShowAsync();
+                  .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
+                  .ShowAsync();
         }
         finally
         {
@@ -953,7 +952,7 @@ public partial class MainWindow : Window
         }
     }
 
-    public async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
+    private async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
         var optionDialog = new OptionDialog();
         if (await optionDialog.ShowDialog<bool>(this))
@@ -963,7 +962,7 @@ public partial class MainWindow : Window
         }
     }
 
-    public void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
+    private void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
     {
         Process.Start(new ProcessStartInfo(HELP_LINK) { UseShellExecute = true });
     }
@@ -1013,10 +1012,10 @@ public partial class MainWindow : Window
         if (char.IsLetterOrDigit(firstChar))
         {
             if (IsCompletionWindowOpen()) return;
-
+            
             var matchedKeywords = KeywordCompletionData.AllMatching(GetCurrentWord());
             if (matchedKeywords.Count == 0) return;
-
+            
             ShowCompletionWindow(matchedKeywords);
         }
         else
@@ -1087,7 +1086,7 @@ public partial class MainWindow : Window
         hoverPosition = null;
     }
 
-    private async void EditorIdle(object sender, EventArgs e)
+    private void EditorIdle(object sender, EventArgs e)
     {
         if (updateFolding)
             foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
@@ -1095,7 +1094,7 @@ public partial class MainWindow : Window
         var clipboard = GetTopLevel(this)?.Clipboard;
         if (clipboard == null) return;
 
-        var text = await clipboard.TryGetTextAsync();
+        var text = clipboard.TryGetTextAsync().GetAwaiter().GetResult();
         // We could have used Editor.CanPaste but it always returns true!
         ToolbarPasteButton.IsEnabled = PasteMenuItem.IsEnabled = !string.IsNullOrEmpty(text);
     }
