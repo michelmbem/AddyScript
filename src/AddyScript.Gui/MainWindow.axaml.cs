@@ -918,7 +918,7 @@ public partial class MainWindow : Window
 
         try
         {
-            int exitCode = await TerminalLauncher.Launch(
+            int exitCode = await TerminalLauncher.LaunchEmulatedTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
                 "./asis",
