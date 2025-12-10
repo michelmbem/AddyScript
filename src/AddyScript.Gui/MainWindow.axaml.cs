@@ -339,8 +339,8 @@ public partial class MainWindow : Window
                         FilePickerFileTypes.All
                     ],
                     SuggestedFileName = !string.IsNullOrWhiteSpace(FilePath)
-                        ? Path.GetFileNameWithoutExtension(FilePath) + ".xml"
-                        : "untitled.xml"
+                                      ? Path.GetFileNameWithoutExtension(FilePath) + ".xml"
+                                      : "untitled.xml"
                 });
 
             if (file is null) return;
@@ -372,8 +372,8 @@ public partial class MainWindow : Window
     private async Task<bool> PromptToSave()
     {
         var answer = await MessageBoxManager
-           .GetMessageBoxStandard(Title!, SR.PromptToSave, ButtonEnum.YesNoCancel, MBI.Question)
-           .ShowAsync();
+            .GetMessageBoxStandard(Title!, SR.PromptToSave, ButtonEnum.YesNoCancel, MBI.Question)
+            .ShowAsync();
 
         switch (answer)
         {
@@ -466,9 +466,9 @@ public partial class MainWindow : Window
 
         // Check if line's coloration at the given position is a comment or a string
         return highlightedLine.Sections.Any(section =>
-                section.Offset <= position &&
-                position < section.Offset + section.Length &&
-                section.Color?.Name is "Comment" or "String");
+            section.Offset <= position &&
+            position < section.Offset + section.Length &&
+            section.Color?.Name is "Comment" or "String");
     }
 
     /// <summary>
@@ -941,8 +941,8 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             await MessageBoxManager
-                  .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
-                  .ShowAsync();
+                .GetMessageBoxStandard(SR.ErrorMessageTitle, ex.Message, ButtonEnum.Ok, MBI.Error)
+                .ShowAsync();
         }
         finally
         {
@@ -955,11 +955,10 @@ public partial class MainWindow : Window
     private async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
         var optionDialog = new OptionDialog();
-        if (await optionDialog.ShowDialog<bool>(this))
-        {
-            App.SearchPaths = [..optionDialog.SearchPaths];
-            App.References = [..optionDialog.References];
-        }
+        if (!await optionDialog.ShowDialog<bool>(this)) return;
+        
+        App.SearchPaths = [..optionDialog.SearchPaths];
+        App.References = [..optionDialog.References];
     }
 
     private void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
