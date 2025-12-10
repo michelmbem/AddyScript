@@ -32,8 +32,8 @@ namespace Pty.Net.Unix
             ReaderStream = new PtyStream(controller, FileAccess.Read);
             WriterStream = new PtyStream(controller, FileAccess.Write);
 
-            controller = controller;
-            pid = pid;
+            this.controller = controller;
+            this.pid = pid;
             var childWatcherThread = new Thread(ChildWatcherThreadProc)
             {
                 IsBackground = true,

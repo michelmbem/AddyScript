@@ -33,8 +33,8 @@ namespace Pty.Net.Windows
             WriterStream = writerStream;
             Pid = GetProcessId(processHandle);
 
-            handle = handle;
-            processHandle = processHandle;
+            this.handle = handle;
+            this.processHandle = processHandle;
             process = Process.GetProcessById(Pid);
             process.Exited += Process_Exited;
             process.EnableRaisingEvents = true;
