@@ -1,14 +1,10 @@
 using System;
-
 using AddyScript.Gui.Terminal;
-
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
-
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
-
 using Pty.Net;
 
 namespace AddyScript.Gui;
@@ -99,10 +95,18 @@ public partial class TerminalWindow : Window
             TextArea textArea = TerminalView.TextArea;
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
-
-            TerminalText tt = parser.Parse(text, inputOffset);
-            document.Insert(inputOffset, tt.Text);
-            colorizer.Spans.AddRange(tt.Spans);
+            TerminalOutput output = parser.Parse(text, inputOffset);
+            
+            if (output.ClearScreen)
+            {
+                document.Text = string.Empty;
+                colorizer.Spans.Clear();
+            }
+            else
+            {
+                document.Insert(inputOffset, output.Text);
+                colorizer.Spans.AddRange(output.Spans);
+            }
 
             inputOffset = caret.Offset = document.TextLength;
             trailingChar = inputOffset > 0 ? document.GetCharAt(inputOffset - 1) : '\0';

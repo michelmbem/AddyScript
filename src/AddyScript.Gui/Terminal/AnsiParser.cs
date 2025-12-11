@@ -11,7 +11,7 @@ internal record ColoredSpan(int StartOffset, int Length, IBrush Foreground, IBru
     public int EndOffset => StartOffset + Length;
 }
 
-internal record TerminalText(string Text, List<ColoredSpan> Spans);
+internal record TerminalOutput(string Text, List<ColoredSpan> Spans, bool ClearScreen);
 
 internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 {
@@ -19,10 +19,11 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
     private IBrush currentFg = defaultFg;
     private IBrush currentBg = defaultBg;
 
-    public TerminalText Parse(string input, int baseOffset)
+    public TerminalOutput Parse(string input, int baseOffset)
     {
         var sb = new StringBuilder();
         List<ColoredSpan> spans = [];
+        bool clearScreen = false;
         int logicalPos = 0;
 
         foreach (Match match in AnsiRegex.Matches(input))
@@ -30,10 +31,12 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             int spanLength = match.Index - logicalPos;
             if (spanLength > 0)
             {
-                spans.Add(new (baseOffset + sb.Length, spanLength, currentFg, currentBg));
+                spans.Add(new(baseOffset + sb.Length, spanLength, currentFg, currentBg));
                 sb.Append(input.AsSpan(logicalPos, spanLength));
             }
-            
+            else if (match.Value.EndsWith("[2J"))
+                clearScreen = true;
+
             logicalPos = match.Index + match.Length;
 
             string[] codes = match.Groups["color"].Value.Split(';');
@@ -42,11 +45,11 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 
         if (logicalPos < input.Length)
         {
-            spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
+            spans.Add(new(baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
             sb.Append(input.AsSpan(logicalPos));
         }
 
-        return new (sb.ToString(), spans);
+        return new(sb.ToString(), spans, clearScreen);
     }
 
     [GeneratedRegex(
@@ -73,7 +76,7 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 
     private void ApplyCodes(string[] codes)
     {
-       if (!int.TryParse(codes[0], out var code))
+        if (!int.TryParse(codes[0], out var code))
             code = 0;
 
         switch (code)
