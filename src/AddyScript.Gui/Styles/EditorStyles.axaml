@@ -1,123 +1,160 @@
-<Styles
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:i="https://github.com/projektanker/icons.avalonia">
-    <Design.PreviewWith>
-        <Border Width="600"
-                Height="400"
-                Background="{DynamicResource WindowBackground}">
-            <Grid RowDefinitions="Auto, *, Auto">
-                <StackPanel Grid.Row="0" Classes="toolbar">
-                    <Button i:Attached.Icon="fa-file" />
-                    <Button i:Attached.Icon="fa-folder-open" />
-                    <SplitButton i:Attached.Icon="fa-floppy-disk">
-                        <SplitButton.Flyout>
-                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuItem Header="Save as..." />
-                                <MenuItem Header="Export to XML" />
-                            </MenuFlyout>
-                        </SplitButton.Flyout>
-                    </SplitButton>
-                    <Rectangle Classes="divider" />
-                    <Button i:Attached.Icon="fa-rotate-left" />
-                </StackPanel>
-                <Border Grid.Row="1" Classes="editor-wrapper"/>
-                <Grid Grid.Row="2" Classes="statusbar" ColumnDefinitions="*, 200">
-                    <Label Grid.Column="0" Content="First label" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Rectangle Classes="divider" />
-                        <Label Content="Second label"/>
-                    </StackPanel>
-                </Grid>
-            </Grid>
-        </Border>
-    </Design.PreviewWith>
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:i="https://github.com/projektanker/icons.avalonia">
 
-    <!--  Add Styles Here  -->
+	<Design.PreviewWith>
+		<Border Width="600"
+				Height="400"
+				Background="{DynamicResource WindowBackground}">
+			<Grid RowDefinitions="Auto, *, Auto">
+				<StackPanel Grid.Row="0" Classes="toolbar">
+					<Button i:Attached.Icon="fa-file" />
+					<Button i:Attached.Icon="fa-folder-open" />
+					<SplitButton i:Attached.Icon="fa-floppy-disk">
+						<SplitButton.Flyout>
+							<MenuFlyout Placement="BottomEdgeAlignedLeft">
+								<MenuItem Header="Save as..." />
+								<MenuItem Header="Export to XML" />
+							</MenuFlyout>
+						</SplitButton.Flyout>
+					</SplitButton>
+					<Rectangle Classes="divider" />
+					<Button i:Attached.Icon="fa-rotate-left" />
+				</StackPanel>
+				<Border Grid.Row="1" Classes="editor-wrapper">
+					<HeaderedContentControl Header="Settings">
+						<StackPanel Spacing="8">
+							<TextBox Text="Sample content"/>
+							<Button Content="Click me"/>
+						</StackPanel>
+					</HeaderedContentControl>
+				</Border>
+				<Grid Grid.Row="2" Classes="statusbar" ColumnDefinitions="*, 200">
+					<Label Grid.Column="0" Content="First label" />
+					<StackPanel Grid.Column="1" Orientation="Horizontal">
+						<Rectangle Classes="divider" />
+						<Label Content="Second label"/>
+					</StackPanel>
+				</Grid>
+			</Grid>
+		</Border>
+	</Design.PreviewWith>
 
-    <Style Selector="Rectangle.divider">
-        <Setter Property="Width" Value="1" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Fill" Value="{DynamicResource DividerFill}" />
-    </Style>
+	<!--  Add Styles Here  -->
 
-    <Style Selector="StackPanel.toolbar">
-        <Setter Property="Orientation" Value="Horizontal" />
-        <Setter Property="Margin" Value="10, 5" />
-        <Setter Property="Spacing" Value="5" />
-    </Style>
+	<Style Selector="Rectangle.divider">
+		<Setter Property="Width" Value="1" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Fill" Value="{DynamicResource DividerFill}" />
+	</Style>
 
-    <Style Selector="StackPanel.toolbar Button">
-        <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="Padding" Value="4" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
-        <Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
-        <Setter Property="FontSize" Value="24" />
-    </Style>
+	<Style Selector="StackPanel.toolbar">
+		<Setter Property="Orientation" Value="Horizontal" />
+		<Setter Property="Margin" Value="10, 5" />
+		<Setter Property="Spacing" Value="5" />
+	</Style>
 
-    <Style Selector="StackPanel.toolbar Button:pointerover /template/ ContentPresenter,
-                     StackPanel.toolbar SplitButton:flyout-open Button /template/ ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource HoverToolbarButtonForeground}" />
-        <Setter Property="Background" Value="{DynamicResource HoverToolbarButtonBackground}" />
-    </Style>
+	<Style Selector="StackPanel.toolbar Button">
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="Padding" Value="4" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+		<Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
+		<Setter Property="FontSize" Value="24" />
+	</Style>
 
-    <Style Selector="StackPanel.toolbar Button[IsEnabled=False] /template/ ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
-        <Setter Property="Background" Value="{DynamicResource InactiveToolbarButtonBackground}" />
-    </Style>
+	<Style Selector="StackPanel.toolbar Button:pointerover /template/ ContentPresenter,
+	StackPanel.toolbar SplitButton:flyout-open Button /template/ ContentPresenter">
+		<Setter Property="Foreground" Value="{DynamicResource HoverToolbarButtonForeground}" />
+		<Setter Property="Background" Value="{DynamicResource HoverToolbarButtonBackground}" />
+	</Style>
 
-    <Style Selector="StackPanel.toolbar Rectangle.divider">
-        <Setter Property="Height" Value="24" />
-    </Style>
+	<Style Selector="StackPanel.toolbar Button[IsEnabled=False] /template/ ContentPresenter">
+		<Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
+		<Setter Property="Background" Value="{DynamicResource InactiveToolbarButtonBackground}" />
+	</Style>
 
-    <Style Selector="MenuFlyoutPresenter, ContextMenu">
-        <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
-    </Style>
+	<Style Selector="StackPanel.toolbar Rectangle.divider">
+		<Setter Property="Height" Value="24" />
+	</Style>
 
-    <Style Selector="MenuItem">
-        <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
-        <Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
-    </Style>
+	<Style Selector="MenuFlyoutPresenter, ContextMenu">
+		<Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+	</Style>
 
-    <Style Selector="MenuItem:pointerover /template/ ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource HoverToolbarButtonForeground}" />
-    </Style>
+	<Style Selector="MenuItem">
+		<Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+		<Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
+	</Style>
 
-    <Style Selector="MenuItem[IsEnabled=False] /template/ ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
-    </Style>
+	<Style Selector="MenuItem:pointerover /template/ ContentPresenter">
+		<Setter Property="Foreground" Value="{DynamicResource HoverToolbarButtonForeground}" />
+	</Style>
 
-    <Style Selector="MenuItem i|Icon">
-        <Setter Property="Width" Value="16" />
-        <Setter Property="Height" Value="16" />
-    </Style>
+	<Style Selector="MenuItem[IsEnabled=False] /template/ ContentPresenter">
+		<Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
+	</Style>
 
-    <Style Selector="Separator">
-        <Setter Property="Background" Value="{DynamicResource DividerFill}" />
-    </Style>
+	<Style Selector="MenuItem i|Icon">
+		<Setter Property="Width" Value="16" />
+		<Setter Property="Height" Value="16" />
+	</Style>
 
-    <Style Selector="Border.editor-wrapper">
-        <Setter Property="Margin" Value="10, 0, 15, 5" />
-        <Setter Property="Padding" Value="10" />
-        <Setter Property="Background" Value="{DynamicResource EditorBackground}" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="BoxShadow" Value="5 5 10 0 Chocolate" />
-    </Style>
+	<Style Selector="Separator">
+		<Setter Property="Background" Value="{DynamicResource DividerFill}" />
+	</Style>
 
-    <Style Selector="Grid.statusbar">
-        <Setter Property="Margin" Value="10, 5" />
-    </Style>
+	<Style Selector="Border.editor-wrapper">
+		<Setter Property="Margin" Value="10, 0, 15, 5" />
+		<Setter Property="Padding" Value="10" />
+		<Setter Property="Background" Value="{DynamicResource EditorBackground}" />
+		<Setter Property="CornerRadius" Value="10" />
+		<Setter Property="BoxShadow" Value="5 5 10 0 Chocolate" />
+	</Style>
 
-    <Style Selector="Grid.statusbar Label">
-        <Setter Property="Padding" Value="5" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
+	<Style Selector="Grid.statusbar">
+		<Setter Property="Margin" Value="10, 5" />
+	</Style>
 
-    <Style Selector="Grid.statusbar Rectangle.divider">
-        <Setter Property="Height" Value="16" />
-        <Setter Property="Margin" Value="5, 0" />
-    </Style>
+	<Style Selector="Grid.statusbar Label">
+		<Setter Property="Padding" Value="5" />
+		<Setter Property="HorizontalContentAlignment" Value="Left" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="Grid.statusbar Rectangle.divider">
+		<Setter Property="Height" Value="16" />
+		<Setter Property="Margin" Value="5, 0" />
+	</Style>
+
+	<Style Selector="HeaderedContentControl">
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Grid RowDefinitions="Auto, *" ColumnDefinitions="Auto, *">
+					<!-- Header -->
+					<Border ZIndex="1"
+							Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+							Padding="5,0,5,0"
+							Margin="5,0,0,0">
+						<TextBlock Text="{TemplateBinding Header}" FontWeight="Bold"/>
+					</Border>
+
+					<!-- Content Area -->
+					<Border Grid.RowSpan="2"
+							Padding="0,5,0,0"
+							Grid.ColumnSpan="2"
+							CornerRadius="4"
+							Margin="0,10,0,0"
+							BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+					BorderThickness="1">
+						<ContentPresenter
+							Name="PART_ContentPresenter"
+							Padding="8"
+							Content="{TemplateBinding Content}"/>
+					</Border>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</Style>
 </Styles>

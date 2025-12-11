@@ -3,12 +3,48 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="https://github.com/projektanker/icons.avalonia"
         Width="550"
-        Height="450"
+        Height="475"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource WindowBackground}"
         Icon="/Assets/Images/Icons/AddyScript.ico">
   <Grid RowDefinitions="*, Auto" Margin="5">
     <TabControl Grid.Row="0">
+        <TabItem Header="General">
+            <StackPanel Margin="0,5,0,0" Background="{DynamicResource EditorBackground}">
+                <HeaderedContentControl Header="Editor" Margin="10,5">
+                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto, Auto">
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Name="EditorFontFaceTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Name="EditorFontSizeTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="1" Grid.Column="2" Text="Word wrap :" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Row="1" Grid.Column="3" Name="EditorWordWrapCheckBox" Margin="5, 3"/>
+                    </Grid>
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Terminal" Margin="10,5">
+                    <Grid ColumnDefinitions="Auto, *, Auto, *">
+                        <RadioButton Grid.Column="0" Name="NativeTerminalRadioButton" Margin="5, 3"/>
+						<TextBlock Grid.Column="1" Text="Use native terminal" VerticalAlignment="Center"/>
+                        <RadioButton Grid.Column="2" Name="EmulatedTerminalRadioButton" Margin="5, 3"/>
+						<TextBlock Grid.Column="3" Text="Use emulated terminal" VerticalAlignment="Center"/>
+                    </Grid>
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Emulated terminal" Margin="10,5">
+                    <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="Foreground :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Name="TerminalForegroundTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="0" Grid.Column="2" Text="Background :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" Name="TerminalBackgroundTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Name="TerminalFontFaceTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Name="TerminalFontSizeTextBox" Margin="5, 3"/>
+						<TextBlock Grid.Row="2" Grid.Column="2" Text="Word wrap :" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Row="2" Grid.Column="3" Name="TerminalWordWrapCheckBox" Margin="5, 3"/>
+                    </Grid>
+                </HeaderedContentControl>
+            </StackPanel>
+        </TabItem>
       <TabItem Header="Search Paths">
         <DockPanel Margin="0,5,0,0">
           <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, Auto">

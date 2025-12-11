@@ -42,13 +42,11 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
                 case 'm':
                     ApplyCodes(tag[1..^1].Split(';'));
                     break;
-                case 'J' when tag[^2] == '3':
-                    // ignoring other J codes for simplicity
-                    clearScreen = true;
-                    break;
-                case 'E' or 'H' or 'f' when tag[^2] == '1' || !char.IsDigit(tag[^2]):
-                    // only handling next line for simplicity
+                case 'H': // skipping to next line for all cursor movements
                     sb.AppendLine();
+                    break;
+                case 'J' when tag[^2] == '3': // only clearing screen for [3J
+                    clearScreen = true;
                     break;
             }
 
@@ -60,8 +58,8 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
             sb.Append(input.AsSpan(logicalPos));
         }
-
-        return new (sb.ToString(), spans, clearScreen);
+        
+        return new(sb.ToString(), spans, clearScreen);
     }
 
     [GeneratedRegex(
