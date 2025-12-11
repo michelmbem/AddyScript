@@ -921,7 +921,7 @@ public partial class MainWindow : Window
             int exitCode = await TerminalLauncher.LaunchEmulatedTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
-                "asis.exe",
+                "./asis",
                 [..argsList]);
 
             if (exitCode == 0 || !File.Exists(logPath)) return;
