@@ -12,13 +12,15 @@
         <TabItem Header="General">
             <StackPanel Margin="0,5,0,0" Background="{DynamicResource EditorBackground}">
                 <HeaderedContentControl Header="Editor" Margin="10,5">
-                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto, Auto">
+                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto">
 						<TextBlock Grid.Row="0" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Name="EditorFontFaceTextBox" Margin="5, 3"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Name="EditorFontFaceTextBox" Margin="5, 3"/>
 						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Name="EditorFontSizeTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="1" Grid.Column="2" Text="Word wrap :" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="1" Grid.Column="3" Name="EditorWordWrapCheckBox" Margin="5, 3"/>
+                        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal"> 
+						    <TextBlock Text="Word wrap :" VerticalAlignment="Center"/>
+                            <CheckBox Name="EditorWordWrapCheckBox" Margin="5, 3, 0, 3"/>
+                        </StackPanel>
                     </Grid>
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Terminal" Margin="10,5">
@@ -38,9 +40,11 @@
 						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Name="TerminalFontFaceTextBox" Margin="5, 3"/>
 						<TextBlock Grid.Row="2" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Name="TerminalFontSizeTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="2" Grid.Column="2" Text="Word wrap :" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="2" Grid.Column="3" Name="TerminalWordWrapCheckBox" Margin="5, 3"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="TerminalFontSizeTextBox" Margin="5, 3"/>
+                        <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right"> 
+						    <TextBlock Text="Word wrap :" VerticalAlignment="Center"/>
+                            <CheckBox Name="TerminalWordWrapCheckBox" Margin="5, 3, 0, 3"/>
+                        </StackPanel>
                     </Grid>
                 </HeaderedContentControl>
             </StackPanel>
