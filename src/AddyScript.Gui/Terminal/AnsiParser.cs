@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-
 using Avalonia.Media;
-
-using HarfBuzzSharp;
 
 namespace AddyScript.Gui.Terminal;
 
@@ -19,6 +16,7 @@ internal record TerminalOutput(string Text, List<ColoredSpan> Spans, bool ClearS
 internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
+    
     private IBrush currentFg = defaultFg;
     private IBrush currentBg = defaultBg;
 
@@ -39,10 +37,20 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             }
 
             string tag = match.Groups["tag"].Value;
-            if (tag is "[2J" or "]1047;\u0007")
-                clearScreen = true;
-            else if (tag.StartsWith('[') && tag.EndsWith('m'))
-                ApplyCodes(tag[1..^1].Split(';'));
+            switch (tag[^1])
+            {
+                case 'm':
+                    ApplyCodes(tag[1..^1].Split(';'));
+                    break;
+                case 'J' when tag[^2] == '3':
+                    // ignoring other J codes for simplicity
+                    clearScreen = true;
+                    break;
+                case 'E' or 'H' or 'f' when tag[^2] == '1' || !char.IsDigit(tag[^2]):
+                    // only handling next line for simplicity
+                    sb.AppendLine();
+                    break;
+            }
 
             logicalPos = match.Index + match.Length;
         }
@@ -102,11 +110,19 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             case >= 100 and <= 107:
                 currentBg = AnsiColor(code - 100) ?? defaultBg;
                 break;
-            case 38 when codes.Length > 2 && int.TryParse(codes[2], out var fg):
+            case 38 when codes.Length == 3 && codes[1] == "5" && int.TryParse(codes[2], out var fg):
                 currentFg = AnsiColor(fg % 8);
                 break;
-            case 48 when codes.Length > 2 && int.TryParse(codes[2], out var bg):
+            case 48 when codes.Length == 3 && codes[1] == "5" && int.TryParse(codes[2], out var bg):
                 currentBg = AnsiColor(bg % 8);
+                break;
+            case 38 when codes.Length == 5 && codes[1] == "2":
+                currentFg = new SolidColorBrush(
+                    new Color(255, byte.Parse(codes[2]), byte.Parse(codes[3]), byte.Parse(codes[4])));
+                break;
+            case 48 when codes.Length == 5 && codes[1] == "2":
+                currentBg = new SolidColorBrush(
+                    new Color(255, byte.Parse(codes[2]), byte.Parse(codes[3]), byte.Parse(codes[4])));
                 break;
         }
     }

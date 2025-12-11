@@ -88,14 +88,14 @@ public partial class TerminalWindow : Window
         }
     }
 
-    private void TerminalDataReceived(string text)
+    private void TerminalDataReceived(object sender, string text)
     {
         Dispatcher.UIThread.Post(() =>
         {
+            TerminalOutput output = parser.Parse(text, inputOffset);
             TextArea textArea = TerminalView.TextArea;
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
-            TerminalOutput output = parser.Parse(text, inputOffset);
             
             if (output.ClearScreen)
             {
@@ -114,7 +114,7 @@ public partial class TerminalWindow : Window
         });
     }
 
-    private void TerminalProcessExited(int exitCode)
+    private void TerminalProcessExited(object sender, int exitCode)
     {
         terminal = null;
         Dispatcher.UIThread.Post(Close);

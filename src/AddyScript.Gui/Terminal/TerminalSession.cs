@@ -17,7 +17,7 @@ internal class TerminalSession
         var ptyConnectionTask = PtyProvider.SpawnAsync(options, timeoutToken);
         ptyConnectionTask.Wait();
         ptyConnection = ptyConnectionTask.Result;
-        ptyConnection.ProcessExited += (_, e) => ProcessExited?.Invoke(e.ExitCode);
+        ptyConnection.ProcessExited += (_, e) => ProcessExited?.Invoke(this, e.ExitCode);
 
         _ = Task.Run(async () =>
         {
@@ -29,7 +29,7 @@ internal class TerminalSession
                 if (read <= 0) continue;
 
                 var text = Encoding.GetString(buffer, 0, read);
-                DataReceived?.Invoke(text);
+                DataReceived?.Invoke(this, text);
             }
         });
     }
@@ -47,7 +47,7 @@ internal class TerminalSession
     
     public void Close() => ptyConnection.Dispose();
 
-    public event Action<string> DataReceived;
+    public event EventHandler<string> DataReceived;
 
-    public event Action<int> ProcessExited;
+    public event EventHandler<int> ProcessExited;
 }
