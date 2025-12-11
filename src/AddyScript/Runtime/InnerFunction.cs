@@ -426,7 +426,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         DataItem arg0 = arguments[0];
         var values = arguments[1].AsList;
 
-        if (values.Count <= 0)
+        if (values.Count == 0)
             RuntimeServices.Out.Write(RuntimeServices.ToString(arg0));
         else
         {
@@ -442,7 +442,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         DataItem arg0 = arguments[0];
         var values = arguments[1].AsList;
 
-        if (values.Count <= 0)
+        if (values.Count == 0)
             RuntimeServices.Out.WriteLine(RuntimeServices.ToString(arg0));
         else
         {
@@ -542,27 +542,27 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                             bf.Write(values[k++].AsDouble);
                         break;
                     case PackFormatType.CString:
-                        {
-                            var tmpString = values[k++].ToString();
-                            if (tmpString.Length > item.Count)
-                                tmpString = tmpString[..item.Count];
-                            else if (tmpString.Length < item.Count)
-                                tmpString = tmpString.PadRight(item.Count, '\0');
-                            bf.Write(StringUtil.String2ByteArray(tmpString));
-                        }
+                    {
+                        var tmpString = values[k++].ToString();
+                        if (tmpString.Length > item.Count)
+                            tmpString = tmpString[..item.Count];
+                        else if (tmpString.Length < item.Count)
+                            tmpString = tmpString.PadRight(item.Count, '\0');
+                        bf.Write(StringUtil.String2ByteArray(tmpString));
                         break;
+                    }
                     case PackFormatType.PascalString:
-                        {
-                            var tmpString = values[k++].ToString();
-                            int count = Math.Min(item.Count - 1, 255);
-                            if (tmpString.Length > count)
-                                tmpString = tmpString[..count];
-                            else if (tmpString.Length < count)
-                                tmpString = tmpString.PadRight(count, '\0');
-                            bf.Write((byte)count);
-                            bf.Write(StringUtil.String2ByteArray(tmpString));
-                        }
+                    {
+                        var tmpString = values[k++].ToString();
+                        int count = Math.Min(item.Count - 1, 255);
+                        if (tmpString.Length > count)
+                            tmpString = tmpString[..count];
+                        else if (tmpString.Length < count)
+                            tmpString = tmpString.PadRight(count, '\0');
+                        bf.Write((byte)count);
+                        bf.Write(StringUtil.String2ByteArray(tmpString));
                         break;
+                    }
                     case PackFormatType.Pointer:
                         switch (IntPtr.Size)
                         {
@@ -646,18 +646,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                             list.Add(new Float(br.ReadDouble()));
                         break;
                     case PackFormatType.CString:
-                        {
-                            byte[] buffer = br.ReadBytes(item.Count);
-                            list.Add(new String(StringUtil.ByteArray2String(buffer).TrimEnd('\0')));
-                        }
+                    {
+                        byte[] buffer = br.ReadBytes(item.Count);
+                        list.Add(new String(StringUtil.ByteArray2String(buffer).TrimEnd('\0')));
                         break;
+                    }
                     case PackFormatType.PascalString:
-                        {
-                            byte b = br.ReadByte();
-                            byte[] buffer = br.ReadBytes(b);
-                            list.Add(new String(StringUtil.ByteArray2String(buffer).TrimEnd('\0')));
-                        }
+                    {
+                        byte b = br.ReadByte();
+                        byte[] buffer = br.ReadBytes(b);
+                        list.Add(new String(StringUtil.ByteArray2String(buffer).TrimEnd('\0')));
                         break;
+                    }
                     case PackFormatType.Pointer:
                         switch (IntPtr.Size)
                         {

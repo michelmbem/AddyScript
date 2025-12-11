@@ -79,10 +79,10 @@ if (__name == "main") {
 	}
 	
 	printTree(node);
-	println();
+	println(' ');
 	
 	println("node depth: {0}", treeDepth(node));
-	println();
+	println(' ');
 	
 	value = (int) readln("value to find = ");
 	found = findNode(node, value);
