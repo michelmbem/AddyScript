@@ -32,7 +32,6 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
         foreach (Match match in AnsiRegex.Matches(input))
         {
             int spanLength = match.Index - logicalPos;
-            
             if (spanLength > 0)
             {
                 spans.Add(new(baseOffset + sb.Length, spanLength, currentFg, currentBg));
@@ -40,7 +39,6 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             }
 
             string tag = match.Groups["tag"].Value;
-
             if (tag is "[2J" or "]1047;\u0007")
                 clearScreen = true;
             else if (tag.StartsWith('[') && tag.EndsWith('m'))
