@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Runtime.InteropServices;
-
 namespace Pty.Net.Windows
 {
-    using static NativeMethods;
+    using System;
+    using System.Runtime.InteropServices;
+    using static Pty.Net.Windows.NativeMethods;
 
     /// <summary>
     /// Native interop definitions for winpty.
@@ -65,10 +64,10 @@ namespace Pty.Net.Windows
         public const int WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = 0x8;
 
         public const int WINPTY_FLAG_MASK = 0
-                                            | WINPTY_FLAG_CONERR
-                                            | WINPTY_FLAG_PLAIN_OUTPUT
-                                            | WINPTY_FLAG_COLOR_ESCAPES
-                                            | WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION;
+            | WINPTY_FLAG_CONERR
+            | WINPTY_FLAG_PLAIN_OUTPUT
+            | WINPTY_FLAG_COLOR_ESCAPES
+            | WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION;
 
         /// <summary>
         /// QuickEdit mode is initially disabled, and the agent does not send mouse
@@ -116,8 +115,8 @@ namespace Pty.Net.Windows
         /// All the spawn flags.
         /// </summary>
         public const int WINPTY_SPAWN_FLAG_MASK = 0
-                                                  | WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN
-                                                  | WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN;
+            | WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN
+            | WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN;
 
         [DllImport(WinptyNativeDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int winpty_error_code(IntPtr err);

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-
 namespace Pty.Net.Linux
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
+    using System.Text;
+
     internal static class NativeMethods
     {
         internal const int STDIN_FILENO = 0;
@@ -135,8 +135,7 @@ namespace Pty.Net.Linux
         [DllImport(LibSystem, SetLastError = true)]
         private static extern int execvp(
             [MarshalAs(UnmanagedType.LPStr)] string file,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
-            string?[] args);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string?[] args);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct WinSize
@@ -148,10 +147,10 @@ namespace Pty.Net.Linux
 
             public WinSize(ushort rows, ushort cols)
             {
-                Rows = rows;
-                Cols = cols;
-                XPixel = 0;
-                YPixel = 0;
+                this.Rows = rows;
+                this.Cols = cols;
+                this.XPixel = 0;
+                this.YPixel = 0;
             }
         }
 
@@ -169,7 +168,6 @@ namespace Pty.Net.Linux
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NCCS)]
             public sbyte[] CC;
-
             public uint ISpeed;
             public uint OSpeed;
 
@@ -181,19 +179,19 @@ namespace Pty.Net.Linux
                 TermSpeed speed,
                 IDictionary<TermSpecialControlCharacter, sbyte> controlCharacters)
             {
-                IFlag = (uint)inputFlag;
-                OFlag = (uint)outputFlag;
-                CFlag = (uint)controlFlag;
-                LFlag = (uint)localFlag;
-                CC = new sbyte[NCCS];
+                this.IFlag = (uint)inputFlag;
+                this.OFlag = (uint)outputFlag;
+                this.CFlag = (uint)controlFlag;
+                this.LFlag = (uint)localFlag;
+                this.CC = new sbyte[NCCS];
                 foreach (var kvp in controlCharacters)
                 {
-                    CC[(int)kvp.Key] = kvp.Value;
+                    this.CC[(int)kvp.Key] = kvp.Value;
                 }
 
-                line = 0;
-                ISpeed = 0;
-                OSpeed = 0;
+                this.line = 0;
+                this.ISpeed = 0;
+                this.OSpeed = 0;
                 cfsetispeed(ref this, (IntPtr)speed);
                 cfsetospeed(ref this, (IntPtr)speed);
             }

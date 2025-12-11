@@ -921,10 +921,10 @@ public partial class MainWindow : Window
             int exitCode = await TerminalLauncher.LaunchEmulatedTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
-                "./asis",
+                "asis.exe",
                 [..argsList]);
 
-            if (exitCode == 0) return;
+            if (exitCode == 0 || !File.Exists(logPath)) return;
 
             using var logReader = File.OpenText(logPath);
             if (await logReader.ReadLineAsync() != scriptPath) return;

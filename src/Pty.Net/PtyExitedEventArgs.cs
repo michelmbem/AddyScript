@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 namespace Pty.Net
 {
+    using System;
+
     /// <summary>
     /// Event arguments that encapsulate data about the pty process exit.
     /// </summary>
@@ -16,7 +16,7 @@ namespace Pty.Net
         /// <param name="exitCode">Exit code of the pty process.</param>
         internal PtyExitedEventArgs(int exitCode)
         {
-            ExitCode = exitCode;
+            this.ExitCode = exitCode;
         }
 
         /// <summary>

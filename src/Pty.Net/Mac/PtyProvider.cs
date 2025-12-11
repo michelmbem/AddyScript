@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Pty.Net.Mac
 {
-    using static NativeMethods;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using static Pty.Net.Mac.NativeMethods;
 
     /// <summary>
     /// Provides a pty connection for MacOS machines.
@@ -18,8 +17,7 @@ namespace Pty.Net.Mac
     internal class PtyProvider : Unix.PtyProvider
     {
         /// <inheritdoc/>
-        public override Task<IPtyConnection> StartTerminalAsync(PtyOptions options, TraceSource trace,
-                                                                CancellationToken cancellationToken)
+        public override Task<IPtyConnection> StartTerminalAsync(PtyOptions options, TraceSource trace, CancellationToken cancellationToken)
         {
             var winSize = new WinSize((ushort)options.Rows, (ushort)options.Cols);
 
@@ -48,12 +46,10 @@ namespace Pty.Net.Mac
             };
 
             var term = new Termios(
-                inputFlag: TermInputFlag.ICRNL | TermInputFlag.IXON | TermInputFlag.IXANY | TermInputFlag.IMAXBEL |
-                           TermInputFlag.BRKINT | TermInputFlag.IUTF8,
+                inputFlag: TermInputFlag.ICRNL | TermInputFlag.IXON | TermInputFlag.IXANY | TermInputFlag.IMAXBEL | TermInputFlag.BRKINT | TermInputFlag.IUTF8,
                 outputFlag: TermOuptutFlag.OPOST | TermOuptutFlag.ONLCR,
                 controlFlag: TermConrolFlag.CREAD | TermConrolFlag.CS8 | TermConrolFlag.HUPCL,
-                localFlag: TermLocalFlag.ICANON | TermLocalFlag.ISIG | TermLocalFlag.IEXTEN | TermLocalFlag.ECHO |
-                           TermLocalFlag.ECHOE | TermLocalFlag.ECHOK | TermLocalFlag.ECHOKE | TermLocalFlag.ECHOCTL,
+                localFlag: TermLocalFlag.ICANON | TermLocalFlag.ISIG | TermLocalFlag.IEXTEN | TermLocalFlag.ECHO | TermLocalFlag.ECHOE | TermLocalFlag.ECHOK | TermLocalFlag.ECHOKE | TermLocalFlag.ECHOCTL,
                 speed: TermSpeed.B38400,
                 controlCharacters: controlCharacters);
 

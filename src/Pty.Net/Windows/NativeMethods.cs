@@ -21,6 +21,8 @@ namespace Pty.Net.Windows
         internal const int EXTENDED_STARTUPINFO_PRESENT = 0x00080000;
         internal const int STARTF_USESTDHANDLES = 0x00000100;
 
+        private const string LibKernel = "kernel32.dll";
+
         internal static readonly IntPtr PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE = new IntPtr(
             22 // ProcThreadAttributePseudoConsole
             | 0x20000); // PROC_THREAD_ATTRIBUTE_INPUT - Attribute is input only
@@ -30,27 +32,27 @@ namespace Pty.Net.Windows
         private static readonly Lazy<bool> IsPseudoConsoleSupportedLazy = new Lazy<bool>(
             () =>
             {
-                IntPtr hLibrary = LoadLibraryW("kernel32.dll");
+                IntPtr hLibrary = LoadLibraryW(LibKernel);
                 return hLibrary != IntPtr.Zero && GetProcAddress(hLibrary, "CreatePseudoConsole") != IntPtr.Zero;
             },
             isThreadSafe: true);
 
         internal static bool IsPseudoConsoleSupported => IsPseudoConsoleSupportedLazy.Value;
 
-        [DllImport("kernel32.dll")]
+        [DllImport(LibKernel)]
         public static extern int GetProcessId(SafeProcessHandle hProcess);
 
         [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(LibKernel, SetLastError = true)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         internal static extern bool CloseHandle(IntPtr hObject);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(LibKernel, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool InitializeProcThreadAttributeList(
             IntPtr lpAttributeList, int dwAttributeCount, int dwFlags, ref IntPtr lpSize);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(LibKernel, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool UpdateProcThreadAttribute(
             IntPtr lpAttributeList,
@@ -63,7 +65,7 @@ namespace Pty.Net.Windows
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(LibKernel, CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool CreateProcess(
             string? lpApplicationName,
             string lpCommandLine,                // LPTSTR - note: CreateProcess might insert a null somewhere in this string
@@ -76,7 +78,7 @@ namespace Pty.Net.Windows
             ref STARTUPINFOEX lpStartupInfo,                // LPSTARTUPINFO
             out PROCESS_INFORMATION lpProcessInformation);  // LPPROCESS_INFORMATION
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(LibKernel, SetLastError = true)]
         [SecurityCritical]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CreatePipe(
@@ -85,26 +87,22 @@ namespace Pty.Net.Windows
             SECURITY_ATTRIBUTES? pipeAttributes,    // LPSECURITY_ATTRIBUTES lpPipeAttributes,  // security attributes
             int size);                              // DWORD nSize                              // pipe size
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(LibKernel, SetLastError = true)]
         internal static extern IntPtr LoadLibraryW([MarshalAs(UnmanagedType.LPWStr)] string libName);
 
-        [DllImport("kernel32.dll")]
+        [DllImport(LibKernel)]
         internal static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string procName);
 
-        [DllImport("kernel32.dll", EntryPoint = "CreatePseudoConsole")]
+        [DllImport(LibKernel, EntryPoint = "CreatePseudoConsole")]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         internal static extern int CreatePseudoConsole(Coord coord, IntPtr input, IntPtr output, uint flags, out IntPtr consoleHandle);
 
-        [DllImport("kernel32.dll", EntryPoint = "ResizePseudoConsole")]
+        [DllImport(LibKernel, EntryPoint = "ResizePseudoConsole")]
         internal static extern int ResizePseudoConsole(SafePseudoConsoleHandle consoleHandle, Coord coord);
 
-        [DllImport("kernel32.dll", EntryPoint = "ClosePseudoConsole")]
+        [DllImport(LibKernel, EntryPoint = "ClosePseudoConsole")]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         internal static extern void ClosePseudoConsole(IntPtr consoleHandle);
-
-        [DllImport("kernel32.dll", EntryPoint = "ClosePseudoConsole")]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        internal static extern void ClosePseudoConsole86(IntPtr consoleHandle);
 
         [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Unicode)]
         internal struct STARTUPINFO
@@ -137,8 +135,8 @@ namespace Pty.Net.Windows
 
             public Coord(int x, int y)
             {
-                X = (ushort)x;
-                Y = (ushort)y;
+                this.X = (ushort)x;
+                this.Y = (ushort)y;
             }
         }
 
@@ -164,8 +162,8 @@ namespace Pty.Net.Windows
             /// <param name="handle">Pseudo console handle.</param>
             internal void InitAttributeListAttachedToConPTY(SafePseudoConsoleHandle handle)
             {
-                StartupInfo.cb = Marshal.SizeOf<STARTUPINFOEX>();
-                StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+                this.StartupInfo.cb = Marshal.SizeOf<STARTUPINFOEX>();
+                this.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
 
                 const int AttributeCount = 1;
                 var size = IntPtr.Zero;
@@ -179,14 +177,14 @@ namespace Pty.Net.Windows
                         new Win32Exception());
                 }
 
-                lpAttributeList = Marshal.AllocHGlobal(size);
-                if (lpAttributeList == IntPtr.Zero)
+                this.lpAttributeList = Marshal.AllocHGlobal(size);
+                if (this.lpAttributeList == IntPtr.Zero)
                 {
                     throw new OutOfMemoryException("Couldn't reserve space for a new process attribute list");
                 }
 
                 // Set startup info's attribute list & initialize it
-                wasInitialized = InitializeProcThreadAttributeList(lpAttributeList, AttributeCount, 0, ref size);
+                wasInitialized = InitializeProcThreadAttributeList(this.lpAttributeList, AttributeCount, 0, ref size);
                 if (!wasInitialized)
                 {
                     throw new InvalidOperationException("Couldn't create new process attribute list", new Win32Exception());
@@ -194,7 +192,7 @@ namespace Pty.Net.Windows
 
                 // Set thread attribute list's Pseudo Console to the specified ConPTY
                 wasInitialized = UpdateProcThreadAttribute(
-                    lpAttributeList,
+                    this.lpAttributeList,
                     0,
                     PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
                     handle.Handle,
@@ -210,10 +208,10 @@ namespace Pty.Net.Windows
 
             internal void FreeAttributeList()
             {
-                if (lpAttributeList != IntPtr.Zero)
+                if (this.lpAttributeList != IntPtr.Zero)
                 {
-                    Marshal.FreeHGlobal(lpAttributeList);
-                    lpAttributeList = IntPtr.Zero;
+                    Marshal.FreeHGlobal(this.lpAttributeList);
+                    this.lpAttributeList = IntPtr.Zero;
                 }
             }
         }
@@ -240,10 +238,10 @@ namespace Pty.Net.Windows
             protected SafeKernelHandle(IntPtr handle, bool ownsHandle)
                 : base(ownsHandle)
             {
-                SetHandle(handle);
+                this.SetHandle(handle);
             }
 
-            public IntPtr Handle => handle;
+            public IntPtr Handle => this.handle;
 
             /// <summary>
             /// Use this method with the default constructor to allow the memory allocation
@@ -253,13 +251,13 @@ namespace Pty.Net.Windows
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             public void InitialSetHandle(IntPtr handle)
             {
-                handle = handle;
+                this.handle = handle;
             }
 
             [SecurityCritical]
             protected override bool ReleaseHandle()
             {
-                return NativeMethods.CloseHandle(handle);
+                return NativeMethods.CloseHandle(this.handle);
             }
         }
 
@@ -316,14 +314,14 @@ namespace Pty.Net.Windows
             public SafePseudoConsoleHandle(IntPtr handle, bool ownsHandle)
                 : base(ownsHandle)
             {
-                SetHandle(handle);
+                this.SetHandle(handle);
             }
 
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             [SecurityCritical]
             protected override bool ReleaseHandle()
             {
-                NativeMethods.ClosePseudoConsole(handle);
+                NativeMethods.ClosePseudoConsole(this.handle);
                 return true;
             }
         }

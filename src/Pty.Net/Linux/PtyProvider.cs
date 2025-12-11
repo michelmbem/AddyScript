@@ -1,17 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Pty.Net.Linux
 {
-    using static NativeMethods;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using static Pty.Net.Linux.NativeMethods;
 
     /// <summary>
     /// Provides a pty connection for linux machines.
@@ -19,8 +18,7 @@ namespace Pty.Net.Linux
     internal class PtyProvider : Unix.PtyProvider
     {
         /// <inheritdoc/>
-        public override Task<IPtyConnection> StartTerminalAsync(PtyOptions options, TraceSource trace,
-                                                                CancellationToken cancellationToken)
+        public override Task<IPtyConnection> StartTerminalAsync(PtyOptions options, TraceSource trace, CancellationToken cancellationToken)
         {
             //Check DOTNET_EnableWriteXorExecute on other platform except Windows.
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -42,7 +40,6 @@ namespace Pty.Net.Linux
                     }
                 }
             }
-
             var winSize = new WinSize((ushort)options.Rows, (ushort)options.Cols);
 
             string?[] terminalArgs = GetExecvpArgs(options);
@@ -68,12 +65,10 @@ namespace Pty.Net.Linux
             };
 
             var term = new Termios(
-                inputFlag: TermInputFlag.ICRNL | TermInputFlag.IXON | TermInputFlag.IXANY | TermInputFlag.IMAXBEL |
-                           TermInputFlag.BRKINT | TermInputFlag.IUTF8,
+                inputFlag: TermInputFlag.ICRNL | TermInputFlag.IXON | TermInputFlag.IXANY | TermInputFlag.IMAXBEL | TermInputFlag.BRKINT | TermInputFlag.IUTF8,
                 outputFlag: TermOuptutFlag.OPOST | TermOuptutFlag.ONLCR,
                 controlFlag: TermConrolFlag.CREAD | TermConrolFlag.CS8 | TermConrolFlag.HUPCL,
-                localFlag: TermLocalFlag.ICANON | TermLocalFlag.ISIG | TermLocalFlag.IEXTEN | TermLocalFlag.ECHO |
-                           TermLocalFlag.ECHOE | TermLocalFlag.ECHOK | TermLocalFlag.ECHOKE | TermLocalFlag.ECHOCTL,
+                localFlag: TermLocalFlag.ICANON | TermLocalFlag.ISIG | TermLocalFlag.IEXTEN | TermLocalFlag.ECHO | TermLocalFlag.ECHOE | TermLocalFlag.ECHOK | TermLocalFlag.ECHOKE | TermLocalFlag.ECHOCTL,
                 speed: TermSpeed.B38400,
                 controlCharacters: controlCharacters);
 

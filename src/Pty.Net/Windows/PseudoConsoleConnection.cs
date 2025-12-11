@@ -24,13 +24,13 @@ namespace Pty.Net.Windows
         /// <param name="handles">The set of handles associated with the pseudoconsole.</param>
         public PseudoConsoleConnection(PseudoConsoleConnectionHandles handles)
         {
-            ReaderStream = new AnonymousPipeClientStream(PipeDirection.In, new Microsoft.Win32.SafeHandles.SafePipeHandle(handles.OutPipeOurSide.Handle, ownsHandle: false));
-            WriterStream = new AnonymousPipeClientStream(PipeDirection.Out, new Microsoft.Win32.SafeHandles.SafePipeHandle(handles.InPipeOurSide.Handle, ownsHandle: false));
+            this.ReaderStream = new AnonymousPipeClientStream(PipeDirection.In, new Microsoft.Win32.SafeHandles.SafePipeHandle(handles.OutPipeOurSide.Handle, ownsHandle: false));
+            this.WriterStream = new AnonymousPipeClientStream(PipeDirection.Out, new Microsoft.Win32.SafeHandles.SafePipeHandle(handles.InPipeOurSide.Handle, ownsHandle: false));
 
-            handles = handles;
-            process = Process.GetProcessById(Pid);
-            process.Exited += Process_Exited;
-            process.EnableRaisingEvents = true;
+            this.handles = handles;
+            this.process = Process.GetProcessById(this.Pid);
+            this.process.Exited += this.Process_Exited;
+            this.process.EnableRaisingEvents = true;
         }
 
         /// <inheritdoc/>
@@ -43,39 +43,39 @@ namespace Pty.Net.Windows
         public Stream WriterStream { get; }
 
         /// <inheritdoc/>
-        public int Pid => handles.Pid;
+        public int Pid => this.handles.Pid;
 
         /// <inheritdoc/>
-        public int ExitCode => process.ExitCode;
+        public int ExitCode => this.process.ExitCode;
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            ReaderStream?.Dispose();
-            WriterStream?.Dispose();
+            this.ReaderStream?.Dispose();
+            this.WriterStream?.Dispose();
 
-            if (handles != null)
+            if (this.handles != null)
             {
-                handles.PseudoConsoleHandle.Close();
-                handles.MainThreadHandle.Close();
-                handles.ProcessHandle.Close();
-                handles.InPipeOurSide.Close();
-                handles.InPipePseudoConsoleSide.Close();
-                handles.OutPipePseudoConsoleSide.Close();
-                handles.OutPipeOurSide.Close();
+                this.handles.PseudoConsoleHandle.Close();
+                this.handles.MainThreadHandle.Close();
+                this.handles.ProcessHandle.Close();
+                this.handles.InPipeOurSide.Close();
+                this.handles.InPipePseudoConsoleSide.Close();
+                this.handles.OutPipePseudoConsoleSide.Close();
+                this.handles.OutPipeOurSide.Close();
             }
         }
 
         /// <inheritdoc/>
         public void Kill()
         {
-            process.Kill();
+            this.process.Kill();
         }
 
         /// <inheritdoc/>
         public void Resize(int cols, int rows)
         {
-            int hr = ResizePseudoConsole(handles.PseudoConsoleHandle, new Coord(cols, rows));
+            int hr = ResizePseudoConsole(this.handles.PseudoConsoleHandle, new Coord(cols, rows));
             if (hr != S_OK)
             {
                 Marshal.ThrowExceptionForHR(hr);
@@ -85,12 +85,12 @@ namespace Pty.Net.Windows
         /// <inheritdoc/>
         public bool WaitForExit(int milliseconds)
         {
-            return process.WaitForExit(milliseconds);
+            return this.process.WaitForExit(milliseconds);
         }
 
         private void Process_Exited(object sender, EventArgs e)
         {
-            ProcessExited?.Invoke(this, new PtyExitedEventArgs(process.ExitCode));
+            this.ProcessExited?.Invoke(this, new PtyExitedEventArgs(this.process.ExitCode));
         }
 
         /// <summary>
@@ -119,14 +119,14 @@ namespace Pty.Net.Windows
                 int pid,
                 SafeThreadHandle mainThreadHandle)
             {
-                InPipePseudoConsoleSide = inPipePseudoConsoleSide;
-                OutPipePseudoConsoleSide = outPipePseudoConsoleSide;
-                InPipeOurSide = inPipeOurSide;
-                OutPipeOurSide = outPipeOurSide;
-                PseudoConsoleHandle = pseudoConsoleHandle;
-                ProcessHandle = processHandle;
-                Pid = pid;
-                MainThreadHandle = mainThreadHandle;
+                this.InPipePseudoConsoleSide = inPipePseudoConsoleSide;
+                this.OutPipePseudoConsoleSide = outPipePseudoConsoleSide;
+                this.InPipeOurSide = inPipeOurSide;
+                this.OutPipeOurSide = outPipeOurSide;
+                this.PseudoConsoleHandle = pseudoConsoleHandle;
+                this.ProcessHandle = processHandle;
+                this.Pid = pid;
+                this.MainThreadHandle = mainThreadHandle;
             }
 
             /// <summary>

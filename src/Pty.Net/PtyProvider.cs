@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Pty.Net
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Provides the ability to spawn new processes under a pseudoterminal.
     /// </summary>
@@ -55,8 +56,7 @@ namespace Pty.Net
             return PlatformServices.PtyProvider.StartTerminalAsync(options, Trace, cancellationToken);
         }
 
-        private static IDictionary<string, string> MergeEnvironment(IDictionary<string, string> enviromentToMerge,
-                                                                    IDictionary<string, string>? environment)
+        private static IDictionary<string, string> MergeEnvironment(IDictionary<string, string> enviromentToMerge, IDictionary<string, string>? environment)
         {
             if (environment == null)
             {

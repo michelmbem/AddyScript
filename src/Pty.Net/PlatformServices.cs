@@ -1,49 +1,41 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-
 namespace Pty.Net
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// Provides platform specific functionality.
     /// </summary>
     internal static class PlatformServices
     {
-        private static readonly Lazy<IPtyProvider> WindowsProviderLazy =
-            new Lazy<IPtyProvider>(() => new Windows.PtyProvider());
-
-        private static readonly Lazy<IPtyProvider> LinuxProviderLazy =
-            new Lazy<IPtyProvider>(() => new Linux.PtyProvider());
-
-        private static readonly Lazy<IPtyProvider>
-            MacProviderLazy = new Lazy<IPtyProvider>(() => new Mac.PtyProvider());
-
+        private static readonly Lazy<IPtyProvider> WindowsProviderLazy = new Lazy<IPtyProvider>(() => new Windows.PtyProvider());
+        private static readonly Lazy<IPtyProvider> LinuxProviderLazy = new Lazy<IPtyProvider>(() => new Linux.PtyProvider());
+        private static readonly Lazy<IPtyProvider> MacProviderLazy = new Lazy<IPtyProvider>(() => new Mac.PtyProvider());
         private static readonly Lazy<IPtyProvider> PtyProviderLazy;
         private static readonly IDictionary<string, string> WindowsPtyEnvironment = new Dictionary<string, string>();
-
-        private static readonly IDictionary<string, string> UnixPtyEnvironment =
-            new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                { "TERM", "xterm-256color" },
+        private static readonly IDictionary<string, string> UnixPtyEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            { "TERM", "xterm-256color" },
 
                 // Make sure we didn't start our server from inside tmux.
-                { "TMUX", string.Empty },
-                { "TMUX_PANE", string.Empty },
+            { "TMUX", string.Empty },
+            { "TMUX_PANE", string.Empty },
 
                 // Make sure we didn't start our server from inside screen.
                 // http://web.mit.edu/gnu/doc/html/screen_20.html
-                { "STY", string.Empty },
-                { "WINDOW", string.Empty },
+            { "STY", string.Empty },
+            { "WINDOW", string.Empty },
 
                 // These variables that might confuse our terminal
-                { "WINDOWID", string.Empty },
-                { "TERMCAP", string.Empty },
-                { "COLUMNS", string.Empty },
-                { "LINES", string.Empty },
-            };
+            { "WINDOWID", string.Empty },
+            { "TERMCAP", string.Empty },
+            { "COLUMNS", string.Empty },
+            { "LINES", string.Empty },
+        };
 
         static PlatformServices()
         {

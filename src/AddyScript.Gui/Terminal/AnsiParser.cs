@@ -24,7 +24,7 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
         var sb = new StringBuilder();
         List<ColoredSpan> spans = [];
         int logicalPos = 0;
-        
+
         foreach (Match match in AnsiRegex.Matches(input))
         {
             int spanLength = match.Index - logicalPos;
@@ -35,9 +35,9 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
             }
             
             logicalPos = match.Index + match.Length;
-            
-            if (SplitCodes(match.Value, out var codes))
-                ApplyCodes(codes);
+
+            string[] codes = match.Groups["color"].Value.Split(';');
+            ApplyCodes(codes);
         }
 
         if (logicalPos < input.Length)
@@ -48,23 +48,15 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 
         return new (sb.ToString(), spans);
     }
-    
-    [GeneratedRegex(@"[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))")]
-    private static partial Regex GetAnsiRegex();
 
-    private static bool SplitCodes(string codeString, out string[] codes)
-    {
-        codes = null;
-        
-        int lBraceIndex = codeString.IndexOf('[');
-        if (lBraceIndex < 0) return false;
-        
-        int lowerMIndex = codeString.IndexOf('m', lBraceIndex);
-        if (lowerMIndex <= lBraceIndex) return false;
-        
-        codes = codeString.Substring(lBraceIndex + 1, lowerMIndex - lBraceIndex - 1).Split(';');
-        return true;
-    }
+    [GeneratedRegex(
+        """
+        [\u001B\u009B](?:\][^\u0007]*\u0007|[\[\]()#;?]*
+        (?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|
+        (?:(?<color>\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~])))
+        """,
+        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace)]
+    private static partial Regex GetAnsiRegex();
 
     private static IBrush AnsiColor(int code) => code switch
     {
@@ -81,7 +73,8 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
 
     private void ApplyCodes(string[] codes)
     {
-        if (!int.TryParse(codes[0], out var code)) return;
+       if (!int.TryParse(codes[0], out var code))
+            code = 0;
 
         switch (code)
         {
@@ -101,6 +94,12 @@ internal partial class AnsiParser(IBrush defaultFg, IBrush defaultBg)
                 break;
             case >= 100 and <= 107:
                 currentBg = AnsiColor(code - 100) ?? defaultBg;
+                break;
+            case 38 when codes.Length > 2 && int.TryParse(codes[2], out var fg):
+                currentFg = AnsiColor(fg % 8);
+                break;
+            case 48 when codes.Length > 2 && int.TryParse(codes[2], out var bg):
+                currentBg = AnsiColor(bg % 8);
                 break;
         }
     }

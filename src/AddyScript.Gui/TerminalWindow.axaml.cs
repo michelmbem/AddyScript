@@ -1,10 +1,14 @@
 using System;
+
 using AddyScript.Gui.Terminal;
+
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
+
 using Pty.Net;
 
 namespace AddyScript.Gui;
@@ -46,6 +50,18 @@ public partial class TerminalWindow : Window
         terminal.ProcessExited += TerminalProcessExited;
     }
 
+    private void WindowClosing(object sender, WindowClosingEventArgs e)
+    {
+        try
+        {
+            terminal?.Close();
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
     private void TerminalViewCaretMoved(object sender, EventArgs e)
     {
         TerminalView.IsReadOnly = TerminalView.TextArea.Caret.Offset < inputOffset;
@@ -66,7 +82,7 @@ public partial class TerminalWindow : Window
 
                 var inputText = document.GetText(inputOffset, inputLength).TrimEnd('\r', '\n');
                 document.Remove(inputOffset, inputLength);
-                terminal.Send(inputText + "\n");
+                terminal.Send(inputText + Environment.NewLine);
                 break;
             }
             case Key.Back when caret.Offset == inputOffset - 1:
@@ -96,6 +112,7 @@ public partial class TerminalWindow : Window
 
     private void TerminalProcessExited(int exitCode)
     {
+        terminal = null;
         Dispatcher.UIThread.Post(Close);
     }
 }

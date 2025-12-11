@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading;
-
 namespace Pty.Net.Unix
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+
     /// <summary>
     /// A connection to a Unix-style pseudoterminal.
     /// </summary>
@@ -29,12 +30,12 @@ namespace Pty.Net.Unix
         /// <param name="pid">The id of the spawned process.</param>
         public PtyConnection(int controller, int pid)
         {
-            ReaderStream = new PtyStream(controller, FileAccess.Read);
-            WriterStream = new PtyStream(controller, FileAccess.Write);
+            this.ReaderStream = new PtyStream(controller, FileAccess.Read);
+            this.WriterStream = new PtyStream(controller, FileAccess.Write);
 
             this.controller = controller;
             this.pid = pid;
-            var childWatcherThread = new Thread(ChildWatcherThreadProc)
+            var childWatcherThread = new Thread(this.ChildWatcherThreadProc)
             {
                 IsBackground = true,
                 Priority = ThreadPriority.Lowest,
@@ -54,43 +55,41 @@ namespace Pty.Net.Unix
         public Stream WriterStream { get; }
 
         /// <inheritdoc/>
-        public int Pid => pid;
+        public int Pid => this.pid;
 
         /// <inheritdoc/>
-        public int ExitCode => exitCode;
+        public int ExitCode => this.exitCode;
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            ReaderStream?.Dispose();
-            WriterStream?.Dispose();
-            Kill();
+            this.ReaderStream?.Dispose();
+            this.WriterStream?.Dispose();
+            this.Kill();
         }
 
         /// <inheritdoc/>
         public void Kill()
         {
-            if (!Kill(controller))
+            if (!this.Kill(this.controller))
             {
-                throw new InvalidOperationException(
-                    $"Killing terminal failed with error {Marshal.GetLastWin32Error()}");
+                throw new InvalidOperationException($"Killing terminal failed with error {Marshal.GetLastWin32Error()}");
             }
         }
 
         /// <inheritdoc/>
         public void Resize(int cols, int rows)
         {
-            if (!Resize(controller, cols, rows))
+            if (!this.Resize(this.controller, cols, rows))
             {
-                throw new InvalidOperationException(
-                    $"Resizing terminal failed with error {Marshal.GetLastWin32Error()}");
+                throw new InvalidOperationException($"Resizing terminal failed with error {Marshal.GetLastWin32Error()}");
             }
         }
 
         /// <inheritdoc/>
         public bool WaitForExit(int milliseconds)
         {
-            return terminalProcessTerminatedEvent.WaitOne(milliseconds);
+            return this.terminalProcessTerminatedEvent.WaitOne(milliseconds);
         }
 
         /// <summary>
@@ -119,18 +118,18 @@ namespace Pty.Net.Unix
 
         private void ChildWatcherThreadProc()
         {
-            Console.WriteLine($"Waiting on {pid}");
+            Console.WriteLine($"Waiting on {this.pid}");
             const int SignalMask = 127;
             const int ExitCodeMask = 255;
 
             int status = 0;
-            if (!WaitPid(pid, ref status))
+            if (!this.WaitPid(this.pid, ref status))
             {
                 int errno = Marshal.GetLastWin32Error();
                 Console.WriteLine($"Wait failed with {errno}");
                 if (errno == EINTR)
                 {
-                    ChildWatcherThreadProc();
+                    this.ChildWatcherThreadProc();
                 }
                 else if (errno == ECHILD)
                 {
@@ -146,10 +145,10 @@ namespace Pty.Net.Unix
             }
 
             Console.WriteLine($"Wait succeeded");
-            exitSignal = status & SignalMask;
-            exitCode = exitSignal == 0 ? (status >> 8) & ExitCodeMask : 0;
-            terminalProcessTerminatedEvent.Set();
-            ProcessExited?.Invoke(this, new PtyExitedEventArgs(exitCode));
+            this.exitSignal = status & SignalMask;
+            this.exitCode = this.exitSignal == 0 ? (status >> 8) & ExitCodeMask : 0;
+            this.terminalProcessTerminatedEvent.Set();
+            this.ProcessExited?.Invoke(this, new PtyExitedEventArgs(this.exitCode));
         }
     }
 }

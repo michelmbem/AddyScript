@@ -5,7 +5,8 @@
         Width="1100"
         Height="600"
         Icon="/Assets/Images/Icons/AddyScript.ico"
-        Activated="WindowActivated">
+        Activated="WindowActivated"
+        Closing="WindowClosing">
   
   <DockPanel>
     <ae:TextEditor Name="TerminalView"

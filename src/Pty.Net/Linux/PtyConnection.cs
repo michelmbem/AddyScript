@@ -3,7 +3,8 @@
 
 namespace Pty.Net.Linux
 {
-    using static NativeMethods;
+    using System.Diagnostics;
+    using static Pty.Net.Linux.NativeMethods;
 
     /// <summary>
     /// A connection to a pseudoterminal on linux machines.
@@ -23,7 +24,7 @@ namespace Pty.Net.Linux
         /// <inheritdoc/>
         protected override bool Kill(int controller)
         {
-            return kill(Pid, SIGHUP) != -1;
+            return kill(this.Pid, SIGHUP) != -1;
         }
 
         /// <inheritdoc/>

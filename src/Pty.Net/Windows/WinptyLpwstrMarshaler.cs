@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Runtime.InteropServices;
-
 namespace Pty.Net.Windows
 {
+    using System;
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// Marshals a LPWStr (wchar_t *) to a string without destroying the LPWStr, this is needed by winpty.
     /// </summary>

@@ -1,22 +1,21 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Pipes;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Pty.Net.Windows
 {
-    using static NativeMethods;
-    using static WinptyNativeInterop;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.IO;
+    using System.IO.Pipes;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using static Pty.Net.Windows.NativeMethods;
+    using static Pty.Net.Windows.WinptyNativeInterop;
 
     /// <summary>
     /// Provides a pty connection for windows machines.
@@ -29,13 +28,13 @@ namespace Pty.Net.Windows
             TraceSource trace,
             CancellationToken cancellationToken)
         {
-            if (IsPseudoConsoleSupported && !options.ForceWinPty)
+            if (NativeMethods.IsPseudoConsoleSupported && !options.ForceWinPty)
             {
-                return StartPseudoConsoleAsync(options, trace, cancellationToken);
+                return this.StartPseudoConsoleAsync(options, trace, cancellationToken);
             }
             else
             {
-                return StartWinPtyTerminalAsync(options, trace, cancellationToken);
+                return this.StartWinPtyTerminalAsync(options, trace, cancellationToken);
             }
         }
 
@@ -63,8 +62,7 @@ namespace Pty.Net.Windows
             }
         }
 
-        private static async Task<Stream> CreatePipeAsync(string pipeName, PipeDirection direction,
-                                                          CancellationToken cancellationToken)
+        private static async Task<Stream> CreatePipeAsync(string pipeName, PipeDirection direction, CancellationToken cancellationToken)
         {
             string serverName = ".";
             if (pipeName.StartsWith("\\"))
@@ -141,7 +139,7 @@ namespace Pty.Net.Windows
             }
 
             string pathEnvironment = (env != null && env.TryGetValue("PATH", out string p) ? p : null)
-                                     ?? Environment.GetEnvironmentVariable("PATH");
+                ?? Environment.GetEnvironmentVariable("PATH");
 
             if (string.IsNullOrWhiteSpace(pathEnvironment))
             {
@@ -156,18 +154,12 @@ namespace Pty.Net.Windows
                 // We do that to accomodate terminal app that VSCode may use. VSCode is a 64 bit app,
                 // and to access 64 bit System32 from wow64 vsls-agent app, we need to go to sysnative.
                 var indexOfSystem32 = paths.FindIndex(entry =>
-                                                          string.Equals(
-                                                              entry, system32Path, StringComparison.OrdinalIgnoreCase)
-                                                          || string.Equals(
-                                                              entry, system32PathWithSlash,
-                                                              StringComparison.OrdinalIgnoreCase));
+                    string.Equals(entry, system32Path, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(entry, system32PathWithSlash, StringComparison.OrdinalIgnoreCase));
 
                 var indexOfSysnative = paths.FindIndex(entry =>
-                                                           string.Equals(
-                                                               entry, sysnativePath, StringComparison.OrdinalIgnoreCase)
-                                                           || string.Equals(
-                                                               entry, sysnativePathWithSlash,
-                                                               StringComparison.OrdinalIgnoreCase));
+                    string.Equals(entry, sysnativePath, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(entry, sysnativePathWithSlash, StringComparison.OrdinalIgnoreCase));
 
                 if (indexOfSystem32 >= 0 && indexOfSysnative == -1)
                 {
@@ -243,9 +235,9 @@ namespace Pty.Net.Windows
         }
 
         private async Task<IPtyConnection> StartWinPtyTerminalAsync(
-            PtyOptions options,
-            TraceSource trace,
-            CancellationToken cancellationToken)
+           PtyOptions options,
+           TraceSource trace,
+           CancellationToken cancellationToken)
         {
             IntPtr error;
 
@@ -259,9 +251,9 @@ namespace Pty.Net.Windows
 
             ThrowIfErrorOrNull("Error launching WinPTY agent", error, handle);
 
-            string commandLine = options.VerbatimCommandLine
-                ? WindowsArguments.FormatVerbatim(options.CommandLine)
-                : WindowsArguments.Format(options.CommandLine);
+            string commandLine = options.VerbatimCommandLine ?
+                WindowsArguments.FormatVerbatim(options.CommandLine) :
+                WindowsArguments.Format(options.CommandLine);
 
             string env = GetEnvironmentString(options.Environment);
             string app = GetAppOnPath(options.App, options.Cwd, options.Environment);
@@ -278,8 +270,7 @@ namespace Pty.Net.Windows
 
             ThrowIfErrorOrNull("Error creating WinPTY spawn config", error, spawnConfig);
 
-            bool spawnSuccess = winpty_spawn(handle, spawnConfig, out SafeProcessHandle hProcess, out IntPtr thread,
-                                             out int procError, out error);
+            bool spawnSuccess = winpty_spawn(handle, spawnConfig, out SafeProcessHandle hProcess, out IntPtr thread, out int procError, out error);
             winpty_spawn_config_free(spawnConfig);
 
             if (!spawnSuccess)
@@ -291,8 +282,7 @@ namespace Pty.Net.Windows
                         winpty_error_free(error);
                     }
 
-                    throw new InvalidOperationException(
-                        $"Unable to start WinPTY terminal '{app}': {new Win32Exception(procError).Message} ({procError})");
+                    throw new InvalidOperationException($"Unable to start WinPTY terminal '{app}': {new Win32Exception(procError).Message} ({procError})");
                 }
 
                 ThrowIfError("Unable to start WinPTY terminal process", error, alwaysThrow: true);
@@ -317,9 +307,9 @@ namespace Pty.Net.Windows
         }
 
         private Task<IPtyConnection> StartPseudoConsoleAsync(
-            PtyOptions options,
-            TraceSource trace,
-            CancellationToken cancellationToken)
+           PtyOptions options,
+           TraceSource trace,
+           CancellationToken cancellationToken)
         {
             // Create the in/out pipes
             if (!CreatePipe(out SafePipeHandle inPipePseudoConsoleSide, out SafePipeHandle inPipeOurSide, null, 0))
@@ -345,8 +335,7 @@ namespace Pty.Net.Windows
             finally
             {
                 // Create the Pseudo Console, using the pipes
-                hr = CreatePseudoConsole(coord, inPipePseudoConsoleSide.Handle, outPipePseudoConsoleSide.Handle, 0,
-                                         out IntPtr hPC);
+                hr = CreatePseudoConsole(coord, inPipePseudoConsoleSide.Handle, outPipePseudoConsoleSide.Handle, 0, out IntPtr hPC);
 
                 // Remember the handle inside the CER to prevent leakage
                 if (hPC != IntPtr.Zero && hPC != INVALID_HANDLE_VALUE)
@@ -367,9 +356,9 @@ namespace Pty.Net.Windows
             try
             {
                 string app = GetAppOnPath(options.App, options.Cwd, options.Environment);
-                string arguments = options.VerbatimCommandLine
-                    ? WindowsArguments.FormatVerbatim(options.CommandLine)
-                    : WindowsArguments.Format(options.CommandLine);
+                string arguments = options.VerbatimCommandLine ?
+                    WindowsArguments.FormatVerbatim(options.CommandLine) :
+                    WindowsArguments.Format(options.CommandLine);
 
                 var commandLine = new StringBuilder(app.Length + arguments.Length + 4);
                 bool quoteApp = app.Contains(" ") && !app.StartsWith("\"") && !app.EndsWith("\"");
@@ -402,11 +391,11 @@ namespace Pty.Net.Windows
                 finally
                 {
                     success = CreateProcess(
-                        null, // lpApplicationName
+                        null,   // lpApplicationName
                         commandLine.ToString(),
-                        null, // lpProcessAttributes
-                        null, // lpThreadAttributes
-                        false, // bInheritHandles VERY IMPORTANT that this is false
+                        null,   // lpProcessAttributes
+                        null,   // lpThreadAttributes
+                        false,  // bInheritHandles VERY IMPORTANT that this is false
                         EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT, // dwCreationFlags
                         lpEnvironment,
                         options.Cwd,
@@ -433,8 +422,7 @@ namespace Pty.Net.Windows
                 if (!success)
                 {
                     var exception = new Win32Exception(errorCode);
-                    throw new InvalidOperationException(
-                        $"Could not start terminal process {commandLine.ToString()}: {exception.Message}", exception);
+                    throw new InvalidOperationException($"Could not start terminal process {commandLine.ToString()}: {exception.Message}", exception);
                 }
 
                 var connectionOptions = new PseudoConsoleConnection.PseudoConsoleConnectionHandles(

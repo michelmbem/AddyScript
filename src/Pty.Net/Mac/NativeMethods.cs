@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-
 namespace Pty.Net.Mac
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
+    using System.Text;
+
     /// <summary>
     /// Defines native types and methods for interop with Mac OS system APIs.
     /// </summary>
@@ -239,8 +239,7 @@ namespace Pty.Net.Mac
         [DllImport(LibSystem, SetLastError = true)]
         private static extern int execvp(
             [MarshalAs(UnmanagedType.LPStr)] string file,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
-            string?[] args);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string?[] args);
 
         // char ***_NSGetEnviron(void);
         [DllImport(LibSystem)]
@@ -256,10 +255,10 @@ namespace Pty.Net.Mac
 
             public WinSize(ushort rows, ushort cols)
             {
-                Rows = rows;
-                Cols = cols;
-                XPixel = 0;
-                YPixel = 0;
+                this.Rows = rows;
+                this.Cols = cols;
+                this.XPixel = 0;
+                this.YPixel = 0;
             }
         }
 
@@ -275,7 +274,6 @@ namespace Pty.Net.Mac
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NCCS)]
             public sbyte[] CC;
-
             public IntPtr ISpeed;
             public IntPtr OSpeed;
 
@@ -287,18 +285,18 @@ namespace Pty.Net.Mac
                 TermSpeed speed,
                 IDictionary<TermSpecialControlCharacter, sbyte> controlCharacters)
             {
-                IFlag = (IntPtr)inputFlag;
-                OFlag = (IntPtr)outputFlag;
-                CFlag = (IntPtr)controlFlag;
-                LFlag = (IntPtr)localFlag;
-                CC = new sbyte[NCCS];
+                this.IFlag = (IntPtr)inputFlag;
+                this.OFlag = (IntPtr)outputFlag;
+                this.CFlag = (IntPtr)controlFlag;
+                this.LFlag = (IntPtr)localFlag;
+                this.CC = new sbyte[Termios.NCCS];
                 foreach (var kvp in controlCharacters)
                 {
-                    CC[(int)kvp.Key] = kvp.Value;
+                    this.CC[(int)kvp.Key] = kvp.Value;
                 }
 
-                ISpeed = IntPtr.Zero;
-                OSpeed = IntPtr.Zero;
+                this.ISpeed = IntPtr.Zero;
+                this.OSpeed = IntPtr.Zero;
 
                 cfsetispeed(ref this, (IntPtr)speed);
                 cfsetospeed(ref this, (IntPtr)speed);

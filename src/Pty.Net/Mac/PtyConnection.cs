@@ -3,7 +3,8 @@
 
 namespace Pty.Net.Mac
 {
-    using static NativeMethods;
+    using System.Diagnostics;
+    using static Pty.Net.Mac.NativeMethods;
 
     /// <summary>
     /// A connection to a pseudoterminal on MacOS machines.
