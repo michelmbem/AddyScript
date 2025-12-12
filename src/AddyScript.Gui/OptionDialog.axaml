@@ -2,53 +2,173 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="https://github.com/projektanker/icons.avalonia"
-        Width="550"
-        Height="475"
+        Width="600"
+        Height="500"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource WindowBackground}"
         Icon="/Assets/Images/Icons/AddyScript.ico">
   <Grid RowDefinitions="*, Auto" Margin="5">
     <TabControl Grid.Row="0">
-        <TabItem Header="General">
-            <StackPanel Margin="0,5,0,0" Background="{DynamicResource EditorBackground}">
-                <HeaderedContentControl Header="Editor" Margin="10,5">
-                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto">
-						<TextBlock Grid.Row="0" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Name="EditorFontFaceTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Name="EditorFontSizeTextBox" Margin="5, 3"/>
-                        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal"> 
-						    <TextBlock Text="Word wrap :" VerticalAlignment="Center"/>
-                            <CheckBox Name="EditorWordWrapCheckBox" Margin="5, 3, 0, 3"/>
-                        </StackPanel>
-                    </Grid>
-                </HeaderedContentControl>
-                <HeaderedContentControl Header="Terminal" Margin="10,5">
-                    <Grid ColumnDefinitions="Auto, *, Auto, *">
-                        <RadioButton Grid.Column="0" Name="NativeTerminalRadioButton" Margin="5, 3"/>
-						<TextBlock Grid.Column="1" Text="Use native terminal" VerticalAlignment="Center"/>
-                        <RadioButton Grid.Column="2" Name="EmulatedTerminalRadioButton" Margin="5, 3"/>
-						<TextBlock Grid.Column="3" Text="Use emulated terminal" VerticalAlignment="Center"/>
-                    </Grid>
-                </HeaderedContentControl>
-                <HeaderedContentControl Header="Emulated terminal" Margin="10,5">
-                    <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
-						<TextBlock Grid.Row="0" Grid.Column="0" Text="Foreground :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Name="TerminalForegroundTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="0" Grid.Column="2" Text="Background :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="0" Grid.Column="3" Name="TerminalBackgroundTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="1" Grid.Column="0" Text="Font face :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Name="TerminalFontFaceTextBox" Margin="5, 3"/>
-						<TextBlock Grid.Row="2" Grid.Column="0" Text="Font size :" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="TerminalFontSizeTextBox" Margin="5, 3"/>
-                        <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right"> 
-						    <TextBlock Text="Word wrap :" VerticalAlignment="Center"/>
-                            <CheckBox Name="TerminalWordWrapCheckBox" Margin="5, 3, 0, 3"/>
-                        </StackPanel>
-                    </Grid>
-                </HeaderedContentControl>
-            </StackPanel>
-        </TabItem>
+      <TabItem Header="General">
+        <StackPanel Background="{DynamicResource EditorBackground}" Margin="0,5,0,0">
+          <Popup Name="ColorPopup" IsLightDismissEnabled="True">
+            <Border Padding="5" Background="{DynamicResource WindowBackground}">
+              <ColorView Name="TerminalColorView" ColorChanged="TerminalColorViewColorChanged"/>
+            </Border>
+          </Popup>
+          <HeaderedContentControl Header="Editor" Margin="10,5">
+            <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
+              <TextBlock Grid.Row="0"
+                         Grid.Column="0"
+                         Text="Font face :"
+                         VerticalAlignment="Center" />
+              <Button Name="EditorFontFaceButton"
+                      Grid.Row="0"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="3"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Margin="5, 3"
+                      Click="EditorFontFaceButtonClick">
+                <TextBlock Name="EditorFontFaceText"
+                           Text="Consolas, Menlo, Ubuntu Mono, Monospace"
+                           FontFamily="Consolas, Menlo, Ubuntu Mono, Monospace"
+                           FontSize="14"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center"/>
+              </Button>
+              <TextBlock Grid.Row="1"
+                         Grid.Column="0"
+                         Text="Font size :"
+                         VerticalAlignment="Center" />
+              <ButtonSpinner Name="EditorFontSizeSpinner"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Content="14"
+                             ButtonSpinnerLocation="Right"
+                             ValidSpinDirection="Increase, Decrease"
+                             Margin="5, 3"
+                             Spin="EditorFontSizeSpinnerSpin"/>
+              <StackPanel Grid.Row="1"
+                          Grid.Column="2"
+                          Grid.ColumnSpan="2"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Right">
+                <TextBlock Text="Wrap long lines :" VerticalAlignment="Center" />
+                <CheckBox Name="EditorWordWrapCheckBox" Margin="5, 3, 0, 3" />
+              </StackPanel>
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="Terminal" Margin="10,5">
+            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto">
+              <RadioButton Grid.Column="0"
+                           Name="NativeTerminalRadioButton"
+                           Margin="5, 3" />
+              <TextBlock Grid.Column="1"
+                         Text="Use native terminal"
+                         VerticalAlignment="Center" />
+              <RadioButton Grid.Column="3"
+                           Name="EmulatedTerminalRadioButton"
+                           IsChecked="True"
+                           Margin="5, 3" />
+              <TextBlock Grid.Column="4"
+                         Text="Use emulated terminal"
+                         VerticalAlignment="Center"
+                         Margin="0,0,8,0"/>
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="Emulated terminal" Margin="10,5">
+            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
+              <TextBlock Grid.Row="0"
+                         Grid.Column="0"
+                         Text="Foreground :"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalForegroundButton"
+                      Grid.Row="0"
+                      Grid.Column="1"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Margin="5, 3"
+                      Click="TerminalForegroundButtonClick">
+                <Border Name="TerminalForegroundBorder"
+                        Background="{DynamicResource TerminalForeground}"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        Height="24">
+                  <TextBlock Name="TerminalForegroundText"
+                             Text="#DDEEEEEE"
+                             TextAlignment="Center"
+                             VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <TextBlock Grid.Row="0"
+                         Grid.Column="2"
+                         Text="Background :"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalBackgroundButton"
+                      Grid.Row="0"
+                      Grid.Column="3"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Margin="5, 3"
+                      Click="TerminalBackgroundButtonClick">
+                <Border Name="TerminalBackgroundBorder"
+                        Background="{DynamicResource TerminalBackground}"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        Height="24">
+                  <TextBlock Name="TerminalBackgroundText"
+                             Text="#171717"
+                             TextAlignment="Center"
+                             VerticalAlignment="Center"
+                             Foreground="White"/>
+                </Border>
+              </Button>
+              <TextBlock Grid.Row="1"
+                         Grid.Column="0"
+                         Text="Font face :"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalFontFaceButton"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="3"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Margin="5, 3"
+                      Click="TerminalFontFaceButtonClick">
+                <TextBlock Name="TerminalFontFaceText"
+                           Text="Courier New, Courier, Monospace"
+                           FontFamily="Courier New, Courier, Monospace"
+                           FontSize="16"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center"/>
+              </Button>
+              <TextBlock Grid.Row="2"
+                         Grid.Column="0"
+                         Text="Font size :"
+                         VerticalAlignment="Center" />
+              <ButtonSpinner Name="TerminalFontSizeSpinner"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Content="16"
+                             ButtonSpinnerLocation="Right"
+                             ValidSpinDirection="Increase, Decrease"
+                             Margin="5, 3"
+                             Spin="TerminalFontSizeSpinnerSpin" />
+              <StackPanel Grid.Row="2"
+                          Grid.Column="2"
+                          Grid.ColumnSpan="2"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Right">
+                <TextBlock Text="Wrap long lines :" VerticalAlignment="Center" />
+                <CheckBox Name="TerminalWordWrapCheckBox"
+                          IsChecked="True"
+                          Margin="5, 3, 0, 3" />
+              </StackPanel>
+            </Grid>
+          </HeaderedContentControl>
+        </StackPanel>
+      </TabItem>
       <TabItem Header="Search Paths">
         <DockPanel Margin="0,5,0,0">
           <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, Auto">
@@ -126,11 +246,14 @@
                 Margin="5, 10, 10, 5">
       <Button Name="CancelButton"
               Content="Cancel"
+              IsCancel="True"
+              HotKey="Escape"
               Width="100"
               HorizontalContentAlignment="Center"
               Margin="0, 0, 5, 0"
               Click="CancelButtonClick" />
       <Button Name="OkButton"
+              IsDefault="True"
               Content="OK"
               Width="100"
               HorizontalContentAlignment="Center"

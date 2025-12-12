@@ -23,6 +23,7 @@
       <StackPanel Grid.Row="3" Orientation="Horizontal" FlowDirection="RightToLeft">
         <Button Name="OkButton"
                 Content="OK"
+                IsDefault="True"
                 Width="100"
                 HorizontalContentAlignment="Center"
                 Click="OkButtonClick" />

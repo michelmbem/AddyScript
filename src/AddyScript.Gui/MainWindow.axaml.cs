@@ -88,6 +88,8 @@ public partial class MainWindow : Window
         textView.BackgroundRenderers.Add(textMarkerService);
         textView.PointerMoved += EditorTextViewPointerMoved;
         textView.PointerExited += EditorTextViewOnPointerExited;
+        
+        ApplyOptions(App.Options.Editor);
     }
 
     private void InitializeTimers()
@@ -234,6 +236,18 @@ public partial class MainWindow : Window
         File.WriteAllText(path, Editor.Document.Text);
         FilePath = path;
         Saved = true;
+    }
+
+    private void ApplyOptions(EditorOptions options)
+    {
+        if (options == null) return;
+        
+        Editor.FontFamily = options.FontFamily;
+        Editor.FontSize = options.FontSize;
+        Editor.WordWrap = options.WordWrap;
+        /*Editor.ShowLineNumbers = options.ShowLineNumbers;
+        Editor.Options.ShowSpaces = options.ShowWhitespace;
+        Editor.Options.HighlightCurrentLine = options.HighlightCurrentLine;*/
     }
 
     /// <summary>
@@ -902,13 +916,13 @@ public partial class MainWindow : Window
         var logPath = Path.ChangeExtension(Path.GetRandomFileName(), ".log");
         List<string> argsList = ["-f", scriptPath, "-l", logPath];
 
-        foreach (var directory in App.SearchPaths)
+        foreach (var directory in App.Options.SearchPaths)
         {
             argsList.Add("-d");
             argsList.Add(directory);
         }
 
-        foreach (var assemblyName in App.References)
+        foreach (var assemblyName in App.Options.References)
         {
             argsList.Add("-r");
             argsList.Add(assemblyName);
@@ -918,7 +932,7 @@ public partial class MainWindow : Window
 
         try
         {
-            int exitCode = await TerminalLauncher.LaunchEmulatedTerminal(
+            int exitCode = await TerminalLauncher.LaunchTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusLabel.Content}]",
                 "./asis",
@@ -954,11 +968,15 @@ public partial class MainWindow : Window
 
     private async void ToolbarConfigButtonClick(object sender, RoutedEventArgs e)
     {
-        var optionDialog = new OptionDialog();
+        var optionDialog = new OptionDialog { Options = App.Options.Clone() };
         if (!await optionDialog.ShowDialog<bool>(this)) return;
         
-        App.SearchPaths = [..optionDialog.SearchPaths];
-        App.References = [..optionDialog.References];
+        App.Options = optionDialog.Options;
+        
+        foreach (var window in App.Windows)
+        {
+            window.ApplyOptions(App.Options.Editor);
+        }
     }
 
     private void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)

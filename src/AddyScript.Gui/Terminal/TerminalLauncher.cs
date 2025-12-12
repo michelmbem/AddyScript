@@ -8,6 +8,11 @@ namespace AddyScript.Gui.Terminal;
 
 internal static class TerminalLauncher
 {
+    public static async Task<int> LaunchTerminal(Window owner, string title, string command, string[] args) =>
+        App.Options.UseEmulatedTerminal
+            ? await LaunchEmulatedTerminal(owner, title, command, args)
+            : await LaunchNativeTerminal(command, args);
+
     public static async Task<int> LaunchEmulatedTerminal(Window owner, string title, string command, string[] args)
     {
         var options = new PtyOptions

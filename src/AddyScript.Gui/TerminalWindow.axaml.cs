@@ -2,6 +2,7 @@ using System;
 using AddyScript.Gui.Terminal;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
@@ -21,6 +22,7 @@ public partial class TerminalWindow : Window
     public TerminalWindow()
     {
         InitializeComponent();
+        ApplyOptions(App.Options.Terminal);
 
         parser = new AnsiParser(TerminalView.Foreground, TerminalView.Background);
         colorizer = new TerminalColorizer();
@@ -34,6 +36,17 @@ public partial class TerminalWindow : Window
     public PtyOptions Options { get; init; }
 
     public int ExitCode => terminal?.ExitCode ?? -1;
+
+    private void ApplyOptions(TerminalOptions options)
+    {
+        if (options == null) return;
+        
+        TerminalView.Foreground = new SolidColorBrush(options.Foreground);
+        TerminalView.Background = new SolidColorBrush(options.Background);
+        TerminalView.FontFamily = options.FontFamily;
+        TerminalView.FontSize = options.FontSize;
+        TerminalView.WordWrap = options.WordWrap;
+    }
 
     private void WindowActivated(object sender, EventArgs e)
     {

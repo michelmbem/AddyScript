@@ -16,12 +16,10 @@ public partial class App : Application
     public const string REPO_URL = "https://github.com/michelmbem/AddyScript";
     
     #region Properties
+
+    public static Options Options { get; set; } = new();
     
-    public static string[] SearchPaths { get; set; } = [];
-    
-    public static string[] References { get; set; } = [];
-    
-    private static List<MainWindow> Windows { get; } = [];
+    public static List<MainWindow> Windows { get; } = [];
     
     #endregion
     
@@ -165,8 +163,9 @@ public partial class App : Application
             initialFiles.Add(args[index++]);
         }
 
-        SearchPaths = [.. searchPaths];
-        References = [.. references];
+        Options.SearchPaths = searchPaths;
+        Options.References = references;
+        Options.UseEmulatedTerminal = true;
 
         return [.. initialFiles];
     }

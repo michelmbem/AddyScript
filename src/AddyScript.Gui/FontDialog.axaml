@@ -1,0 +1,62 @@
+<Window x:Class="AddyScript.Gui.FontDialog"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        Title="Select Font"
+        Width="400"
+        Height="500"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackground}"
+        Icon="/Assets/Images/Icons/AddyScript.ico">
+  <DockPanel Margin="5">
+    <Grid DockPanel.Dock="Top"
+          ColumnDefinitions="Auto, *, Auto"
+          ColumnSpacing="2"
+          Margin="0,0,0,3">
+      <Label Grid.Column="0"
+             Content="Filter by name :"
+             VerticalAlignment="Center" />
+      <TextBox Name="FilterTextBox" Grid.Column="1" TextChanged="FilterTextBoxTextChanged" />
+      <Button Name="ClearFilterButton"
+              Grid.Column="2"
+              i:Attached.Icon="fa-xmark"
+              VerticalAlignment="Stretch"
+              ToolTip.Tip="Clear Filter"
+              Click="ClearFilterButtonClick" />
+    </Grid>
+    <StackPanel DockPanel.Dock="Bottom"
+                Orientation="Horizontal"
+                FlowDirection="RightToLeft"
+                Margin="5, 10, 10, 5">
+      <Button Name="CancelButton"
+              Content="Cancel"
+              IsCancel="True"
+              HotKey="Escape"
+              Width="100"
+              HorizontalContentAlignment="Center"
+              Margin="0, 0, 5, 0"
+              Click="CancelButtonClick" />
+      <Button Name="OkButton"
+              Content="OK"
+              IsDefault="True"
+              Width="100"
+              HorizontalContentAlignment="Center"
+              Click="OkButtonClick" />
+    </StackPanel>
+    <ListBox Name="FontListBox"
+             SelectionMode="Single"
+             Margin="5">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Border BorderBrush="{DynamicResource DividerFill}"
+                  BorderThickness="0,0,0,1">
+            <TextBlock FontFamily="{Binding}"
+                       Text="{Binding}"
+                       FontSize="24"
+                       DoubleTapped="FontListItemDoubleTapped"/>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</Window>
