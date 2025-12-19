@@ -30,6 +30,7 @@ public class Keyword(TokenID tokenID, object value = null)
     {
         Register("const", TokenID.KW_Const);
         Register("var", TokenID.KW_Var);
+        Register("let", TokenID.KW_Let);
 
         Register("if", TokenID.KW_If);
         Register("else", TokenID.KW_Else);

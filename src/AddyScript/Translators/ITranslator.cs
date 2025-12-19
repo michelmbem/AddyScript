@@ -64,5 +64,5 @@ public interface ITranslator
     void TranslateTryCatchFinally(TryCatchFinally tcf);
     void TranslateStringInterpolation(StringInterpolation stringInt);
     void TranslatePatternMatching(PatternMatching patMatch);
-    void TranslateAlteredCopy(AlteredCopy altCopy);
+    void TranslateMutableCopy(MutableCopy mutableCopy);
 }

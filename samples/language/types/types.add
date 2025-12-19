@@ -1,12 +1,13 @@
+import sys::console;
 import sys::environment;
 
 t = {
 		null,
 		true,
-		0xc,
+		0x7fc,
 		9_876_543_210,
 		1/3,
-		0.5,
+		PI,
 		-9_876_543_210.123_456_789d,
 		2 - 1i,
 		`1975-3-18`,
@@ -20,18 +21,26 @@ t = {
 		stack::of(9, 7),
 		new {name = "John Doe"},
 		getOSVersion(),
-		now
+		format
 	};
 
 println('{0, -42} | {1}', 'Value', 'Type');
 println('-' * 43 + '+' + '-' * 24);
 
 foreach (item in t) {
-	print('{0, -42} | {1}', item, item.type.name);
-	if (item is resource)
-		println(' ({0})', item.GetType().FullName);
-	else
-		println();
+	print('{0, -42} | ', item);
+	
+	setForeground('Blue');
+	print(item.type.name);
+	resetColor();
+	
+	if (item is resource) {
+		setForeground('Green');
+		print(' ({0})', item.GetType().FullName);
+		resetColor();
+	}
+
+	println();
 }
 
 readln();

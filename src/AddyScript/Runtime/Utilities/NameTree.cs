@@ -11,7 +11,7 @@ namespace AddyScript.Runtime.Utilities;
 /// </summary>
 public class NameTree
 {
-    private readonly List<NameTreeNode> roots = new List<NameTreeNode>();
+    private readonly List<NameTreeNode> roots = [];
 
     #region Public interface
 
@@ -20,10 +20,7 @@ public class NameTree
     /// </summary>
     /// <param name="name">The given name</param>
     /// <returns>The object attached to <paramref name="name"/> if any or null</returns>
-    public object this[QualifiedName name]
-    {
-        get { return Find(roots, name, 0); }
-    }
+    public object this[QualifiedName name] => Find(roots, name, 0);
 
     /// <summary>
     /// Adds a qualified name to the tree.
@@ -40,20 +37,14 @@ public class NameTree
     /// </summary>
     /// <param name="name">The name to find</param>
     /// <returns><b>true</b> if found; <b>false</b> otherwise</returns>
-    public bool Contains(QualifiedName name)
-    {
-        return Find(roots, name, 0) != null;
-    }
+    public bool Contains(QualifiedName name) => Find(roots, name, 0) != null;
 
     /// <summary>
     /// Removes a qualified name and its attached value from the tree.
     /// </summary>
     /// <param name="name">The name to be removed</param>
     /// <returns><b>true</b> on success; <b>false</b> on failure</returns>
-    public bool Remove(QualifiedName name)
-    {
-        return Remove(roots, name, 0);
-    }
+    public bool Remove(QualifiedName name) => Remove(roots, name, 0);
 
     /// <summary>
     /// Empties the tree.

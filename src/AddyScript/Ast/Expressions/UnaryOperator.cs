@@ -1,58 +1,58 @@
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Enumeration of unary operators.
+/// </summary>
+public enum UnaryOperator
 {
     /// <summary>
-    /// Enumeration of unary operators.
+    /// Null operator
     /// </summary>
-    public enum UnaryOperator
-    {
-        /// <summary>
-        /// Null operator
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Unary +
-        /// </summary>
-        Plus,
+    /// <summary>
+    /// Unary +
+    /// </summary>
+    Plus,
 
-        /// <summary>
-        /// Unary -
-        /// </summary>
-        Minus,
+    /// <summary>
+    /// Unary -
+    /// </summary>
+    Minus,
 
-        /// <summary>
-        /// Negation
-        /// </summary>
-        Not,
+    /// <summary>
+    /// Negation
+    /// </summary>
+    Not,
 
-        /// <summary>
-        /// Bitwise negation
-        /// </summary>
-        BitwiseNot,
+    /// <summary>
+    /// Bitwise negation
+    /// </summary>
+    BitwiseNot,
 
-        /// <summary>
-        /// Pre-increment
-        /// </summary>
-        PreIncrement,
+    /// <summary>
+    /// Pre-increment
+    /// </summary>
+    PreIncrement,
 
-        /// <summary>
-        /// Post-increment
-        /// </summary>
-        PostIncrement,
+    /// <summary>
+    /// Post-increment
+    /// </summary>
+    PostIncrement,
 
-        /// <summary>
-        /// Pre-decrement
-        /// </summary>
-        PreDecrement,
+    /// <summary>
+    /// Pre-decrement
+    /// </summary>
+    PreDecrement,
 
-        /// <summary>
-        /// Post-decrement
-        /// </summary>
-        PostDecrement,
+    /// <summary>
+    /// Post-decrement
+    /// </summary>
+    PostDecrement,
 
-        /// <summary>
-        /// Emptyness checking operator
-        /// </summary>
-        NotEmpty
-    }
+    /// <summary>
+    /// Emptyness checking operator
+    /// </summary>
+    NotEmpty
 }

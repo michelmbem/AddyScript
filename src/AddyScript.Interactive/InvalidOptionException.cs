@@ -9,6 +9,6 @@ namespace AddyScript.Interactive
         {
         }
 
-        public string Option { get; private set; } = option;
+        public string Option => option;
     }
 }

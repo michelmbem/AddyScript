@@ -1,0 +1,35 @@
+dbHost = readln("SQL Server host: (localhost) ") ?? "localhost";
+dbPort = readln("SQL Server port: (1433) ") ?? "1433";
+dbUser = readln("SQL Server username: (sa) ") ?? "sa";
+dbSecret = readln("SQL Server password: ");
+
+try {
+	adoCon = new ADODB::Connection();
+	adoCon.ConnectionString = $@"Provider=SQLOLEDB;Data Source={dbHost};Port={dbPort};Initial Catalog=Northwind;User ID={dbUser};Password={dbSecret}";
+	adoCon.Open();
+	
+	adoRs = new ADODB::Recordset();
+	adoRs.Open("SELECT * FROM Employees", adoCon);
+	
+	println();
+	println("ID  ToC   Last Name   First Name  Job Title");
+	println("-" * 60);
+	
+	while (!adoRs.EOF)
+	{
+		println("{0,-4}{1,-6}{2,-12}{3,-12}{4}",
+				adoRs.Fields["EmployeeID"].Value,
+				adoRs.Fields["TitleOfCourtesy"].Value,
+				adoRs.Fields["LastName"].Value,
+				adoRs.Fields["FirstName"].Value,
+				adoRs.Fields["Title"].Value);
+		adoRs.MoveNext();
+	}
+	
+	adoRs.Close();
+	adoCon.Close();
+} catch (e) {
+	println($"{e.name} : {e.message}");
+} finally {
+	readln();
+}

@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
-using AddyScript.Translators;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.OOP;
-
+using AddyScript.Translators;
 
 namespace AddyScript.Runtime;
 
@@ -35,7 +35,6 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public static readonly Dictionary<string, Function> Map = [];
 
     private readonly Dictionary<Type, Delegate> delegateCache = [];
-    private readonly Dictionary<string, IFrameItem> capturedItems = [];
     private MethodFrame declaringFrame;
 
     /// <summary>
@@ -67,12 +66,12 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
         set
         {
             declaringFrame = value;
-            capturedItems.Clear();
+            CapturedItems.Clear();
 
-            if (value == null) return;
+            if (declaringFrame == null) return;
 
-            foreach (string name in value.GetNames())
-                capturedItems.Add(name, value.GetItem(name));
+            foreach (string name in declaringFrame.GetNames())
+                CapturedItems.Add(name, declaringFrame.GetItem(name));
         }
     }
 
@@ -80,7 +79,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// Gets a reference to the items that were present in
     /// the parent function's frame when this function was created.
     /// </summary>
-    public Dictionary<string, IFrameItem> CapturedItems => capturedItems;
+    public Dictionary<string, IFrameItem> CapturedItems { get; } = [];
 
     /// <summary>
     /// The minimum number of arguments required by a call to this function.
@@ -108,9 +107,10 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// <param name="frameItems">The items of the frame that was allocated for the function's call</param>
     public void UpdateCapturedItems(Dictionary<string, IFrameItem> frameItems)
     {
-        foreach (var pair in frameItems)
-            if (capturedItems.ContainsKey(pair.Key))
-                capturedItems[pair.Key] = pair.Value;
+        foreach (var pair in frameItems.Where(p => CapturedItems.ContainsKey(p.Key)))
+        {
+            CapturedItems[pair.Key] = pair.Value;
+        }
     }
 
     /// <summary>

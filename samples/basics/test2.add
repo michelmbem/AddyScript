@@ -15,7 +15,7 @@ abstract class A
 	
 	public property size => this._list.size;
 	
-	protected function first() => this._list[0];
+	protected function first() => this._list.front;
 	
 	public function iterator()
 	{

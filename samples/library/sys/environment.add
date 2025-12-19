@@ -1,10 +1,17 @@
 import System::Environment;
 import System::Threading::Thread;
 import System::Diagnostics::Process;
+import System::Runtime::InteropServices::OSPlatform;
+import System::Runtime::InteropServices::RuntimeInformation;
 
 function getOSVersion()
 {
 	return Environment::OSVersion;
+}
+
+function isOSPlatform(platform)
+{
+	return RuntimeInformation::IsOSPlatform(platform);
 }
 
 function getEnv(variable)

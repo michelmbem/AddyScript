@@ -40,19 +40,15 @@ public enum PackFormatType
 
 public class PackFormatItem
 {
-    public PackFormatType Type { get; private set; }
+    public PackFormatType Type { get; }
 
-    public int Count { get; private set; }
+    public int Count { get; }
 
-    public PackFormatItem(PackFormatType type, int count)
+    public PackFormatItem(PackFormatType type, int count = 1)
     {
         Debug.Assert(count > 0);
         Type = type;
         Count = count;
-    }
-
-    public PackFormatItem(PackFormatType type) : this(type, 1)
-    {
     }
 
     public static string ToString(PackFormatType type)
@@ -79,10 +75,7 @@ public class PackFormatItem
         };
     }
 
-    public override string ToString()
-    {
-        return Count > 1 ? Count + ToString(Type) : ToString(Type);
-    }
+    public override string ToString() => Count > 1 ? Count + ToString(Type) : ToString(Type);
 }
 
 

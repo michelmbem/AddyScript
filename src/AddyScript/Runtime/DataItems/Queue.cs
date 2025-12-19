@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 using AddyScript.Runtime.OOP;
 
@@ -20,9 +22,9 @@ public sealed class Queue : DataItem
 
     public override DataItem[] AsArray => [.. queue];
 
-    public override List<DataItem> AsList => new (queue);
+    public override List<DataItem> AsList => [.. queue];
 
-    public override HashSet<DataItem> AsHashSet => new (queue);
+    public override HashSet<DataItem> AsHashSet => [.. queue];
 
     public override Queue<DataItem> AsQueue => queue;
 
@@ -40,11 +42,24 @@ public sealed class Queue : DataItem
         return new Queue(content);
     }
 
+    public override string ToString(string format, IFormatProvider formatProvider)
+    {
+        var sb = new StringBuilder();
+        sb.Append($"<{Class.Name} {{size = {queue.Count}");
+
+        if (queue.Count > 0)
+        {
+            sb.Append($", front = {queue.Peek().ToString(format, formatProvider)}");
+        }
+
+        return sb.Append("}>").ToString();
+    }
+
     protected override bool UnsafeEquals(DataItem other) => queue.Equals(other.AsQueue);
 
     public override int GetHashCode() => queue.GetHashCode();
 
-    public override bool IsEmpty() => queue.Count <= 0;
+    public override bool IsEmpty() => queue.Count == 0;
 
     public override DataItem GetProperty(string propertyName) => propertyName switch
     {

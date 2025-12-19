@@ -32,13 +32,16 @@ function partition(t, left, right)
 if (__name == 'main')
 {
 	n = (int) readln("how many items? ");
+	low = (int) readln('lower bound = ');
+	up = (int) readln('upper bound = ');
 	prec = (int) readln("precision? ");
     println();
 	
 	println("generating values...");
     println();
     
-	t = randlst(n, n, rounding: prec); // generates a list of n floating-point values comprised between 0 and n and rounded to prec
+    // generates a list of n floating-point values comprised between low and up rounded to prec
+	t = randlst(n, low, up, prec);
 	println("generated list : " + t);
     println();
 	

@@ -19,7 +19,7 @@ public sealed class Blob(byte[] buffer) : DataItem
     public override byte[] AsByteArray => buffer;
 
     private IEnumerable<DataItem> Items
-        => buffer.Select(b => new String(b.ToString())).Cast<DataItem>();
+        => buffer.Select(b => new String(b.ToString()));
 
     public override DataItem[] AsArray => Items.ToArray();
 
@@ -76,7 +76,7 @@ public sealed class Blob(byte[] buffer) : DataItem
         return 0;
     }
 
-    public override bool IsEmpty() => buffer.Length <= 0;
+    public override bool IsEmpty() => buffer.Length == 0;
 
     public override DataItem UnaryOperation(UnaryOperator _operator)
     {
@@ -152,7 +152,7 @@ public sealed class Blob(byte[] buffer) : DataItem
                     return new Blob(result);
                 }
             case BinaryOperator.Contains:
-                return Boolean.FromBool(Array.IndexOf(buffer, (byte)operand.AsInt32) >= 0); // Todo: Améliorer!!
+                return Boolean.FromBool(Array.IndexOf(buffer, (byte)operand.AsInt32) >= 0); // Todo: Amï¿½liorer!!
             default:
                 return base.BinaryOperation(_operator, operand);
         }

@@ -38,10 +38,7 @@ public class NameTreeNode(string name, object value)
     /// <summary>
     /// Gets the fummy qualified name of this node
     /// </summary>
-    public string FullName
-    {
-        get { return Parent == null ? Name : Parent.FullName + "::" + Name; }
-    }
+    public string FullName => Parent == null ? Name : $"{Parent.FullName}::{Name}";
 
     ///<summary>
     ///Returns a <see cref="string" /> that represents the current <see cref="object" />.
@@ -51,8 +48,5 @@ public class NameTreeNode(string name, object value)
     ///A <see cref="string" /> that represents the current <see cref="object" />.
     ///</returns>
     ///<filterpriority>2</filterpriority>
-    public override string ToString()
-    {
-        return FullName;
-    }
+    public override string ToString() => FullName;
 }

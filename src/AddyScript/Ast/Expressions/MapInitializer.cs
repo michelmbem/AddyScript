@@ -1,30 +1,29 @@
 using AddyScript.Translators;
 
 
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Represents a map's initializer: a set of item initializers into braces.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of ArrayInitializer
+/// </remarks>
+/// <param name="entries">The key/value pairs listed between braces</param>
+public class MapInitializer(params MapEntry[] entries) : Expression
 {
     /// <summary>
-    /// Represents a map's initializer: a set of item initializers into braces.
+    /// The key/value pairs listed between braces.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of ArrayInitializer
-    /// </remarks>
-    /// <param name="itemInitializers">The item initializers that are listed between the braces</param>
-    public class MapInitializer(params MapItemInitializer[] itemInitializers) : Expression
+    public MapEntry[] Entries => entries;
+
+    /// <summary>
+    /// Translates this node.
+    /// </summary>
+    /// <param name="translator">The translator to use</param>
+    public override void AcceptTranslator(ITranslator translator)
     {
-
-        /// <summary>
-        /// The expressions that are listed between the braces.
-        /// </summary>
-        public MapItemInitializer[] ItemInitializers => itemInitializers;
-
-        /// <summary>
-        /// Translates this node.
-        /// </summary>
-        /// <param name="translator">The translator to use</param>
-        public override void AcceptTranslator(ITranslator translator)
-        {
-            translator.TranslateMapInitializer(this);
-        }
+        translator.TranslateMapInitializer(this);
     }
 }

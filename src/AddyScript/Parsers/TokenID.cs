@@ -75,6 +75,7 @@ public enum TokenID
     KW_As,
     KW_Const,
     KW_Var,
+    KW_Let,
     KW_If,
     KW_Else,
     KW_Switch,

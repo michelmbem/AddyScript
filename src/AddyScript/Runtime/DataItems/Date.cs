@@ -40,7 +40,7 @@ public sealed class Date(DateTime value) : DataItem
     public override DataItem GetProperty(string propertyName) => propertyName switch
     {
         "date" => new Date(value.Date),
-        "time" => new Date(new DateTime(value.TimeOfDay.Ticks)),
+        "time" => new Date(new DateTime(value.TimeOfDay.Ticks, DateTimeKind.Local)),
         "year" => new Integer(value.Year),
         "month" => new Integer(value.Month),
         "day" => new Integer(value.Day),

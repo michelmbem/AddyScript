@@ -21,15 +21,15 @@ public sealed class Float(double value) : DataItem
 
     public override int AsInt32 => (int)value;
 
-    public override BigInteger AsBigInteger => new BigInteger(value);
+    public override BigInteger AsBigInteger => new (value);
 
-    public override Rational32 AsRational32 => new Rational32((int)value);
+    public override Rational32 AsRational32 => new ((int)value);
 
     public override double AsDouble => value;
 
-    public override BigDecimal AsBigDecimal => new BigDecimal(value);
+    public override BigDecimal AsBigDecimal => new (value);
 
-    public override Complex64 AsComplex64 => new Complex64(value, 0);
+    public override Complex64 AsComplex64 => new (value, 0);
 
     public override object AsNativeObject => value;
 

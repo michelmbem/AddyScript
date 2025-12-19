@@ -137,14 +137,14 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("ConstantDecl");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertyInitializers(tmpElement, cstDecl.Initializers);
+        ProcessPropertySetters(tmpElement, cstDecl.Setters);
     }
 
     public void TranslateVariableDecl(VariableDecl varDecl)
     {
         XmlElement tmpElement = document.CreateElement("VariableDecl");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertyInitializers(tmpElement, varDecl.Initializers);
+        ProcessPropertySetters(tmpElement, varDecl.Setters);
     }
 
     public void TranslateBlock(Block block)
@@ -159,7 +159,7 @@ public class XmlGenerator : ITranslator
 
         foreach (Statement statement in block.Statements)
         {
-            if (statement is Return ret && ret.Expression == null) break;
+            if (statement is Return { Expression: null }) break;
             statement.AcceptTranslator(this);
         }
 
@@ -297,14 +297,14 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("MapInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessMapItemInitializers(tmpElement, mapInit.ItemInitializers);
+        ProcessMapItemInitializers(tmpElement, mapInit.Entries);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objectInit)
     {
         XmlElement tmpElement = document.CreateElement("ObjectInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertyInitializers(tmpElement, objectInit.PropertyInitializers);
+        ProcessPropertySetters(tmpElement, objectInit.PropertySetters);
     }
 
     public void TranslateInlineFunction(InlineFunction inline)
@@ -469,12 +469,12 @@ public class XmlGenerator : ITranslator
 
         ProcessArguments(tmpElement, constCall);
 
-        if (constCall.PropertyInitializers != null)
+        if (constCall.PropertySetters != null)
         {
-            XmlElement propsElement = document.CreateElement("PropertyInitializers");
+            XmlElement propsElement = document.CreateElement("PropertySetters");
             tmpElement.AppendChild(propsElement);
 
-            ProcessPropertyInitializers(propsElement, constCall.PropertyInitializers);
+            ProcessPropertySetters(propsElement, constCall.PropertySetters);
         }
     }
 
@@ -568,9 +568,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
 
-        currentElement = document.CreateElement("Test");
+        currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
-        ifElse.Test.AcceptTranslator(this);
+        ifElse.Guard.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -630,14 +630,14 @@ public class XmlGenerator : ITranslator
         foreach (Statement initializer in forLoop.Initializers)
             initializer.AcceptTranslator(this);
 
-        currentElement = document.CreateElement("Test");
+        currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
-        forLoop.Test?.AcceptTranslator(this);
+        forLoop.Guard?.AcceptTranslator(this);
 
-        currentElement = document.CreateElement("Updaters");
+        currentElement = document.CreateElement("Incrementers");
         tmpElement.AppendChild(currentElement);
-        foreach (Expression updater in forLoop.Updaters)
-            updater.AcceptTranslator(this);
+        foreach (Expression incrementer in forLoop.Incrementers)
+            incrementer.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -657,9 +657,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
         
-        currentElement = document.CreateElement("Test");
+        currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
-        forEach.Test.AcceptTranslator(this);
+        forEach.Guard.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -675,9 +675,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
 
-        currentElement = document.CreateElement("Test");
+        currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
-        whileLoop.Test.AcceptTranslator(this);
+        whileLoop.Guard.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -693,9 +693,9 @@ public class XmlGenerator : ITranslator
 
         XmlElement previousElement = currentElement;
         
-        currentElement = document.CreateElement("Test");
+        currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
-        doLoop.Test.AcceptTranslator(this);
+        doLoop.Guard.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Action");
         tmpElement.AppendChild(currentElement);
@@ -818,15 +818,15 @@ public class XmlGenerator : ITranslator
         ProcessMatchCases(tmpElement, patMatch.MatchCases);
     }
 
-    public void TranslateAlteredCopy(AlteredCopy altCopy)
+    public void TranslateMutableCopy(MutableCopy mutableCopy)
     {
-        XmlElement tmpElement = document.CreateElement("AlteredCopy");
+        XmlElement tmpElement = document.CreateElement("MutableCopy");
         currentElement.AppendChild(tmpElement);
 
-        XmlElement propsElement = document.CreateElement("PropertyInitializers");
+        XmlElement propsElement = document.CreateElement("PropertySetters");
         tmpElement.AppendChild(propsElement);
 
-        ProcessPropertyInitializers(propsElement, altCopy.PropertyInitializers);
+        ProcessPropertySetters(propsElement, mutableCopy.PropertySetters);
     }
 
     #endregion
@@ -876,10 +876,10 @@ public class XmlGenerator : ITranslator
         tmpElement.SetAttribute("Name", attribute.Name);
         parent.AppendChild(tmpElement);
 
-        XmlElement propsElement = document.CreateElement("PropertyInitializers");
+        XmlElement propsElement = document.CreateElement("PropertySetters");
         tmpElement.AppendChild(propsElement);
 
-        ProcessPropertyInitializers(propsElement, attribute.PropertyInitializers);
+        ProcessPropertySetters(propsElement, attribute.PropertySetters);
     }
 
     private void ProcessParameters(XmlElement parent, ParameterDecl[] parameters)
@@ -904,15 +904,15 @@ public class XmlGenerator : ITranslator
             ProcessAttributes(tmpElement, parameter.Attributes);
     }
 
-    private void ProcessPropertyInitializers(XmlElement parent, PropertyInitializer[] initializers)
+    private void ProcessPropertySetters(XmlElement parent, VariableSetter[] initializers)
     {
-        foreach (PropertyInitializer initializer in initializers)
+        foreach (VariableSetter initializer in initializers)
             ProcessPropertyInitializer(parent, initializer);
     }
 
-    private void ProcessPropertyInitializer(XmlElement parent, PropertyInitializer initializer)
+    private void ProcessPropertyInitializer(XmlElement parent, VariableSetter initializer)
     {
-        XmlElement tmpElement = document.CreateElement("PropertyInitializer");
+        XmlElement tmpElement = document.CreateElement("VariableSetter");
         parent.AppendChild(tmpElement);
         tmpElement.SetAttribute("Name", initializer.Name);
 
@@ -926,13 +926,13 @@ public class XmlGenerator : ITranslator
         }
     }
 
-    private void ProcessListItems(XmlElement parent, ListItem[] initializers)
+    private void ProcessListItems(XmlElement parent, Argument[] initializers)
     {
-        foreach (ListItem initializer in initializers)
+        foreach (Argument initializer in initializers)
             ProcessListItem(parent, initializer);
     }
 
-    private void ProcessListItem(XmlElement parent, ListItem initializer)
+    private void ProcessListItem(XmlElement parent, Argument initializer)
     {
         XmlElement tmpElement = document.CreateElement("Item");
         tmpElement.SetAttribute("Spread", initializer.Spread.ToString());
@@ -947,15 +947,15 @@ public class XmlGenerator : ITranslator
         currentElement = previousElement;
     }
 
-    private void ProcessMapItemInitializers(XmlElement parent, MapItemInitializer[] initializers)
+    private void ProcessMapItemInitializers(XmlElement parent, MapEntry[] initializers)
     {
-        foreach (MapItemInitializer initializer in initializers)
+        foreach (MapEntry initializer in initializers)
             ProcessMapItemInitializer(parent, initializer);
     }
 
-    private void ProcessMapItemInitializer(XmlElement parent, MapItemInitializer initializer)
+    private void ProcessMapItemInitializer(XmlElement parent, MapEntry initializer)
     {
-        XmlElement tmpElement = document.CreateElement("MapItemInitializer");
+        XmlElement tmpElement = document.CreateElement("MapEntry");
         parent.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;

@@ -85,6 +85,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             TokenID.KW_Extern => ExternalFunction(),
             TokenID.KW_Const => ConstantDecl(),
             TokenID.KW_Var => VariableDecl(),
+            TokenID.KW_Let => AssignmentWithLet(),
             TokenID.LeftBrace => Block(),
             TokenID.KW_If => IfElse(),
             TokenID.KW_Switch => SwitchBlock(),
@@ -102,7 +103,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             _ => ExpressionAsStatement(),
         };
     }
-    
+
     /// <summary>
     /// Recognizes a statement decorated with some attributes.
     /// </summary>
@@ -316,7 +317,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private ConstantDecl ConstantDecl()
     {
         Token first = Match(TokenID.KW_Const);
-        var initializers = List(PropertyInitializer, true, Resources.DuplicatedConstant);
+        var initializers = List(VariableSetter, true, Resources.DuplicatedConstant);
         Token last = Match(TokenID.SemiColon);
 
         var constDecl = new ConstantDecl(initializers);
@@ -330,7 +331,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="Ast.Statements.VariableDecl"/></returns>
     private VariableDecl VariableDecl()
     {
-        List<PropertyInitializer> initializers = [];
+        List<VariableSetter> initializers = [];
         Token first = Match(TokenID.KW_Var);
 
         while (TryMatch(TokenID.Identifier))
@@ -346,7 +347,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 varValue = RequiredExpression();
             }
 
-            var initializer = new PropertyInitializer(varName, varValue);
+            var initializer = new VariableSetter(varName, varValue);
             initializer.SetLocation(bookmark.Start, varValue?.End ?? bookmark.End);
             initializers.Add(initializer);
 
@@ -358,6 +359,23 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         var varDecl = new VariableDecl([.. initializers]);
         varDecl.SetLocation(first.Start, last.Start);
         return varDecl;
+    }
+
+    /// <summary>
+    /// Recognizes an assignment starting with the <b>let</b> keyword.
+    /// </summary>
+    /// <returns>An <see cref="Assignment"/></returns>
+    private Assignment AssignmentWithLet()
+    {
+        Token first = Match(TokenID.KW_Let);
+        Expression lValue = Reference();
+        Match(TokenID.Equal);
+        Expression rvalue = RequiredExpression();
+        Token last = Match(TokenID.SemiColon);
+
+        var expr = new Assignment(lValue, rvalue);
+        expr.SetLocation(first.Start, last.End);
+        return expr;
     }
 
     /// <summary>
@@ -1423,7 +1441,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     {
         Token first = Match(TokenID.Identifier), last = first;
         string typeName = first.ToString();
-        var props = new List<PropertyInitializer>();
+        List<VariableSetter> props = [];
 
         if (TryMatch(TokenID.LeftParenthesis))
         {
@@ -1441,7 +1459,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 }
             }
 
-            var moreProps = List(PropertyInitializer, true, Resources.DuplicatedAttributeProperty);
+            var moreProps = List(VariableSetter, true, Resources.DuplicatedAttributeProperty);
 
             if (props.Count > 0)
             {

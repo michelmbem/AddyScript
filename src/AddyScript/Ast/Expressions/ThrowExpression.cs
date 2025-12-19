@@ -2,35 +2,35 @@
 using AddyScript.Translators;
 
 
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Represents a <b>throw</b> statement being used as an expression.
+/// </summary>
+public class ThrowExpression : Expression
 {
     /// <summary>
-    /// Represents a <b>throw</b> statement being used as an expression.
+    /// Initializes a new instance of <see cref="ThrowExpression"/>.
     /// </summary>
-    public class ThrowExpression : Expression
+    /// <param name="_throw">The wrapped <b>throw</b> statement</param>
+    public ThrowExpression(Throw _throw)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ThrowExpression"/>.
-        /// </summary>
-        /// <param name="_throw">The wrapped <b>throw</b> statement</param>
-        public ThrowExpression(Throw _throw)
-        {
-            Throw = _throw;
-            CopyLocation(_throw);
-        }
+        Throw = _throw;
+        CopyLocation(_throw);
+    }
         
-        /// <summary>
-        /// The wrapped <b>throw</b> statement.
-        /// </summary>
-        public Throw Throw { get; }
+    /// <summary>
+    /// The wrapped <b>throw</b> statement.
+    /// </summary>
+    public Throw Throw { get; }
 
-        /// <summary>
-        /// Translates this node.
-        /// </summary>
-        /// <param name="translator">The translator to use</param>
-        public override void AcceptTranslator(ITranslator translator)
-        {
-            Throw.AcceptTranslator(translator);
-        }
+    /// <summary>
+    /// Translates this node.
+    /// </summary>
+    /// <param name="translator">The translator to use</param>
+    public override void AcceptTranslator(ITranslator translator)
+    {
+        Throw.AcceptTranslator(translator);
     }
 }

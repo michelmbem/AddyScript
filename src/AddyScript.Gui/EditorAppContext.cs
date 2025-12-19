@@ -85,7 +85,7 @@ namespace AddyScript.Gui
             }
 
             if (directories.Count <= 0)
-                directories.Add(Path.GetFullPath(@"..\..\..\samples"));
+                directories.Add(Path.GetFullPath(@"..\..\..\samples\library"));
 
             if (assemblies.Count <= 0)
                 assemblies.AddRange(["System.Data.OleDb", "Microsoft.Data.SqlClient", "System.Windows.Forms"]);

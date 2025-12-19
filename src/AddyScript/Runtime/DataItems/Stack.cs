@@ -1,5 +1,6 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 using AddyScript.Runtime.OOP;
 
@@ -21,9 +22,9 @@ public sealed class Stack : DataItem
 
     public override DataItem[] AsArray => [.. stack];
 
-    public override List<DataItem> AsList => new (stack);
+    public override List<DataItem> AsList => [.. stack];
 
-    public override HashSet<DataItem> AsHashSet => new (stack);
+    public override HashSet<DataItem> AsHashSet => [.. stack];
 
     public override Queue<DataItem> AsQueue => new (stack);
 
@@ -41,11 +42,24 @@ public sealed class Stack : DataItem
         return new Stack(content);
     }
 
+    public override string ToString(string format, IFormatProvider formatProvider)
+    {
+        var sb = new StringBuilder();
+        sb.Append($"<{Class.Name} {{size = {stack.Count}");
+
+        if (stack.Count > 0)
+        {
+            sb.Append($", top = {stack.Peek().ToString(format, formatProvider)}");
+        }
+
+        return sb.Append("}>").ToString();
+    }
+
     protected override bool UnsafeEquals(DataItem other) => stack.Equals(other.AsStack);
 
     public override int GetHashCode() => stack.GetHashCode();
 
-    public override bool IsEmpty() => stack.Count <= 0;
+    public override bool IsEmpty() => stack.Count == 0;
 
     public override DataItem GetProperty(string propertyName) => propertyName switch
     {

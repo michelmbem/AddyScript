@@ -45,8 +45,8 @@ public sealed class Complex : DataItem
         if (imaginaryString == "0") return realString;
 
         return value.Imaginary < 0.0
-             ? string.Format("({0}{1})", realString, imaginaryString)
-             : string.Format("({0}+{1})", realString, imaginaryString); 
+             ? $"({realString}{imaginaryString})"
+             : $"({realString}+{imaginaryString})";
     }
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsComplex64;

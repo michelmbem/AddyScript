@@ -30,6 +30,15 @@ namespace AddyScript.Parsers;
 public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 {
     /// <summary>
+    /// Recognizes a non-null expression.
+    /// </summary>
+    /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
+    public Expression RequiredExpression()
+    {
+        return Required(Expression, Resources.ExpressionRequired);
+    }
+
+    /// <summary>
     /// Recognizes an expression.
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
@@ -41,12 +50,18 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a non-null expression.
+    /// Recognizes an expression that can be used as a valid lvalue;
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
-    protected Expression RequiredExpression()
+    protected Expression Reference()
     {
-        return Required(Expression, Resources.ExpressionRequired);
+        Expression expr = Composite();
+        return expr switch
+        {
+            IReference => expr,
+            null => throw new SyntaxError(FileName, token, Resources.ExpressionRequired),
+            _ => throw new ScriptError(FileName, expr, Resources.InvalidLValue)
+        };
     }
 
     /// <summary>
@@ -131,8 +146,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Expression expr = Term();
         if (expr == null) return null;
 
-        bool negate = false;
-
         switch (token.TokenID)
         {
             case TokenID.DoubleEqual or TokenID.ExclamationEqual or TokenID.TripleEqual or
@@ -147,49 +160,74 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 break;
             }
             case TokenID.KW_Not:
-                negate = true;
                 Consume(1);
-                if (TryMatch(TokenID.KW_In)) goto case TokenID.KW_In;
-                throw new SyntaxError(FileName, token);
+                expr = BelongingCheck(expr, true);
+                break;
             case TokenID.KW_In:
-            {
-                Consume(1);
-                var container = Required(Term, Resources.ExpressionRequired);
-                Expression element = expr;
-                expr = new BinaryExpression(BinaryOperator.Contains, container, element) {IsParenthesized = true};
-                if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
-                expr.SetLocation(element.Start, container.End);
+                expr = BelongingCheck(expr, false);
                 break;
-            }
             case TokenID.KW_Is:
-            {
-                Consume(1);
-
-                if (TryMatch(TokenID.KW_Not))
-                {
-                    negate = true;
-                    Consume(1);
-                }
-
-                var pattern = MatchCasePattern();
-                Expression checkedExpr = expr;
-
-                expr = pattern switch
-                {
-                    null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
-                    TypePattern typePattern and not ObjectPattern =>
-                            new TypeVerification(checkedExpr, typePattern.TypeName),
-                    _ => new PatternMatching(checkedExpr,
-                                             new (pattern, new Literal(Boolean.True)),
-                                             new (new AlwaysPattern(), new Literal(Boolean.False))),
-                };
-
-                if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
-                expr.SetLocation(checkedExpr.Start, pattern.End);
+                expr = SimplePatternMatching(expr);
                 break;
-            }
         }
 
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes a belonging check expression (one like <i>x in y</i>).
+    /// </summary>
+    /// <param name="element">The element whose belonging to a container is being checked</param>
+    /// <param name="negate">Determines whether the belonging check is negated (like in <i>x not in y</i>)</param>
+    /// <returns>
+    /// A <see cref="BinaryExpression"/> with the <see cref="BinaryOperator.Contains"/> operator,
+    /// possibly negated with a <see cref="UnaryExpression"/> with the <see cref="UnaryOperator.Not"/> operator
+    /// </returns>
+    private Expression BelongingCheck(Expression element, bool negate)
+    {
+        Match(TokenID.KW_In);
+        var container = Required(Term, Resources.ExpressionRequired);
+        Expression expr = new BinaryExpression(BinaryOperator.Contains, container, element);
+        if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+        expr.SetLocation(element.Start, container.End);
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes a simple pattern matching expression (one like <i>expr is [not] pattern</i>).
+    /// </summary>
+    /// <param name="checkedExpr">The expression being checked against the pattern</param>
+    /// <returns>
+    /// A <see cref="TypeVerification"/> if the pattern is a type pattern;
+    /// or a <see cref="PatternMatching"/> otherwise,
+    /// </returns>
+    /// <exception cref="SyntaxError">
+    /// If no valid pattern is found after the <b>is</b> [<b>not</b>] keywords
+    /// </exception>
+    private Expression SimplePatternMatching(Expression checkedExpr)
+    {
+        Match(TokenID.KW_Is);
+        
+        bool negate = false;
+        if (TryMatch(TokenID.KW_Not))
+        {
+            negate = true;
+            Consume(1);
+        }
+
+        var pattern = MatchCasePattern();
+        Expression expr = pattern switch
+        {
+            null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
+            TypePattern typePattern and not ObjectPattern =>
+                new TypeVerification(checkedExpr, typePattern.TypeName),
+            _ => new PatternMatching(checkedExpr,
+                new (pattern, new Literal(Boolean.True)),
+                new (new AlwaysPattern(), new Literal(Boolean.False))),
+        };
+
+        if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+        expr.SetLocation(expr.Start, pattern.End);
         return expr;
     }
 
@@ -326,88 +364,37 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// </summary>
     /// <returns>
     /// An <see cref="ItemRef"/>, a <see cref="SliceRef"/>, a <see cref="PropertyRef"/>, a <see cref="MethodCall"/>,
-    /// a <see cref="PatternMatching"/> or an <see cref="AlteredCopy"/>
+    /// a <see cref="PatternMatching"/> or an <see cref="MutableCopy"/>
     /// </returns>
     private Expression Composite()
     {
         Expression expr = Atom();
         if (expr == null) return null;
 
-        Token bookmark;
-        bool loop = true;
+        bool doChaining;
 
-        while (loop)
+        do
         {
             SkipComments();
+            doChaining = true;
 
             switch (token.TokenID)
             {
                 case TokenID.LeftBracket or TokenID.QuestionBracket:
-                {
-                    bool optional = token.TokenID == TokenID.QuestionBracket;
-                    Consume(1);
-
-                    Expression lBound = null, uBound = null;
-                    bool isSlice = false;
-
-                    if (TryMatch(TokenID.DoubleDot))
-                    {
-                        Consume(1);
-                        uBound = Expression();
-                        isSlice = true;
-                    }
-                    else
-                    {
-                        lBound = RequiredExpression();
-
-                        if (TryMatch(TokenID.DoubleDot))
-                        {
-                            Consume(1);
-                            uBound = Expression();
-                            isSlice = true;
-                        }
-                    }
-
-                    bookmark = Match(TokenID.RightBracket);
-
-                    Expression owner = expr;
-                    expr = isSlice
-                         ? new SliceRef(owner, lBound, uBound) { Optional = optional }
-                         : new ItemRef(owner, lBound) { Optional = optional };
-                    expr.SetLocation(owner.Start, bookmark.End);
+                    expr = ItemOrSliceRef(expr);
                     break;
-                }
                 case TokenID.Dot or TokenID.QuestionDot:
-                {
-                    bool optional = token.TokenID == TokenID.QuestionDot;
-                    Consume(1);
-
-                    bookmark = Match(TokenID.Identifier);
-                    string memberName = bookmark.ToString();
-
-                    Expression owner = expr;
-                    if (TryMatch(TokenID.LeftParenthesis))
-                    {
-                        Consume(1);
-                        (var positionalArgs, var namedArgs) = FunctionArguments();
-                        bookmark = Match(TokenID.RightParenthesis);
-                        expr = new MethodCall(owner, memberName, positionalArgs, namedArgs) { Optional = optional };
-                    }
-                    else
-                        expr = new PropertyRef(owner, memberName) { Optional = optional };
-
-                    expr.SetLocation(owner.Start, bookmark.End);
+                    expr = MemberRef(expr);
                     break;
-                }
                 case TokenID.LeftParenthesis:
                 {
                     Consume(1);
-                    (var positionalArgs, var namedArgs) = FunctionArguments();
-                    bookmark = Match(TokenID.RightParenthesis);
+                    var (positionalArgs, namedArgs) = FunctionArguments();
+                    var last = Match(TokenID.RightParenthesis);
 
                     Expression callee = expr;
                     expr = new AnonymousCall(callee, positionalArgs, namedArgs);
-                    expr.SetLocation(callee.Start, bookmark.End);
+                    expr.SetLocation(callee.Start, last.End);
                     break;
                 }
                 case TokenID.KW_Switch:
@@ -417,29 +404,97 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     MatchCase[] cases = List(MatchCase, false, null);
                     Token last = Match(TokenID.RightBrace);
 
-                    Expression expr2match = expr;
-                    expr = new PatternMatching(expr2match, cases);
-                    expr.SetLocation(expr2match.Start, last.End);
+                    Expression checkedExpr = expr;
+                    expr = new PatternMatching(checkedExpr, cases);
+                    expr.SetLocation(checkedExpr.Start, last.End);
                     break;
                 }
                 case TokenID.KW_With:
                 {
                     Consume(1);
                     Match(TokenID.LeftBrace);
-                    PropertyInitializer[] fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
+                    VariableSetter[] fields = List(VariableSetter, true, Resources.DuplicatedProperty);
                     Token last = Match(TokenID.RightBrace);
 
                     Expression original = expr;
-                    expr = new AlteredCopy(original, fields);
+                    expr = new MutableCopy(original, fields);
                     expr.SetLocation(original.Start, last.End);
                     break;
                 }
                 default:
-                    loop = false;
+                    doChaining = false;
                     break;
             }
         }
+        while (doChaining);
 
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes an item or a slice reference.
+    /// </summary>
+    /// <param name="owner">The expression representing the owner of the item or slice being referenced</param>
+    /// <returns>A <see cref="ItemRef"/> or a <see cref="SliceRef"/></returns>
+    private Expression ItemOrSliceRef(Expression owner)
+    {
+        Expression lBound = null, uBound = null;
+        bool isSlice = false;
+        bool isOptional = MatchAny(TokenID.LeftBracket, TokenID.QuestionBracket)
+            .TokenID == TokenID.QuestionBracket;
+
+        if (TryMatch(TokenID.DoubleDot))
+        {
+            Consume(1);
+            uBound = Expression();
+            isSlice = true;
+        }
+        else
+        {
+            lBound = RequiredExpression();
+
+            if (TryMatch(TokenID.DoubleDot))
+            {
+                Consume(1);
+                uBound = Expression();
+                isSlice = true;
+            }
+        }
+
+        var last = Match(TokenID.RightBracket);
+
+        Expression expr = isSlice
+            ? new SliceRef(owner, lBound, uBound) { Optional = isOptional }
+            : new ItemRef(owner, lBound) { Optional = isOptional };
+        expr.SetLocation(owner.Start, last.End);
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes a member reference (property or method).
+    /// </summary>
+    /// <param name="owner">The expression representing the owner of the member being referenced</param>
+    /// <returns>A <see cref="PropertyRef"/> or a <see cref="MethodCall"/></returns>
+    private Expression MemberRef(Expression owner)
+    {
+        bool isOptional = MatchAny(TokenID.Dot, TokenID.QuestionDot)
+            .TokenID == TokenID.QuestionDot;
+        
+        var last = Match(TokenID.Identifier);
+        string memberName = last.ToString();
+
+        Expression expr;
+        if (TryMatch(TokenID.LeftParenthesis))
+        {
+            Consume(1);
+            var (positionalArgs, namedArgs) = FunctionArguments();
+            last = Match(TokenID.RightParenthesis);
+            expr = new MethodCall(owner, memberName, positionalArgs, namedArgs) { Optional = isOptional };
+        }
+        else
+            expr = new PropertyRef(owner, memberName) { Optional = isOptional };
+
+        expr.SetLocation(owner.Start, last.End);
         return expr;
     }
 
@@ -533,7 +588,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             if (TryMatch(TokenID.LeftParenthesis))
             {
                 Consume(1);
-                (var positionalArgs, var namedArgs) = FunctionArguments();
+                var (positionalArgs, namedArgs) = FunctionArguments();
                 expr = new ParentMethodCall(memberName, positionalArgs, namedArgs);
                 last = Match(TokenID.RightParenthesis);
             }
@@ -569,16 +624,16 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.LeftBrace:
             {
                 Consume(1);
-                expr = new ObjectInitializer(List(PropertyInitializer, true, Resources.DuplicatedProperty));
+                expr = new ObjectInitializer(List(VariableSetter, true, Resources.DuplicatedProperty));
                 last = Match(TokenID.RightBrace);
                 break;
             }
             case TokenID.Identifier:
             {
                 QualifiedName className = QualifiedName(ref first, ref last);
-                ListItem[] positionalArgs = null;
+                Argument[] positionalArgs = null;
                 Dictionary<string, Expression> namedArgs = null;
-                PropertyInitializer[] fields = null;
+                VariableSetter[] fields = null;
 
                 if (token.TokenID == TokenID.LeftParenthesis)
                 {
@@ -590,7 +645,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 if (TryMatch(TokenID.LeftBrace))
                 {
                     Consume(1);
-                    fields = List(PropertyInitializer, true, Resources.DuplicatedProperty);
+                    fields = List(VariableSetter, true, Resources.DuplicatedProperty);
                     last = Match(TokenID.RightBrace);
                 }
                 else if (last.TokenID != TokenID.RightParenthesis) // Require an empty pair of parenthesis when no initializer is supplied
@@ -650,7 +705,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (TryMatch(TokenID.LeftParenthesis))
         {
             Consume(1);
-            (var positionalArgs, var namedArgs) = FunctionArguments();
+            var (positionalArgs, namedArgs) = FunctionArguments();
             expr = new StaticMethodCall(name, positionalArgs, namedArgs);
             last = Match(TokenID.RightParenthesis);
         }
@@ -719,8 +774,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         }
 
         // Other cases: parenthesized expressions and tuple initializers
-        List<ListItem> listItems = [];
-        ListItem item = ListItem();
+        List<Argument> listItems = [];
+        Argument item = Argument();
         bool isTuple = false;
 
         while (item != null)
@@ -728,13 +783,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             listItems.Add(item);
             if (!TryMatch(TokenID.Comma)) break;
             Consume(1);
-            item = ListItem();
+            item = Argument();
             isTuple = true;
         }
 
         Token last = Match(TokenID.RightParenthesis);
 
-        if (listItems.Count <= 0) throw new SyntaxError(FileName, last);
+        if (listItems.Count == 0) throw new SyntaxError(FileName, last);
 
         Expression expr;
         if (isTuple || listItems[0].Spread)
@@ -757,11 +812,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// </returns>
     private Expression AtomStartingWithLBrace()
     {
-        List<MapItemInitializer> mapItems = [];
-        List<ListItem> setItems = [];
+        List<MapEntry> mapEntries = [];
+        List<Argument> setItems = [];
 
         Token first = Match(TokenID.LeftBrace);
-        ListItem firstItem = ListItem();
+        Argument firstItem = Argument();
         bool isSet = false;
 
         if (firstItem == null)
@@ -779,9 +834,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
                 Consume(1);
                 var value = RequiredExpression();
-                var mapItem = new MapItemInitializer(firstItem.Expression, value);
-                mapItem.SetLocation(firstItem.Start, value.End);
-                mapItems.Add(mapItem);
+                var entry = new MapEntry(firstItem.Expression, value);
+                entry.SetLocation(firstItem.Start, value.End);
+                mapEntries.Add(entry);
             }
             else
             {
@@ -792,14 +847,14 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             if (TryMatch(TokenID.Comma)) Consume(1);
 
             if (isSet)
-                setItems.AddRange(List(ListItem, false, null));
+                setItems.AddRange(List(Argument, false, null));
             else
-                mapItems.AddRange(List(MapItemInitializer, false, null));
+                mapEntries.AddRange(List(MapEntry, false, null));
         }
 
         Token last = Match(TokenID.RightBrace);
 
-        Expression initializer = isSet ? new SetInitializer([.. setItems]) : new MapInitializer([.. mapItems]);
+        Expression initializer = isSet ? new SetInitializer([.. setItems]) : new MapInitializer([.. mapEntries]);
         initializer.SetLocation(first.Start, last.End);
         return initializer;
     }
@@ -811,7 +866,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private Expression ListInitializer()
     {
         Token first = Match(TokenID.LeftBracket);
-        ListItem[] items = List(ListItem, false, null);
+        Argument[] items = List(Argument, false, null);
         Token last = Match(TokenID.RightBracket);
 
         var initializer = new ListInitializer(items);
@@ -987,8 +1042,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes a property's initializer.
     /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.PropertyInitializer"/></returns>
-    protected PropertyInitializer PropertyInitializer()
+    /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
+    protected VariableSetter VariableSetter()
     {
         if (!TryMatch(TokenID.Identifier)) return null;
 
@@ -998,7 +1053,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Match(TokenID.Equal);
         Expression fieldValue = RequiredExpression();
         
-        var initializer = new PropertyInitializer(fieldName, fieldValue);
+        var initializer = new VariableSetter(fieldName, fieldValue);
         initializer.SetLocation(first.Start, fieldValue.End);
         return initializer;
     }
@@ -1006,8 +1061,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes a list or set item initializer.
     /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.ListItem"/></returns>
-    private ListItem ListItem()
+    /// <returns>A <see cref="Ast.Expressions.Argument"/></returns>
+    private Argument Argument()
     {
         ScriptLocation start = null;
         Expression expr;
@@ -1028,7 +1083,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         if (expr == null) return null;
 
-        var item = new ListItem(expr, spread);
+        var item = new Argument(expr, spread);
         item.SetLocation(start ?? expr.Start, expr.End);
         return item;
     }
@@ -1036,8 +1091,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes a map item initializer.
     /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.MapItemInitializer"/></returns>
-    private MapItemInitializer MapItemInitializer()
+    /// <returns>A <see cref="Ast.Expressions.MapEntry"/></returns>
+    private MapEntry MapEntry()
     {
         Expression key = Expression();
         if (key == null) return null;
@@ -1045,7 +1100,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Match(TokenID.Arrow);
         var value = RequiredExpression();
 
-        var initializer = new MapItemInitializer(key, value);
+        var initializer = new MapEntry(key, value);
         initializer.SetLocation(key.Start, value.End);
         return initializer;
     }
@@ -1054,9 +1109,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes the set of arguments passed to a function or method when it's called.
     /// </summary>
     /// <returns>A (ListItem[], Dictionary{string, Expression})" tuple</returns>
-    protected (ListItem[], Dictionary<string, Expression>) FunctionArguments()
+    protected (Argument[], Dictionary<string, Expression>) FunctionArguments()
     {
-        List<ListItem> positionalArgs = [];
+        List<Argument> positionalArgs = [];
         Dictionary<string, Expression> namedArgs = [];
         int section = 0; // 0 => positional arguments section
 
@@ -1078,7 +1133,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
             else
             {
-                ListItem arg = ListItem();
+                Argument arg = Argument();
                 
                 if (arg != null)
                 {
@@ -1149,7 +1204,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Pattern"/></returns>
     private Pattern MatchCasePattern()
     {
-        var pairs = new Queue<(Pattern, bool)>();
+        Queue<(Pattern, bool)> pairs = [];
         bool inclusiveCmp = false; // inclusive composition ('and' instead of 'or')
         bool morePatterns; // look-up for more pattern => chaining
 

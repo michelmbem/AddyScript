@@ -13,7 +13,7 @@ for (i = 0; i < 16; i++)
 println();
 resetColor();
 
-for (i = 0; i < 16; i++)
+for (var i = 0; i < 16; i++)
 {
 	setForeground('Yellow');
 	print('{0:X} ', i);
@@ -21,7 +21,7 @@ for (i = 0; i < 16; i++)
 	
 	if (i is not 0 or 1 or 8 or 9)
     {
-        for (j = 0; j < 16; j++)
+        for (var j = 0; j < 16; j++)
         {
             print('{0} ', chr(16 * i + j));
         }

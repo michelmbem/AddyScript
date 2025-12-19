@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -163,83 +162,69 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             case Modifier.Final or Modifier.Static:
                 throw new RuntimeError(fileName, classDef, string.Format(Resources.CannotCreateSubclass, classDef.SuperClassName));
-            case Modifier.Abstract:
-                if (classDef.Modifier != Modifier.Abstract)
+            case Modifier.Abstract when classDef.Modifier != Modifier.Abstract:
+            {
+                const MemberKind kind = MemberKind.Indexer | MemberKind.Property | MemberKind.Method;
+
+                foreach (var member in superClass.GetMembers(kind))
                 {
-                    const MemberKind kind = MemberKind.Indexer | MemberKind.Property | MemberKind.Method;
-                    
-                    foreach (ClassMember member in superClass.GetMembers(kind))
-                    {
-                        if (member.Modifier != Modifier.Abstract) continue;
+                    if (member.Modifier != Modifier.Abstract) continue;
 
-                        ClassMemberDecl _override = null;
-                        foreach (ClassMemberDecl m in classDef.GetMembers(kind))
-                            if (m.Name == member.Name)
-                            {
-                                _override = m;
-                                break;
-                            }
+                    var _override = classDef.GetMembers(kind).FirstOrDefault(m => m.Name == member.Name);
+                    if (_override == null)
+                        throw new RuntimeError(fileName, classDef, string.Format(Resources.MustOverride, classDef.ClassName, member.FullName));
 
-                        if (_override == null)
-                            throw new RuntimeError(fileName, classDef,
-                                string.Format(Resources.MustOverride, classDef.ClassName, member.FullName));
-
-                        if (_override.Modifier is Modifier.Abstract or Modifier.Static)
-                            throw new ScriptError(fileName, _override, string.Format(Resources.InvalidMemberModifier, _override.Name));
-                    }
+                    if (_override.Modifier is Modifier.Abstract or Modifier.Static)
+                        throw new ScriptError(fileName, _override, string.Format(Resources.InvalidMemberModifier, _override.Name));
                 }
                 break;
+            }
         }
 
-        foreach (ClassFieldDecl field in classDef.Fields)
+        foreach (var field in classDef.Fields)
         {
-            ClassField superField = superClass.GetField(field.Name);
+            var superField = superClass.GetField(field.Name);
             if (superField != null)
-                throw new ScriptError(fileName, field,
-                    string.Format(Resources.FieldDeclaredInAncestor, field.Name, superField.Holder.Name));
+                throw new ScriptError(fileName, field, string.Format(Resources.FieldDeclaredInAncestor, field.Name, superField.Holder.Name));
 
             if (superClass.GetMember(field.Name, MemberKind.All & ~MemberKind.Field) != null)
                 throw new ScriptError(fileName, field, string.Format(Resources.FieldHidesHomonymous, field.Name));
         }
 
-        foreach (ClassPropertyDecl property in classDef.Properties)
+        foreach (var property in classDef.Properties)
         {
             if (superClass.GetMember(property.Name, MemberKind.All & ~MemberKind.Property) != null)
                 throw new ScriptError(fileName, property, string.Format(Resources.PropertyHidesHomonymous, property.Name));
 
-            ClassProperty overriden = superClass.GetProperty(property.Name);
-            if (overriden != null)
-            {
-                if (overriden.Modifier is Modifier.Final or Modifier.Static)
-                    throw new ScriptError(fileName, property, string.Format(Resources.MemberCantOverride, overriden.FullName));
+            var overriden = superClass.GetProperty(property.Name);
+            if (overriden == null) continue;
+            
+            if (overriden.Modifier is Modifier.Final or Modifier.Static)
+                throw new ScriptError(fileName, property, string.Format(Resources.MemberCantOverride, overriden.FullName));
 
-                if (!property.MatchesSignature(overriden))
-                    throw new ScriptError(fileName, property, string.Format(Resources.MustMatchSignature,
-                                                                                property.Name, overriden.FullName));
-            }
+            if (!property.MatchesSignature(overriden))
+                throw new ScriptError(fileName, property, string.Format(Resources.MustMatchSignature, property.Name, overriden.FullName));
         }
 
-        foreach (ClassMethodDecl method in classDef.Methods)
+        foreach (var method in classDef.Methods)
         {
             if (superClass.GetMember(method.Name, MemberKind.All & ~MemberKind.Method) != null)
                 throw new ScriptError(fileName, method, string.Format(Resources.MethodHidesHomonymous, method.Name));
 
-            ClassMethod overriden = superClass.GetMethod(method.Name);
-            if (overriden != null)
-            {
-                if (overriden.Modifier is Modifier.Final or Modifier.Static)
-                    throw new ScriptError(fileName, method, string.Format(Resources.MemberCantOverride, overriden.FullName));
+            var overriden = superClass.GetMethod(method.Name);
+            if (overriden == null) continue;
+            
+            if (overriden.Modifier is Modifier.Final or Modifier.Static)
+                throw new ScriptError(fileName, method, string.Format(Resources.MemberCantOverride, overriden.FullName));
 
-                //Note: I'm not sure it's wise to check this!
-                if (!method.MatchesSignature(overriden))
-                    throw new ScriptError(fileName, method,
-                        string.Format(Resources.MustMatchSignature, method.Name, overriden.FullName));
-            }
+            //Note: I'm not sure if it's wise to check this!
+            if (!method.MatchesSignature(overriden))
+                throw new ScriptError(fileName, method, string.Format(Resources.MustMatchSignature, method.Name, overriden.FullName));
         }
 
-        foreach (ClassEventDecl _event in classDef.Events)
+        foreach (var _event in classDef.Events)
         {
-            ClassEvent superEvent = superClass.GetEvent(_event.Name);
+            var superEvent = superClass.GetEvent(_event.Name);
             if (superEvent != null)
                 throw new ScriptError(fileName, _event,
                     string.Format(Resources.EventDeclaredInAncestor, _event.Name, superEvent.Holder.Name));
@@ -330,7 +315,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             throw new RuntimeError(fileName, extDecl,
                 string.Format(Resources.MissingAttribute, importAttributeName, extDecl.Name));
 
-        PropertyInitializer libNameProperty = importAttribute.GetPropertyInitializer(AttributeDecl.DEFAULT_FIELD_NAME) ??
+        VariableSetter libNameProperty = importAttribute.GetPropertySetter(AttributeDecl.DEFAULT_FIELD_NAME) ??
             throw new ScriptError(fileName, importAttribute,
                 string.Format(Resources.MissingAttributeProperty, AttributeDecl.DEFAULT_FIELD_NAME, importAttributeName));
 
@@ -338,7 +323,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         string libName = WithNativeLibraryExtension(returnedValue.ToString());
 
         string procName = extDecl.Name;
-        PropertyInitializer procNameProperty = importAttribute.GetPropertyInitializer("procName");
+        VariableSetter procNameProperty = importAttribute.GetPropertySetter("procName");
         if (procNameProperty != null)
         {
             procNameProperty.Expression.AcceptTranslator(this);
@@ -347,7 +332,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         Type returnType = typeof(void), defaultParamType = typeof(object);
 
-        PropertyInitializer returnTypeProperty = importAttribute.GetPropertyInitializer("returnType");
+        VariableSetter returnTypeProperty = importAttribute.GetPropertySetter("returnType");
         if (returnTypeProperty != null)
         {
             returnTypeProperty.Expression.AcceptTranslator(this);
@@ -371,7 +356,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             else
             {
 
-                PropertyInitializer typeNameProperty = typeAttribute.GetPropertyInitializer(AttributeDecl.DEFAULT_FIELD_NAME) ??
+                VariableSetter typeNameProperty = typeAttribute.GetPropertySetter(AttributeDecl.DEFAULT_FIELD_NAME) ??
                     throw new ScriptError(fileName, typeAttribute,
                         string.Format(Resources.MissingAttributeProperty, AttributeDecl.DEFAULT_FIELD_NAME, typeAttributeName));
 
@@ -399,34 +384,27 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         try
         {
-            foreach (PropertyInitializer initializer in cstDecl.Initializers)
+            foreach (VariableSetter setter in cstDecl.Setters)
             {
                 MethodFrame frame = currentFrame;
-                IFrameItem frameItem = frame.GetItem(initializer.Name);
+                IFrameItem frameItem = frame.GetItem(setter.Name);
 
                 if (frameItem == null && frame != rootFrame)
                 {
                     frame = rootFrame;
-                    frameItem = frame.GetItem(initializer.Name);
+                    frameItem = frame.GetItem(setter.Name);
                 }
 
-                if (frameItem == null)
+                switch (frameItem)
                 {
-                    initializer.Expression.AcceptTranslator(this);
-                    currentFrame.PutItem(initializer.Name, new Constant(returnedValue));
+                    case null:
+                    case DataItem or Constant when frame != currentFrame:
+                        setter.Expression.AcceptTranslator(this);
+                        currentFrame.PutItem(setter.Name, new Constant(returnedValue));
+                        break;
+                    default:
+                        throw new ScriptError(fileName, setter, string.Format(Resources.NameConflict, setter.Name));
                 }
-                else if (frame != currentFrame)
-                    switch (frameItem.Kind)
-                    {
-                        case FrameItemKind.Constant or FrameItemKind.Variable:
-                            initializer.Expression.AcceptTranslator(this);
-                            currentFrame.PutItem(initializer.Name, new Constant(returnedValue));
-                            break;
-                        default:
-                            throw new ScriptError(fileName, initializer, string.Format(Resources.NameConflict, initializer.Name));
-                    }
-                else
-                    throw new ScriptError(fileName, initializer, string.Format(Resources.NameConflict, initializer.Name));
             }
         }
         catch (ScriptError)
@@ -441,42 +419,31 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateVariableDecl(VariableDecl varDecl)
     {
-        foreach (PropertyInitializer initializer in varDecl.Initializers)
+        foreach (VariableSetter setter in varDecl.Setters)
         {
             MethodFrame frame = currentFrame;
-            IFrameItem frameItem = frame.GetItem(initializer.Name);
+            IFrameItem frameItem = frame.GetItem(setter.Name);
 
             if (frameItem == null && frame != rootFrame)
             {
                 frame = rootFrame;
-                frameItem = frame.GetItem(initializer.Name);
+                frameItem = frame.GetItem(setter.Name);
             }
 
-            if (frameItem == null)
+            switch (frameItem)
             {
-                if (initializer.Expression == null)
-                    returnedValue = Undefined.Value;
-                else
-                    initializer.Expression.AcceptTranslator(this);
+                case null:
+                case DataItem or Constant when frame != currentFrame:
+                    if (setter.Expression == null)
+                        returnedValue = Undefined.Value;
+                    else
+                        setter.Expression.AcceptTranslator(this);
 
-                currentFrame.PutItem(initializer.Name, returnedValue);
+                    currentFrame.PutItem(setter.Name, returnedValue);
+                    break;
+                default:
+                    throw new ScriptError(fileName, setter, string.Format(Resources.NameConflict, setter.Name));
             }
-            else if (frame != currentFrame)
-                switch (frameItem.Kind)
-                {
-                    case FrameItemKind.Constant or FrameItemKind.Variable:
-                        if (initializer.Expression == null)
-                            returnedValue = Undefined.Value;
-                        else
-                            initializer.Expression.AcceptTranslator(this);
-
-                        currentFrame.PutItem(initializer.Name, returnedValue);
-                        break;
-                    default:
-                        throw new ScriptError(fileName, initializer, string.Format(Resources.NameConflict, initializer.Name));
-                }
-            else
-                throw new ScriptError(fileName, initializer, string.Format(Resources.NameConflict, initializer.Name));
         }
     }
 
@@ -699,34 +666,34 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateTupleInitializer(TupleInitializer tupleInit)
     {
-        (var elements, _) = ExpandList(tupleInit.Items);
-        returnedValue = new Tuple([.. elements]);
+        var (items, _) = ExpandArguments(tupleInit.Items);
+        returnedValue = new Tuple([.. items]);
     }
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
-        (var elements, _) = ExpandList(listInit.Items);
-        returnedValue = new List(elements);
+        var (items, _) = ExpandArguments(listInit.Items);
+        returnedValue = new List(items);
     }
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
-        var (elements, _) = ExpandList(setInit.Items);
-        returnedValue = new Set(elements);
+        var (items, _) = ExpandArguments(setInit.Items);
+        returnedValue = new Set(items);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
     {
-        var dict = new Dictionary<DataItem, DataItem>();
+        Dictionary<DataItem, DataItem> dict = [];
 
-        foreach (MapItemInitializer item in mapInit.ItemInitializers)
+        foreach (MapEntry entry in mapInit.Entries)
         {
             try
             {
-                item.Key.AcceptTranslator(this);
+                entry.Key.AcceptTranslator(this);
                 DataItem key = returnedValue;
 
-                item.Value.AcceptTranslator(this);
+                entry.Value.AcceptTranslator(this);
                 dict.Add(key, returnedValue);
             }
             catch (ScriptError)
@@ -735,7 +702,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
             catch (Exception ex)
             {
-                throw new ScriptError(fileName, item, ex);
+                throw new ScriptError(fileName, entry, ex);
             }
         }
 
@@ -744,14 +711,14 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
     {
-        var fields = new Dictionary<string, DataItem>();
+        Dictionary<string, DataItem> fields = [];
 
-        foreach (PropertyInitializer propInit in objInit.PropertyInitializers)
+        foreach (VariableSetter setter in objInit.PropertySetters)
         {
             try
             {
-                propInit.Expression.AcceptTranslator(this);
-                fields.Add(propInit.Name, returnedValue);
+                setter.Expression.AcceptTranslator(this);
+                fields.Add(setter.Name, returnedValue);
             }
             catch (ScriptError)
             {
@@ -759,7 +726,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
             catch (Exception ex)
             {
-                throw new ScriptError(fileName, propInit, ex);
+                throw new ScriptError(fileName, setter, ex);
             }
         }
 
@@ -783,35 +750,30 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         if (frameItem == null && currentFrame != rootFrame)
             frameItem = rootFrame.GetItem(varRef.Name);
 
-        if (frameItem == null)
-            switch (misRefAct)
-            {
-                case MissingReferenceAction.Create:
-                    currentFrame.PutItem(varRef.Name, returnedValue = Undefined.Value);
-                    break;
-                case MissingReferenceAction.Fail:
-                    throw new RuntimeError(fileName, varRef, string.Format(Resources.UndefinedVariable, varRef.Name));
-            }
-        else
-            switch (frameItem.Kind)
-            {
-                case FrameItemKind.Variable:
-                    {
-                        var variable = (DataItem)frameItem;
-                        if (variable == Undefined.Value && misRefAct == MissingReferenceAction.Fail)
-                            throw new RuntimeError(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
-                        returnedValue = variable;
-                    }
-                    break;
-                case FrameItemKind.Constant:
-                    returnedValue = ((Constant)frameItem).Value;
-                    break;
-                case FrameItemKind.Function:
-                    returnedValue = new Closure((Function)frameItem);
-                    break;
-                default:
-                    throw new RuntimeError(fileName, varRef, string.Format(Resources.NotAVariable, varRef.Name));
-            }
+        switch (frameItem)
+        {
+            case null when misRefAct == MissingReferenceAction.Create:
+                returnedValue = Undefined.Value;
+                currentFrame.PutItem(varRef.Name, returnedValue);
+                break;
+            case null when misRefAct == MissingReferenceAction.Fail:
+                throw new RuntimeError(fileName, varRef, string.Format(Resources.UndefinedVariable, varRef.Name));
+            case null: // do nothing when misRefAction is Ignore
+                break;
+            case Undefined when misRefAct == MissingReferenceAction.Fail:
+                throw new RuntimeError(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
+            case DataItem variable: // handles Undefined when misRefAct is not Fail
+                returnedValue = variable;
+                break;
+            case Constant constant:
+                returnedValue = constant.Value;
+                break;
+            case Function function:
+                returnedValue = new Closure(function);
+                break;
+            default:
+                throw new RuntimeError(fileName, varRef, string.Format(Resources.NotAVariable, varRef.Name));
+        }
     }
 
     public void TranslateItemRef(ItemRef itemRef)
@@ -896,22 +858,23 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                             propValue = field.IsStatic ? field.SharedValue : owner.GetProperty(field.Name);
                             break;
                         case ClassMethod method:
-                            {
-                                var parameters = method.Function.Parameters;
-                                var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
-                                var fn = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(owner), method.Name, args)));
-                                propValue = new Closure(fn);
-                            }
+                        {
+                            var parameters = method.Function.Parameters;
+                            var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
+                            var fn = new Function(parameters, Block.WithReturn(new MethodCall(new Literal(owner), method.Name, args)));
+                            propValue = new Closure(fn);
                             break;
+                        }
                         default: // member is surely a ClassProperty
-                            {
-                                var property = (ClassProperty)member;
-                                if (!property.CanRead) throw new RuntimeError(fileName, propertyRef, Resources.CannotReadProperty);
+                        {
+                            var property = (ClassProperty)member;
+                            if (!property.CanRead)
+                                throw new RuntimeError(fileName, propertyRef, Resources.CannotReadProperty);
 
-                                CheckAccess(property.Reader, propertyRef);
-                                Invoke(property.Reader.Function, property.Name, property.Holder, owner);
-                            }
+                            CheckAccess(property.Reader, propertyRef);
+                            Invoke(property.Reader.Function, property.Name, property.Holder, owner);
                             return;
+                        }
                     }
                     break;
 
@@ -983,21 +946,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             if (frameItem == null && currentFrame != rootFrame)
                 frameItem = rootFrame.GetItem(fnCall.FunctionName);
 
-            if (frameItem != null)
-                switch (frameItem.Kind)
-                {
-                    case FrameItemKind.Function:
-                        function = (Function)frameItem;
-                        break;
-                    case FrameItemKind.Variable:
-                        if (frameItem is Closure closure)
-                        {
-                            function = closure.AsFunction;
-                            if (function.DeclaringFrame != null)
-                                ctx = function.DeclaringFrame.Context;
-                        }
-                        break;
-                }
+            switch (frameItem)
+            {
+                case Function fn:
+                    function = fn;
+                    break;
+                case Closure closure:
+                    function = closure.AsFunction;
+                    if (function.DeclaringFrame != null)
+                        ctx = function.DeclaringFrame.Context;
+                    break;
+            }
 
             if (function == null)
                 throw new RuntimeError(fileName, fnCall, string.Format(Resources.UndefinedFunction, fnCall.FunctionName));
@@ -1054,19 +1013,23 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 switch (methodTarget.Class.ClassID)
                 {
                     case ClassID.Object:
+                    {
                         ClassField field = methodTarget.Class.GetField(methodCall.FunctionName);
                         if (field != null) CheckAccess(field, methodCall);
 
-                        DataItem fieldValue = field != null && field.IsStatic
-                                            ? field.SharedValue
-                                            : methodTarget.GetProperty(methodCall.FunctionName);
+                        DataItem fieldValue = field is { IsStatic: true }
+                            ? field.SharedValue
+                            : methodTarget.GetProperty(methodCall.FunctionName);
 
                         if (fieldValue is Closure) function = fieldValue.AsFunction;
                         break;
+                    }
                     case ClassID.Resource:
-                        object target = methodTarget.AsNativeObject;
-                        InvokeNative(target.GetType(), methodCall.FunctionName, target, methodCall.Arguments);
+                    {
+                        object nativeTarget = methodTarget.AsNativeObject;
+                        InvokeNative(nativeTarget.GetType(), methodCall.FunctionName, nativeTarget, methodCall.Arguments);
                         return; // IMPORTANT!!!
+                    }
                 }
             else
             {
@@ -1097,22 +1060,22 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         try
         {
-            if (targetMethod is ClassMethod method)
-                Invoke(method.Function, method.Name, method.Holder, null, staticCall.Arguments, staticCall.NamedArgs);
-            else if (targetMethod is ClassField field)
+            switch (targetMethod)
             {
-                Function function = null;
-                if (field.SharedValue is Closure) function = field.SharedValue.AsFunction;
-
-                if (function == null)
+                case ClassMethod method:
+                    Invoke(method.Function, method.Name, method.Holder, null, staticCall.Arguments, staticCall.NamedArgs);
+                    break;
+                case ClassField { SharedValue: Closure closure } field:
+                    Invoke(closure.AsFunction, field.Name, currentFrame.Context.MethodHolder, null, staticCall.Arguments, staticCall.NamedArgs);
+                    break;
+                case ClassField field:
                     throw new RuntimeError(fileName, staticCall, string.Format(Resources.MethodNotFound, field.Name, staticCall.Name));
-
-                Invoke(function, field.Name, currentFrame.Context.MethodHolder, null, staticCall.Arguments, staticCall.NamedArgs);
+                case StaticTypeMember member:
+                    InvokeNative(member.Type, member.MemberName, null, staticCall.Arguments);
+                    break;
+                default:
+                    throw new RuntimeError(fileName, staticCall, string.Format(Resources.UnresolvedMemberRef, staticCall.Name));
             }
-            else if (targetMethod is StaticTypeMember member)
-                InvokeNative(member.Type, member.MemberName, null, staticCall.Arguments);
-            else
-                throw new RuntimeError(fileName, staticCall, string.Format(Resources.UnresolvedMemberRef, staticCall.Name));
         }
         catch (ScriptError)
         {
@@ -1142,20 +1105,20 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     InitializeFields(inst);
                     Invoke(constructor.Function, constructor.Name, klass, inst, ctorCall.Arguments, ctorCall.NamedArgs);
 
-                    if (ctorCall.PropertyInitializers != null)
-                        ApplyPropertyInitializers(ctorCall, inst, ctorCall.PropertyInitializers);
+                    if (ctorCall.PropertySetters != null)
+                        ApplyPropertySetters(ctorCall, inst, ctorCall.PropertySetters);
 
                     returnedValue = inst;
                     break;
                 }
                 case Type type:
                 {
-                    (DataItem[] args, _) = ExpandList(ctorCall.Arguments ?? []);
+                    (DataItem[] args, _) = ExpandArguments(ctorCall.Arguments ?? []);
                     object obj = Reflector.CreateInstance(type, args);
                     DataItem inst = DataItemFactory.CreateDataItem(obj);
 
-                    if (ctorCall.PropertyInitializers != null)
-                        foreach (PropertyInitializer initializer in ctorCall.PropertyInitializers)
+                    if (ctorCall.PropertySetters != null)
+                        foreach (VariableSetter initializer in ctorCall.PropertySetters)
                         {
                             initializer.Expression.AcceptTranslator(this);
                             inst.SetProperty(initializer.Name, returnedValue);
@@ -1184,8 +1147,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             DataItem _this = currentFrame.Context.MethodTarget;
             ClassMethod method = _this.Class.SuperClass.GetMethod(pmc.FunctionName) ??
-                throw new RuntimeError(fileName, pmc, string.Format(Resources.MethodNotFound,
-                                                                    pmc.FunctionName, _this.Class.SuperClass.Name));
+                throw new RuntimeError(fileName, pmc,
+                    string.Format(Resources.MethodNotFound, pmc.FunctionName, _this.Class.SuperClass.Name));
             
             if (method.Modifier == Modifier.Abstract)
                 throw new RuntimeError(fileName, pmc, string.Format(Resources.CannotInvokeAbstractMember, method.FullName));
@@ -1228,8 +1191,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             Class superClass = currentFrame.Context.MethodHolder.SuperClass;
             ClassMember member = superClass.GetMember(ppr.PropertyName, MemberKind.Property | MemberKind.Method) ??
-                throw new RuntimeError(fileName, ppr, string.Format(Resources.PropertyNotFoundInClass,
-                                                                    ppr.PropertyName, superClass.Name));
+                throw new RuntimeError(fileName, ppr,
+                    string.Format(Resources.PropertyNotFoundInClass, ppr.PropertyName, superClass.Name));
 
             if (member.Modifier == Modifier.Abstract)
                 throw new RuntimeError(fileName, ppr, string.Format(Resources.CannotInvokeAbstractMember, member.FullName));
@@ -1388,7 +1351,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateIfElse(IfElse ifElse)
     {
-        if (IsTrue(ifElse.Test))
+        if (IsTrue(ifElse.Guard))
             ifElse.Action.AcceptTranslator(this);
         else
             ifElse.AlternativeAction?.AcceptTranslator(this);
@@ -1399,17 +1362,14 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         switchBlock.Test.AcceptTranslator(this);
         int hashCode = returnedValue.GetHashCode();
 
-        int address = switchBlock.DefaultCase;
-        foreach (CaseLabel caseLabel in switchBlock.Cases)
-            if (caseLabel.GetHashCode() == hashCode)
-            {
-                address = caseLabel.Address;
-                break;
-            }
+        int address = switchBlock.Cases
+            .Where(caseLabel => caseLabel.GetHashCode() == hashCode)
+            .Select(caseLabel => caseLabel.Address)
+            .FirstOrDefault(switchBlock.DefaultCase);
 
         currentFrame.PushBlock();
 
-        foreach (KeyValuePair<string, Label> pair in switchBlock.Labels)
+        foreach (var pair in switchBlock.Labels)
             RegisterLabel(pair.Key, pair.Value);
 
         try
@@ -1433,9 +1393,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         foreach (Statement initializer in forLoop.Initializers)
             initializer.AcceptTranslator(this);
 
-        Expression test = forLoop.Test ?? new Literal(Boolean.True);
+        Expression guard = forLoop.Guard ?? new Literal(Boolean.True);
 
-        while (IsTrue(test))
+        while (IsTrue(guard))
         {
             forLoop.Action.AcceptTranslator(this);
 
@@ -1451,8 +1411,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                     goto EXIT;
             }
 
-            foreach (Expression updater in forLoop.Updaters)
-                updater.AcceptTranslator(this);
+            foreach (Expression incrementer in forLoop.Incrementers)
+                incrementer.AcceptTranslator(this);
         }
 
     EXIT:
@@ -1463,7 +1423,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         currentFrame.PushBlock();
 
-        foreach ((DataItem key, DataItem value) in GetEnumerable(forEach.Test))
+        foreach (var (key, value) in GetEnumerable(forEach.Guard))
         {
             RegisterVariable(forEach.KeyName, key);
             RegisterVariable(forEach.ValueName, value);
@@ -1489,7 +1449,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
     public void TranslateWhileLoop(WhileLoop whileLoop)
     {
-        while (IsTrue(whileLoop.Test))
+        while (IsTrue(whileLoop.Guard))
         {
             whileLoop.Action.AcceptTranslator(this);
 
@@ -1524,7 +1484,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 case JumpCode.Goto or JumpCode.Return:
                     return;
             }
-        } while (IsTrue(doLoop.Test));
+        } while (IsTrue(doLoop.Guard));
     }
 
     public void TranslateContinue(Continue _continue)
@@ -1606,7 +1566,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         {
             if (tcf.FinallyBlock != null)
             {
-                var (prevValue, prevCode, prevGoto) = (returnedValue, jumpCode, lastGoto);
+                var (prevRetValue, prevJumpCode, prevGoto) = (returnedValue, jumpCode, lastGoto);
 
                 try
                 {
@@ -1621,7 +1581,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 }
                 finally
                 {
-                    (returnedValue, jumpCode, lastGoto) = (prevValue, prevCode, prevGoto);
+                    // Any return or jump within the finally block is ignored
+                    (returnedValue, jumpCode, lastGoto) = (prevRetValue, prevJumpCode, prevGoto);
                 }
             }
 
@@ -1636,17 +1597,18 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         try
         {
-            var listItems = new List<DataItem>();
+            List<DataItem> listItems = [];
             foreach (Expression substitution in stringInt.Substitions)
             {
                 substitution.AcceptTranslator(this);
                 listItems.Add(returnedValue);
             }
 
-            var args = new Expression[] {
+            Expression[] args =
+            [
                 new Literal(new String(stringInt.Pattern)) ,
                 new Literal(new List(listItems))
-            };
+            ];
 
             var innerFnCall = new InnerFunctionCall(InnerFunction.Format, args);
             innerFnCall.CopyLocation(stringInt);
@@ -1667,29 +1629,28 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         try
         {
             patMatch.Expression.AcceptTranslator(this);
+
             var testArg = new Literal(returnedValue);
-
-            foreach (MatchCase matchCase in patMatch.MatchCases)
+            var frameItems = new Dictionary<string, IFrameItem>
             {
-                var frameItems = new Dictionary<string, IFrameItem> {
-                    [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
-                };
-                
-                currentFrame.PushBlock(frameItems);
+                [ClassProperty.WRITER_PARAMETER_NAME] = testArg.Value,
+            };
 
-                try
-                {
+            currentFrame.PushBlock(frameItems);
+
+            try
+            {
+                foreach (MatchCase matchCase in patMatch.MatchCases)
                     if (IsTrue(matchCase.Pattern.GetMatchTest(testArg)) &&
                         (matchCase.Guard == null || IsTrue(matchCase.Guard)))
                     {
                         matchCase.Expression.AcceptTranslator(this);
                         return;
                     }
-                }
-                finally
-                {
-                    currentFrame.PopBlock();
-                }
+            }
+            finally
+            {
+                currentFrame.PopBlock();
             }
 
             returnedValue = Void.Value;
@@ -1704,23 +1665,22 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
     }
 
-    public void TranslateAlteredCopy(AlteredCopy altCopy)
+    public void TranslateMutableCopy(MutableCopy mutableCopy)
     {
         try
         {
-            altCopy.Original.AcceptTranslator(this);
-
+            mutableCopy.Original.AcceptTranslator(this);
             DataItem original = returnedValue;
+            
             if (original.Class.ClassID != ClassID.Object)
-                throw new RuntimeError(fileName, altCopy, Resources.InvalidOperandForWith);
+                throw new RuntimeError(fileName, mutableCopy, Resources.InvalidOperandForWith);
 
-            var copyFields = new Dictionary<string, DataItem>();
-
-            foreach (var originalField in original.AsDynamicObject)
-                copyFields.Add(originalField.Key, originalField.Value);
+            var copyFields = original.AsDynamicObject.ToDictionary(
+                originalField => originalField.Key,
+                originalField => originalField.Value);
 
             DataItem copy = new Object(original.Class, copyFields);
-            ApplyPropertyInitializers(altCopy, copy, altCopy.PropertyInitializers);
+            ApplyPropertySetters(mutableCopy, copy, mutableCopy.PropertySetters);
 
             returnedValue = copy;
         }
@@ -1730,7 +1690,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
         catch (Exception ex)
         {
-            throw new RuntimeError(fileName, altCopy, ex);
+            throw new RuntimeError(fileName, mutableCopy, ex);
         }
     }
 
@@ -1747,15 +1707,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         ResolveItemRef(itemRef, out DataItem owner, out DataItem index, out ClassProperty indexer);
 
-        if (indexer == null)
-            owner.SetItem(index, rValue);
-        else
+        switch (indexer)
         {
-            if (!indexer.CanWrite)
+            case null:
+                owner.SetItem(index, rValue);
+                break;
+            case { CanWrite: false}:
                 throw new RuntimeError(fileName, itemRef, Resources.CannotWriteProperty);
-
-            CheckAccess(indexer.Writer, itemRef);
-            Invoke(indexer.Writer.Function, indexer.Name, indexer.Holder, owner, new Literal(index), new Literal(rValue));
+            default:
+                CheckAccess(indexer.Writer, itemRef);
+                Invoke(indexer.Writer.Function, indexer.Name, indexer.Holder, owner, new Literal(index), new Literal(rValue));
+                break;
         }
     }
 
@@ -1769,59 +1731,57 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     {
         ResolvePropertyRef(propertyRef, out DataItem owner, out ClassMember member);
 
-        if (member == null)
-            owner.SetProperty(propertyRef.PropertyName, rValue);
-        else if (member is ClassField field)
-            switch (member.Modifier)
-            {
-                case Modifier.Default:
-                    owner.SetProperty(member.Name, rValue);
-                    break;
-                case Modifier.Static:
-                    field.SharedValue = rValue;
-                    break;
-                case Modifier.Final:
-                    if (currentFrame.Context.MethodIsConstructor())
-                        owner.SetProperty(member.Name, rValue);
-                    else
-                        throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteFinalField);
-                    break;
-                default: // StaticFinal
-                    throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteFinalField);
-            }
-        else if (member is ClassProperty property)
+        switch (member)
         {
-            if (!property.CanWrite) throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteProperty);
-
-            CheckAccess(property.Writer, propertyRef);
-            Invoke(property.Writer.Function, property.Name, property.Holder, owner, new Literal(rValue));
+            case null:
+                owner.SetProperty(propertyRef.PropertyName, rValue);
+                break;
+            case ClassField field:
+                switch (field.Modifier)
+                {
+                    case Modifier.Default:
+                    case Modifier.Final when currentFrame.Context.MethodIsConstructor():
+                        owner.SetProperty(field.Name, rValue);
+                        break;
+                    case Modifier.Static:
+                        field.SharedValue = rValue;
+                        break;
+                    default: // Final (out of constructor) or StaticFinal
+                        throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteFinalField);
+                }
+                break;
+            case ClassProperty { CanWrite: false }:
+                throw new RuntimeError(fileName, propertyRef, Resources.CannotWriteProperty);
+            case ClassProperty property:
+                CheckAccess(property.Writer, propertyRef);
+                Invoke(property.Writer.Function, property.Name, property.Holder, owner, new Literal(rValue));
+                break;
+            default:
+                throw new RuntimeError(fileName, propertyRef, Resources.InvalidLValue);
         }
-        else
-            throw new RuntimeError(fileName, propertyRef, Resources.InvalidLValue);
     }
 
     public void AssignToStaticProperty(StaticPropertyRef staticRef, DataItem rValue)
     {
-        object targetProperty = ResolveName(staticRef.Name, staticRef);
-
-        if (targetProperty is ClassField field)
+        switch (ResolveName(staticRef.Name, staticRef))
         {
-            if (field.Modifier == Modifier.Static)
+            case ClassField { Modifier: Modifier.Static } field:
                 field.SharedValue = rValue;
-            else // Static + Final
+                break;
+            case ClassField: // StaticFinal field
                 throw new RuntimeError(fileName, staticRef, Resources.CannotWriteFinalField);
+            case ClassProperty { CanWrite: false }:
+                throw new RuntimeError(fileName, staticRef, Resources.CannotWriteProperty);
+            case ClassProperty property:
+                CheckAccess(property.Writer, staticRef);
+                Invoke(property.Writer.Function, property.Name, property.Holder, null, new Literal(rValue));
+                break;
+            case StaticTypeMember member:
+                member.SetValue(rValue);
+                break;
+            default:
+                throw new RuntimeError(fileName, staticRef, string.Format(Resources.UnresolvedMemberRef, staticRef.Name));
         }
-        else if (targetProperty is ClassProperty property)
-        {
-            if (!property.CanWrite) throw new RuntimeError(fileName, staticRef, Resources.CannotWriteProperty);
-
-            CheckAccess(property.Writer, staticRef);
-            Invoke(property.Writer.Function, property.Name, property.Holder, null, new Literal(rValue));
-        }
-        else if (targetProperty is StaticTypeMember member)
-            member.SetValue(rValue);
-        else
-            throw new RuntimeError(fileName, staticRef, string.Format(Resources.UnresolvedMemberRef, staticRef.Name));
     }
 
     public void AssignToParentItem(ParentIndexerRef pir, DataItem rValue)
@@ -1950,19 +1910,19 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             frameItem = frame.GetItem(name);
         }
 
-        if (frameItem == null)
-            currentFrame.PutItem(name, variable);
-        else
-            switch (frameItem.Kind)
-            {
-                case FrameItemKind.Variable:
-                    frame.PutItem(name, variable);
-                    break;
-                case FrameItemKind.Constant:
-                    throw new InvalidOperationException(Resources.CannotAlterConstant);
-                default:
-                    throw new InvalidOperationException(string.Format(Resources.NameConflict, name));
-            }
+        switch (frameItem)
+        {
+            case null:
+                currentFrame.PutItem(name, variable);
+                break;
+            case DataItem:
+                frame.PutItem(name, variable);
+                break;
+            case Constant:
+                throw new InvalidOperationException(Resources.CannotAlterConstant);
+            default:
+                throw new InvalidOperationException(string.Format(Resources.NameConflict, name));
+        }
     }
 
     /// <summary>
@@ -1973,7 +1933,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private void RegisterLabel(string name, Label label)
     {
         IFrameItem frameItem = currentFrame.GetItem(name);
-        if (frameItem != null) throw new ScriptError(fileName, label, string.Format(Resources.NameConflict, name));
+        if (frameItem != null)
+            throw new ScriptError(fileName, label, string.Format(Resources.NameConflict, name));
         
         currentFrame.PutItem(name, label);
     }
@@ -1987,7 +1948,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
     /// <returns>A <see cref="(Dictionary<string, IFrameItem>, List<Expression>)"/> tuple</returns>
     private (Dictionary<string, IFrameItem>, List<Expression>)
-        GetInitialFrameItems(Function function, string functionName, ListItem[] positionalArgs,
+        GetInitialFrameItems(Function function, string functionName, Argument[] positionalArgs,
                              Dictionary<string, Expression> namedArgs)
     {
         // Make sure we are not dealing with null references
@@ -1995,7 +1956,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         namedArgs ??= [];
 
         // Expand the list of positional arguments
-        var (argValues, argItems) = ExpandList(positionalArgs);
+        var (argValues, argItems) = ExpandArguments(positionalArgs);
         int totalArgCount = argValues.Length;
 
         // Check that every named argument matches a parameter declared in the function's header
@@ -2029,7 +1990,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         while (counter < argValues.Length)
         {
             Parameter parameter = function.Parameters[counter];
-            ListItem argument = argItems[counter];
+            Argument argument = argItems[counter];
             DataItem argValue = argValues[counter];
 
             // Check that parameters are not passed by reference from expressions with the spread operator
@@ -2055,9 +2016,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             }
         }
 
-        List<Expression> expandedArgList = argItems
-            .Select(argument => argument.Expression)
-            .ToList();
+        List<Expression> expandedArgList = [.. argItems.Select(arg => arg.Expression)];
 
         // Then finish with the named arguments and optional parameters default values
         while (counter < function.Parameters.Length)
@@ -2082,8 +2041,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         }
 
         // For inline functions, import the declaring function's local constants and variables
-        foreach (var pair in function.CapturedItems)
-            if (!frameItems.ContainsKey(pair.Key)) frameItems.Add(pair.Key, pair.Value);
+        foreach (var pair in function.CapturedItems.Where(kv => !frameItems.ContainsKey(kv.Key)))
+            frameItems.Add(pair.Key, pair.Value);
 
         return (frameItems, expandedArgList);
     }
@@ -2139,7 +2098,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     /// <param name="namedArgs">The collection of named arguments passed to the function</param>
     private void Invoke(Function function, string name, Class holder, DataItem target,
-                        ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs)
+                        Argument[] positionalArgs, Dictionary<string, Expression> namedArgs)
     {
         var (frameItems, expandedArgList) = GetInitialFrameItems(function, name, positionalArgs, namedArgs);
         PushFrame(holder, target, name, frameItems);
@@ -2173,7 +2132,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="arguments">The arguments passed to the function</param>
     private void Invoke(Function function, string name, Class holder, DataItem target, params Expression[] arguments)
     {
-        Invoke(function, name, holder, target, Call.ToListItems(arguments), null);
+        Invoke(function, name, holder, target, Call.ToArguments(arguments), null);
     }
 
     /// <summary>
@@ -2234,12 +2193,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <param name="klass">A class</param>
     private void InitializeFields(Class klass)
     {
-        foreach (ClassField field in klass.Fields)
-            if (field.IsStatic && field.Initializer != null)
-            {
-                field.Initializer.AcceptTranslator(this);
-                field.SharedValue = returnedValue;
-            }
+        foreach (var field in klass.Fields.Where(f => f.IsStatic && f.Initializer != null))
+        {
+            field.Initializer.AcceptTranslator(this);
+            field.SharedValue = returnedValue;
+        }
     }
 
     /// <summary>
@@ -2252,15 +2210,14 @@ public class Interpreter : ITranslator, IAssignmentProcessor
 
         while (klass != null)
         {
-            foreach (ClassField field in klass.Fields)
-                if (!field.IsStatic)
-                    if (field.Initializer == null)
-                        instance.SetProperty(field.Name, Void.Value);
-                    else
-                    {
-                        field.Initializer.AcceptTranslator(this);
-                        instance.SetProperty(field.Name, returnedValue);
-                    }
+            foreach (var field in klass.Fields.Where(f => !f.IsStatic))
+                if (field.Initializer == null)
+                    instance.SetProperty(field.Name, Void.Value);
+                else
+                {
+                    field.Initializer.AcceptTranslator(this);
+                    instance.SetProperty(field.Name, returnedValue);
+                }
 
             klass = klass.SuperClass;
         }
@@ -2289,38 +2246,40 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
-    /// Initializes the properties of an instance with the given set of <see cref="PropertyInitializer"/>s.
+    /// Initializes the properties of an instance with the given set of <see cref="VariableSetter"/>s.
     /// </summary>
     /// <param name="astNode">The AST node that from witch the properties are getting initialized</param>
     /// <param name="target">The object that's being initialized</param>
-    /// <param name="propertyInitializers">The given set of property initializers</param>
-    private void ApplyPropertyInitializers(AstNode astNode, DataItem target, PropertyInitializer[] propertyInitializers)
+    /// <param name="propertySetters">The given set of property setters</param>
+    private void ApplyPropertySetters(AstNode astNode, DataItem target, VariableSetter[] propertySetters)
     {
         DataItem savedValue = returnedValue;
 
-        foreach (PropertyInitializer initializer in propertyInitializers)
+        foreach (VariableSetter setter in propertySetters)
         {
-            ClassMember member = target.Class.GetMember(initializer.Name, MemberKind.Field | MemberKind.Property);
+            var member = target.Class.GetMember(setter.Name, MemberKind.Field | MemberKind.Property);
             if (member != null)
             {
                 CheckAccess(member, astNode);
                 if (member.Modifier == Modifier.StaticFinal)
-                    throw new ScriptError(fileName, initializer, Resources.CannotWriteFinalField);
+                    throw new ScriptError(fileName, setter, Resources.CannotWriteFinalField);
             }
 
-            initializer.Expression.AcceptTranslator(this);
+            setter.Expression.AcceptTranslator(this);
             DataItem propValue = returnedValue;
 
-            if (member is ClassProperty property)
+            switch (member)
             {
-                if (!property.CanWrite)
-                    throw new ScriptError(fileName, initializer, Resources.CannotWriteProperty);
-
-                CheckAccess(property.Writer, initializer.Expression);
-                Invoke(property.Writer.Function, property.Name, property.Holder, target, new Literal(propValue));
+                case ClassProperty { CanWrite: false }:
+                    throw new ScriptError(fileName, setter, Resources.CannotWriteProperty);
+                case ClassProperty property:
+                    CheckAccess(property.Writer, setter.Expression);
+                    Invoke(property.Writer.Function, property.Name, property.Holder, target, new Literal(propValue));
+                    break;
+                default:
+                    target.SetProperty(setter.Name, propValue);
+                    break;
             }
-            else
-                target.SetProperty(initializer.Name, propValue);
         }
 
         returnedValue = savedValue;
@@ -2369,7 +2328,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor
         var ctorCall = new ConstructorCall(new QualifiedName(Class.Attribute.Name),
                                            [new (new Literal(new String(attribute.Name)))],
                                            null,
-                                           attribute.PropertyInitializers);
+                                           attribute.PropertySetters);
         ctorCall.CopyLocation(attribute);
         ctorCall.AcceptTranslator(this);
 
@@ -2605,9 +2564,9 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     private static string WithNativeLibraryExtension(string libraryName)
     {
         libraryName = Path.GetFileNameWithoutExtension(libraryName);
-        if (OperatingSystem.IsWindows()) return libraryName + ".dll";
-        if (OperatingSystem.IsIOS()) return libraryName + ".dynlib";
-        return libraryName + ".so"; // Unix/Linux
+        if (OperatingSystem.IsWindows()) return $"{libraryName}.dll";
+        if (OperatingSystem.IsMacOS()) return $"{libraryName}.dynlib";
+        return $"{libraryName}.so"; // Unix/Linux
     }
 
     /// <summary>
@@ -2642,20 +2601,18 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     /// <exception cref="MissingMethodException">
     /// When there is no method with the name <paramref name="methodName"/> in type indicated by <paramref name="type"/>
     /// </exception>
-    private void InvokeNative(Type type, string methodName, object target, ListItem[] arguments)
+    private void InvokeNative(Type type, string methodName, object target, Argument[] arguments)
     {
         const BindingFlags flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance |
                                    BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding;
 
-        arguments ??= [];
-
-        (DataItem[] argValues, ListItem[] argItems) = ExpandList(arguments);
-        object[] nativeArgValues;
         object result;
-        
+        object[] nativeArgValues;
+        var (argValues, argItems) = ExpandArguments(arguments ?? []);
+
         if (type.IsCOMObject)
         {
-            nativeArgValues = argValues.Select(val => val.AsNativeObject).ToArray();
+            nativeArgValues = [.. argValues.Select(val => val.AsNativeObject)];
             result = type.InvokeMember(methodName, flags, null, target, nativeArgValues);
         }
         else
@@ -2664,13 +2621,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor
                 throw new MissingMethodException(type.FullName, methodName);
 
             ParameterInfo[] parameters = matchedMethod.GetParameters();
-            bool[] isParamOut = parameters.Select(p => p.IsOut || p.IsRetval).ToArray();
+            bool[] isParamOut = [.. parameters.Select(p => p.IsOut || p.IsRetval)];
 
             for (int i = 0; i < isParamOut.Length; ++i)
                 if (isParamOut[i] && argItems[i].Spread)
                     throw new ScriptError(fileName, argItems[i], Resources.InvalidLValue);
 
-            nativeArgValues = argValues.Select((val, i) => val.ConvertTo(parameters[i].ParameterType)).ToArray();
+            nativeArgValues = [.. argValues.Select((val, i) => val.ConvertTo(parameters[i].ParameterType))];
             result = matchedMethod.Invoke(target, nativeArgValues);
 
             for (int i = 0; i < isParamOut.Length; ++i)
@@ -2741,8 +2698,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor
             case JumpCode.Goto:
                 if (!labels.TryGetValue(lastGoto.LabelName, out var label))
                     return canJumpOut
-                        ? int.MaxValue
-                        : throw new RuntimeError(fileName, lastGoto,
+                         ? int.MaxValue
+                         : throw new RuntimeError(fileName, lastGoto,
                             string.Format(Resources.MissingLabel, lastGoto.LabelName));
                 
                 jumpCode = JumpCode.None;
@@ -3130,17 +3087,17 @@ public class Interpreter : ITranslator, IAssignmentProcessor
     }
 
     /// <summary>
-    /// Expands a list potentially containing items with the spread operator to its full contents.
+    /// Expands a list potentially containing arguments with the spread operator to its full contents.
     /// </summary>
-    /// <param name="listItems">The list that should be expanded</param>
-    /// <returns>A <see cref="(DataItem[], ListItem[])"/> tuple</returns>
+    /// <param name="arguments">The list of arguments that should be expanded</param>
+    /// <returns>A (DataItem[], ListItem[]) tuple</returns>
     /// <exception cref="ScriptError">The evaluation of an argument failed</exception>
-    private (DataItem[], ListItem[]) ExpandList(ListItem[] listItems)
+    private (DataItem[], Argument[]) ExpandArguments(Argument[] arguments)
     {
         List<DataItem> values = [];
-        List<ListItem> valueItems = [];
+        List<Argument> valueItems = [];
 
-        foreach (ListItem item in listItems)
+        foreach (Argument item in arguments)
         {
             try
             {

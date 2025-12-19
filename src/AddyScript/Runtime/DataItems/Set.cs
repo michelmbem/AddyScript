@@ -62,7 +62,7 @@ public sealed class Set : DataItem
 
     public override int GetHashCode() => hashSet.GetHashCode();
 
-    public override bool IsEmpty() => hashSet.Count <= 0;
+    public override bool IsEmpty() => hashSet.Count == 0;
 
     public override bool ConversionNeeded(Class targetClass, BinaryOperator _operator) => _operator switch
     {

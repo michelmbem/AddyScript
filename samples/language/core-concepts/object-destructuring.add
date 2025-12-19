@@ -1,0 +1,27 @@
+tobie = new  {
+	name = 'ross',
+	surname = 'tobie',
+	age = 38,
+	address = new {
+		number = 16,
+		street = 'sunny street',
+		city = 'borneo'
+	},
+	job = new {
+		title = 'software engineer',
+		company = 'interstellar inc.',
+		date_hired = `2020-05-27`,
+		supervisor = 'mike adams'
+	}
+};
+
+let {name, surname, age, {number, street, city} = address,
+		{title, company = 'orion corp', salary = 5000d, ..rest} = job} = tobie;
+
+println($'name = {name}');
+println($'surname = {surname}');
+println($'age = {age}');
+println($'address = {number} {street}, {city}');
+println($'job = {title} at {company} since {rest.date_hired:d}');
+println($'rest = {rest}');
+readln();

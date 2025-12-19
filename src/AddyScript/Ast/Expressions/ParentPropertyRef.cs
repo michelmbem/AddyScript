@@ -2,41 +2,40 @@ using AddyScript.Runtime.DataItems;
 using AddyScript.Translators;
 
 
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Represents a reference to the original implementation of an overriden property.<br>
+/// Looks in the code like: <code>super::someProp</code>.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of ParentPropertyRef
+/// </remarks>
+/// <param name="propertyName">The property's name</param>
+public class ParentPropertyRef(string propertyName) : Expression, IReference
 {
     /// <summary>
-    /// Represents a reference to the original implementation of an overriden property.<br>
-    /// Looks in the code like: <code>super::someProp</code>.
+    /// The field name.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of ParentPropertyRef
-    /// </remarks>
-    /// <param name="propertyName">The property's name</param>
-    public class ParentPropertyRef(string propertyName) : Expression, IReference
+    public string PropertyName => propertyName;
+
+    /// <summary>
+    /// Operates assignment to this reference.
+    /// </summary>
+    /// <param name="processor">The assignment processor to use</param>
+    /// <param name="rValue">The value that should be assigned to this reference</param>
+    public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
     {
+        processor.AssignToParentProperty(this, rValue);
+    }
 
-        /// <summary>
-        /// The field name.
-        /// </summary>
-        public string PropertyName => propertyName;
-
-        /// <summary>
-        /// Operates assignment to this reference.
-        /// </summary>
-        /// <param name="processor">The assignment processor to use</param>
-        /// <param name="rValue">The value that should be assigned to this reference</param>
-        public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
-        {
-            processor.AssignToParentProperty(this, rValue);
-        }
-
-        /// <summary>
-        /// Translates this node.
-        /// </summary>
-        /// <param name="translator">The translator to use</param>
-        public override void AcceptTranslator(ITranslator translator)
-        {
-            translator.TranslateParentPropertyRef(this);
-        }
+    /// <summary>
+    /// Translates this node.
+    /// </summary>
+    /// <param name="translator">The translator to use</param>
+    public override void AcceptTranslator(ITranslator translator)
+    {
+        translator.TranslateParentPropertyRef(this);
     }
 }

@@ -86,7 +86,7 @@ public sealed class String(string value) : DataItem
     public override byte[] AsByteArray => StringUtil.String2ByteArray(value);
 
     private IEnumerable<DataItem> Chars
-        => value.ToCharArray().Select(c => new String(c.ToString())).Cast<DataItem>();
+        => value.ToCharArray().Select(c => new String(c.ToString()));
 
     public override DataItem[] AsArray => Chars.ToArray();
 
@@ -123,7 +123,7 @@ public sealed class String(string value) : DataItem
         };
     }
 
-    public override bool IsEmpty() => value.Length <= 0;
+    public override bool IsEmpty() => value.Length == 0;
 
     public override bool ConversionNeeded(Class targetClass, BinaryOperator _operator) => false;
 

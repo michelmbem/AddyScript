@@ -21,12 +21,6 @@ namespace AddyScript.Runtime;
 /// </summary>
 public class Constant : IFrameItem
 {
-    /// <summary>
-    /// Stores the constant's value.<br/>
-    /// This must be an immutable object.
-    /// </summary>
-    private readonly DataItem value;
-
     #region Constructors
 
     /// <summary>
@@ -35,7 +29,7 @@ public class Constant : IFrameItem
     /// <param name="value">The value of the constant</param>
     public Constant(DataItem value)
     {
-        this.value = value.Class.ClassID switch
+        Value = value.Class.ClassID switch
         {
             ClassID.Boolean or ClassID.Integer or ClassID.Long or ClassID.Rational or ClassID.Float or
             ClassID.Decimal or ClassID.Complex or ClassID.Date or ClassID.String => value,
@@ -49,7 +43,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(bool value)
     {
-        this.value = Boolean.FromBool(value);
+        this.Value = Boolean.FromBool(value);
     }
 
     /// <summary>
@@ -58,7 +52,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(int value)
     {
-        this.value = new Integer(value);
+        this.Value = new Integer(value);
     }
 
     /// <summary>
@@ -67,7 +61,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(BigInteger value)
     {
-        this.value = new Long(value);
+        this.Value = new Long(value);
     }
 
     /// <summary>
@@ -76,7 +70,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(Rational32 value)
     {
-        this.value = new Rational(value);
+        this.Value = new Rational(value);
     }
 
     /// <summary>
@@ -85,7 +79,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(double value)
     {
-        this.value = new Float(value);
+        this.Value = new Float(value);
     }
 
     /// <summary>
@@ -94,7 +88,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(BigDecimal value)
     {
-        this.value = new Decimal(value);
+        this.Value = new Decimal(value);
     }
 
     /// <summary>
@@ -103,7 +97,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(Complex64 value)
     {
-        this.value = new Complex(value);
+        this.Value = new Complex(value);
     }
 
     /// <summary>
@@ -112,7 +106,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(DateTime value)
     {
-        this.value = new Date(value);
+        this.Value = new Date(value);
     }
 
     /// <summary>
@@ -121,7 +115,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(string value)
     {
-        this.value = new String(value);
+        this.Value = new String(value);
     }
 
     #endregion
@@ -135,5 +129,5 @@ public class Constant : IFrameItem
     /// Gets the constant's value.
     /// </summary>
     /// <returns>The embedded <see cref="DataItem"/></returns>
-    public DataItem Value => value;
+    public DataItem Value { get; }
 }

@@ -8,23 +8,19 @@ namespace AddyScript.Runtime.Utilities;
 
 public static class StringUtil
 {
-    public static string Capitalize(string value)
-    {
-        return value == null
-             ? null
-             : value.Length < 2
-             ? value.ToUpper()
-             : char.ToUpper(value[0]) + value.Substring(1);
-    }
+    public static string Capitalize(string value) =>
+        value == null
+            ? null
+            : value.Length < 2
+                ? value.ToUpper()
+                : char.ToUpper(value[0]) + value[1..];
 
-    public static string Uncapitalize(string value)
-    {
-        return value == null
-             ? null
-             : value.Length < 2
-             ? value.ToLower()
-             : char.ToLower(value[0]) + value[1..];
-    }
+    public static string Uncapitalize(string value) =>
+        value == null
+            ? null
+            : value.Length < 2
+                ? value.ToLower()
+                : char.ToLower(value[0]) + value[1..];
 
     public static string Repeat(string value, int times)
     {

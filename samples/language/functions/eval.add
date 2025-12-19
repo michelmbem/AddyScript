@@ -8,7 +8,7 @@ try
 	for (x = start; x <= end; x += step)
 	{
 		y = eval(func);
-		println('f({0}) = {1}', x, y);
+		println($'f({x}) = {y}');
 	}
 }
 catch (e)

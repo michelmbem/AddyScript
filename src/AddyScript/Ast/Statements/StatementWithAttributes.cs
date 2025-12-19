@@ -1,28 +1,24 @@
-namespace AddyScript.Ast.Statements
+using System.Linq;
+
+
+namespace AddyScript.Ast.Statements;
+
+
+/// <summary>
+/// The base class of all statements that can be decorated with attributes.
+/// </summary>
+public abstract class StatementWithAttributes : Statement
 {
     /// <summary>
-    /// The base class of all statements that can be decorated with attributes.
+    /// The statement's attributes.
     /// </summary>
-    public abstract class StatementWithAttributes : Statement
-    {
-        /// <summary>
-        /// The statement's attributes.
-        /// </summary>
-        public AttributeDecl[] Attributes { get; set; }
+    public AttributeDecl[] Attributes { get; set; }
 
-        /// <summary>
-        /// Gets an attribute by its name.
-        /// </summary>
-        /// <param name="name">The name of the target attribute</param>
-        /// <returns><see cref="AttributeDecl"/></returns>
-        public AttributeDecl GetAttribute(string name)
-        {
-            if (Attributes == null) return null;
-            
-            foreach (AttributeDecl attribute in Attributes)
-                if (attribute.Name == name) return attribute;
-
-            return null;
-        }
-    }
+    /// <summary>
+    /// Gets an attribute by its name.
+    /// </summary>
+    /// <param name="name">The name of the target attribute</param>
+    /// <returns><see cref="AttributeDecl"/></returns>
+    public AttributeDecl GetAttribute(string name) =>
+        Attributes?.FirstOrDefault(attribute => attribute.Name == name);
 }

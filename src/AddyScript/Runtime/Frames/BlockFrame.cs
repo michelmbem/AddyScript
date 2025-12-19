@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using AddyScript.Translators;
 
@@ -26,10 +27,7 @@ public class BlockFrame(Dictionary<string, IFrameItem> items) : Frame
 
     #region Overrides
 
-    public override IEnumerable<string> GetNames()
-    {
-        return items.Keys;
-    }
+    public override IEnumerable<string> GetNames() => items.Keys;
 
     public override IFrameItem GetItem(string name)
     {
@@ -57,8 +55,9 @@ public class BlockFrame(Dictionary<string, IFrameItem> items) : Frame
     /// <param name="otherFrame">The frame to copy</param>
     public void CopyItemsFrom(BlockFrame otherFrame)
     {
-        foreach (var pair in otherFrame.items)
-            if (pair.Key != Interpreter.MODULE_NAME_CONSTANT)
-                items[pair.Key] = pair.Value;
+        foreach (var pair in otherFrame.items.Where(p => p.Key != Interpreter.MODULE_NAME_CONSTANT))
+        {
+            items[pair.Key] = pair.Value;
+        }
     }
 }

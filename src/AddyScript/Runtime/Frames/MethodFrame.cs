@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Linq;
 
 namespace AddyScript.Runtime.Frames;
 
@@ -9,9 +9,7 @@ namespace AddyScript.Runtime.Frames;
 /// </summary>
 public class MethodFrame : Frame
 {
-    private readonly InvocationContext context;
-    private readonly Stack<BlockFrame> blockFrames;
-    private readonly BlockFrame rootBlock;
+    private readonly Stack<BlockFrame> blockFrames = [];
     private BlockFrame currentBlock;
 
     /// <summary>
@@ -21,10 +19,9 @@ public class MethodFrame : Frame
     /// <param name="initialItems">A set of initial frame's items</param>
     public MethodFrame(InvocationContext context, Dictionary<string, IFrameItem> initialItems)
     {
-        this.context = context;
-        blockFrames = new Stack<BlockFrame>();
+        Context = context;
         PushBlock(initialItems);
-        rootBlock = blockFrames.Peek();
+        RootBlock = blockFrames.Peek();
     }
 
     /// <summary>
@@ -33,21 +30,20 @@ public class MethodFrame : Frame
     /// <param name="context">The context under which the frame is created</param>
     public MethodFrame(InvocationContext context)
     {
-        this.context = context;
-        blockFrames = new Stack<BlockFrame>();
+        Context = context;
         PushBlock();
-        rootBlock = blockFrames.Peek();
+        RootBlock = blockFrames.Peek();
     }
 
     /// <summary>
     /// The context under which the frame is created.
     /// </summary>
-    public InvocationContext Context => context;
+    public InvocationContext Context { get; }
 
     /// <summary>
     /// Gets the root <see cref="BlockFrame"/> of this <see cref="MethodFrame"/>
     /// </summary>
-    public BlockFrame RootBlock => rootBlock;
+    public BlockFrame RootBlock { get; }
 
     /// <summary>
     /// Pushes a new <see cref="BlockFrame"/> on top of the internal block related frames stack.
@@ -79,7 +75,7 @@ public class MethodFrame : Frame
 
     public override IEnumerable<string> GetNames()
     {
-        var names = new List<string>();
+        List<string> names = [];
 
         foreach (BlockFrame blockFrame in blockFrames)
             names.AddRange(blockFrame.GetNames());
@@ -87,34 +83,20 @@ public class MethodFrame : Frame
         return names;
     }
 
-    public override IFrameItem GetItem(string name)
-    {
-        foreach (BlockFrame blockFrame in blockFrames)
-        {
-            IFrameItem item = blockFrame.GetItem(name);
-            if (item != null) return item;
-        }
-
-        return null;
-    }
+    public override IFrameItem GetItem(string name) =>
+        blockFrames.Select(frame => frame.GetItem(name))
+                   .FirstOrDefault(item => item != null);
 
     public override void PutItem(string name, IFrameItem item)
     {
-        foreach (BlockFrame blockFrame in blockFrames)
-            if (blockFrame.UpdateItem(name, item))
-                return;
+        if (blockFrames.Any(frame => frame.UpdateItem(name, item)))
+            return;
 
         currentBlock.PutItem(name, item);
     }
 
-    public override bool UpdateItem(string name, IFrameItem item)
-    {
-        foreach (BlockFrame blockFrame in blockFrames)
-            if (blockFrame.UpdateItem(name, item))
-                return true;
-
-        return false;
-    }
+    public override bool UpdateItem(string name, IFrameItem item) =>
+        blockFrames.Any(frame => frame.UpdateItem(name, item));
 
     #endregion
 

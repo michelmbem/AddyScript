@@ -1,4 +1,4 @@
-﻿namespace AddyScript.Interactive
+namespace AddyScript.Interactive
 {
     public class OptionSet
     {
@@ -32,17 +32,14 @@
                         option = arg;
                         mode = ExecutionMode.RunFile;
                         break;
-                    case "-d":
-                    case "-r":
-                    case "-l":
+                    case "-d" or "-r" or "-l":
                         CheckOption(option);
                         option = arg;
                         break;
                     default:
                         switch (option)
                         {
-                            case "-e":
-                            case "-f":
+                            case "-e" or "-f":
                                 input = arg;
                                 break;
                             case "-d":
@@ -54,10 +51,8 @@
                             case "-l":
                                 log = arg;
                                 break;
-                            default:
-                                if (option == null)
-                                    throw new InvalidOptionException(arg);
-                                break;
+                            case null:
+                                throw new InvalidOptionException(arg);
                         }
 
                         option = null;
@@ -70,13 +65,13 @@
             Log = log;
         }
 
-        public ExecutionMode ExecutionMode { get; private set; }
+        public ExecutionMode ExecutionMode { get; }
 
-        public string Input { get; private set; }
+        public string Input { get; }
 
-        public string Log { get; private set; }
+        public string Log { get; }
 
-        public ScriptContext Context { get; } = new();
+        public ScriptContext Context { get; } = new ();
 
         private static void CheckOption(string option)
         {

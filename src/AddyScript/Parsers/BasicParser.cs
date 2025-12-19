@@ -20,7 +20,7 @@ public abstract class BasicParser
     #region Fields
 
     private const int MAX_BUFFER_SIZE = 100;
-    private const string MAIN_FUNCTION_NAME = "__main";
+    private const string MAIN_FUNCTION_NAME = "main";
     private const string ITERATOR_FUNCTION_NAME = "iterator";
 
     private readonly Lexer lexer;
@@ -120,11 +120,11 @@ public abstract class BasicParser
     {
         SkipComments();
 
-        if (!predicate.Invoke(token)) throw new SyntaxError(FileName, token);
+        if (!predicate.Invoke(token))
+            throw new SyntaxError(FileName, token);
 
         Token matched = token;
         Consume(1);
-
         return matched;
     }
 
@@ -135,10 +135,8 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> that the next non-comment <see cref="Token"/> should have</param>
     /// <returns>The matched <see cref="Token"/></returns>
-    protected Token Match(TokenID requiredID)
-    {
-        return Match(t => t.TokenID == requiredID);
-    }
+    protected Token Match(TokenID requiredID) =>
+        Match(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to have one of the required <see cref="TokenID"/>s.<br/>
@@ -147,10 +145,8 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredIDs">The set of <see cref="TokenID"/>s to search in</param>
     /// <returns>The matched <see cref="Token"/></returns>
-    protected Token MatchAny(params TokenID[] requiredIDs)
-    {
-        return Match(t => requiredIDs.Any(id => id == t.TokenID));
-    }
+    protected Token MatchAny(params TokenID[] requiredIDs) =>
+        Match(t => requiredIDs.Any(id => id == t.TokenID));
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment satisfies a particular <paramref name="predicate"/>.<br/>
@@ -168,20 +164,16 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> we may want to match</param>
     /// <returns><b>true</b> if the token's ID matches the given <see cref="TokenID"/>; <b>false</b> otherwise</returns>
-    protected bool TryMatch(TokenID requiredID)
-    {
-        return TryMatch(t => t.TokenID == requiredID);
-    }
+    protected bool TryMatch(TokenID requiredID) =>
+        TryMatch(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment has one of the given <see cref="TokenID"/>s.
     /// </summary>
     /// <param name="requiredIDs">The set of <see cref="TokenID"/>s to search in</param>
     /// <returns><b>true</b> if the token's ID matches one of the given <see cref="TokenID"/>s; <b>false</b> otherwise</returns>
-    protected bool TryMatchAny(params TokenID[] requiredIDs)
-    {
-        return TryMatch(t => requiredIDs.Any(id => id == t.TokenID));
-    }
+    protected bool TryMatchAny(params TokenID[] requiredIDs) =>
+        TryMatch(t => requiredIDs.Any(id => id == t.TokenID));
 
     /// <summary>
     /// Searches the <see cref="Token"/> stream for a symbol that is not a comment and satisfies a particular
@@ -206,10 +198,8 @@ public abstract class BasicParser
     /// <param name="lookupID">The <see cref="TokenID"/> to find</param>
     /// <param name="k">The position of the matched <see cref="Token"/> if any</param>
     /// <returns><b>true</b> if a matched <see cref="Token"/> is met ahead; <b>false</b> otherwise</returns>
-    protected bool LookAhead(TokenID lookupID, out int k)
-    {
-        return LookAhead(t => t.TokenID == lookupID, out k);
-    }
+    protected bool LookAhead(TokenID lookupID, out int k) =>
+        LookAhead(t => t.TokenID == lookupID, out k);
 
     /// <summary>
     /// Executes some parsing method and verifies that the returned value is non-null.
@@ -220,10 +210,8 @@ public abstract class BasicParser
     /// The message of the exception thrown whenever <paramref name="recognizer"/> returns null
     /// </param>
     /// <returns>A non-null instance of the desired type</returns>
-    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
-    {
-        return recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
-    }
+    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement =>
+        recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
 
     /// <summary>
     /// Recognizes a sequence of non-terminal symbols of the same type.
@@ -255,7 +243,8 @@ public abstract class BasicParser
     protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
     {
         T[] elements = Asterisk(recognizer);
-        if (elements.Length == 0) throw new SyntaxError(FileName, token, errorMessage);
+        if (elements.Length == 0)
+            throw new SyntaxError(FileName, token, errorMessage);
         return elements;
     }
 
@@ -267,7 +256,8 @@ public abstract class BasicParser
     /// <param name="checkUnicity">Tells if each symbol must be unique</param>
     /// <param name="errorMessage">The message of the exception thrown if a symbol is duplicated in the list</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage) where T : ScriptElement
+    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage)
+        where T : ScriptElement
     {
         T element = recognizer();
         if (element == null) return [];
@@ -311,7 +301,7 @@ public abstract class BasicParser
     /// </summary>
     protected void PopClass()
     {
-        CurrentClass = CurrentClass.Next;
+        CurrentClass = CurrentClass.Previous;
     }
 
     /// <summary>
@@ -331,7 +321,7 @@ public abstract class BasicParser
     /// </summary>
     protected void PopFunction()
     {
-        CurrentFunction = CurrentFunction.Next;
+        CurrentFunction = CurrentFunction.Previous;
     }
 
     #endregion
@@ -343,19 +333,22 @@ public abstract class BasicParser
     /// </summary>
     /// <typeparam name="T">The returned symbol's type</typeparam>
     /// <returns>An instance of the desired type</returns>
-    protected delegate T Recognizer<T>() where T : ScriptElement;
+    protected delegate T Recognizer<out T>() where T : ScriptElement;
 
     #region ParseTimeClass
 
     /// <summary>
     /// Represents a class at parse time.
     /// </summary>
-    protected class ParseTimeClass(Modifier modifier, string name, string parentName, ParseTimeClass next)
+    protected class ParseTimeClass(Modifier modifier, string name, string parentName, ParseTimeClass previous)
     {
         public Modifier Modifier => modifier;
+
         public string Name => name;
+
         public string ParentName => parentName;
-        public ParseTimeClass Next => next;
+
+        public ParseTimeClass Previous => previous;
     }
 
     #endregion
@@ -367,24 +360,33 @@ public abstract class BasicParser
     /// </summary>
     protected class ParseTimeFunction
     {
-        public ParseTimeFunction(string name, bool isMethod, bool isContructor, bool isStatic, ParseTimeFunction next)
+        public ParseTimeFunction(string name, bool isMethod, bool isContructor,
+                                 bool isStatic, ParseTimeFunction previous)
         {
             Name = name;
             IsMethod = isMethod;
             IsContructor = isContructor;
             IsStatic = isStatic;
-            Next = next;
+            Previous = previous;
             PushBlock(false);
         }
 
         public string Name { get; }
+
         public bool IsMethod { get; }
+
         public bool IsContructor { get; }
+
         public bool IsStatic { get; }
-        public ParseTimeFunction Next { get; }
+
+        public ParseTimeFunction Previous { get; }
+
         public ParseTimeBlock CurrentBlock { get; private set; }
+
         public int Loops { get; set; }
+
         public int SwitchBlocks { get; set; }
+
         public int FinallyBlocks { get; set; }
 
         public bool IsMain => Name == MAIN_FUNCTION_NAME;
@@ -398,7 +400,7 @@ public abstract class BasicParser
 
         public void PopBlock()
         {
-            CurrentBlock = CurrentBlock.Next;
+            CurrentBlock = CurrentBlock.Parent;
         }
     }
 
@@ -409,29 +411,31 @@ public abstract class BasicParser
     /// <summary>
     /// Represents a block at parse time.
     /// </summary>
-    protected class ParseTimeBlock(bool asExpression, ParseTimeBlock next)
+    protected class ParseTimeBlock(bool asExpression, ParseTimeBlock parent)
     {
         public bool AsExpression => asExpression;
-        public ParseTimeBlock Next => next;
-        public List<ParseTimeLabel> Labels => [];
+
+        public ParseTimeBlock Parent => parent;
+
+        public bool CanYield => AsExpression || Parent is { CanYield: true };
+
+        public List<ParseTimeLabel> Labels { get; } = [];
 
         public Dictionary<string, Label> ConvertLabels(Statement[] statements)
         {
-            var converted = new Dictionary<string, Label>();
-            int counter = 0;
+            Dictionary<string, Label> converted = [];
+            int address = 0;
 
             foreach (ParseTimeLabel label in Labels)
             {
-                while (counter < statements.Length && statements[counter].Start.Offset < label.End.Offset)
-                    ++counter;
+                while (address < statements.Length && statements[address].Start.Offset < label.End.Offset)
+                    ++address;
 
-                converted[label.Name] = new Label(counter);
+                converted[label.Name] = new Label(address);
             }
 
             return converted;
         }
-        
-        public bool CanYield => AsExpression || Next is { CanYield: true };
     }
 
     #endregion
@@ -441,11 +445,11 @@ public abstract class BasicParser
     /// <summary>
     /// Represents a label at parse time.
     /// </summary>
-    protected struct ParseTimeLabel(string name, ScriptLocation start, ScriptLocation end)
+    protected readonly struct ParseTimeLabel(string name, ScriptLocation start, ScriptLocation end)
     {
-        public string Name = name;
-        public ScriptLocation Start = start;
-        public ScriptLocation End = end;
+        public readonly string Name = name;
+        public readonly ScriptLocation Start = start;
+        public readonly ScriptLocation End = end;
     }
 
     #endregion

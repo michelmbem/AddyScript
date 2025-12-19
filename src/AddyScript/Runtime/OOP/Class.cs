@@ -405,8 +405,8 @@ public class Class : IFrameItem
                                                                             new VariableRef("i"),
                                                                             new Literal(new Integer(0))),
                                                         [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))], 
-                                                        new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
-                                                                   new Return(ItemRef.This(new VariableRef("i"))))),
+                                                        new IfElse(new FunctionCall("predicate", ItemRef.OfSelf(new VariableRef("i")), new VariableRef("i")),
+                                                                   new Return(ItemRef.OfSelf(new VariableRef("i"))))),
                                             new Return(new Literal())));
 
         Tuple.RegisterMethod(new ClassMethod("last", Scope.Public, Modifier.Final, lastFunction));
@@ -421,7 +421,7 @@ public class Class : IFrameItem
                                                                                   new VariableRef("i"),
                                                                                   PropertyRef.OfSelf("size")),
                                                              [new UnaryExpression(UnaryOperator.PreIncrement, new VariableRef("i"))],
-                                                             new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
+                                                             new IfElse(new FunctionCall("predicate", ItemRef.OfSelf(new VariableRef("i")), new VariableRef("i")),
                                                                         new Return(new VariableRef("i")))),
                                                  new Return(new Literal(new Integer(-1)))));
 
@@ -439,7 +439,7 @@ public class Class : IFrameItem
                                                                                      new VariableRef("i"),
                                                                                      new Literal(new Integer(0))),
                                                                  [new UnaryExpression(UnaryOperator.PreDecrement, new VariableRef("i"))],
-                                                                 new IfElse(new FunctionCall("predicate", ItemRef.This(new VariableRef("i")), new VariableRef("i")),
+                                                                 new IfElse(new FunctionCall("predicate", ItemRef.OfSelf(new VariableRef("i")), new VariableRef("i")),
                                                                             new Return(new VariableRef("i")))),
                                                      new Return(new Literal(new Integer(-1)))));
 
@@ -507,7 +507,7 @@ public class Class : IFrameItem
                                                                                                    "add",
                                                                                                    new VariableRef("__value")),
                                                                                     new Assignment(new ItemRef(new VariableRef("groups"), new VariableRef("groupId")),
-                                                                                                   new ListInitializer(new ListItem(new VariableRef("__value"))))))),
+                                                                                                   new ListInitializer(new Argument(new VariableRef("__value"))))))),
                                                new Return(new VariableRef("groups"))));
 
         List.RegisterMethod(new ClassMethod("groupBy", Scope.Public, Modifier.Final, groupByFunction));

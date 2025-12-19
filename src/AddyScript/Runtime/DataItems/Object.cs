@@ -59,7 +59,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         if (IsOverridden("toString")) return RuntimeServices.ToString(this, format);
 
         var sb = new StringBuilder();
-        sb.AppendFormat("<{0} {{", Class.Name);
+        sb.Append($"<{Class.Name} {{");
 
         bool trimEnd = false;
 
@@ -67,7 +67,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         {
             ClassField field = klass.GetField(pair.Key);
             if (!(field == null || field.Scope == Scope.Public)) continue;
-            sb.AppendFormat("{0} = {1}, ", pair.Key, pair.Value.ToString(format, formatProvider));
+            sb.Append($"{pair.Key} = {pair.Value.ToString(format, formatProvider)}, ");
             trimEnd = true;
         }
 

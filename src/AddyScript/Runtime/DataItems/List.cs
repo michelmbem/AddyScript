@@ -94,7 +94,7 @@ public sealed class List : DataItem
         return Math.Sign(list.Count - otherList.Count);
     }
 
-    public override bool IsEmpty() => list.Count <= 0;
+    public override bool IsEmpty() => list.Count == 0;
 
     public override bool ConversionNeeded(Class targetClass, BinaryOperator _operator) => _operator switch
     {

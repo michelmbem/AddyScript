@@ -1,20 +1,20 @@
 using AddyScript.Translators;
 
 
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Represents the <b>this</b> keyword.
+/// </summary>
+public class SelfReference : Expression
 {
     /// <summary>
-    /// Represents the <b>this</b> keyword.
+    /// Translates this node.
     /// </summary>
-    public class SelfReference : Expression
+    /// <param name="translator">The translator to use</param>
+    public override void AcceptTranslator(ITranslator translator)
     {
-        /// <summary>
-        /// Translates this node.
-        /// </summary>
-        /// <param name="translator">The translator to use</param>
-        public override void AcceptTranslator(ITranslator translator)
-        {
-            translator.TranslateSelfReference(this);
-        }
+        translator.TranslateSelfReference(this);
     }
 }

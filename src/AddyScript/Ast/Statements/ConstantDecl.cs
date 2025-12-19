@@ -2,25 +2,24 @@ using AddyScript.Ast.Expressions;
 using AddyScript.Translators;
 
 
-namespace AddyScript.Ast.Statements
+namespace AddyScript.Ast.Statements;
+
+
+/// <summary>
+/// Represents the declaration of a set of constants.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of ConstantDecl
+/// </remarks>
+/// <param name="setters">The list of (name, value) pairs used to define constants.</param>
+public class ConstantDecl(params VariableSetter[] setters) : VariableDecl(setters)
 {
     /// <summary>
-    /// Represents the declaration of a set of constants.
+    /// Translates this node.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of ConstantDecl
-    /// </remarks>
-    /// <param name="initializers">The set of (name, value) couples used to define constants.</param>
-    public class ConstantDecl(params PropertyInitializer[] initializers) : VariableDecl(initializers)
+    /// <param name="translator">The translator to use</param>
+    public override void AcceptTranslator(ITranslator translator)
     {
-
-        /// <summary>
-        /// Translates this node.
-        /// </summary>
-        /// <param name="translator">The translator to use</param>
-        public override void AcceptTranslator(ITranslator translator)
-        {
-            translator.TranslateConstantDecl(this);
-        }
+        translator.TranslateConstantDecl(this);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using AddyScript.Ast;
@@ -48,9 +49,8 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
         while (counter < program.Statements.Length)
         {
-            foreach (var pair in program.Labels)
-                if (pair.Value.Address == counter)
-                    textWriter.WriteLine("{0}:", SafeName(pair.Key));
+            foreach (var pair in program.Labels.Where(pair => pair.Value.Address == counter))
+                textWriter.WriteLine("{0}:", SafeName(pair.Key));
 
             Statement statement = program.Statements[counter];
             if (prevStatement != null && (
@@ -144,10 +144,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.Write("const ");
 
-        for (int i = 0; i < cstDecl.Initializers.Length; ++i)
+        for (int i = 0; i < cstDecl.Setters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
-            DumpPropertyInitializer(cstDecl.Initializers[i]);
+            DumpPropertyInitializer(cstDecl.Setters[i]);
         }
 
         textWriter.WriteLine(';');
@@ -157,10 +157,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.Write("var ");
 
-        for (int i = 0; i < varDecl.Initializers.Length; ++i)
+        for (int i = 0; i < varDecl.Setters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
-            DumpPropertyInitializer(varDecl.Initializers[i]);
+            DumpPropertyInitializer(varDecl.Setters[i]);
         }
 
         if (!inForLoopInitializer) textWriter.WriteLine(';');
@@ -179,8 +179,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         int counter = 0;
         int length = block.Statements.Length;
         
-        if (wasFunctionBody && length > 0 && block.Statements[length - 1] is Return ret && ret.Expression == null)
-            --length;
+        if (wasFunctionBody && length > 0 &&
+            block.Statements[length - 1] is Return ret &&
+            ret.Expression == null) --length;
 
         while (counter < length)
         {
@@ -190,9 +191,8 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 continue;
             }
 
-            foreach (var pair in block.Labels)
-                if (pair.Value.Address == counter)
-                    textWriter.WriteLine("{0}:", SafeName(pair.Key));
+            foreach (var pair in block.Labels.Where(pair => pair.Value.Address == counter))
+                textWriter.WriteLine("{0}:", SafeName(pair.Key));
 
             Statement stmt = block.Statements[counter];
             stmt.AcceptTranslator(this);
@@ -290,13 +290,13 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateMapInitializer(MapInitializer mapInit)
     {
-        DumpMapItemInitializersList(mapInit.ItemInitializers);
+        DumpMapItemInitializersList(mapInit.Entries);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
     {
         textWriter.Write("new ");
-        DumpPropertyInitializersList(objInit.PropertyInitializers);
+        DumpPropertyInitializersList(objInit.PropertySetters);
     }
 
     public void TranslateInlineFunction(InlineFunction inlineFn)
@@ -405,10 +405,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write("new {0}", SafeName(ctorCall.Name));
         DumpArgumentsList(ctorCall.Arguments, ctorCall.NamedArgs);
 
-        if (ctorCall.PropertyInitializers == null) return;
+        if (ctorCall.PropertySetters == null) return;
 
         textWriter.Write(' ');
-        DumpPropertyInitializersList(ctorCall.PropertyInitializers);
+        DumpPropertyInitializersList(ctorCall.PropertySetters);
     }
 
     public void TranslateParentMethodCall(ParentMethodCall pmc)
@@ -466,7 +466,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateIfElse(IfElse ifElse)
     {
         textWriter.Write("if (");
-        ifElse.Test.AcceptTranslator(this);
+        ifElse.Guard.AcceptTranslator(this);
         textWriter.WriteLine(')');
 
         MayBeIndent(ifElse.Action);
@@ -549,11 +549,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
 
         textWriter.Write("; ");
-        forLoop.Test?.AcceptTranslator(this);
+        forLoop.Guard?.AcceptTranslator(this);
         textWriter.Write("; ");
 
         bool comma2 = false;
-        foreach (Expression updater in forLoop.Updaters)
+        foreach (Expression updater in forLoop.Incrementers)
         {
             if (comma2) textWriter.Write(", ");
             updater.AcceptTranslator(this);
@@ -570,7 +570,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         if (forEach.KeyName != ForEachLoop.DEFAULT_KEY_NAME)
             textWriter.Write("{0} => ", SafeName(forEach.KeyName));
         textWriter.Write("{0} in ", SafeName(forEach.ValueName));
-        forEach.Test.AcceptTranslator(this);
+        forEach.Guard.AcceptTranslator(this);
         textWriter.WriteLine(')');
         MayBeIndent(forEach.Action);
     }
@@ -578,7 +578,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateWhileLoop(WhileLoop whileLoop)
     {
         textWriter.Write("while (");
-        whileLoop.Test.AcceptTranslator(this);
+        whileLoop.Guard.AcceptTranslator(this);
         textWriter.WriteLine(')');
         MayBeIndent(whileLoop.Action);
     }
@@ -588,7 +588,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.WriteLine("do ");
         MayBeIndent(doLoop.Action);
         textWriter.Write("while (");
-        doLoop.Test.AcceptTranslator(this);
+        doLoop.Guard.AcceptTranslator(this);
         textWriter.WriteLine(");");
     }
 
@@ -724,11 +724,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write('}');
     }
 
-    public void TranslateAlteredCopy(AlteredCopy altCopy)
+    public void TranslateMutableCopy(MutableCopy mutableCopy)
     {
-        MayBeParenthesize(altCopy.Original);
+        MayBeParenthesize(mutableCopy.Original);
         textWriter.Write(" with ");
-        DumpPropertyInitializersList(altCopy.PropertyInitializers);
+        DumpPropertyInitializersList(mutableCopy.PropertySetters);
     }
 
     #endregion
@@ -976,7 +976,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
     }
 
-    private void DumpArgumentsList(ListItem[] positionalArgs, Dictionary<string, Expression> namedArgs,
+    private void DumpArgumentsList(Argument[] positionalArgs, Dictionary<string, Expression> namedArgs,
                                    string prefix = "(", string suffix = ")")
     {
         textWriter.Write(prefix);
@@ -1017,7 +1017,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpPropertyInitializersList(PropertyInitializer[] propertyInitializers, string prefix = "{", string suffix = "}")
+    private void DumpPropertyInitializersList(VariableSetter[] propertyInitializers, string prefix = "{", string suffix = "}")
     {
         textWriter.Write(prefix);
 
@@ -1030,18 +1030,18 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpPropertyInitializer(PropertyInitializer propertyInitializer)
+    private void DumpPropertyInitializer(VariableSetter variableSetter)
     {
-        textWriter.Write(SafeName(propertyInitializer.Name));
+        textWriter.Write(SafeName(variableSetter.Name));
 
-        if (propertyInitializer.Expression != null)
+        if (variableSetter.Expression != null)
         {
             textWriter.Write(" = ");
-            propertyInitializer.Expression.AcceptTranslator(this);
+            variableSetter.Expression.AcceptTranslator(this);
         }
     }
 
-    private void DumpList(ListItem[] items, string prefix = "[", string suffix = "]")
+    private void DumpList(Argument[] items, string prefix = "[", string suffix = "]")
     {
         textWriter.Write(prefix);
 
@@ -1054,13 +1054,13 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpListItem(ListItem item)
+    private void DumpListItem(Argument item)
     {
         if (item.Spread) textWriter.Write(".. ");
         item.Expression.AcceptTranslator(this);
     }
 
-    private void DumpMapItemInitializersList(MapItemInitializer[] itemInitializers, string prefix = "{", string suffix = "}")
+    private void DumpMapItemInitializersList(MapEntry[] itemInitializers, string prefix = "{", string suffix = "}")
     {
         textWriter.Write(prefix);
 
@@ -1076,11 +1076,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpMapItemInitializer(MapItemInitializer itemInitializer)
+    private void DumpMapItemInitializer(MapEntry entry)
     {
-        itemInitializer.Key.AcceptTranslator(this);
+        entry.Key.AcceptTranslator(this);
         textWriter.Write(" => ");
-        itemInitializer.Value.AcceptTranslator(this);
+        entry.Value.AcceptTranslator(this);
     }
 
     private void DumpAttributesList(AttributeDecl[] attributes, bool multiline)
@@ -1116,7 +1116,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpAttribute(AttributeDecl attribute)
     {
         textWriter.Write(SafeName(attribute.Name));
-        DumpPropertyInitializersList(attribute.PropertyInitializers, "(", ")");
+        DumpPropertyInitializersList(attribute.PropertySetters, "(", ")");
     }
 
     private void DumpMatchCase(MatchCase matchCase)

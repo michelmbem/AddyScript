@@ -90,7 +90,7 @@ public sealed class Map : DataItem
 
     public override int GetHashCode() => dict.GetHashCode();
 
-    public override bool IsEmpty() => dict.Count <= 0;
+    public override bool IsEmpty() => dict.Count == 0;
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand)
     {

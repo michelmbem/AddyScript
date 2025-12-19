@@ -1,18 +1,17 @@
-namespace AddyScript.Ast.Expressions
+namespace AddyScript.Ast.Expressions;
+
+
+/// <summary>
+/// Represents the initializer of a sequential collection.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of <see cref="SequenceInitializer"/>
+/// </remarks>
+/// <param name="arguments">The <see cref="Argument"/>s that are listed between the delimiters</param>
+public abstract class SequenceInitializer(params Argument[] arguments) : Expression
 {
     /// <summary>
-    /// Represents the initializer of a sequential collection.
+    /// The <see cref="Argument"/> that are listed between the delimiters.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of <see cref="SequenceInitializer"/>
-    /// </remarks>
-    /// <param name="items">The <see cref="ListItem"/>s that are listed between the delimiters</param>
-    public abstract class SequenceInitializer(params ListItem[] items) : Expression
-    {
-
-        /// <summary>
-        /// The <see cref="ListItem"/> that are listed between the delimiters.
-        /// </summary>
-        public ListItem[] Items => items;
-    }
+    public Argument[] Items => arguments;
 }

@@ -14,12 +14,14 @@ if (__name == 'main')
 	n = (int) readln('how many items? ');
 	low = (int) readln('lower bound = ');
 	upp = (int) readln('upper bound = ');
+	pre = (int) readln('precision = ');
     println();
 	
 	println("generating values...");
     println();
     
-	t = randlst(n, low, upp); // generates a list of n floating-point values comprised between low and upp
+    // generates a list of n floating-point values comprised between low and upp with pre decimal digits
+	t = randlst(n, low, upp, pre);
 	println("generated list : " + t);
     println();
 	

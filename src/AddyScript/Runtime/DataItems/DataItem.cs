@@ -106,8 +106,6 @@ public abstract class DataItem
 
     public override bool Equals(object obj) => (obj is DataItem dataItem) && Equals(dataItem);
 
-    public override int GetHashCode() => base.GetHashCode();
-
     protected virtual int UnsafeCompareTo(DataItem other) => 0;
 
     public int CompareTo(DataItem other)
