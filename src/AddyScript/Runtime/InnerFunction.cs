@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -15,6 +16,7 @@ using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
+
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;

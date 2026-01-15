@@ -29,12 +29,9 @@ public class Constant : IFrameItem
     /// <param name="value">The value of the constant</param>
     public Constant(DataItem value)
     {
-        Value = value.Class.ClassID switch
-        {
-            ClassID.Boolean or ClassID.Integer or ClassID.Long or ClassID.Rational or ClassID.Float or
-            ClassID.Decimal or ClassID.Complex or ClassID.Date or ClassID.String => value,
-            _ => throw new InvalidOperationException(string.Format(Resources.InvalidConstantType, value.Class.Name)),
-        };
+        Value = value is Boolean or Integer or Long or Rational or Float or Decimal or Complex or Date or String
+              ? value
+              : throw new InvalidOperationException(string.Format(Resources.InvalidConstantType, value.Class.Name));
     }
 
     /// <summary>
@@ -43,7 +40,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(bool value)
     {
-        this.Value = Boolean.FromBool(value);
+        Value = Boolean.FromBool(value);
     }
 
     /// <summary>
@@ -52,7 +49,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(int value)
     {
-        this.Value = new Integer(value);
+        Value = new Integer(value);
     }
 
     /// <summary>
@@ -61,7 +58,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(BigInteger value)
     {
-        this.Value = new Long(value);
+        Value = new Long(value);
     }
 
     /// <summary>
@@ -70,7 +67,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(Rational32 value)
     {
-        this.Value = new Rational(value);
+        Value = new Rational(value);
     }
 
     /// <summary>
@@ -79,7 +76,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(double value)
     {
-        this.Value = new Float(value);
+        Value = new Float(value);
     }
 
     /// <summary>
@@ -88,7 +85,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(BigDecimal value)
     {
-        this.Value = new Decimal(value);
+        Value = new Decimal(value);
     }
 
     /// <summary>
@@ -97,7 +94,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(Complex64 value)
     {
-        this.Value = new Complex(value);
+        Value = new Complex(value);
     }
 
     /// <summary>
@@ -106,7 +103,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(DateTime value)
     {
-        this.Value = new Date(value);
+        Value = new Date(value);
     }
 
     /// <summary>
@@ -115,7 +112,7 @@ public class Constant : IFrameItem
     /// <param name="value">The constant's value</param>
     public Constant(string value)
     {
-        this.Value = new String(value);
+        Value = new String(value);
     }
 
     #endregion
