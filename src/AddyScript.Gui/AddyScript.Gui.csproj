@@ -1,83 +1,78 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <AssemblyName>asgui</AssemblyName>
+        <Nullable>disable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<AssemblyName>asgui</AssemblyName>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<Nullable>disable</Nullable>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<UseWindowsForms>true</UseWindowsForms>
-		<GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<ApplicationIcon>AddyScript.ico</ApplicationIcon>
-		<OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ApplicationIcon>Assets\Images\Icons\AddyScript.ico</ApplicationIcon>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<NoWarn>1701;1702;CA1416</NoWarn>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\AddyScript\AddyScript.csproj" />
-		<ProjectReference Include="..\AddyScript.GuiUtilities\AddyScript.GuiUtilities.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.9"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.9"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.9">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0"/>
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0"/>
+        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.2"/>
+        <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.6.2"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="AutoCompleteMenu-ScintillaNET" Version="2.1.1" />
-		<PackageReference Include="Scintilla5.NET" Version="5.6.1" />
-		<PackageReference Include="ScintillaNetPrinting.NET" Version="1.0.11" />
-		<PackageReference Include="ScintillaNET_FindReplaceDialog" Version="1.5.5" />
-	</ItemGroup>
-	
-	<ItemGroup>
-		<Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
-	</ItemGroup>
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+        <PackageReference Include="System.Drawing.Common" Version="10.0.1"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-		<Compile Update="Properties\Settings.Designer.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTimeSharedInput>True</DesignTimeSharedInput>
-			<DependentUpon>Settings.settings</DependentUpon>
-		</Compile>
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AddyScript\AddyScript.csproj"/>
+        <ProjectReference Include="..\Pty.Net\Pty.Net.csproj"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Properties\Resources.fr.resx">
-			<DependentUpon>Resources.resx</DependentUpon>
-		</EmbeddedResource>
-		<None Update="Properties\Settings.settings">
-			<Generator>SettingsSingleFileGenerator</Generator>
-			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<Content Include="AddyScript.ico" />
-		<EmbeddedResource Include="red_bullet.bmp" />
-	</ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<None Remove="AddyScript.jpg" />
-		<None Remove="AddyScript.png" />
-	</ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-	<ItemGroup>
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\Clock.ico" />
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\Clock.png" />
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\DeleteHS.png" />
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToNextMessage.png" />
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\GoToPreviousMessage.png" />
-		<Content Remove="C:\Users\mbem_\.nuget\packages\scintillanet_findreplacedialog\1.5.5\contentFiles\any\net6.0-windows7.0\Resources\LineColorHS.png" />
-	</ItemGroup>
-
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.fr.resx">
+            <DependentUpon>Resources.resx</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.es.resx">
+            <DependentUpon>Resources.resx</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.pt.resx">
+            <DependentUpon>Resources.resx</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
 </Project>

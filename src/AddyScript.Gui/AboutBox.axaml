@@ -1,0 +1,36 @@
+<Window x:Class="AddyScript.Gui.AboutBox"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="using:AddyScript.Gui.Properties"
+        Width="500"
+        Height="275"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0" Height="100">
+      <Border.Background>
+        <ImageBrush Source="Assets/Images/Backgrounds/AddyScript.jpg"
+                    Stretch="Uniform" />
+      </Border.Background>
+    </Border>
+    <Grid Grid.Row="1"
+          RowDefinitions="Auto, *, Auto, Auto"
+          Margin="15">
+      <TextBlock Grid.Row="0" Name="VersionTextBlock" />
+      <StackPanel Grid.Row="1" VerticalAlignment="Center">
+        <TextBlock Name="DescriptionTextBlock" />
+        <HyperlinkButton Content="{x:Static p:Resources.ViewOnGitHub}"
+                         Click="HyperlinkButtonClick" />
+      </StackPanel>
+      <TextBlock Grid.Row="2" Name="CopyrightTextBlock" />
+      <StackPanel Grid.Row="3"
+                  Margin="0, 15, 0, 0"
+                  Classes="button-bar">
+        <Button Name="OkButton"
+                Content="{x:Static p:Resources.OK}"
+                IsDefault="True"
+                Click="OkButtonClick" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

@@ -1,0 +1,135 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using Avalonia.Media;
+
+namespace AddyScript.Gui.Terminal;
+
+internal record ColoredSpan(int Offset, int Length, IBrush Foreground, IBrush Background)
+{
+    public int EndOffset => Offset + Length;
+}
+
+internal record TerminalOutput(string Text, List<ColoredSpan> Spans, bool ClearScreen);
+
+internal partial class AnsiParser
+{
+    private static readonly Regex AnsiRegex = GetAnsiRegex();
+    
+    private readonly IBrush DefaultFg;
+    private readonly IBrush DefaultBg;
+    private IBrush currentFg;
+    private IBrush currentBg;
+
+    public AnsiParser(IBrush defaultFg, IBrush defaultBg)
+    {
+        currentFg = DefaultFg = defaultFg;
+        currentBg = DefaultBg = defaultBg;
+    }
+
+    public TerminalOutput Parse(string input, int baseOffset)
+    {
+        StringBuilder sb = new ();
+        List<ColoredSpan> spans = [];
+        bool clearScreen = false;
+        int logicalPos = 0;
+
+        foreach (Match match in AnsiRegex.Matches(input))
+        {
+            int spanLength = match.Index - logicalPos;
+            if (spanLength > 0)
+            {
+                spans.Add(new(baseOffset + sb.Length, spanLength, currentFg, currentBg));
+                sb.Append(input.AsSpan(logicalPos, spanLength));
+            }
+
+            string tag = match.Groups["tag"].Value;
+            switch (tag[^1])
+            {
+                case 'm':
+                    ApplyCodes(tag[1..^1].Split(';'));
+                    break;
+                case 'H': // skipping to next line for all cursor movements
+                    sb.AppendLine();
+                    break;
+                case 'J' when tag[^2] == '3': // only clearing screen for [3J
+                    clearScreen = true;
+                    break;
+            }
+
+            logicalPos = match.Index + match.Length;
+        }
+
+        if (logicalPos < input.Length)
+        {
+            spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
+            sb.Append(input.AsSpan(logicalPos));
+        }
+        
+        return new(sb.ToString(), spans, clearScreen);
+    }
+
+    [GeneratedRegex(
+        """
+        [\u001B\u009B](?<tag>\][^\u0007]*\u0007|[\[\]()#;?]*
+        (?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|
+        (?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~])))
+        """,
+        RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace)]
+    private static partial Regex GetAnsiRegex();
+
+    private static IBrush AnsiColor(int code) => code switch
+    {
+        0 => Brushes.Black,
+        1 => Brushes.Red,
+        2 => Brushes.Green,
+        3 => Brushes.Yellow,
+        4 => Brushes.Blue,
+        5 => Brushes.Magenta,
+        6 => Brushes.Cyan,
+        7 => Brushes.White,
+        _ => null
+    };
+
+    private void ApplyCodes(string[] codes)
+    {
+        if (!int.TryParse(codes[0], out var code))
+            code = 0;
+
+        switch (code)
+        {
+            case 0:
+            case 39 when codes.Length > 1 && int.TryParse(codes[1], out var code1) && code1 == 49:
+                currentFg = DefaultFg;
+                currentBg = DefaultBg;
+                break;
+            case >= 30 and <= 37:
+                currentFg = AnsiColor(code - 30) ?? DefaultFg;
+                break;
+            case >= 40 and <= 47:
+                currentBg = AnsiColor(code - 40) ?? DefaultBg;
+                break;
+            case >= 90 and <= 97:
+                currentFg = AnsiColor(code - 90) ?? DefaultFg;
+                break;
+            case >= 100 and <= 107:
+                currentBg = AnsiColor(code - 100) ?? DefaultBg;
+                break;
+            case 38 when codes.Length == 3 && codes[1] == "5" && int.TryParse(codes[2], out var fg):
+                currentFg = AnsiColor(fg % 8);
+                break;
+            case 48 when codes.Length == 3 && codes[1] == "5" && int.TryParse(codes[2], out var bg):
+                currentBg = AnsiColor(bg % 8);
+                break;
+            case 38 when codes.Length == 5 && codes[1] == "2":
+                currentFg = new SolidColorBrush(
+                    new Color(255, byte.Parse(codes[2]), byte.Parse(codes[3]), byte.Parse(codes[4])));
+                break;
+            case 48 when codes.Length == 5 && codes[1] == "2":
+                currentBg = new SolidColorBrush(
+                    new Color(255, byte.Parse(codes[2]), byte.Parse(codes[3]), byte.Parse(codes[4])));
+                break;
+        }
+    }
+}

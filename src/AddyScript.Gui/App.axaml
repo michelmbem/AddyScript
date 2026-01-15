@@ -1,0 +1,34 @@
+<Application x:Class="AddyScript.Gui.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             RequestedThemeVariant="Light">
+  <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="Styles/EditorStyles.axaml" />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+  </Application.Styles>
+
+  <Application.Resources>
+    <SolidColorBrush x:Key="WindowForeground" Color="Black" />
+    <SolidColorBrush x:Key="WindowBackground" Color="DarkOrange" />
+    <SolidColorBrush x:Key="ToolbarButtonForeground" Color="White" />
+    <SolidColorBrush x:Key="ToolbarButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="HoverToolbarButtonBackground" Color="#55FFFFFF" />
+    <SolidColorBrush x:Key="PressedToolbarButtonBackground" Color="#55999999" />
+    <SolidColorBrush x:Key="InactiveToolbarButtonForeground" Color="LightGray" />
+    <SolidColorBrush x:Key="InactiveToolbarButtonBackground" Color="#11111111" />
+    <SolidColorBrush x:Key="DividerFill" Color="#99FFFFFF" />
+    <SolidColorBrush x:Key="EditorForeground" Color="Black" />
+    <SolidColorBrush x:Key="EditorBackground" Color="White" />
+    <SolidColorBrush x:Key="TerminalForeground" Color="#E7E7E7" />
+    <SolidColorBrush x:Key="TerminalBackground" Color="#171717" />
+    <SolidColorBrush x:Key="PopupBackground" Color="#DDEEEEEE" />
+    <FontFamily x:Key="EditorFontFamily">Monospace</FontFamily>
+    <FontFamily x:Key="TerminalFontFamily">Monospace</FontFamily>
+    <x:Double x:Key="EditorFontSize">15</x:Double>
+    <x:Double x:Key="TerminalFontSize">15</x:Double>
+  </Application.Resources>
+</Application>

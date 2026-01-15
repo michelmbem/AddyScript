@@ -1,0 +1,291 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia">
+
+  <Design.PreviewWith>
+    <Border Width="600"
+            Height="400"
+            Background="{DynamicResource WindowBackground}">
+      <Grid RowDefinitions="Auto, Auto, *, Auto">
+        <StackPanel Grid.Row="0" Classes="toolbar">
+          <Button i:Attached.Icon="fa-file" />
+          <Button i:Attached.Icon="fa-folder-open" />
+          <SplitButton i:Attached.Icon="fa-floppy-disk">
+            <SplitButton.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                <MenuItem Header="Save as..." />
+                <MenuItem Header="Export to..." />
+              </MenuFlyout>
+            </SplitButton.Flyout>
+          </SplitButton>
+          <Rectangle Classes="divider" />
+          <Button i:Attached.Icon="fa-rotate-left" />
+        </StackPanel>
+        <Grid Grid.Row="1"
+              ColumnDefinitions="Auto, *, Auto, Auto, *"
+              Margin="10, 5"
+              Classes="input-group">
+          <Label Grid.Column="0" Content="Some stuff :" />
+          <TextBox Grid.Column="1" />
+          <Button Grid.Column="2"
+                  i:Attached.Icon="fa-folder-open"
+                  ToolTip.Tip="Browse" />
+          <Button Name="AddReferenceButton"
+                  Grid.Column="3"
+                  i:Attached.Icon="fa-circle-plus"
+                  ToolTip.Tip="Add" />
+        </Grid>
+        <Border Grid.Row="2" Classes="editor-wrapper">
+          <HeaderedContentControl Header="Settings">
+            <StackPanel Spacing="8">
+              <TextBox Text="Sample content" />
+              <Button Content="Click me" />
+            </StackPanel>
+          </HeaderedContentControl>
+        </Border>
+        <Grid Grid.Row="3" Classes="statusbar" ColumnDefinitions="*, 200">
+          <TextBlock Grid.Column="0" Text="First label" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Rectangle Classes="divider" />
+            <TextBlock Text="Second label" />
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+  </Design.PreviewWith>
+
+  <!--  Add Styles Here  -->
+
+  <Style Selector="Window">
+    <Setter Property="Foreground" Value="{DynamicResource WindowForeground}" />
+    <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+    <Setter Property="Icon" Value="/Assets/Images/Icons/AddyScript.ico" />
+  </Style>
+
+  <Style Selector="Rectangle.divider">
+    <Setter Property="Width" Value="1" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Fill" Value="{DynamicResource DividerFill}" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="Spacing" Value="5" />
+    <Setter Property="Margin" Value="10, 5" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar Button">
+    <Setter Property="FontSize" Value="24" />
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
+  </Style>
+
+  <Style
+    Selector="
+      StackPanel.toolbar Button:pointerover /template/ ContentPresenter,
+	    StackPanel.toolbar SplitButton:flyout-open Button /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource HoverToolbarButtonBackground}" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar Button:pressed /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource PressedToolbarButtonBackground}" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar Button[IsEnabled=False] /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource InactiveToolbarButtonBackground}" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar SplitButton Button#PART_SecondaryButton">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="MinWidth" Value="16" />
+    <Setter Property="MaxWidth" Value="16" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar SplitButton Button#PART_SecondaryButton Path">
+    <Setter Property="Data" Value="M 0 2 L 6 8 L 12 2" />
+    <Setter Property="Fill" Value="{DynamicResource ToolbarButtonBackground}" />
+    <Setter Property="Stroke" Value="{DynamicResource ToolbarButtonForeground}" />
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+
+  <Style Selector="StackPanel.toolbar Rectangle.divider">
+    <Setter Property="Height" Value="24" />
+  </Style>
+
+  <Style Selector="MenuFlyoutPresenter, ContextMenu">
+    <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+  </Style>
+
+  <Style Selector="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource ToolbarButtonBackground}" />
+  </Style>
+
+  <Style Selector="MenuItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource ToolbarButtonForeground}" />
+  </Style>
+
+  <Style Selector="MenuItem[IsEnabled=False] /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource InactiveToolbarButtonForeground}" />
+    <Setter Property="Background" Value="{DynamicResource InactiveToolbarButtonBackground}" />
+  </Style>
+
+  <Style Selector="MenuItem i|Icon">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+  </Style>
+
+  <Style Selector="Separator">
+    <Setter Property="Background" Value="{DynamicResource DividerFill}" />
+  </Style>
+
+  <Style Selector="Border.editor-wrapper">
+    <Setter Property="Background" Value="{DynamicResource EditorBackground}" />
+    <Setter Property="Margin" Value="10, 0, 15, 5" />
+    <Setter Property="Padding" Value="10" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="BoxShadow" Value="5 5 10 0 Chocolate" />
+  </Style>
+
+  <Style Selector="StackPanel.button-bar">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="FlowDirection" Value="RightToLeft" />
+    <Setter Property="Spacing" Value="5" />
+  </Style>
+
+  <Style Selector="Grid.input-group">
+    <Setter Property="ColumnSpacing" Value="1" />
+  </Style>
+
+  <Style Selector="StackPanel.button-bar Button, Grid.input-group Button">
+    <Setter Property="Background" Value="#55FFFFFF" />
+  </Style>
+
+  <Style Selector="StackPanel.button-bar Button">
+    <Setter Property="Width" Value="100" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="Grid.input-group Button">
+    <Setter Property="Foreground" Value="#553311" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="Grid.input-group > Label">
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style
+    Selector="
+      StackPanel.button-bar Button:pointerover /template/ ContentPresenter,
+      Grid.input-group Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#88FFFFFF" />
+  </Style>
+
+  <Style
+    Selector="
+      StackPanel.button-bar Button:pressed /template/ ContentPresenter,
+      Grid.input-group Button:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#88999999" />
+  </Style>
+
+  <Style Selector="Grid.statusbar">
+    <Setter Property="Margin" Value="10, 5" />
+  </Style>
+
+  <Style Selector="Grid.statusbar TextBlock">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Padding" Value="5" />
+  </Style>
+
+  <Style Selector="Grid.statusbar Rectangle.divider">
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Margin" Value="5, 0" />
+  </Style>
+
+  <Style Selector="Border.info">
+    <Setter Property="Background" Value="#99EEEEEE" />
+    <Setter Property="BorderBrush" Value="Chocolate" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="10" />
+  </Style>
+
+  <Style Selector="Border.info TextBlock">
+    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+  </Style>
+
+  <Style Selector="ListBox.path-list">
+    <Setter Property="SelectionMode" Value="Single" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem">
+    <Setter Property="Padding" Value="8, 4" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem:nth-child(even)">
+    <Setter Property="Background" Value="LightGray" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem > DockPanel">
+    <Setter Property="HorizontalSpacing" Value="2" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem > DockPanel > Button">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem > DockPanel > Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="SlateGray" />
+  </Style>
+
+  <Style Selector="ListBox.path-list > ListBoxItem > DockPanel > Button:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="DarkRed" />
+  </Style>
+
+  <Style Selector="ListBox.font-list">
+    <Setter Property="SelectionMode" Value="Single" />
+    <Setter Property="Margin" Value="5" />
+  </Style>
+
+  <Style Selector="ListBox.font-list > ListBoxItem">
+    <Setter Property="BorderBrush" Value="LightGray" />
+    <Setter Property="BorderThickness" Value="0, 0, 0, 1" />
+  </Style>
+
+  <Style Selector="HeaderedContentControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="Auto, *" ColumnDefinitions="Auto, *">
+          <!-- Header -->
+          <Border ZIndex="1"
+                  Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                  Padding="5,0"
+                  Margin="5,0,0,0">
+            <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" />
+          </Border>
+
+          <!-- Content Area -->
+          <Border Grid.RowSpan="2"
+                  Padding="0,5,0,0"
+                  Grid.ColumnSpan="2"
+                  CornerRadius="4"
+                  Margin="0,7.5,0,0"
+                  BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                  BorderThickness="1">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Padding="10"
+                              Content="{TemplateBinding Content}" />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

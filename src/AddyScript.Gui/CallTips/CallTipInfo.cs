@@ -1,87 +1,88 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-
 using AddyScript.Runtime;
-using AddyScript.Runtime.OOP;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
 
+using Projektanker.Icons.Avalonia;
 
-namespace AddyScript.Gui.CallTips
+namespace AddyScript.Gui.CallTips;
+
+internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 {
-    public class CallTipInfo
+    private int activeParameterIndex;
+    
+    public CallTipInfo(InnerFunction innerFunction) :
+        this(innerFunction.Name, [.. innerFunction.Parameters.Select(p => new ParameterInfo(p))])
     {
-        private readonly List<ParameterInfo> parameters = [];
-        private int parameterIndex;
+    }
 
-        public CallTipInfo(string text, params ParameterInfo[] parameters)
+    public void Reset() => activeParameterIndex = 0;
+
+    public bool NextParameter()
+    {
+        var lastParameterIndex = parameters.Count - 1;
+
+        if (activeParameterIndex >= lastParameterIndex)
+            return activeParameterIndex == lastParameterIndex && parameters[activeParameterIndex].Infinite;
+        
+        ++activeParameterIndex;
+        return true;
+
+    }
+
+    public Visual ToVisual()
+    {
+        var panel = new StackPanel
         {
-            Text = text;
-            this.parameters.AddRange(parameters);
-        }
-
-        public CallTipInfo(InnerFunction innerFunction)
+            Orientation = Orientation.Horizontal,
+        };
+        
+        panel.Children.Add(new Icon
         {
-            var textBuilder = new StringBuilder(innerFunction.Name).Append("(");
-            bool firstParam = true;
+            Value = "mdi-function-variant",
+            Width = 16,
+            Height = 16,
+            Margin = new Thickness(2, 0),
+        });
+        
+        panel.Children.Add(new TextBlock
+        {
+            Text = functionName,
+            Foreground = Brushes.DarkOrange,
+            FontWeight = FontWeight.Bold,
+        });
+        
+        panel.Children.Add(new TextBlock { Text = "(" });
 
-            foreach (Parameter parameter in innerFunction.Parameters)
+        for (var i = 0; i < parameters.Count; ++i)
+        {
+            if (i > 0) panel.Children.Add(new TextBlock { Text = ", " });
+            
+            panel.Children.Add(new TextBlock
             {
-                if (firstParam)
-                    firstParam = false;
-                else
-                    textBuilder.Append(", ");
-
-                int paramStart = textBuilder.Length;
-
-                if (parameter.ByRef)
-                    textBuilder.Append('&');
-                else if (parameter.VaList)
-                    textBuilder.Append("..");
-
-                textBuilder.Append(parameter.Name);
-
-                if (!parameter.CanBeEmpty) textBuilder.Append('!');
-
-                if (parameter.DefaultValue != null)
-                    switch (parameter.DefaultValue.Class.ClassID)
-                    {
-                        case ClassID.Date:
-                            textBuilder.AppendFormat(" = `{0}`", parameter.DefaultValue);
-                            break;
-                        case ClassID.String:
-                            textBuilder.AppendFormat(" = '{0}'", parameter.DefaultValue);
-                            break;
-                        default:
-                            textBuilder.AppendFormat(" = {0}", parameter.DefaultValue);
-                            break;
-                    }
-
-                parameters.Add(new ParameterInfo(paramStart, textBuilder.Length, parameter.VaList));
-            }
-
-            Text = textBuilder.Append(')').ToString();
+                Text = parameters[i].Text,
+                FontWeight = i == activeParameterIndex ? FontWeight.Bold : FontWeight.Regular,
+            });
         }
 
-        public string Text { get; private set; }
+        panel.Children.Add(new TextBlock { Text = ")" });
+        return panel;
+    }
 
-        public CallTipInfo Parent { get; set; }
+    public override string ToString()
+    {
+        var textBuilder = new StringBuilder(functionName).Append('(');
 
-        public ParameterInfo ActiveParameter
+        for (var i = 0; i < parameters.Count; i++)
         {
-            get => 0 <= parameterIndex && parameterIndex < parameters.Count
-                 ? parameters[parameterIndex]
-                 : null;
+            if (i > 0) textBuilder.Append(", ");
+            textBuilder.Append(parameters[i].Text);
         }
 
-        public void Reset()
-        {
-            parameterIndex = 0;
-        }
-
-        public bool NextParameter()
-        {
-            if (parameterIndex < 0 || parameterIndex >= parameters.Count) return false;
-            if (!parameters[parameterIndex].Infinite) ++parameterIndex;
-            return parameterIndex < parameters.Count;
-        }
+        return textBuilder.Append(')').ToString();
     }
 }

@@ -1,0 +1,415 @@
+<Window x:Class="AddyScript.Gui.OptionDialog"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:p="using:AddyScript.Gui.Properties"
+        Title="{x:Static p:Resources.OptionDialogTitle}"
+        Width="600"
+        Height="600"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="*, Auto" Margin="5">
+    <Popup Name="ColorPopup" IsLightDismissEnabled="True">
+      <Border Background="{DynamicResource WindowBackground}"
+              Padding="5">
+        <ColorView Name="TerminalColorView" ColorChanged="TerminalColorViewColorChanged" />
+      </Border>
+    </Popup>
+    <TabControl Grid.Row="0">
+      <TabControl.Styles>
+        <Style Selector="TabItem">
+          <Setter Property="FontSize" Value="16" />
+          <Setter Property="BorderBrush" Value="Chocolate" />
+          <Setter Property="Padding" Value="7.5, 0" />
+          <Setter Property="CornerRadius" Value="7.5, 7.5, 0, 0" />
+        </Style>
+        <Style Selector="TabItem:selected">
+          <Setter Property="FontWeight" Value="Bold" />
+          <Setter Property="BorderThickness" Value="1, 1, 1, 0" />
+        </Style>
+        <Style Selector="TabItem:not(:selected)">
+          <Setter Property="Background" Value="SandyBrown" />
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+      </TabControl.Styles>
+      <TabItem Header="{x:Static p:Resources.General}">
+        <StackPanel Background="{DynamicResource EditorBackground}"
+                    Spacing="10"
+                    Margin="0, 5, 0, 0">
+          <HeaderedContentControl Header="{x:Static p:Resources.Appearence}"
+                                  Margin="10, 5, 10, 0">
+            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="5">
+              <Label Grid.Column="0"
+                     Content="{x:Static p:Resources.Language}"
+                     VerticalAlignment="Center" />
+              <ComboBox Grid.Column="1"
+                        Name="LanguageComboBox"
+                        HorizontalAlignment="Stretch" />
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="{x:Static p:Resources.Editor}"
+                                  Margin="10, 0">
+            <Grid RowDefinitions="Auto, Auto, Auto"
+                  ColumnDefinitions="Auto, Auto, *, Auto, Auto"
+                  RowSpacing="8"
+                  ColumnSpacing="5">
+              <TextBlock Grid.Row="0"
+                         Grid.Column="0"
+                         Text="{x:Static p:Resources.FontFace}"
+                         VerticalAlignment="Center" />
+              <Button Name="EditorFontFaceButton"
+                      Grid.Row="0"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="4"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Click="EditorFontFaceButtonClick">
+                <TextBlock Name="EditorFontFaceText"
+                           Text="Monospace"
+                           FontFamily="Monospace"
+                           FontSize="15"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center" />
+              </Button>
+              <TextBlock Grid.Row="1"
+                         Grid.Column="0"
+                         Text="{x:Static p:Resources.FontSize}"
+                         VerticalAlignment="Center" />
+              <ButtonSpinner Name="EditorFontSizeSpinner"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Content="15"
+                             ButtonSpinnerLocation="Right"
+                             ValidSpinDirection="Increase, Decrease"
+                             Spin="EditorFontSizeSpinnerSpin" />
+              <CheckBox Name="EditorWordWrapCheckBox"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="3"
+                        Content="{x:Static p:Resources.WrapLongLines}"
+                        HorizontalAlignment="Right" />
+              <Grid Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="5"
+                    ColumnDefinitions="Auto, *, Auto, *, Auto">
+                <CheckBox Name="EditorShowLineNumbersCheckBox"
+                          Grid.Column="0"
+                          Content="{x:Static p:Resources.ShowLineNumbers}"
+                          IsChecked="True" />
+                <CheckBox Name="EditorShowWhitespaceCheckBox"
+                          Grid.Column="2"
+                          Content="{x:Static p:Resources.ShowWhitespace}" />
+                <CheckBox Name="EditorHighlightCurrentLineCheckBox"
+                          Grid.Column="4"
+                          Content="{x:Static p:Resources.HighlightCurrentLine}"
+                          IsChecked="True" />
+              </Grid>
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="{x:Static p:Resources.Terminal}"
+                                  Margin="10, 0">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+              <RadioButton Name="NativeTerminalRadioButton"
+                           Grid.Column="0"
+                           Content="{x:Static p:Resources.UseNativeTerminal}" />
+              <RadioButton Name="EmulatedTerminalRadioButton"
+                           Grid.Column="2"
+                           Content="{x:Static p:Resources.UseEmulatedTerminal}"
+                           IsChecked="True" />
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="{x:Static p:Resources.EmulatedTerminal}"
+                                  Margin="10, 0">
+            <Grid RowDefinitions="Auto, Auto, Auto"
+                  ColumnDefinitions="Auto, Auto, *, Auto, Auto"
+                  RowSpacing="8"
+                  ColumnSpacing="5">
+              <TextBlock Grid.Row="0"
+                         Grid.Column="0"
+                         Text="{x:Static p:Resources.Foreground}"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalForegroundButton"
+                      Grid.Row="0"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      Width="140"
+                      Padding="8"
+                      Click="TerminalForegroundButtonClick">
+                <Border Name="TerminalForegroundBorder"
+                        Background="{DynamicResource TerminalForeground}"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        Height="24">
+                  <TextBlock Name="TerminalForegroundText"
+                             Text="#DDEEEEEE"
+                             TextAlignment="Center"
+                             VerticalAlignment="Center" />
+                </Border>
+              </Button>
+              <TextBlock Grid.Row="0"
+                         Grid.Column="3"
+                         Text="{x:Static p:Resources.Background}"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalBackgroundButton"
+                      Grid.Row="0"
+                      Grid.Column="4"
+                      Width="140"
+                      Padding="8"
+                      Click="TerminalBackgroundButtonClick">
+                <Border Name="TerminalBackgroundBorder"
+                        Background="{DynamicResource TerminalBackground}"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        Height="24">
+                  <TextBlock Name="TerminalBackgroundText"
+                             Text="#171717"
+                             TextAlignment="Center"
+                             VerticalAlignment="Center"
+                             Foreground="White" />
+                </Border>
+              </Button>
+              <TextBlock Grid.Row="1"
+                         Grid.Column="0"
+                         Text="{x:Static p:Resources.FontFace}"
+                         VerticalAlignment="Center" />
+              <Button Name="TerminalFontFaceButton"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="4"
+                      HorizontalAlignment="Stretch"
+                      Padding="8"
+                      Click="TerminalFontFaceButtonClick">
+                <TextBlock Name="TerminalFontFaceText"
+                           Text="Monospace"
+                           FontFamily="Monospace"
+                           FontSize="15"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center" />
+              </Button>
+              <TextBlock Grid.Row="2"
+                         Grid.Column="0"
+                         Text="{x:Static p:Resources.FontSize}"
+                         VerticalAlignment="Center" />
+              <ButtonSpinner Name="TerminalFontSizeSpinner"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Content="15"
+                             ButtonSpinnerLocation="Right"
+                             ValidSpinDirection="Increase, Decrease"
+                             Spin="TerminalFontSizeSpinnerSpin" />
+              <CheckBox Name="TerminalWordWrapCheckBox"
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="3"
+                        Content="{x:Static p:Resources.WrapLongLines}"
+                        HorizontalAlignment="Right"
+                        IsChecked="True" />
+            </Grid>
+          </HeaderedContentControl>
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="{x:Static p:Resources.Printing}">
+        <StackPanel Background="{DynamicResource EditorBackground}"
+                    Spacing="10"
+                    Margin="0, 5, 0, 0">
+          <HeaderedContentControl Header="{x:Static p:Resources.PrinterAndPageSettings}"
+                                  Margin="10, 5, 10, 0">
+            <Grid RowDefinitions="Auto, Auto, Auto"
+                  ColumnDefinitions="Auto, *"
+                  RowSpacing="8"
+                  ColumnSpacing="5">
+              <Label Grid.Row="0"
+                     Grid.Column="0"
+                     Content="{x:Static p:Resources.PrinterName}"
+                     Target="PrinterNameComboBox"
+                     VerticalAlignment="Center" />
+              <ComboBox Name="PrinterNameComboBox"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch" />
+              <Label Grid.Row="1"
+                     Grid.Column="0"
+                     Content="{x:Static p:Resources.PageFormat}"
+                     Target="PageFormatComboBox"
+                     VerticalAlignment="Center" />
+              <ComboBox Name="PageFormatComboBox"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch" />
+              <Label Grid.Row="2"
+                     Grid.Column="0"
+                     Content="{x:Static p:Resources.Orientation}"
+                     VerticalAlignment="Center" />
+              <Grid Grid.Row="2"
+                    Grid.Column="1"
+                    ColumnDefinitions="Auto, *, Auto">
+                <RadioButton Name="PortraitRadioButton"
+                             Grid.Column="0"
+                             Content="{x:Static p:Resources.Portrait}"
+                             IsChecked="True" />
+                <RadioButton Name="LandscapeRadioButton"
+                             Grid.Column="2"
+                             Content="{x:Static p:Resources.Landscape}" />
+              </Grid>
+            </Grid>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="{x:Static p:Resources.MarginsInInches}"
+                                  Margin="10, 0">
+            <Grid RowDefinitions="*, *, *"
+                  ColumnDefinitions="*, Auto, Auto, *"
+                  RowSpacing="15"
+                  ColumnSpacing="30">
+              <StackPanel Grid.Row="0"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="4"
+                          Spacing="5"
+                          HorizontalAlignment="Center">
+                <TextBlock Text="{x:Static p:Resources.Top}" HorizontalAlignment="Center" />
+                <ButtonSpinner Name="TopMarginSpinner"
+                               Content="0.4"
+                               ButtonSpinnerLocation="Right"
+                               ValidSpinDirection="Increase, Decrease"
+                               Spin="MarginSpinnerSpin" />
+              </StackPanel>
+              <StackPanel Grid.Row="1"
+                          Grid.Column="1"
+                          Orientation="Horizontal"
+                          Spacing="5">
+                <TextBlock Text="{x:Static p:Resources.Left}" VerticalAlignment="Center" />
+                <ButtonSpinner Name="LeftMarginSpinner"
+                               Content="0.4"
+                               ButtonSpinnerLocation="Right"
+                               ValidSpinDirection="Increase, Decrease"
+                               Spin="MarginSpinnerSpin" />
+              </StackPanel>
+              <StackPanel Grid.Row="1"
+                          Grid.Column="2"
+                          Orientation="Horizontal"
+                          Spacing="5">
+                <ButtonSpinner Name="RightMarginSpinner"
+                               Content="0.4"
+                               ButtonSpinnerLocation="Right"
+                               ValidSpinDirection="Increase, Decrease"
+                               Spin="MarginSpinnerSpin" />
+                <TextBlock Text="{x:Static p:Resources.Right}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Grid.Row="2"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="4"
+                          Spacing="5"
+                          HorizontalAlignment="Center">
+                <ButtonSpinner Name="BottomMarginSpinner"
+                               Content="0.4"
+                               ButtonSpinnerLocation="Right"
+                               ValidSpinDirection="Increase, Decrease"
+                               Spin="MarginSpinnerSpin" />
+                <TextBlock Text="{x:Static p:Resources.Bottom}" HorizontalAlignment="Center" />
+              </StackPanel>
+            </Grid>
+          </HeaderedContentControl>
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="{x:Static p:Resources.SearchPaths}">
+        <Grid RowDefinitions="Auto, Auto, *"
+              RowSpacing="10"
+              Margin="0,5,0,0">
+          <Border Grid.Row="0" Classes="info">
+            <TextBlock Text="{x:Static p:Resources.SearchPathsDescription}" />
+          </Border>
+          <Grid Grid.Row="1"
+                ColumnDefinitions="Auto, *, Auto, Auto"
+                Classes="input-group">
+            <Label Grid.Column="0"
+                   Content="{x:Static p:Resources.NewDirectory}"
+                   Target="NewDirectoryTextBox" />
+            <TextBox Name="NewDirectoryTextBox" Grid.Column="1" />
+            <Button Name="BrowseDirectoryButton"
+                    Grid.Column="2"
+                    i:Attached.Icon="fa-folder-open"
+                    ToolTip.Tip="{x:Static p:Resources.Browse4Directory}"
+                    Click="BrowseDirectoryButtonClick" />
+            <Button Name="AddDirectoryButton"
+                    Grid.Column="3"
+                    i:Attached.Icon="fa-circle-plus"
+                    ToolTip.Tip="{x:Static p:Resources.Add2list}"
+                    Click="AddDirectoryButtonClick" />
+          </Grid>
+          <ListBox Grid.Row="2"
+                   Name="SearchPathsListBox"
+                   Classes="path-list">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <Button i:Attached.Icon="fa-circle-minus"
+                          DockPanel.Dock="Right"
+                          ToolTip.Tip="{x:Static p:Resources.RemoveFromList}"
+                          Click="RemoveDirectoryButtonClick" />
+                  <TextBlock Text="{Binding}"
+                             VerticalAlignment="Center"
+                             ToolTip.Tip="{Binding}" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </TabItem>
+      <TabItem Header="{x:Static p:Resources.References}">
+        <Grid RowDefinitions="Auto, Auto, *"
+              RowSpacing="10"
+              Margin="0,5,0,0">
+          <Border Grid.Row="0" Classes="info">
+            <TextBlock
+              Text="{x:Static p:Resources.ReferencesDescription}" />
+          </Border>
+          <Grid Grid.Row="1"
+                ColumnDefinitions="Auto, *, Auto, Auto"
+                Classes="input-group">
+            <Label Grid.Column="0"
+                   Content="{x:Static p:Resources.NewReference}"
+                   Target="NewReferenceTextBox" />
+            <TextBox Name="NewReferenceTextBox" Grid.Column="1" />
+            <Button Name="BrowseAssemblyButton"
+                    Grid.Column="2"
+                    i:Attached.Icon="fa-folder-open"
+                    ToolTip.Tip="{x:Static p:Resources.Browse4Assembly}"
+                    Click="BrowseAssemblyButtonClick" />
+            <Button Name="AddReferenceButton"
+                    Grid.Column="3"
+                    i:Attached.Icon="fa-circle-plus"
+                    ToolTip.Tip="{x:Static p:Resources.Add2list}"
+                    Click="AddReferenceButtonClick" />
+          </Grid>
+          <ListBox Grid.Row="2"
+                   Name="ReferencesListBox"
+                   Classes="path-list">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <Button i:Attached.Icon="fa-circle-minus"
+                          DockPanel.Dock="Right"
+                          ToolTip.Tip="{x:Static p:Resources.RemoveFromList}"
+                          Click="RemoveReferenceButtonClick" />
+                  <TextBlock Text="{Binding}"
+                             VerticalAlignment="Center"
+                             ToolTip.Tip="{Binding}" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </TabItem>
+    </TabControl>
+    <StackPanel Grid.Row="1"
+                Margin="5, 10, 10, 5"
+                Classes="button-bar">
+      <Button Name="CancelButton"
+              Content="{x:Static p:Resources.Cancel}"
+              IsCancel="True"
+              HotKey="Escape"
+              Click="CancelButtonClick" />
+      <Button Name="OkButton"
+              IsDefault="True"
+              Content="{x:Static p:Resources.OK}"
+              Click="OkButtonClick" />
+    </StackPanel>
+  </Grid>
+</Window>

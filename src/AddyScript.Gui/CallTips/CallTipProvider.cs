@@ -1,31 +1,19 @@
 using System.Collections.Generic;
-
 using AddyScript.Runtime;
 
+namespace AddyScript.Gui.CallTips;
 
-namespace AddyScript.Gui.CallTips
+internal static class CallTipProvider
 {
-    public static class CallTipProvider
+    private static readonly Dictionary<string, CallTipInfo> Registry = [];
+
+    static CallTipProvider()
     {
-        private static readonly Dictionary<string, CallTipInfo> callTips;
-
-        static CallTipProvider()
-        {
-            callTips = [];
-            foreach (InnerFunction function in InnerFunction.Globals)
-                callTips[function.Name] = new CallTipInfo(function);
-        }
-
-        public static bool IsDefined(string fName)
-        {
-            return callTips.ContainsKey(fName);
-        }
-
-        public static CallTipInfo GetCallTipInfo(string fName)
-        {
-            CallTipInfo callTip = callTips[fName];
-            callTip.Reset();
-            return callTip;
-        }
+        foreach (var innerFunction in InnerFunction.Globals)
+            Registry[innerFunction.Name] = new CallTipInfo(innerFunction);
     }
+
+    public static bool IsDefined(string functionName) => Registry.ContainsKey(functionName);
+
+    public static CallTipInfo GetCallTip(string functionName) => Registry[functionName];
 }

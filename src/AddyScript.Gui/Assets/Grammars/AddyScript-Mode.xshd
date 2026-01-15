@@ -1,0 +1,334 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="AddyScript"
+                  extensions=".add, .txt"
+                  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+
+    <Color name="Default" foreground="Black" />
+    <Color name="Preprocessor" foreground="WhiteSmoke" background="DarkRed" exampleText="#region Title" />
+    <Color name="Comment" fontStyle="italic" foreground="Gray" exampleText="// comment" />
+    <Color name="String" foreground="Green" exampleText="&quot;Hello, World!&quot;"/>
+    <Color name="EscapeSec" foreground="Olive" exampleText="'Abigail\'s kid is aged {0}\n'"/>
+    <Color name="Blob" foreground="DarkOliveGreen" exampleText="b'AddyScript is awesome'"/>
+    <Color name="DateTime" foreground="DarkCyan" exampleText="`2025-11-26`"/>
+    <Color name="Punctuation" foreground="Chocolate" exampleText="a.b(c) + t[1];" />
+    <Color name="Keywords" fontWeight="bold" foreground="Blue" exampleText="if (a) continue; else break;"/>
+    <Color name="TypeNameKeywords" fontWeight="bold" foreground="DarkRed" exampleText="bool, int, float" />
+    <Color name="OperatorKeywords" fontWeight="bold" foreground="SteelBlue" exampleText="in, is, new, matches"/>
+    <Color name="ThisOrSuperReference" fontWeight="bold" foreground="Navy" exampleText="this, super"/>
+    <Color name="ValueKeywords" fontWeight="bold" foreground="DarkSlateGray" exampleText="null, true, false"/>
+    <Color name="StandardConstants" fontStyle="italic" foreground="Indigo" exampleText="EPSILON, PI, NEWLINE"/>
+    <Color name="ContextKeywords" fontWeight="bold" foreground="Teal" exampleText="__value = 2 * __key"/>
+    <Color name="MethodCall" foreground="DarkViolet" exampleText="s = readln(); println(s);"/>
+    <Color name="NumberLiteral" foreground="Firebrick" exampleText="2 - 14l + 3.1415f / 7.2d"/>
+    <Color name="Modifiers" fontWeight="bold" foreground="Red" exampleText="static, final, abstract"/>
+    <Color name="Visibility" fontWeight="bold" foreground="SaddleBrown" exampleText="private, protected, public"/>
+    
+    <RuleSet name="CommentMarkerSet">
+        <Keywords fontWeight="bold" foreground="Orange">
+            <Word>TODO</Word>
+            <Word>FIXME</Word>
+        </Keywords>
+        <Keywords fontWeight="bold" foreground="Yellow">
+            <Word>HACK</Word>
+            <Word>UNDONE</Word>
+        </Keywords>
+    </RuleSet>
+    
+    <!-- This is the main ruleset. -->
+    <RuleSet>
+        <Span color="Preprocessor">
+            <Begin>^\s*\#</Begin>
+            <RuleSet name="PreprocessorSet">
+                <Span> <!-- preprocessor directives that allows comments -->
+                    <Begin fontWeight="bold">
+                        (define|undef|if|elif|else|endif|line)\b
+                    </Begin>
+                    <RuleSet>
+                        <Span color="Comment" ruleSet="CommentMarkerSet">
+                            <Begin>//</Begin>
+                        </Span>
+                    </RuleSet>
+                </Span>
+                <Span> <!-- preprocessor directives that don't allow comments -->
+                    <Begin fontWeight="bold">
+                        (region|endregion|error|warning|pragma)\b
+                    </Begin>
+                </Span>
+            </RuleSet>
+        </Span>
+        
+        <Span color="Comment" ruleSet="CommentMarkerSet">
+            <Begin>//</Begin>
+        </Span>
+        
+        <Span color="Comment" ruleSet="CommentMarkerSet" multiline="true">
+            <Begin>/\*</Begin>
+            <End>\*/</End>
+        </Span>
+        
+        <Span color="String">
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+                <Span begin="{" end="}" color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+        
+        <Span color="String">
+            <Begin>'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+                <Span begin="{" end="}" color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+        
+        <Span color="String" multiline="true">
+            <Begin>@"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin='""' end="" color="EscapeSec"/>
+                <Span begin="{" end="}" color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+
+        <Span color="String" multiline="true">
+            <Begin>@'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="''" end="" color="EscapeSec"/>
+                <Span begin="{" end="}" color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+        
+        <Span color="String">
+            <Begin>\$"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+                <!-- should not be captured as string interpolation -->
+                <Span begin="\{\{" end="" color="EscapeSec"/>
+                <Span begin="\}\}" end="" color="EscapeSec"/>
+                <!-- string interpolation -->
+                <Span begin="{" end="}" color="Default" ruleSet=""/>
+            </RuleSet>
+        </Span>
+
+        <Span color="String">
+            <Begin>\$'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+                <!-- should not be captured as string interpolation -->
+                <Span begin="\{\{" end="" color="EscapeSec"/>
+                <Span begin="\}\}" end="" color="EscapeSec"/>
+                <!-- string interpolation -->
+                <Span begin="{" end="}" color="Default" ruleSet=""/>
+            </RuleSet>
+        </Span>
+
+        <Span color="String" multiline="true">
+            <Begin>\$@"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin='""' end="" color="EscapeSec"/>
+                <!-- should not be captured as string interpolation -->
+                <Span begin="\{\{" end="" color="EscapeSec"/>
+                <Span begin="\}\}" end="" color="EscapeSec"/>
+                <!-- string interpolation -->
+                <Span begin="{" end="}" color="Default" ruleSet=""/>
+            </RuleSet>
+        </Span>
+
+        <Span color="String" multiline="true">
+            <Begin>\$@'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="''" end="" color="EscapeSec"/>
+                <!-- should not be captured as string interpolation -->
+                <Span begin="\{\{" end="" color="EscapeSec"/>
+                <Span begin="\}\}" end="" color="EscapeSec"/>
+                <!-- string interpolation -->
+                <Span begin="{" end="}" color="Default" ruleSet=""/>
+            </RuleSet>
+        </Span>
+
+        <Span color="Blob">
+            <Begin>b"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+
+        <Span color="Blob">
+            <Begin>b'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <!-- span for escape sequences -->
+                <Span begin="\\" end="." color="EscapeSec"/>
+            </RuleSet>
+        </Span>
+
+        <Span color="DateTime">
+            <Begin>`</Begin>
+            <End>`</End>
+        </Span>
+        
+        <!-- don't highlight "$int" as keyword -->
+        <Rule>
+            \$[\w\d_]+
+        </Rule>
+
+        <Keywords color="Keywords">
+            <Word>break</Word>
+            <Word>case</Word>
+            <Word>catch</Word>
+            <Word>class</Word>
+            <Word>const</Word>
+            <Word>constructor</Word>
+            <Word>continue</Word>
+            <Word>default</Word>
+            <Word>do</Word>
+            <Word>else</Word>
+            <Word>event</Word>
+            <Word>finally</Word>
+            <Word>for</Word>
+            <Word>foreach</Word>
+            <Word>function</Word>
+            <Word>goto</Word>
+            <Word>if</Word>
+            <Word>import</Word>
+		    <Word>let</Word>
+            <Word>operator</Word>
+            <Word>property</Word>
+            <Word>return</Word>
+            <Word>switch</Word>
+            <Word>throw</Word>
+            <Word>try</Word>
+            <Word>var</Word>
+            <Word>when</Word>
+            <Word>while</Word>
+            <Word>yield</Word>
+        </Keywords>
+        
+        <Keywords color="ThisOrSuperReference">
+            <Word>super</Word>
+            <Word>this</Word>
+        </Keywords>
+        
+        <Keywords color="ContextKeywords">
+            <Word>__context</Word>
+            <Word>__key</Word>
+            <Word>__name</Word>
+            <Word>__value</Word>
+            <Word>read</Word>
+            <Word>write</Word>
+        </Keywords>
+        
+        <Keywords color="TypeNameKeywords">
+            <Word>blob</Word>
+            <Word>bool</Word>
+            <Word>closure</Word>
+            <Word>complex</Word>
+            <Word>date</Word>
+            <Word>duration</Word>
+            <Word>decimal</Word>
+            <Word>float</Word>
+            <Word>int</Word>
+            <Word>list</Word>
+            <Word>long</Word>
+            <Word>map</Word>
+            <Word>object</Word>
+            <Word>queue</Word>
+            <Word>rational</Word>
+            <Word>resource</Word>
+            <Word>set</Word>
+            <Word>stack</Word>
+            <Word>string</Word>
+            <Word>tuple</Word>
+            <Word>void</Word>
+        </Keywords>
+        
+        <Keywords color="OperatorKeywords">
+            <Word>and</Word>
+            <Word>as</Word>
+            <Word>contains</Word>
+            <Word>endswith</Word>
+            <Word>in</Word>
+            <Word>is</Word>
+            <Word>matches</Word>
+            <Word>new</Word>
+            <Word>not</Word>
+            <Word>or</Word>
+            <Word>startswith</Word>
+            <Word>typeof</Word>
+            <Word>with</Word>
+        </Keywords>
+        
+        <Keywords color="Modifiers">
+            <Word>abstract</Word>
+            <Word>extern</Word>
+            <Word>final</Word>
+            <Word>static</Word>
+        </Keywords>
+        
+        <Keywords color="Visibility">
+            <Word>private</Word>
+            <Word>protected</Word>
+            <Word>public</Word>
+        </Keywords>
+        
+        <Keywords color="ValueKeywords">
+            <Word>null</Word>
+            <Word>false</Word>
+            <Word>true</Word>
+        </Keywords>
+
+        <Keywords color="StandardConstants">
+            <Word>NEWLINE</Word>
+            <Word>EPSILON</Word>
+            <Word>PI</Word>
+            <Word>E</Word>
+            <Word>NAN</Word>
+            <Word>NINFINITY</Word>
+            <Word>PINFINITY</Word>
+            <Word>MININT</Word>
+            <Word>MAXINT</Word>
+            <Word>MINFLOAT</Word>
+            <Word>MAXFLOAT</Word>
+            <Word>MINDATE</Word>
+            <Word>MAXDATE</Word>
+        </Keywords>
+
+        <!-- Mark previous rule-->
+        <Rule color="MethodCall">
+            (?&lt;!\bnew\s+)\b    # no initial new keyword
+            [\d\w_]+  # an identifier
+            (?=\s*\() # followed by (
+        </Rule>
+        
+        <!-- Digits -->
+        <Rule color="NumberLiteral">
+            \b0[xX][0-9a-fA-F]+[lL]?    # hex number
+            |
+            \b([0-9](_?[0-9])*)+(\.([0-9](_?[0-9])*)+)?([Ee]?[+-]?([0-9](_?[0-9])*)+)?[iILlFfDd]? # decimal number
+            |
+            \b\.([0-9](_?[0-9])*)+([Ee]?[+-]?([0-9](_?[0-9])*)+)?[iIFfDd]? # floatting-point number
+        </Rule>
+        
+        <Rule color="Punctuation">
+            [?,.;:()\[\]{}+\-/%*&lt;&gt;^+~!|&amp;=]+
+        </Rule>
+    </RuleSet>
+</SyntaxDefinition>

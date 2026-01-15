@@ -1,0 +1,17 @@
+<Window x:Class="AddyScript.Gui.TerminalWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+        Width="1100"
+        Height="600"
+        Activated="WindowActivated"
+        Closing="WindowClosing">
+  <ae:TextEditor Name="TerminalView"
+                 FontFamily="{DynamicResource TerminalFontFamily}"
+                 FontSize="{DynamicResource TerminalFontSize}"
+                 Foreground="{DynamicResource TerminalForeground}"
+                 Background="{DynamicResource TerminalBackground}"
+                 ShowLineNumbers="False"
+                 WordWrap="True"
+                 Padding="10" />
+</Window>

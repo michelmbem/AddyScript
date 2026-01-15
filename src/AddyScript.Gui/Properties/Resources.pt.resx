@@ -118,336 +118,318 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About...</value>
+    <value>Sobre...</value>
   </data>
   <data name="AboutBoxTitle" xml:space="preserve">
-    <value>About {0}</value>
+    <value>Sobre {0}</value>
   </data>
   <data name="Add2list" xml:space="preserve">
-    <value>Add to the list</value>
+    <value>Adicionar à lista</value>
   </data>
   <data name="Appearence" xml:space="preserve">
-    <value>Appearence</value>
+    <value>Aparência</value>
   </data>
   <data name="AssemblyChooserFilter" xml:space="preserve">
-    <value>.Net assembly</value>
+    <value>Montagem .Net</value>
   </data>
   <data name="AssemblyChooserTitle" xml:space="preserve">
-    <value>Select a .Net assembly</value>
+    <value>Selecione um assembly .Net</value>
   </data>
   <data name="AssemblyLoadFailureMessage" xml:space="preserve">
-    <value>Could not load assembly {0}</value>
+    <value>Não foi possível carregar o assembly {0}</value>
   </data>
   <data name="AssemblyLoadFailureTitle" xml:space="preserve">
-    <value>Invalid assembly name</value>
+    <value>Nome de montagem inválido</value>
   </data>
   <data name="Background" xml:space="preserve">
-    <value>Background :</value>
+    <value>Fundo :</value>
   </data>
   <data name="Bottom" xml:space="preserve">
-    <value>Bottom</value>
+    <value>Fundo</value>
   </data>
   <data name="Browse4Assembly" xml:space="preserve">
-    <value>Browse for an assembly</value>
+    <value>Procure uma montagem</value>
   </data>
   <data name="Browse4Directory" xml:space="preserve">
-    <value>Browse for a directory</value>
+    <value>Procure um diretório</value>
   </data>
   <data name="BuiltinFunction" xml:space="preserve">
-    <value>Builtin function</value>
+    <value>Função integrada</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-  <data name="CaretStatus" xml:space="preserve">
-    <value>Ln: {0}   Col: {1}   Sel: {2}</value>
+    <value>Cancelar</value>
   </data>
   <data name="ClearFilter" xml:space="preserve">
-    <value>Clear filter</value>
-  </data>
-  <data name="Comma" xml:space="preserve">
-    <value>, </value>
+    <value>Limpar filtro</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment selected lines</value>
+    <value>Comente as linhas selecionadas</value>
   </data>
   <data name="Configure" xml:space="preserve">
-    <value>Configure...</value>
+    <value>Configurar...</value>
   </data>
   <data name="ConfirmationBoxTitle" xml:space="preserve">
-    <value>Confirmation needed</value>
+    <value>Confirmação necessária</value>
   </data>
   <data name="ConfirmDelete" xml:space="preserve">
-    <value>Do you really want to delete this item?</value>
+    <value>Você realmente deseja excluir este item?</value>
   </data>
   <data name="Copy" xml:space="preserve">
-    <value>Copy</value>
+    <value>Cópia</value>
   </data>
   <data name="Cut" xml:space="preserve">
-    <value>Cut</value>
+    <value>Corte</value>
   </data>
   <data name="Delete" xml:space="preserve">
-    <value>Delete</value>
+    <value>Excluir</value>
   </data>
   <data name="DirectoryChooserTitle" xml:space="preserve">
-    <value>Select a folder</value>
+    <value>Selecione uma pasta</value>
   </data>
   <data name="DirectoryNotFound" xml:space="preserve">
-    <value>Directory '{0}' does not exist</value>
-  </data>
-  <data name="Editor" xml:space="preserve">
-    <value>Editor</value>
+    <value>O diretório '{0}' não existe</value>
   </data>
   <data name="EmulatedTerminal" xml:space="preserve">
-    <value>Emulated terminal</value>
+    <value>Terminal emulado</value>
   </data>
   <data name="ErrorMessageBody" xml:space="preserve">
-    <value>Something went wrong</value>
+    <value>Algo deu errado</value>
   </data>
   <data name="ErrorMessageTitle" xml:space="preserve">
-    <value>Error</value>
+    <value>Erro</value>
   </data>
   <data name="ExportAsXML" xml:space="preserve">
-    <value>Export AST as XML...</value>
+    <value>Exporte a estrutura para XML..</value>
   </data>
   <data name="ExportBoxTitle" xml:space="preserve">
-    <value>Export the script to</value>
+    <value>Exporte o script para</value>
   </data>
   <data name="File" xml:space="preserve">
-    <value>File :</value>
+    <value>Arquivo :</value>
   </data>
   <data name="FileDialogFilter" xml:space="preserve">
-    <value>AddyScript files</value>
+    <value>Arquivos AddyScript</value>
   </data>
   <data name="FilterByName" xml:space="preserve">
-    <value>Filter by name :</value>
+    <value>Filtrar por nome:</value>
   </data>
   <data name="Find" xml:space="preserve">
-    <value>Find</value>
+    <value>Encontrar</value>
   </data>
   <data name="FontDialogTitle" xml:space="preserve">
-    <value>Select a font</value>
+    <value>Selecione uma fonte</value>
   </data>
   <data name="FontFace" xml:space="preserve">
-    <value>Font face :</value>
+    <value>Tipo de fonte :</value>
   </data>
   <data name="FontSize" xml:space="preserve">
-    <value>Font size :</value>
+    <value>Tamanho da fonte :</value>
   </data>
   <data name="Foreground" xml:space="preserve">
-    <value>Foreground :</value>
+    <value>Primeiro plano :</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Em geral</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Help</value>
+    <value>Ajuda</value>
   </data>
   <data name="HighlightCurrentLine" xml:space="preserve">
-    <value>Highlight current line</value>
+    <value>Destacar a linha atual</value>
   </data>
   <data name="Indent" xml:space="preserve">
-    <value>Indent</value>
+    <value>Recuar</value>
   </data>
   <data name="InfoMessageTitle" xml:space="preserve">
-    <value>Information</value>
+    <value>Informação</value>
   </data>
   <data name="InitializationFailure" xml:space="preserve">
-    <value>Initialization failure</value>
+    <value>Falha na inicialização</value>
   </data>
   <data name="InsertSnippet" xml:space="preserve">
-    <value>Insert a code snippet...</value>
+    <value>Insira um trecho de código...</value>
   </data>
   <data name="Landscape" xml:space="preserve">
-    <value>Landscape</value>
+    <value>Paisagem</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Language :</value>
+    <value>Linguagem :</value>
   </data>
   <data name="LanguageChangeOnRestart" xml:space="preserve">
-    <value>Language change will only take effect after a restart</value>
+    <value>A mudança de idioma só terá efeito após uma reinicialização</value>
   </data>
   <data name="Left" xml:space="preserve">
-    <value>Left</value>
+    <value>Esquerda</value>
   </data>
   <data name="Line" xml:space="preserve">
-    <value>Line :</value>
+    <value>Linha :</value>
   </data>
   <data name="MarginsInInches" xml:space="preserve">
-    <value>Margins (in inches)</value>
+    <value>Margens (em polegadas)</value>
   </data>
   <data name="MissingFunctionality" xml:space="preserve">
-    <value>Missing functionality</value>
+    <value>Funcionalidade ausente</value>
   </data>
   <data name="MonospacedFontsOnly" xml:space="preserve">
-    <value>Monospaced fonts only</value>
+    <value>Somente fontes monoespaçadas</value>
   </data>
   <data name="New" xml:space="preserve">
-    <value>New</value>
+    <value>Novo</value>
   </data>
   <data name="NewDirectory" xml:space="preserve">
-    <value>New directory :</value>
+    <value>Novo diretório :</value>
   </data>
   <data name="NewReference" xml:space="preserve">
-    <value>New reference :</value>
+    <value>Nova referência :</value>
   </data>
   <data name="NewScript" xml:space="preserve">
-    <value>New script</value>
+    <value>Novo roteiro</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
-    <value>Not yet implemented</value>
-  </data>
-  <data name="OK" xml:space="preserve">
-    <value>OK</value>
+    <value>Ainda não implementado</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>Open</value>
+    <value>Abrir</value>
   </data>
   <data name="OpenFileDialogTitle" xml:space="preserve">
-    <value>Open a script</value>
+    <value>Abra um script</value>
   </data>
   <data name="OptionDialogTitle" xml:space="preserve">
-    <value>Options</value>
+    <value>Opções</value>
   </data>
   <data name="Orientation" xml:space="preserve">
-    <value>Orientation :</value>
+    <value>Orientação :</value>
   </data>
   <data name="Outdent" xml:space="preserve">
     <value>Outdent</value>
   </data>
   <data name="PageFormat" xml:space="preserve">
-    <value>Page format :</value>
+    <value>Formato da página :</value>
   </data>
   <data name="PageN" xml:space="preserve">
-    <value>Page {0}</value>
+    <value>Página {0}</value>
   </data>
   <data name="Paste" xml:space="preserve">
-    <value>Paste</value>
-  </data>
-  <data name="PortableDocumentFormat" xml:space="preserve">
-    <value>Portable Document Format</value>
+    <value>Colar</value>
   </data>
   <data name="Portrait" xml:space="preserve">
-    <value>Portrait</value>
+    <value>Retrato</value>
   </data>
   <data name="PressAnyKeyToReturn" xml:space="preserve">
-    <value>Press any key to return...</value>
+    <value>Pressione qualquer tecla para retornar...</value>
   </data>
   <data name="Print" xml:space="preserve">
-    <value>Print</value>
+    <value>Imprimir</value>
   </data>
   <data name="PrintedOn" xml:space="preserve">
-    <value>Printed on {0}</value>
+    <value>Impresso em {0}</value>
   </data>
   <data name="PrinterAndPageSettings" xml:space="preserve">
-    <value>Printer and page settings</value>
+    <value>Impressora e layout</value>
   </data>
   <data name="PrinterName" xml:space="preserve">
-    <value>Printer name :</value>
+    <value>Nome da impressora :</value>
   </data>
   <data name="Printing" xml:space="preserve">
-    <value>Printing</value>
+    <value>Impressão</value>
   </data>
   <data name="PrintPdfTitle" xml:space="preserve">
-    <value>Save PDF file as</value>
+    <value>Salvar arquivo PDF como</value>
   </data>
   <data name="PrintToPDF" xml:space="preserve">
-    <value>Print to PDF...</value>
+    <value>Imprimir em PDF...</value>
   </data>
   <data name="PromptToSave" xml:space="preserve">
-    <value>Save changes to the current script?</value>
+    <value>Salvar alterações no script atual?</value>
   </data>
   <data name="Redo" xml:space="preserve">
-    <value>Redo</value>
+    <value>Refazer</value>
   </data>
   <data name="References" xml:space="preserve">
-    <value>References</value>
+    <value>Referências</value>
   </data>
   <data name="ReferencesDescription" xml:space="preserve">
-    <value>Select the .NET assemblies that can be referenced from a script. You can either supply their name or their path</value>
+    <value>Selecione os assemblies .NET que podem ser referenciados em um script. Você pode fornecer o nome ou o caminho</value>
   </data>
   <data name="ReformatCode" xml:space="preserve">
-    <value>Reformat the code</value>
+    <value>Reformate o código</value>
   </data>
   <data name="RemoveFromList" xml:space="preserve">
-    <value>Remove from the list</value>
+    <value>Remover da lista</value>
   </data>
   <data name="Replace" xml:space="preserve">
-    <value>Replace</value>
+    <value>Substituir</value>
   </data>
   <data name="Right" xml:space="preserve">
-    <value>Right</value>
+    <value>Direita</value>
   </data>
   <data name="Run" xml:space="preserve">
-    <value>Run the script</value>
+    <value>Execute o script</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Salvar</value>
   </data>
   <data name="SaveAs" xml:space="preserve">
-    <value>Save as...</value>
+    <value>Salvar como...</value>
   </data>
   <data name="SaveFileDialogTitle" xml:space="preserve">
-    <value>Save the script as</value>
+    <value>Salve o script como</value>
   </data>
   <data name="SearchPaths" xml:space="preserve">
-    <value>Search paths</value>
+    <value>Caminhos de pesquisa</value>
   </data>
   <data name="SearchPathsDescription" xml:space="preserve">
-    <value>Define the set of directories where the AddyScript runtime can look for imported modules</value>
+    <value>Defina o conjunto de diretórios onde o tempo de execução do AddyScript pode procurar módulos importados</value>
   </data>
   <data name="SelectAll" xml:space="preserve">
-    <value>Select all</value>
+    <value>Selecionar tudo</value>
   </data>
   <data name="ShowLineNumbers" xml:space="preserve">
-    <value>Show line numbers</value>
+    <value>Mostrar núm. de linha</value>
   </data>
   <data name="ShowWhitespace" xml:space="preserve">
-    <value>Show whitespaces</value>
+    <value>Mostrar espaços</value>
   </data>
   <data name="SlicingNotSupported" xml:space="preserve">
-    <value>The {0} type does not have support for slice extraction</value>
+    <value>O tipo {0} não tem suporte para extração de fatia</value>
   </data>
   <data name="SurroundWith" xml:space="preserve">
-    <value>Surround with...</value>
+    <value>Cerque com...</value>
   </data>
   <data name="SystemDefault" xml:space="preserve">
-    <value>(System default value)</value>
-  </data>
-  <data name="Terminal" xml:space="preserve">
-    <value>Terminal</value>
+    <value>(Valor padrão do sistema)</value>
   </data>
   <data name="TextLength" xml:space="preserve">
-    <value>{0} characters</value>
+    <value>{0} caracteres</value>
   </data>
   <data name="Top" xml:space="preserve">
-    <value>Top</value>
+    <value>Acima</value>
   </data>
   <data name="Uncomment" xml:space="preserve">
-    <value>Uncomment selected lines</value>
+    <value>Remova o comentário das linhas selecionadas</value>
   </data>
   <data name="Undo" xml:space="preserve">
-    <value>Undo</value>
+    <value>Desfazer</value>
   </data>
   <data name="Untitled" xml:space="preserve">
-    <value>Untitled</value>
+    <value>Sem título</value>
   </data>
   <data name="UseEmulatedTerminal" xml:space="preserve">
-    <value>Use an emulated terminal</value>
+    <value>Use um terminal emulado</value>
   </data>
   <data name="UseNativeTerminal" xml:space="preserve">
-    <value>Use the native terminal</value>
+    <value>Use o terminal nativo</value>
   </data>
   <data name="VersionLabel" xml:space="preserve">
-    <value>Version {0}</value>
+    <value>Versão {0}</value>
   </data>
   <data name="ViewOnGitHub" xml:space="preserve">
-    <value>View on GitHub</value>
+    <value>Ver no GitHub</value>
   </data>
   <data name="WrapLongLines" xml:space="preserve">
-    <value>Wrap long lines</value>
+    <value>Quebra de linha automática</value>
   </data>
   <data name="XmlFileFilter" xml:space="preserve">
-    <value>eXtensible Markup Language</value>
+    <value>Linguagem de marcação extensível</value>
   </data>
 </root>

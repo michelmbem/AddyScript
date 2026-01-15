@@ -1,0 +1,66 @@
+<Window x:Class="AddyScript.Gui.FontDialog"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:p="using:AddyScript.Gui.Properties"
+        Title="{x:Static p:Resources.FontDialogTitle}"
+        Width="400"
+        Height="500"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        KeyUp="WindowKeyUp">
+  <DockPanel Margin="5">
+    <Grid DockPanel.Dock="Top"
+          RowDefinitions="Auto, Auto"
+          ColumnDefinitions="Auto, *, Auto"
+          Margin="0,0,0,3"
+          Classes="input-group">
+      <Label Grid.Row="0"
+             Grid.Column="0"
+             Content="{x:Static p:Resources.FilterByName}"
+             Target="FilterTextBox"
+             VerticalAlignment="Center" />
+      <TextBox Name="FilterTextBox"
+               Grid.Row="0"
+               Grid.Column="1"
+               TextChanged="FilterTextBoxTextChanged" />
+      <Button Name="ClearFilterButton"
+              Grid.Row="0"
+              Grid.Column="2"
+              i:Attached.Icon="fa-xmark"
+              VerticalAlignment="Stretch"
+              ToolTip.Tip="{x:Static p:Resources.ClearFilter}"
+              Click="ClearFilterButtonClick" />
+      <CheckBox Name="MonospaceFontCheckBox"
+                Grid.Row="1"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Content="{x:Static p:Resources.MonospacedFontsOnly}"
+                HorizontalAlignment="Right"
+                IsCheckedChanged="MonospaceFontCheckBoxCheckedChanged" />
+    </Grid>
+    <StackPanel DockPanel.Dock="Bottom"
+                Margin="5, 10, 5, 5"
+                Classes="button-bar">
+      <Button Name="CancelButton"
+              Content="{x:Static p:Resources.Cancel}"
+              IsCancel="True"
+              HotKey="Escape"
+              Click="CancelButtonClick" />
+      <Button Name="OkButton"
+              Content="{x:Static p:Resources.OK}"
+              IsDefault="True"
+              Click="OkButtonClick" />
+    </StackPanel>
+    <ListBox Name="FontListBox" Classes="font-list">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock FontFamily="{Binding}"
+                     Text="{Binding}"
+                     FontSize="24"
+                     DoubleTapped="FontListItemDoubleTapped" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</Window>

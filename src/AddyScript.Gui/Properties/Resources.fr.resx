@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -121,15 +121,12 @@
     <value>Impossible de charger l'assembly {0}</value>
   </data>
   <data name="AssemblyLoadFailureTitle" xml:space="preserve">
-    <value>Nom d'assembly invalide</value>
-  </data>
-  <data name="CapsLoc" xml:space="preserve">
-    <value>MAJ</value>
+    <value>Nom de bibliothèque invalide</value>
   </data>
   <data name="CaretStatus" xml:space="preserve">
-    <value>Ln {0}   Col {1}   Sél {2}</value>
+    <value>Ln: {0}   Col: {1}   Sél: {2}</value>
   </data>
-  <data name="ConfirmationBoxMessage" xml:space="preserve">
+  <data name="ConfirmDelete" xml:space="preserve">
     <value>Voulez-vous vraiment supprimer cet élément?</value>
   </data>
   <data name="ConfirmationBoxTitle" xml:space="preserve">
@@ -141,23 +138,20 @@
   <data name="ErrorMessageTitle" xml:space="preserve">
     <value>Erreur</value>
   </data>
-  <data name="ExportXmlTitle" xml:space="preserve">
+  <data name="ExportBoxTitle" xml:space="preserve">
     <value>Exporter le script vers</value>
   </data>
   <data name="File" xml:space="preserve">
-    <value>Fichier:</value>
+    <value>Fichier :</value>
   </data>
   <data name="FileDialogFilter" xml:space="preserve">
-    <value>Fichiers AddyScript (*.add; *.txt)|*.add; *.txt|Tous les fichiers (*.*)|*.*</value>
+    <value>Fichiers AddyScript</value>
   </data>
   <data name="InitializationFailure" xml:space="preserve">
     <value>Échec de l'initialisation</value>
   </data>
-  <data name="InsLoc" xml:space="preserve">
-    <value>REM</value>
-  </data>
   <data name="Line" xml:space="preserve">
-    <value>Ligne:</value>
+    <value>Ligne :</value>
   </data>
   <data name="MissingFunctionality" xml:space="preserve">
     <value>Fonctionnalité manquante</value>
@@ -183,10 +177,244 @@
   <data name="TextLength" xml:space="preserve">
     <value>{0} caractères</value>
   </data>
-  <data name="XmlFileFilter" xml:space="preserve">
-    <value>Fichier Xml (*.xml)|*.xml|Tous les fichiers (*.*)|*.*</value>
-  </data>
   <data name="SlicingNotSupported" xml:space="preserve">
     <value>Le type {0} ne prend pas en charge l'extration de tranches</value>
+  </data>
+  <data name="AboutBoxTitle" xml:space="preserve">
+    <value>À propos d'{0}</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>Le répertoire '{0}' n'existe pas</value>
+  </data>
+  <data name="DirectoryChooserTitle" xml:space="preserve">
+    <value>Choisir un dossier</value>
+  </data>
+  <data name="AssemblyChooserTitle" xml:space="preserve">
+    <value>Choisir un assembly .Net</value>
+  </data>
+  <data name="AssemblyChooserFilter" xml:space="preserve">
+    <value>Bibliothèque .Net</value>
+  </data>
+  <data name="BuiltinFunction" xml:space="preserve">
+    <value>Fonction interne</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>Sans titre</value>
+  </data>
+  <data name="PrintPdfTitle" xml:space="preserve">
+    <value>Enregistrer le fichier PDF sous</value>
+  </data>
+  <data name="PrintedOn" xml:space="preserve">
+    <value>Imprimé le {0}</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="SaveAs" xml:space="preserve">
+    <value>Enregistrer sous...</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Imprimer</value>
+  </data>
+  <data name="PrintToPDF" xml:space="preserve">
+    <value>Imprimer en PDF...</value>
+  </data>
+  <data name="ExportAsXML" xml:space="preserve">
+    <value>Exporter la structure en XML...</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Redo" xml:space="preserve">
+    <value>Refaire</value>
+  </data>
+  <data name="Cut" xml:space="preserve">
+    <value>Couper</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>Coller</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Exécuter le script</value>
+  </data>
+  <data name="Configure" xml:space="preserve">
+    <value>Configurer...</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>À propos...</value>
+  </data>
+  <data name="Find" xml:space="preserve">
+    <value>Trouver</value>
+  </data>
+  <data name="Replace" xml:space="preserve">
+    <value>Remplacer</value>
+  </data>
+  <data name="Indent" xml:space="preserve">
+    <value>Augmenter l'indentation</value>
+  </data>
+  <data name="Outdent" xml:space="preserve">
+    <value>Réduire l'indentation</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Mettre la sélection en commentaire</value>
+  </data>
+  <data name="Uncomment" xml:space="preserve">
+    <value>Annuler la mise en commentaire de la sélection</value>
+  </data>
+  <data name="InsertSnippet" xml:space="preserve">
+    <value>Insérer un bout de code...</value>
+  </data>
+  <data name="SurroundWith" xml:space="preserve">
+    <value>Entourrer de...</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Tout sélectionner</value>
+  </data>
+  <data name="ReformatCode" xml:space="preserve">
+    <value>Mettre le document en forme</value>
+  </data>
+  <data name="Editor" xml:space="preserve">
+    <value>Éditeur</value>
+  </data>
+  <data name="FontFace" xml:space="preserve">
+    <value>Type de police :</value>
+  </data>
+  <data name="FontSize" xml:space="preserve">
+    <value>Taille de police :</value>
+  </data>
+  <data name="WrapLongLines" xml:space="preserve">
+    <value>Retour automatique à la ligne</value>
+  </data>
+  <data name="ShowLineNumbers" xml:space="preserve">
+    <value>Afficher n° ligne</value>
+  </data>
+  <data name="HighlightCurrentLine" xml:space="preserve">
+    <value>Surligner ligne courante</value>
+  </data>
+  <data name="UseNativeTerminal" xml:space="preserve">
+    <value>Utiliser le terminal natif</value>
+  </data>
+  <data name="UseEmulatedTerminal" xml:space="preserve">
+    <value>Utiliser un terminal émulé</value>
+  </data>
+  <data name="EmulatedTerminal" xml:space="preserve">
+    <value>Terminal émulé</value>
+  </data>
+  <data name="Foreground" xml:space="preserve">
+    <value>Premier plan :</value>
+  </data>
+  <data name="Background" xml:space="preserve">
+    <value>Arrière-plan :</value>
+  </data>
+  <data name="PrinterAndPageSettings" xml:space="preserve">
+    <value>Imprimante et mise en page</value>
+  </data>
+  <data name="PrinterName" xml:space="preserve">
+    <value>Nom d'imprimante :</value>
+  </data>
+  <data name="PageFormat" xml:space="preserve">
+    <value>Format de page :</value>
+  </data>
+  <data name="Landscape" xml:space="preserve">
+    <value>Paysage</value>
+  </data>
+  <data name="MarginsInInches" xml:space="preserve">
+    <value>Marges (en pouces)</value>
+  </data>
+  <data name="Top" xml:space="preserve">
+    <value>En haut</value>
+  </data>
+  <data name="Left" xml:space="preserve">
+    <value>À gauche</value>
+  </data>
+  <data name="Right" xml:space="preserve">
+    <value>À droite</value>
+  </data>
+  <data name="Bottom" xml:space="preserve">
+    <value>En bas</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="SearchPaths" xml:space="preserve">
+    <value>Chémins d'inclusion</value>
+  </data>
+  <data name="NewDirectory" xml:space="preserve">
+    <value>Nouveau répertoire :</value>
+  </data>
+  <data name="Browse4Directory" xml:space="preserve">
+    <value>Parcourir les répertoires</value>
+  </data>
+  <data name="Add2list" xml:space="preserve">
+    <value>Ajouter à la liste</value>
+  </data>
+  <data name="RemoveFromList" xml:space="preserve">
+    <value>Retirer de la liste</value>
+  </data>
+  <data name="References" xml:space="preserve">
+    <value>Références</value>
+  </data>
+  <data name="NewReference" xml:space="preserve">
+    <value>Nouvelle référence :</value>
+  </data>
+  <data name="Browse4Assembly" xml:space="preserve">
+    <value>Parcourir les bibliothèques</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Général</value>
+  </data>
+  <data name="Printing" xml:space="preserve">
+    <value>Impression</value>
+  </data>
+  <data name="ShowWhitespace" xml:space="preserve">
+    <value>Afficher espaces</value>
+  </data>
+  <data name="FontDialogTitle" xml:space="preserve">
+    <value>Choisir une police</value>
+  </data>
+  <data name="FilterByName" xml:space="preserve">
+    <value>Filtrer par nom :</value>
+  </data>
+  <data name="ClearFilter" xml:space="preserve">
+    <value>Annuler le filtre</value>
+  </data>
+  <data name="MonospacedFontsOnly" xml:space="preserve">
+    <value>Espacement fixe uniquement</value>
+  </data>
+  <data name="ViewOnGitHub" xml:space="preserve">
+    <value>Voir sur GitHub</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Langue :</value>
+  </data>
+  <data name="Appearence" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="SystemDefault" xml:space="preserve">
+    <value>(Valeur par défaut du système)</value>
+  </data>
+  <data name="LanguageChangeOnRestart" xml:space="preserve">
+    <value>Le changement de langue ne prendra effet qu'après un redémarrage</value>
+  </data>
+  <data name="SearchPathsDescription" xml:space="preserve">
+    <value>Définissez l'ensemble des répertoires dans lesquels le runtime d'AddyScript peut rechercher les modules importés</value>
+  </data>
+  <data name="ReferencesDescription" xml:space="preserve">
+    <value>Sélectionnez les assemblys .NET pouvant être référencés depuis un script. Vous pouvez indiquer leur nom ou leur chemin d'accès.</value>
   </data>
 </root>

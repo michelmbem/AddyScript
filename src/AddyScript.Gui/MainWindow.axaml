@@ -1,0 +1,224 @@
+<Window x:Class="AddyScript.Gui.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+        xmlns:p="using:AddyScript.Gui.Properties"
+        Width="1000"
+        Height="650"
+        Loaded="WindowLoaded"
+        Activated="WindowActivated"
+        KeyDown="WindowKeyDown"
+        Closing="WindowClosing">
+
+  <Grid RowDefinitions="Auto, *, Auto">
+    <Popup Name="InfoPopup"
+           Placement="Pointer"
+           IsLightDismissEnabled="False">
+      <Border Background="{DynamicResource PopupBackground}"
+              BorderBrush="{DynamicResource WindowBackground}"
+              BorderThickness="1"
+              Padding="5">
+        <StackPanel>
+          <TextBlock Name="PopupHeader"
+                     Foreground="{DynamicResource WindowBackground}"
+                     FontWeight="Bold"
+                     Margin="0, 0, 0, 2" />
+          <TextBlock Name="PopupText" />
+        </StackPanel>
+      </Border>
+    </Popup>
+    <StackPanel Grid.Row="0" Classes="toolbar">
+      <Button Name="ToolbarNewButton"
+              i:Attached.Icon="fa-file"
+              ToolTip.Tip="{x:Static p:Resources.New}"
+              HotKey="{OnPlatform Ctrl+N, macOS=Meta+N}"
+              Click="ToolbarNewButtonClick" />
+      <Button Name="ToolbarOpenButton"
+              i:Attached.Icon="fa-folder-open"
+              ToolTip.Tip="{x:Static p:Resources.Open}"
+              HotKey="{OnPlatform Ctrl+O, macOS=Meta+O}"
+              Click="ToolbarOpenButtonClick" />
+      <SplitButton Name="ToolbarSaveButton"
+                   i:Attached.Icon="fa-floppy-disk"
+                   ToolTip.Tip="{x:Static p:Resources.Save}"
+                   HotKey="{OnPlatform Ctrl+S, macOS=Meta+S}"
+                   Click="ToolbarSaveButtonClick">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedLeft">
+            <MenuItem Name="ToolbarSaveAsMenuItem"
+                      Header="{x:Static p:Resources.SaveAs}"
+                      i:MenuItem.Icon="mdi-content-save-edit"
+                      Click="ToolbarSaveAsMenuItemClick" />
+            <MenuItem Name="ToolbarExportXmlMenuItem"
+                      Header="{x:Static p:Resources.ExportAsXML}"
+                      i:MenuItem.Icon="mdi-file-xml-box"
+                      Click="ToolbarExportXmlMenuItemClick" />
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+      <Rectangle Classes="divider" />
+      <SplitButton Name="ToolbarPrintButton"
+                   i:Attached.Icon="fa-print"
+                   ToolTip.Tip="{x:Static p:Resources.Print}"
+                   HotKey="{OnPlatform Ctrl+P, macOS=Meta+P}"
+                   Click="ToolbarPrintButtonClick">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedLeft">
+            <MenuItem Name="ToolbarPrintToPdfMenuItem"
+                      Header="{x:Static p:Resources.PrintToPDF}"
+                      i:MenuItem.Icon="fa-file-pdf"
+                      Click="ToolbarPrintToPdfMenuItemClick" />
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarUndoButton"
+              i:Attached.Icon="fa-rotate-left"
+              ToolTip.Tip="{x:Static p:Resources.Undo}"
+              Click="ToolbarUndoButtonClick" />
+      <Button Name="ToolbarRedoButton"
+              i:Attached.Icon="fa-rotate-right"
+              ToolTip.Tip="{x:Static p:Resources.Redo}"
+              Click="ToolbarRedoButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarCutButton"
+              i:Attached.Icon="fa-scissors"
+              ToolTip.Tip="{x:Static p:Resources.Cut}"
+              Click="ToolbarCutButtonClick" />
+      <Button Name="ToolbarCopyButton"
+              i:Attached.Icon="fa-copy"
+              ToolTip.Tip="{x:Static p:Resources.Copy}"
+              Click="ToolbarCopyButtonClick" />
+      <Button Name="ToolbarPasteButton"
+              i:Attached.Icon="fa-paste"
+              ToolTip.Tip="{x:Static p:Resources.Paste}"
+              Click="ToolbarPasteButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarFindButton"
+              i:Attached.Icon="fa-magnifying-glass"
+              ToolTip.Tip="{x:Static p:Resources.Find}"
+              Click="ToolbarFindButtonClick" />
+      <Button Name="ToolbarReplaceButton"
+              i:Attached.Icon="fa-rotate"
+              ToolTip.Tip="{x:Static p:Resources.Replace}"
+              HotKey="{OnPlatform Ctrl+H, macOS=Meta+H}"
+              Click="ToolbarReplaceButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarIndentButton"
+              i:Attached.Icon="fa-indent"
+              ToolTip.Tip="{x:Static p:Resources.Indent}"
+              Click="ToolbarIndentButtonClick" />
+      <Button Name="ToolbarOutdentButton"
+              i:Attached.Icon="fa-outdent"
+              ToolTip.Tip="{x:Static p:Resources.Outdent}"
+              Click="ToolbarOutdentButtonClick" />
+      <Button Name="ToolbarCommentButton"
+              i:Attached.Icon="fa-comment"
+              ToolTip.Tip="{x:Static p:Resources.Comment}"
+              HotKey="{OnPlatform Ctrl+K, macOS=Meta+K}"
+              Click="ToolbarCommentButtonClick" />
+      <Button Name="ToolbarUncommentButton"
+              i:Attached.Icon="fa-comment-slash"
+              ToolTip.Tip="{x:Static p:Resources.Uncomment}"
+              HotKey="{OnPlatform Ctrl+Shift+K, macOS=Meta+Shift+K}"
+              Click="ToolbarUncommentButtonClick" />
+      <Rectangle Classes="divider" />
+      <Button Name="ToolbarRunButton"
+              i:Attached.Icon="fa-play"
+              ToolTip.Tip="{x:Static p:Resources.Run}"
+              HotKey="F5"
+              Click="ToolbarRunButtonClick" />
+      <Button Name="ToolbarConfigButton"
+              i:Attached.Icon="fa-gear"
+              ToolTip.Tip="{x:Static p:Resources.Configure}"
+              HotKey="F10"
+              Click="ToolbarConfigButtonClick" />
+      <Rectangle Classes="divider" />
+      <SplitButton Name="ToolbarHelpButton"
+                   i:Attached.Icon="fa-circle-info"
+                   ToolTip.Tip="{x:Static p:Resources.Help}"
+                   HotKey="F1"
+                   Click="ToolbarHelpButtonClick">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedLeft">
+            <MenuItem Name="ToolbarHelpAboutMenuItem"
+                      Header="{x:Static p:Resources.About}"
+                      Click="ToolbarHelpAboutMenuItemClick" />
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+    </StackPanel>
+    <Border Grid.Row="1" Classes="editor-wrapper">
+      <ae:TextEditor Name="Editor"
+                     FontFamily="{DynamicResource EditorFontFamily}"
+                     FontSize="{DynamicResource EditorFontSize}"
+                     Foreground="{DynamicResource EditorForeground}"
+                     Background="{DynamicResource EditorBackground}"
+                     ShowLineNumbers="True">
+        <ae:TextEditor.ContextMenu>
+          <ContextMenu>
+            <MenuItem Name="InsertSnippetMenuItem"
+                      Header="{x:Static p:Resources.InsertSnippet}"
+                      Click="InsertSnippetMenuItemClick" />
+            <MenuItem Name="SurroundWithMenuItem"
+                      Header="{x:Static p:Resources.SurroundWith}"
+                      Click="SurroundWithMenuItemClick" />
+            <Separator />
+            <MenuItem Name="UndoMenuItem"
+                      Header="{x:Static p:Resources.Undo}"
+                      i:MenuItem.Icon="fa-rotate-left"
+                      Click="ToolbarUndoButtonClick" />
+            <MenuItem Name="RedoMenuItem"
+                      Header="{x:Static p:Resources.Redo}"
+                      i:MenuItem.Icon="fa-rotate-right"
+                      Click="ToolbarRedoButtonClick" />
+            <Separator />
+            <MenuItem Name="CutMenuItem"
+                      Header="{x:Static p:Resources.Cut}"
+                      i:MenuItem.Icon="fa-scissors"
+                      Click="ToolbarCutButtonClick" />
+            <MenuItem Name="CopyMenuItem"
+                      Header="{x:Static p:Resources.New}"
+                      i:MenuItem.Icon="fa-copy"
+                      Click="ToolbarCopyButtonClick" />
+            <MenuItem Name="PasteMenuItem"
+                      Header="{x:Static p:Resources.Paste}"
+                      i:MenuItem.Icon="fa-paste"
+                      Click="ToolbarPasteButtonClick" />
+            <MenuItem Name="DeleteMenuItem"
+                      Header="{x:Static p:Resources.Delete}"
+                      i:MenuItem.Icon="fa-trash"
+                      Click="DeleteMenuItemClick" />
+            <Separator />
+            <MenuItem Name="SelectAllMenuItem"
+                      Header="{x:Static p:Resources.SelectAll}"
+                      Click="SelectAllMenuItemClick" />
+            <MenuItem Name="ReformatMenuItem"
+                      Header="{x:Static p:Resources.ReformatCode}"
+                      Click="ReformatMenuItemClick" />
+          </ContextMenu>
+        </ae:TextEditor.ContextMenu>
+      </ae:TextEditor>
+    </Border>
+    <Grid Grid.Row="2"
+          Classes="statusbar"
+          ColumnDefinitions="*, 200, 200, Auto">
+      <TextBlock Name="FileNameStatusItem" Grid.Column="0" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <Rectangle Classes="divider" />
+        <TextBlock Name="TextLengthStatusItem" />
+      </StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal">
+        <Rectangle Classes="divider" />
+        <TextBlock Name="CaretStatusItem" />
+      </StackPanel>
+      <StackPanel Name="InfoStatusSection"
+                  Grid.Column="3"
+                  Orientation="Horizontal"
+                  IsVisible="False">
+        <Rectangle Classes="divider" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

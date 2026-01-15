@@ -1,52 +1,224 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript", "AddyScript\AddyScript.csproj", "{A114CFE7-08D1-46CC-8131-22111E4DA0D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Gui", "AddyScript.Gui\AddyScript.Gui.csproj", "{EF288506-5299-4C7F-BA12-649509DB83BE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Interactive", "AddyScript.Interactive\AddyScript.Interactive.csproj", "{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.GuiUtilities", "AddyScript.GuiUtilities\AddyScript.GuiUtilities.csproj", "{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Plotter", "AddyScript.Plotter\AddyScript.Plotter.csproj", "{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Tests", "AddyScript.Tests\AddyScript.Tests.csproj", "{0A24A20E-8751-417A-B77C-B71DB21F609A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddyScript.Gui", "AddyScript.Gui\AddyScript.Gui.csproj", "{59C242A8-5333-443E-8E8F-17EDD536F234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pty.Net", "Pty.Net\Pty.Net.csproj", "{CB0753C7-9EEE-4A94-B2E0-9A68DC358B17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{AF129D32-8893-4D2F-8FB2-42D5394F1056}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+		..\README.md = ..\README.md
+		..\mkdocs.yml = ..\mkdocs.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B0734001-F12C-4887-8AF0-898C5FD43CC4}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\mkdocs.yml = ..\.github\workflows\mkdocs.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6EBB68CC-3D46-49CF-8606-9E9B1F852E1F}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\AddyScript.jpg = ..\docs\AddyScript.jpg
+		..\docs\anatomy.md = ..\docs\anatomy.md
+		..\docs\asgui-asis.md = ..\docs\asgui-asis.md
+		..\docs\asgui.jpg = ..\docs\asgui.jpg
+		..\docs\asis.jpg = ..\docs\asis.jpg
+		..\docs\classes.md = ..\docs\classes.md
+		..\docs\col-obj.md = ..\docs\col-obj.md
+		..\docs\evaluate.md = ..\docs\evaluate.md
+		..\docs\exceptions.md = ..\docs\exceptions.md
+		..\docs\expressions.md = ..\docs\expressions.md
+		..\docs\extapi.md = ..\docs\extapi.md
+		..\docs\extlang.md = ..\docs\extlang.md
+		..\docs\features.md = ..\docs\features.md
+		..\docs\flow-control.md = ..\docs\flow-control.md
+		..\docs\grammar.ebnf = ..\docs\grammar.ebnf
+		..\docs\grammar.md = ..\docs\grammar.md
+		..\docs\improve.md = ..\docs\improve.md
+		..\docs\inheritance.md = ..\docs\inheritance.md
+		..\docs\innerfunc.md = ..\docs\innerfunc.md
+		..\docs\interop.md = ..\docs\interop.md
+		..\docs\interpret.md = ..\docs\interpret.md
+		..\docs\introspection.md = ..\docs\introspection.md
+		..\docs\README.md = ..\docs\README.md
+		..\docs\scriptengine.md = ..\docs\scriptengine.md
+		..\docs\spec-types.md = ..\docs\spec-types.md
+		..\docs\tree.jpg = ..\docs\tree.jpg
+		..\docs\userfunc.md = ..\docs\userfunc.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagram", "diagram", "{409F11D0-0D63-4D73-9DAB-D79C38FC68DC}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\grammar\Argument.svg = ..\docs\grammar\Argument.svg
+		..\docs\grammar\ArgumentList.svg = ..\docs\grammar\ArgumentList.svg
+		..\docs\grammar\Arguments.svg = ..\docs\grammar\Arguments.svg
+		..\docs\grammar\Assignment.svg = ..\docs\grammar\Assignment.svg
+		..\docs\grammar\AssignmentOperator.svg = ..\docs\grammar\AssignmentOperator.svg
+		..\docs\grammar\AssignmentWithLet.svg = ..\docs\grammar\AssignmentWithLet.svg
+		..\docs\grammar\Atom.svg = ..\docs\grammar\Atom.svg
+		..\docs\grammar\AtomStartingWithId.svg = ..\docs\grammar\AtomStartingWithId.svg
+		..\docs\grammar\AtomStartingWithLBrace.svg = ..\docs\grammar\AtomStartingWithLBrace.svg
+		..\docs\grammar\AtomStartingWithLParen.svg = ..\docs\grammar\AtomStartingWithLParen.svg
+		..\docs\grammar\AtomStartingWithNew.svg = ..\docs\grammar\AtomStartingWithNew.svg
+		..\docs\grammar\AtomStartingWithSuper.svg = ..\docs\grammar\AtomStartingWithSuper.svg
+		..\docs\grammar\AtomStartingWithTypeName.svg = ..\docs\grammar\AtomStartingWithTypeName.svg
+		..\docs\grammar\AtomStartingWithTypeOf.svg = ..\docs\grammar\AtomStartingWithTypeOf.svg
+		..\docs\grammar\Attribute.svg = ..\docs\grammar\Attribute.svg
+		..\docs\grammar\Attributes.svg = ..\docs\grammar\Attributes.svg
+		..\docs\grammar\BIG_DECIMAL.svg = ..\docs\grammar\BIG_DECIMAL.svg
+		..\docs\grammar\BIG_INTEGER.svg = ..\docs\grammar\BIG_INTEGER.svg
+		..\docs\grammar\BLOB.svg = ..\docs\grammar\BLOB.svg
+		..\docs\grammar\Block.svg = ..\docs\grammar\Block.svg
+		..\docs\grammar\BOOLEAN.svg = ..\docs\grammar\BOOLEAN.svg
+		..\docs\grammar\Break.svg = ..\docs\grammar\Break.svg
+		..\docs\grammar\CaseLabel.svg = ..\docs\grammar\CaseLabel.svg
+		..\docs\grammar\ClassDefinition.svg = ..\docs\grammar\ClassDefinition.svg
+		..\docs\grammar\ClassMember.svg = ..\docs\grammar\ClassMember.svg
+		..\docs\grammar\COMPLEX.svg = ..\docs\grammar\COMPLEX.svg
+		..\docs\grammar\Composite.svg = ..\docs\grammar\Composite.svg
+		..\docs\grammar\CompositePattern.svg = ..\docs\grammar\CompositePattern.svg
+		..\docs\grammar\Condition.svg = ..\docs\grammar\Condition.svg
+		..\docs\grammar\ConstantDecl.svg = ..\docs\grammar\ConstantDecl.svg
+		..\docs\grammar\ConstructorCall.svg = ..\docs\grammar\ConstructorCall.svg
+		..\docs\grammar\ConstructorSpec.svg = ..\docs\grammar\ConstructorSpec.svg
+		..\docs\grammar\Continue.svg = ..\docs\grammar\Continue.svg
+		..\docs\grammar\Conversion.svg = ..\docs\grammar\Conversion.svg
+		..\docs\grammar\DATE.svg = ..\docs\grammar\DATE.svg
+		..\docs\grammar\DECIMAL_INTEGER.svg = ..\docs\grammar\DECIMAL_INTEGER.svg
+		..\docs\grammar\DIGIT.svg = ..\docs\grammar\DIGIT.svg
+		..\docs\grammar\DoLoop.svg = ..\docs\grammar\DoLoop.svg
+		..\docs\grammar\DOUBLE_QUOTED.svg = ..\docs\grammar\DOUBLE_QUOTED.svg
+		..\docs\grammar\ESCAPE_SEQ.svg = ..\docs\grammar\ESCAPE_SEQ.svg
+		..\docs\grammar\EventSpec.svg = ..\docs\grammar\EventSpec.svg
+		..\docs\grammar\Exponentiation.svg = ..\docs\grammar\Exponentiation.svg
+		..\docs\grammar\Expression.svg = ..\docs\grammar\Expression.svg
+		..\docs\grammar\ExpressionList.svg = ..\docs\grammar\ExpressionList.svg
+		..\docs\grammar\ExternalFunctionDecl.svg = ..\docs\grammar\ExternalFunctionDecl.svg
+		..\docs\grammar\Factor.svg = ..\docs\grammar\Factor.svg
+		..\docs\grammar\FieldSpec.svg = ..\docs\grammar\FieldSpec.svg
+		..\docs\grammar\FLOAT.svg = ..\docs\grammar\FLOAT.svg
+		..\docs\grammar\ForEachLoop.svg = ..\docs\grammar\ForEachLoop.svg
+		..\docs\grammar\ForLoop.svg = ..\docs\grammar\ForLoop.svg
+		..\docs\grammar\FunctionBody.svg = ..\docs\grammar\FunctionBody.svg
+		..\docs\grammar\FunctionDecl.svg = ..\docs\grammar\FunctionDecl.svg
+		..\docs\grammar\Goto.svg = ..\docs\grammar\Goto.svg
+		..\docs\grammar\GroupingPattern.svg = ..\docs\grammar\GroupingPattern.svg
+		..\docs\grammar\HEXDIGIT.svg = ..\docs\grammar\HEXDIGIT.svg
+		..\docs\grammar\HEX_INTEGER.svg = ..\docs\grammar\HEX_INTEGER.svg
+		..\docs\grammar\IDENTIFIER.svg = ..\docs\grammar\IDENTIFIER.svg
+		..\docs\grammar\IfElse.svg = ..\docs\grammar\IfElse.svg
+		..\docs\grammar\ImportDirective.svg = ..\docs\grammar\ImportDirective.svg
+		..\docs\grammar\InlineFunction.svg = ..\docs\grammar\InlineFunction.svg
+		..\docs\grammar\INTEGER.svg = ..\docs\grammar\INTEGER.svg
+		..\docs\grammar\Label.svg = ..\docs\grammar\Label.svg
+		..\docs\grammar\Lambda.svg = ..\docs\grammar\Lambda.svg
+		..\docs\grammar\LETTER.svg = ..\docs\grammar\LETTER.svg
+		..\docs\grammar\LETTER_EXTENDED.svg = ..\docs\grammar\LETTER_EXTENDED.svg
+		..\docs\grammar\ListInitializer.svg = ..\docs\grammar\ListInitializer.svg
+		..\docs\grammar\Literal.svg = ..\docs\grammar\Literal.svg
+		..\docs\grammar\LogicalOperator.svg = ..\docs\grammar\LogicalOperator.svg
+		..\docs\grammar\MapInitializer.svg = ..\docs\grammar\MapInitializer.svg
+		..\docs\grammar\MapItemInitializer.svg = ..\docs\grammar\MapItemInitializer.svg
+		..\docs\grammar\MapItemInitializerList.svg = ..\docs\grammar\MapItemInitializerList.svg
+		..\docs\grammar\MatchCase.svg = ..\docs\grammar\MatchCase.svg
+		..\docs\grammar\MatchCaseExpression.svg = ..\docs\grammar\MatchCaseExpression.svg
+		..\docs\grammar\MatchCaseList.svg = ..\docs\grammar\MatchCaseList.svg
+		..\docs\grammar\MemberPrefix.svg = ..\docs\grammar\MemberPrefix.svg
+		..\docs\grammar\MemberSpec.svg = ..\docs\grammar\MemberSpec.svg
+		..\docs\grammar\MethodBody.svg = ..\docs\grammar\MethodBody.svg
+		..\docs\grammar\MethodSpec.svg = ..\docs\grammar\MethodSpec.svg
+		..\docs\grammar\MODIFIER.svg = ..\docs\grammar\MODIFIER.svg
+		..\docs\grammar\NamedArg.svg = ..\docs\grammar\NamedArg.svg
+		..\docs\grammar\NamedArgList.svg = ..\docs\grammar\NamedArgList.svg
+		..\docs\grammar\NegativePattern.svg = ..\docs\grammar\NegativePattern.svg
+		..\docs\grammar\ObjectInitializer.svg = ..\docs\grammar\ObjectInitializer.svg
+		..\docs\grammar\ObjectPattern.svg = ..\docs\grammar\ObjectPattern.svg
+		..\docs\grammar\OperatorSpec.svg = ..\docs\grammar\OperatorSpec.svg
+		..\docs\grammar\OverloadableOperator.svg = ..\docs\grammar\OverloadableOperator.svg
+		..\docs\grammar\Parameter.svg = ..\docs\grammar\Parameter.svg
+		..\docs\grammar\ParameterList.svg = ..\docs\grammar\ParameterList.svg
+		..\docs\grammar\ParenthesizedExpression.svg = ..\docs\grammar\ParenthesizedExpression.svg
+		..\docs\grammar\Pattern.svg = ..\docs\grammar\Pattern.svg
+		..\docs\grammar\PostfixUnaryExpression.svg = ..\docs\grammar\PostfixUnaryExpression.svg
+		..\docs\grammar\PrefixUnaryExpression.svg = ..\docs\grammar\PrefixUnaryExpression.svg
+		..\docs\grammar\Program.svg = ..\docs\grammar\Program.svg
+		..\docs\grammar\PropertySpec.svg = ..\docs\grammar\PropertySpec.svg
+		..\docs\grammar\QualifiedName.svg = ..\docs\grammar\QualifiedName.svg
+		..\docs\grammar\RangePattern.svg = ..\docs\grammar\RangePattern.svg
+		..\docs\grammar\REAL.svg = ..\docs\grammar\REAL.svg
+		..\docs\grammar\Reference.svg = ..\docs\grammar\Reference.svg
+		..\docs\grammar\Relation.svg = ..\docs\grammar\Relation.svg
+		..\docs\grammar\RelationalOperator.svg = ..\docs\grammar\RelationalOperator.svg
+		..\docs\grammar\Return.svg = ..\docs\grammar\Return.svg
+		..\docs\grammar\rr-2.6.svg = ..\docs\grammar\rr-2.6.svg
+		..\docs\grammar\SCOPE.svg = ..\docs\grammar\SCOPE.svg
+		..\docs\grammar\SetInitializer.svg = ..\docs\grammar\SetInitializer.svg
+		..\docs\grammar\SINGLE_QUOTED.svg = ..\docs\grammar\SINGLE_QUOTED.svg
+		..\docs\grammar\SPECIAL_IDENTIFIER.svg = ..\docs\grammar\SPECIAL_IDENTIFIER.svg
+		..\docs\grammar\STANDARD_IDENTIFIER.svg = ..\docs\grammar\STANDARD_IDENTIFIER.svg
+		..\docs\grammar\Statement.svg = ..\docs\grammar\Statement.svg
+		..\docs\grammar\StatementWithLabels.svg = ..\docs\grammar\StatementWithLabels.svg
+		..\docs\grammar\STRING.svg = ..\docs\grammar\STRING.svg
+		..\docs\grammar\SwitchBlock.svg = ..\docs\grammar\SwitchBlock.svg
+		..\docs\grammar\Term.svg = ..\docs\grammar\Term.svg
+		..\docs\grammar\TernaryExpression.svg = ..\docs\grammar\TernaryExpression.svg
+		..\docs\grammar\Throw.svg = ..\docs\grammar\Throw.svg
+		..\docs\grammar\TryCatchFinally.svg = ..\docs\grammar\TryCatchFinally.svg
+		..\docs\grammar\TupleInitializer.svg = ..\docs\grammar\TupleInitializer.svg
+		..\docs\grammar\TYPE_NAME.svg = ..\docs\grammar\TYPE_NAME.svg
+		..\docs\grammar\ValuePattern.svg = ..\docs\grammar\ValuePattern.svg
+		..\docs\grammar\VariableDecl.svg = ..\docs\grammar\VariableDecl.svg
+		..\docs\grammar\VariableSetter.svg = ..\docs\grammar\VariableSetter.svg
+		..\docs\grammar\VariableSetterList.svg = ..\docs\grammar\VariableSetterList.svg
+		..\docs\grammar\WhileLoop.svg = ..\docs\grammar\WhileLoop.svg
+		..\docs\grammar\Yield.svg = ..\docs\grammar\Yield.svg
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A114CFE7-08D1-46CC-8131-22111E4DA0D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF288506-5299-4C7F-BA12-649509DB83BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF288506-5299-4C7F-BA12-649509DB83BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF288506-5299-4C7F-BA12-649509DB83BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF288506-5299-4C7F-BA12-649509DB83BE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FE376A9-5370-42AE-8EF0-D3D28B93F82B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4E85D34-328D-4CD3-B7FC-A5D53495B51A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0DA7F48-7EA7-492D-B2E8-98D7AAD24346}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A24A20E-8751-417A-B77C-B71DB21F609A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C242A8-5333-443E-8E8F-17EDD536F234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB0753C7-9EEE-4A94-B2E0-9A68DC358B17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB0753C7-9EEE-4A94-B2E0-9A68DC358B17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB0753C7-9EEE-4A94-B2E0-9A68DC358B17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB0753C7-9EEE-4A94-B2E0-9A68DC358B17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6EBB68CC-3D46-49CF-8606-9E9B1F852E1F} = {AF129D32-8893-4D2F-8FB2-42D5394F1056}
+		{B0734001-F12C-4887-8AF0-898C5FD43CC4} = {AF129D32-8893-4D2F-8FB2-42D5394F1056}
+		{409F11D0-0D63-4D73-9DAB-D79C38FC68DC} = {6EBB68CC-3D46-49CF-8606-9E9B1F852E1F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F75050D-FFD7-4560-A6BB-F1B696C11762}
 	EndGlobalSection
 EndGlobal
