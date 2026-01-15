@@ -167,17 +167,17 @@ namespace AddyScript.Gui
 
             // Define keywords
             scintilla.SetKeywords(0, @"
-                abstract and as blob bool break case catch class closure complex const constructor contains continue date decimal
-                default do else endswith event extern false final finally float for foreach function goto if import in int is
+                abstract and as blob bool break case catch class closure complex const constructor contains continue date duration
+                decimal default do else endswith event extern false final finally float for foreach function goto if import in int is
                 list long map matches new not null object operator or private property protected public queue rational read resource
                 return set stack startswith static string super switch this throw true try tuple typeof var void when while with write
                 yield
             ");
 
             scintilla.SetKeywords(1, @"
-                abs acos asin atan atan2 ceil chr cos cosh deg2rad E eval exp floor format I log log10 log2 max MAXDATE MAXFLOAT
-                MAXINT min MINDATE MINFLOAT MININT NAN NINFINITY NEWLINE now ord pack PI PINFINITY print println rad2deg rand
-                randint readln round sign sin sinh sqrt tan tanh trunc unpack
+                abs acos asin atan atan2 ceil chr cos cosh days deg2rad E eval exp floor format hash hours log log10 log2 max MAXDATE
+                MAXFLOAT MAXINT milliseconds min MINDATE MINFLOAT MININT minutes NAN NINFINITY NEWLINE now ord pack PI PINFINITY print
+                println rad2deg rand randint readln round seconds sign sin sinh sqrt tan tanh trunc unpack
             ");
 
             // Define styles
@@ -298,46 +298,48 @@ namespace AddyScript.Gui
 
             // Keywords menu
             string keywords = @"
-                abs?3 abstract?0 acos?3 and?0 as?0 asin?3 atan?3 atan2?3 blob?0 bool?1 break?0 case?0 catch?0 ceil?3 chr?3
-                class?0 closure?1 complex?1 const?0 constructor?0 contains?4 continue?0 cos?3 cosh?3 date?1 decimal?1
-                default?0 deg2rad?3 do?0 E?2 else?0 endswith?4 eval?3 event?0 exp?3 extern?0 false?2 final?0 finally?0
-                float?1 floor?3 for?0 foreach?0 format?3 function?0 goto?0 I?2 if?0 import?0 in?4 int?1 is?4 list?1 log?3
-                log10?3 log2?3 long?1 map?1 matches?4 max?3 MAXDATE?2 MAXFLOAT?2 MAXINT?2 min?3 MINDATE?2 MINFLOAT?2 MININT?2
-                NAN?2 new?4 NEWLINE?2 NINFINITY?2 not?0 now?3 null?2 object?1 operator?0 or?0 ord?3 pack?3 PI?2 PINFINITY?2
-                print?3 println?3 private?0 property?0 protected?0 public?0 queue?1 rad2deg?3 rand?3 randint?3 rational?1 read?5
-                readln?3 resource?1 return?0 round?3 set?1 sign?3 sin?3 sinh?3 sqrt?3 stack?1 startswith?4 static?0 string?1
-                super?0 switch?0 tan?3 tanh?3 this?5 throw?0 true?2 trunc?3 try?0 tuple?0 typeof?4 unpack?3 var?0 void?1 when?0
-                while?0 with?0 write?5 yield?0
+                abs:3 abstract:0 acos:3 and:4 as:4 asin:3 atan:3 atan2:3 blob:1 bool:1 break:0 case:0 catch:0 ceil:3 chr:3
+                class:0 closure:1 complex:1 const:0 constructor:0 contains:4 continue:0 cos:3 cosh:3 date:1 days:3 decimal:1
+                default:0 deg2rad:3 do:0 E:2 duration:1 else:0 endswith:4 eval:3 event:0 exp:3 extern:0 false:2 final:0 finally:0
+                float:1 floor:3 for:0 foreach:0 format:3 function:0 goto:0 hash:3 hours:3 I:2 if:0 import:0 in:4 int:1 is:4 let:0
+                list:1 log:3 log10:3 log2:3 long:1 map:1 matches:4 max:3 MAXDATE:2 MAXFLOAT:2 MAXINT:2 milliseconds:3 min:3 MINDATE:2
+                MINFLOAT:2 MININT:2 minutes:3 NAN:2 new:4 NEWLINE:2 NINFINITY:2 not:4 now:3 null:2 object:1 operator:0 or:4 ord:3
+                pack:3 PI:2 PINFINITY:2 print:3 println:3 private:0 property:0 protected:0 public:0 queue:1 rad2deg:3 rand:3
+                randint:3 rational:1 read:5 readln:3 resource:1 return:0 round:3 seconds:3 set:1 sign:3 sin:3 sinh:3 sqrt:3 stack:1
+                startswith:4 static:0 string:1 super:5 switch:0 tan:3 tanh:3 this:5 throw:0 true:2 trunc:3 try:0 tuple:1 typeof:4
+                unpack:3 var:0 void:1 when:0 while:0 with:4 write:5 yield:0
             ";
 
             foreach (string keyword in Regex.Split(keywords, @"\s+"))
             {
                 if (keyword.Length <= 0) continue;
 
-                string[] parts = keyword.Split('?');
+                string[] parts = keyword.Split(':');
                 int imageIndex = int.Parse(parts[1]);
                 keywordMenu.AddItem(new KeywordItem(parts[0], imageIndex, imageIndex == 3));
             }
 
             // Code snippets menu
             string[][] snippets = [
-                ["if", "if (^) "],
-                ["else", "else ^"],
-                ["ifb", "if (^)\n{\n}"],
-                ["elseb", "else\n{\t^\n}"],
-                ["switch", "switch (^)\n{\n\tcase $label$:\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
-                ["for", "for (^;;)\n{\n}"],
-                ["foreach", "foreach (^ in $sequence$)\n{\n}"],
-                ["while", "while (^)\n{\n}"],
-                ["do", "do\n{\n\t^\n} while ($condition$);"],
-                ["try", "try\n{\n\t^\n}\ncatch (e)\n{\n}"],
-                ["tryf", "try\n{\n\t^\n}\nfinally\n{\n}"],
-                ["tcf", "try\n{\n\t^\n}\ncatch (e)\n{\n}\nfinally\n{\n}"],
-                ["tryres", "try (^)\n{\n\t\n}"],
-                ["function", "function $fname$(^)\n{\n}"],
-                ["class", "class $cname$\n{\n}"],
+                ["simple-if", "if (true) ^;"],
+                ["simple-else", "else ^;"],
+                ["block-if", "if (true) {\n\t^\n}"],
+                ["block-else", "else {\n\t^\n}"],
+                ["switch", "switch (0) {\n\tcase 0:\n\t\t^\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}"],
+                ["for", "for (;;) {\n\t^\n}"],
+                ["foreach", "foreach (item in []) {\n\t^\n}"],
+                ["foreach-kv", "foreach (key => value in {=>}) {\n\t^\n}"],
+                ["while", "while (true) {\n\t^\n}"],
+                ["do-while", "do {\n\t^\n} while (true);"],
+                ["try-catch", "try {\n\t^\n} catch (e) {\n\tprintln(e);\n}"],
+                ["try-finally", "try {\n\t^\n} finally {\n}"],
+                ["try-catch-finally", "try {\n\t^\n} catch (e) {\n\tprintln(e);\n} finally {\n}"],
+                ["try-with-resource", "try (res) {\n\t^\n}"],
+                ["function", "function myFunc(arg1, arg2) {\n\t^\n}"],
+                ["extern-function", "[LibImport(\"mylib\", returnType=\"Int32\")]\nextern function myFunc(\n\t^\n);"],
+                ["class", "class MyClass {\n\t^\n}"],
                 ["import", "import ^;"],
-                ["impas", "import ^ as $alias$;"],
+                ["import-as", "import ^ as alias;"],
             ];
 
             foreach (string[] snippet in snippets)
@@ -608,12 +610,13 @@ namespace AddyScript.Gui
         /// <summary>
         /// Renders an error with a marker and an indicator.
         /// </summary>
-        /// <param name="element">The <see cref="ScriptElement"/> on which an error occured</param>
-        private void ReportError(ScriptElement element)
+        /// <param name="start">The start position of the error</param>
+        /// <param name="end">The end position of the error</param>
+        private void ReportError(ScriptLocation start, ScriptLocation end)
         {
-            scintilla.Lines[element.Start.LineNumber].MarkerAdd(ERROR_MARKER);
+            scintilla.Lines[start.LineNumber].MarkerAdd(ERROR_MARKER);
             scintilla.IndicatorCurrent = ERROR_INDICATOR;
-            scintilla.IndicatorFillRange(element.Start.Offset, element.Length);
+            scintilla.IndicatorFillRange(start.Offset, end.Offset - start.Offset);
         }
 
         /// <summary>
@@ -1043,7 +1046,7 @@ namespace AddyScript.Gui
                 var end = new ScriptLocation(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
 
                 errorMessage = logReader.ReadLine();
-                ReportError(new ScriptElement(start, end));
+                ReportError(start, end);
             }
             catch (Exception ex)
             {
