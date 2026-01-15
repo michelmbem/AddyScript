@@ -145,7 +145,7 @@ l.each(|item| => {
 });
 println();
 
-l.where(|item| => item is Employee {languages : {}})
+l.where(|item| => item is Employee(languages))
 	.each(|item| => println($'{item.name} is a {" and ".join(..item.languages)} developper'));
 println();
 

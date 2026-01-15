@@ -142,6 +142,7 @@ function reflect(type, otherType)
 	println($"isSequential: {type.isSequential}");
 	println($"isCollection: {type.isCollection}");
 	println($"isSubclassOf({otherType.name}): {type.isSubclassOf(otherType)}");
+	println($"isSuperClassOf({otherType.name}): {otherType.isSubclassOf(type)}");
 	println($"isAssignableTo({otherType.name}): {type.isAssignableTo(otherType)}");
 	println($"isAssignableFrom({otherType.name}): {type.isAssignableFrom(otherType)}");
 	
