@@ -16,7 +16,6 @@ using AutocompleteMenuNS;
 using ScintillaNET;
 using ScintillaNET_FindReplaceDialog;
 using ScintillaPrinting;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 
 namespace AddyScript.Gui
