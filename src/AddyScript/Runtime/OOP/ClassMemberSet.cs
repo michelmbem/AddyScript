@@ -43,7 +43,7 @@ public class ClassMemberSet<T> : List<T>
     public new void AddRange(IEnumerable<T> items)
     {
         if (items == null) return;
-        foreach (T item in items)
+        foreach (var item in items)
             Add(item);
     }
 

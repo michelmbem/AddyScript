@@ -31,6 +31,16 @@ public abstract class ClassMemberDecl(string name, Scope scope, Modifier modifie
     public Modifier Modifier => modifier;
 
     /// <summary>
+    /// Gets if this member is static.
+    /// </summary>
+    public bool IsStatic => Modifier is Modifier.Static or Modifier.StaticFinal;
+
+    /// <summary>
+    /// Gets if this member is final.
+    /// </summary>
+    public bool IsFinal => Modifier is Modifier.Final or Modifier.StaticFinal;
+
+    /// <summary>
     /// Creates a <see cref="ClassMember"/> from this instance.
     /// </summary>
     public abstract ClassMember ToClassMember();

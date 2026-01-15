@@ -1,8 +1,27 @@
 function sum(vector)
 {
 	total = 0;
-	foreach (item in vector) total += item;
+	foreach (item in vector)
+		total += item;
 	return total;
+}
+
+function minimum(vector)
+{
+	mini = MAXFLOAT;
+	foreach (item in vector)
+		if (item < mini)
+			mini = item;
+	return mini;
+}
+
+function maximum(vector)
+{
+	maxi = MINFLOAT;
+	foreach (item in vector)
+		if (item > maxi)
+			maxi = item;
+	return maxi;
 }
 
 t = [];
@@ -12,16 +31,17 @@ if (n <= 0)
 	println("goodbye!");
 else
 {
-	for (i = 0; i < n; ++i)
+	for (i = 1; i <= n; i++)
 	{
-		t.add((float)readln($"item no. {i + 1} = "));
+		item = (float)readln("item no. " + i + ": ");
+		t.add(item);
 	}
 	
-	s = sum(t); // s = t.aggregate(0, |a, v| => a + v);
-	println("you've entered: " + t.join(", "));
+	s = sum(t);
+	println("you entered: " + t);
 	println("the sum of items is: " + s);
-	println("the minimum is: " + min(..t));
-	println("the maximum is: " + max(..t));
+	println("the minimum is: " + minimum(t));
+	println("the maximum is: " + maximum(t));
 	println("the averrage is: " + (s / n));
 }
 

@@ -34,8 +34,8 @@ public sealed class Long(BigInteger value) : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsBigInteger;
 

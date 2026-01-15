@@ -1,10 +1,10 @@
+__context.AddReference("System.Windows.Forms");
+
 import std::dbo;
 import System::Windows::Forms;
 
-//const PROVIDER = "oledb";
-//const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../../samples/demo-data/nwind.mdb";
-const PROVIDER = "mssql";
-const CONNECTION_STRING = "Data Source=(local);Initial Catalog=Northwind;Integrated Security=Yes";
+const DBO_PROVIDER = "oledb";
+const CONNECTION_STRING = "Provider=MicroSoft.Ace.OleDb.12.0;Data Source=../../../samples/demo-data/nwind.mdb";
 
 function createColumn($property, header = '', type = "text", width = 100, readonly = false)
 {
@@ -65,9 +65,8 @@ function formLoad(sender, args)
 {
 	try
 	{
-		println('provider: {0}. connection string: {1}', PROVIDER, CONNECTION_STRING);
 		println('connecting to the database...');
-		dbo = new DBO(PROVIDER, CONNECTION_STRING);
+		dbo = new DBO(DBO_PROVIDER, CONNECTION_STRING);
 		println('loading data...');
 		da = dbo.fill(ds, "Products", "SELECT * FROM Products", true /* will generate a command builder for the returned data adapter */);
 		dbo.fill(ds, "Suppliers", "SELECT SupplierID, CompanyName FROM Suppliers").Dispose();
@@ -180,5 +179,4 @@ g = new DataGridView
 		};
 
 f.Controls.AddRange([g, p]);
-f.ShowDialog();
-f.Dispose();
+Application::Run(f);

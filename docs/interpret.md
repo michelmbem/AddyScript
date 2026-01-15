@@ -105,9 +105,9 @@ So far you have been reading this tutorial, you may have noticed that on each ex
 |--------|-----------|
 |`Dictionary<string, object> Bindings { get; private set; }`|A set of variables bindings: they will be automatically declared in the script and can be retrieved upon script's completion.|
 |`string[] ImportPaths { get; set; }`|The list of directories in which the import directive searches the files to include.|
-|`Assembly[] References { get; set; }`|The list of assemblies in which references to .Net types will be searched for.|
+|`Assembly[] References { get; set; }`|The list of assemblies in which references to .NET types will be searched for.|
 
-Notice that by default, the _ImportPaths_ property is empty while the _References_ property contains references to some essential .Net assemblies. You don't need to put a dot (symbolizing the current working directory) to the _ImportPaths_ property since imported scripts are always first searched in the same directory than the importing script.
+Notice that by default, the _ImportPaths_ property is empty while the _References_ property contains references to some essential .NET assemblies. You don't need to put a dot (symbolizing the current working directory) to the _ImportPaths_ property since imported scripts are always first searched in the same directory than the importing script.
 
 ### The RuntimeServices class
 

@@ -143,7 +143,6 @@ In addition to the above operators, the **list** class exposes the following mem
 |`list sublist(int start, int count)`|method|Extracts a subset of the list delimited by the given boundaries.|
 |`list unique()`|method|Gets a clone of the calling list in which each item is unique.|
 |`map mapTo(list other)`|method|Creates and returns a map using the items of the calling list as keys and those of the other list as values. Both lists must have the same length.|
-|`string join(string separator = ' ')`|method|Creates a string by concatenating the list items. An optional separator can be provided; by default, the whitespace is used as a separator.|
 
 ### Sets
 
@@ -330,23 +329,23 @@ In addition to the above operators, the **map** class exposes the following memb
 
 In addition to the members listed in the tables above, collection classes also have methods that can be used to iterate over their instances while performing an action, evaluating a predicate, or collecting a summary value. Such a method is generally equivalent to a loop, except that it has a more compact syntax and can appear anywhere an expression is expected, which loops cannot do. Most of these methods return the instance on which they are invoked, which allows for call chaining. The following table summarizes AddyScript iteration methods and the classes they belong to. One of them, the "times" method of the **int** and **long** types, does not belong to a collection class but has similar behavior.
 
-|Method|Description|Example|
-|-|-|-|
-|`int int::times(closure action)`<br>`long long::times(closure action)`|Performs the given action n times where n is the integer value on which the method is invoked.|`4.times(\|i\| => println('hello!'));`|
-|`string string::each(closure action)`<br>`blob blob::each(closure action)`<br>`tuple tuple::each(closure action)`<br>`list list::each(closure action)`<br>`set set::each(closure action)`<br>`queue queue::each(closure action)`<br>`stack stack::each(closure action)`<br>`map map::each(closure action)`|Repeats the given action on each item (each character for strings, each byte for blobs, or each key-value pair for maps) of the target object. When the target object is a map, the closure expects two arguments. In any other case, it expects a single argument.|`l = [4, 2, 5, 3, 8, 6];`<br>`sum = 0;`<br>`l.each(\|x\| => sum += x);`<br>`println(sum);`|
-|`tuple tuple::eachIndex(closure action)`<br>`list list::eachIndex(closure action)`|Repeats the given action on each index of the target tuple or list.|`l = [4, 2, 5, 3, 8, 6];`<br>`l.eachIndex(\|i\| => l[i] *= 2);`<br>`println(l.join(', '));`|
-|`map map::eachKey(closure action)`|Repeats the given action on each key of the target map.|`m = {'age' => 30, 'weight' => 80, 'height' => 170};`<br>`m.eachKey(\|k\| => println(k + ': ' + m[k]));`|
-|`map map::eachValue(closure action)`|Repeats the given action on each distinct value of the calling map.|`m = {'age' => 70, 'weight' => 70, 'height' => 180};`<br>`m.eachValue(\|v\| => println(v + ': ' + m.keysOf(v)));`|
-|`bool tuple::all(closure predicate)`<br>`bool list::all(closure predicate)`<br>`bool set::all(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for all items; returns **false** otherwise.|`s = {4, 2, 0, 8, 6};`<br>`b = s.all(\|e\| => e % 2 == 0);`<br>`if (b) println('all them are even');`|
-|`bool tuple::any(closure predicate)`<br>`bool list::any(closure predicate)`<br>`bool set::any(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for at least one of them; returns **false** otherwise.|`s = {4, 1, 2, 0, 3, 8, 6};`<br>`b = s.any(\|e\| => e % 2 == 1);`<br>`if (b) println('there is an odd one');`|
-|`any tuple::first(closure predicate)`<br>`any list::first(closure predicate)`<br>`any set::first(closure predicate)`|Successively evaluates a predicate on each item of a tuple, list, or set, returning the first item for which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.first(\|x\| => x % 2 == 1);`<br>will return 5|
-|`any tuple::last(closure predicate)`<br>`any list::last(closure predicate)`|Traverse a tuple or a list backwards by successively evaluating a predicate on each of its items, returning the first item for which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.last(\|x\| => x % 2 == 1);`<br>will return 1|
-|`int tuple::findIndex(closure predicate)`<br>`int list::findIndex(closure predicate)`|Finds the index of the first item of a tuple or list that satisfies the given predicate.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findIndex(\|x\| => x % 2 == 1);`<br>will return 3|
-|`any tuple::findLastIndex(closure predicate)`<br>`any list::findLastIndex(closure predicate)`|Finds the index of the last item of a list that satisfies the given predicate.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findLastIndex(\|x\| => x % 2 == 0);`<br>will return 8|
-|`list list::where(closure predicate)`<br>`set set::where(closure predicate)`|Successively evaluates a predicate on each item of a list or set, returning a list or set of items on which the predicate evaluates to true.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.where(\|x\| => x % 2 == 1);`<br>will return [5, 3, 7, 1]|
-|`list list::select(closure transform)`<br>`set set::select(closure transform)`|Successively evaluates a predicate on every item of a list or set, returning a list or set of items created from the original items by its argument.|`s = {'nadia', 'dave', 'roland', 'rick', 'john'};`<br>`t = s.select(\|x\| => x.toUpper());`<br>returns {NADIA, DAVE, ROLAND, RICK, JOHN}|
-|`any tuple::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`|Generate a single value by aggregating the items of a tuple, list or set; the _aggregator_ is a function that takes 2 arguments: an _accumulator_ and the current item; it generates the next value of the _accumulator_; parameter _seed_ is the initial value of the _accumulator_; **aggregate** returns the last value of the _accumulator_.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`sum = l.aggregate(0, \|acc, val\| => acc + val);`<br>will return 36|
-|`map list::groupBy(closure criterion)`|Groups the items of a list according to the given criterion and returns a map of sub-lists identified by the distinct group identifiers that were produced by the criterion.|`l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`g = l.groupBy(\|x\| => x % 2);`<br>will return {0 => [4, 0, 2, 8, 6], 1 => [5, 3, 7, 1]}|
+|Method|Description| Example                                                                                                                                  |
+|-|-|------------------------------------------------------------------------------------------------------------------------------------------|
+|`int int::times(closure action)`<br>`long long::times(closure action)`|Performs the given action n times where n is the integer value on which the method is invoked.| `4.times(\|i\| => println('hello!'));`                                                                                                   |
+|`string string::each(closure action)`<br>`blob blob::each(closure action)`<br>`tuple tuple::each(closure action)`<br>`list list::each(closure action)`<br>`set set::each(closure action)`<br>`queue queue::each(closure action)`<br>`stack stack::each(closure action)`<br>`map map::each(closure action)`|Repeats the given action on each item (each character for strings, each byte for blobs, or each key-value pair for maps) of the target object. When the target object is a map, the closure expects two arguments. In any other case, it expects a single argument.| `l = [4, 2, 5, 3, 8, 6];`<br>`sum = 0;`<br>`l.each(\|x\| => sum += x);`<br>`println(sum);`                                               |
+|`tuple tuple::eachIndex(closure action)`<br>`list list::eachIndex(closure action)`|Repeats the given action on each index of the target tuple or list.| `l = [4, 2, 5, 3, 8, 6];`<br>`l.eachIndex(\|i\| => l[i] *= 2);`<br>`println(', '.join(..l));`                                             |
+|`map map::eachKey(closure action)`|Repeats the given action on each key of the target map.| `m = {'age' => 30, 'weight' => 80, 'height' => 170};`<br>`m.eachKey(\|k\| => println(k + ': ' + m[k]));`                                 |
+|`map map::eachValue(closure action)`|Repeats the given action on each distinct value of the calling map.| `m = {'age' => 70, 'weight' => 70, 'height' => 180};`<br>`m.eachValue(\|v\| => println(v + ': ' + m.keysOf(v)));`                        |
+|`bool tuple::all(closure predicate)`<br>`bool list::all(closure predicate)`<br>`bool set::all(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for all items; returns **false** otherwise.| `s = {4, 2, 0, 8, 6};`<br>`b = s.all(\|e\| => e % 2 == 0);`<br>`if (b) println('all them are even');`                                    |
+|`bool tuple::any(closure predicate)`<br>`bool list::any(closure predicate)`<br>`bool set::any(closure predicate)`|Evaluates a predicate on each item of a tuple, list, or set. Returns **true** if the predicate is true for at least one of them; returns **false** otherwise.| `s = {4, 1, 2, 0, 3, 8, 6};`<br>`b = s.any(\|e\| => e % 2 == 1);`<br>`if (b) println('there is an odd one');`                            |
+|`any tuple::first(closure predicate)`<br>`any list::first(closure predicate)`<br>`any set::first(closure predicate)`|Successively evaluates a predicate on each item of a tuple, list, or set, returning the first item for which the predicate evaluates to true.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.first(\|x\| => x % 2 == 1);`<br>will return 5                                               |
+|`any tuple::last(closure predicate)`<br>`any list::last(closure predicate)`|Traverse a tuple or a list backwards by successively evaluating a predicate on each of its items, returning the first item for which the predicate evaluates to true.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.last(\|x\| => x % 2 == 1);`<br>will return 1                                                |
+|`int tuple::findIndex(closure predicate)`<br>`int list::findIndex(closure predicate)`|Finds the index of the first item of a tuple or list that satisfies the given predicate.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findIndex(\|x\| => x % 2 == 1);`<br>will return 3                                           |
+|`any tuple::findLastIndex(closure predicate)`<br>`any list::findLastIndex(closure predicate)`|Finds the index of the last item of a list that satisfies the given predicate.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.findLastIndex(\|x\| => x % 2 == 0);`<br>will return 8                                       |
+|`list list::where(closure predicate)`<br>`set set::where(closure predicate)`|Successively evaluates a predicate on each item of a list or set, returning a list or set of items on which the predicate evaluates to true.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`a = l.where(\|x\| => x % 2 == 1);`<br>will return [5, 3, 7, 1]                                    |
+|`list list::select(closure transform)`<br>`set set::select(closure transform)`|Successively evaluates a predicate on every item of a list or set, returning a list or set of items created from the original items by its argument.| `s = {'nadia', 'dave', 'roland', 'rick', 'john'};`<br>`t = s.select(\|x\| => x.toUpper());`<br>returns {NADIA, DAVE, ROLAND, RICK, JOHN} |
+|`any tuple::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`<br>`any list::aggregate(any seed, closure aggregator)`|Generate a single value by aggregating the items of a tuple, list or set; the _aggregator_ is a function that takes 2 arguments: an _accumulator_ and the current item; it generates the next value of the _accumulator_; parameter _seed_ is the initial value of the _accumulator_; **aggregate** returns the last value of the _accumulator_.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`sum = l.aggregate(0, \|acc, val\| => acc + val);`<br>will return 36                               |
+|`map list::groupBy(closure criterion)`|Groups the items of a list according to the given criterion and returns a map of sub-lists identified by the distinct group identifiers that were produced by the criterion.| `l = [4, 0, 2, 5, 3, 7, 1, 8, 6];`<br>`g = l.groupBy(\|x\| => x % 2);`<br>will return {0 => [4, 0, 2, 8, 6], 1 => [5, 3, 7, 1]}          |
 
 **Note**:
 
@@ -367,7 +366,7 @@ println('Items at odd ranks concatenated: ' + concatOddItems);
 
 ### Objects
 
-Just like a collection, an object is another way to store multiple values ​​in a single variable. These values ​​are then called the fields of the object. The fields of the object are accessed by their name, using the dot syntax: objectName.fieldName.
+Just like a collection, an object is another way to store multiple values in a single variable. These values are then called the fields of the object. The fields of the object are accessed by their name, using the dot syntax: _objectName.fieldName_.
 
 #### Creating an object
 
@@ -382,7 +381,7 @@ An object initializer is a comma-separated list of field initializers enclosed i
 Example:
 
 ```JS
-student = new {firstName = 'John', lastName = 'Alberti', age = 12};
+student = new { firstName = 'John', lastName = 'Alberti', age = 12 };
 println('{0} {1} is aged {2}', student.firstName, student.lastName, student.age);
 ```
 
@@ -404,13 +403,55 @@ Finally, it is worth mentioning that AddyScript has the ability to convert a map
 Example:
 
 ```JS
-hash = {'long' => 120, 'large' => 80, 'depth' => 20};
+hash = { 'long' => 120, 'large' => 80, 'depth' => 20 };
 shape = (object) hash;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth);
 ```
 
+#### Object destructuring
+
+In AddyScript one can initialize multiple variables at once by setting them values from the properties of an object. That mechanism is called object destructuring.
+Object destructuring is achieved by writing an assignment where the _lvalue_ is a list of variable names enclosed in curly braces and the _rvalue_ an expression that evaluates to an object.
+Such an assignment requires the usage of the **let** keyword (otherwise AddyScript will take the opening brace as the beginning of a block of statements).
+
+Here is an example of object destructuring:
+
+```JS
+person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
+let { firstName, lastName, age } = person;
+println($'{firstName} {lastName} is a {age} years old person');
+```
+
+In the above syntax each of the variables listed between curly braces must match a property in name in the source object.
+To prevent the code from crashing in the case a property with some name is not found in the source object, a default value can be set to the target variable.
+The default value is ignored when a matching property is found in the source object.
+
+Illustration:
+
+```JS
+person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
+let { firstName, lastName, job = 'Journalist', age = 17 } = person;
+println($'{firstName} {lastName} is a {age} years old {job}');
+```
+
+Objects can be destructured recursively: if the source object has a property that is also an objet it can be recursively destructured as illustrated below:
+
+```JS
+person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
+let { firstName, lastName, age, { title, company } = job } = person;
+println($'{firstName} {lastName} is a {age} years old {title} at {company}');
+```
+
+If the name of a variable is preceded by the _spread_ operator (..) it will be used to collect the remaining properties of the source object (those that were not explicitly extracted).
+
+```JS
+person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
+let { firstName, lastName, age, { title, ..rest } = job } = person;
+println($'{firstName} {lastName} is a {age} years old {title} at {rest.company} since {rest.since:d}');
+```
+
 #### Manipulating objects
 
-Well, there is no special manipulation on objects, other than storing values ​​in their fields and retrieving them later. Advanced object manipulation is a concern of object-oriented programming.
+Well, there is no special manipulation on objects, other than storing values in their fields and retrieving them later. Advanced object manipulation is a concern of object-oriented programming.
 
 [Home](README.md) | [Previous](spec-types.md) | [Next](innerfunc.md)

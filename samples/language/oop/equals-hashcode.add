@@ -18,7 +18,7 @@ class Product
 	
 	public function equals(other) => other is Product && other.id === this.id;
 	
-	public function hashCode() => this.id.hashCode();
+	public function hashCode() => hash(this.id);
 	
 	public function toString(fmt = '') =>
 		$'Product {{id = {this.id}, name = "{this.name}", price = {this.price:c}}}';
@@ -27,17 +27,17 @@ class Product
 products = [
 	new Product(1, 'Yellow Sofa', 'A nice yellow sofa', 1050),
 	new Product(2, 'Two-doors Fridge', 'A two-doors fridge', 2075),
-	new Product(1, 'Cooking Set', 'An amasing cooking set', 180),
+	new Product(1, 'Cooking Set', 'An amazing cooking set', 180),
 	new Product(3, 'Huge Microwave', 'A huge microwave oven', 220),
 	new Product(4, 'Electric Red Car', 'A beautiful electric red car', 1050),
 	new Product(3, 'Gabonese Statues', 'A pair of statues for Gabon representing a couple', 45),
 	new Product(2, 'Silver Hair Dryer', 'A shining hair dryer', 35),
 	new Product(4, 'Italian Tomato Can', 'A 1Kg tomato can from Italy', 12),
-	new Product(1, 'Very Smart TV', 'A TV that\'s realy smart', 1800)
+	new Product(1, 'Very Smart TV', 'A TV that\'s really smart', 1800)
 ];
 
 println('items in the list:');
-println(products.join(NEWLINE));
+println(NEWLINE.join(..products));
 println();
 
 s = {..products};
@@ -52,7 +52,7 @@ distincts = products.aggregate([], |acc, val| => {
 });
 
 println('distinct items:');
-println(distincts.join(NEWLINE));
+println(NEWLINE.join(..distincts));
 println();
 
 readln();

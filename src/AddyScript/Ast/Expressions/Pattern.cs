@@ -1,5 +1,12 @@
+using System;
+using System.Collections;
+using System.Linq;
+
+using AddyScript.Ast.Statements;
+using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+using Boolean = AddyScript.Runtime.DataItems.Boolean;
 
 
 namespace AddyScript.Ast.Expressions;
@@ -17,16 +24,24 @@ public abstract class Pattern : ScriptElement
     /// <param name="arg">The value to match against this <see cref="Pattern"/></param>
     /// <returns>An <see cref="Expression"/> that evaluates to <b>true</b> or <b>false</b></returns>
     public abstract Expression GetMatchTest(Expression arg);
+    
+    /// <summary>
+    /// Gets the <see cref="Statement"/> that extracts data from the value of <paramref name="arg"/>
+    /// if this <see cref="Pattern"/> matches it.
+    /// </summary>
+    /// <param name="arg">The expression to extract data from</param>
+    /// <returns>A <see cref="Statement"/> that performs the extraction, or <b>null</b> if no extraction is needed</returns>
+    public virtual Statement GetExtractionAction(Expression arg) => null;
 }
 
 
 /// <summary>
 /// A subclass of <see cref="Pattern"/> that always matches any value.
 /// </summary>
-public class AlwaysPattern : Pattern
+public class AlwaysTruePattern : Pattern
 {
     /// <summary>
-    /// The symbol that indicates that <see cref="AlwaysPattern"/> is used.
+    /// The symbol that indicates that <see cref="AlwaysTruePattern"/> is used.
     /// </summary>
     public const string Symbol = "_";
 
@@ -35,78 +50,37 @@ public class AlwaysPattern : Pattern
 
 
 /// <summary>
-/// A subclass of <see cref="Pattern"/> that checks if the value to match is null.
+/// A subclass of <see cref="Pattern"/> that checks if the value to match satisfies a relational operation.
 /// </summary>
-public class NullPattern : Pattern
+/// <param name="_operator">The relational operator to use for the comparison</param>
+/// <param name="value">The value to compare against</param>
+public class RelationalPattern(BinaryOperator _operator, DataItem value) : Pattern
 {
     /// <summary>
-    /// The symbol that indicates that <see cref="NullPattern"/> is used.
+    /// The relational operator to use for the comparison.
     /// </summary>
-    public const string Symbol = "null";
+    public BinaryOperator Operator => _operator;
 
-    public override Expression GetMatchTest(Expression arg) =>
-        new BinaryExpression(BinaryOperator.Identical, arg, new Literal());
-}
-
-
-/// <summary>
-/// A subclass of <see cref="Pattern"/> that checks if the value to match is equal to an initially fixed value.
-/// </summary>
-/// <remarks>
-/// Initializes a new instance of <see cref="ValuePattern"/>.
-/// </remarks>
-/// <param name="value">The value this <see cref="Pattern"/> compares other values to in order to match them</param>
-public class ValuePattern(DataItem value) : Pattern
-{
     /// <summary>
-    /// The value this <see cref="Pattern"/> compares other values to in order to match them.
+    /// The value to compare against.
     /// </summary>
     public DataItem Value => value;
 
     public override Expression GetMatchTest(Expression arg) =>
-        new BinaryExpression(BinaryOperator.Equal, arg, new Literal(value));
+        new BinaryExpression(_operator, arg, new Literal(value));
 }
 
 
 /// <summary>
-/// A subclass of <see cref="Pattern"/> that checks if the value to match is in a particular range.
+/// A subclass of <see cref="Pattern"/> that checks if the value to match satisfies a regex pattern.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of <see cref="RangePattern"/>.
-/// </remarks>
-/// <param name="lowerBound">
-/// The lower bound of the range in which values must be for this <see cref="Pattern"/> to match them
-/// </param>
-/// <param name="upperBound">
-/// The upper bound of the range in which values must be for this <see cref="Pattern"/> to match them.
-/// </param>
-public class RangePattern(DataItem lowerBound, DataItem upperBound) : Pattern
+/// <param name="value">The regex pattern to match against</param>
+public class RegexPattern(DataItem value) : RelationalPattern(BinaryOperator.Matches, value)
 {
-    /// <summary>
-    /// The lower bound of the range in which values must be for this <see cref="Pattern"/> to match them.
-    /// </summary>
-    public DataItem LowerBound => lowerBound;
-
-    /// <summary>
-    /// The upper bound of the range in which values must be for this <see cref="Pattern"/> to match them.
-    /// </summary>
-    public DataItem UpperBound => upperBound;
-
-    public override Expression GetMatchTest(Expression arg)
-    {
-        var lowerBoundCheck = lowerBound != null
-            ? new BinaryExpression(BinaryOperator.GreaterThanOrEqual, arg, new Literal(lowerBound))
-            : null;
-
-        var upperBoundCheck = upperBound != null
-            ? new BinaryExpression(BinaryOperator.LessThanOrEqual, arg, new Literal(upperBound))
-            : null;
-
-        // Assuming both lowerBound and upperBound cannot be null at the same time!
-        if (lowerBoundCheck == null) return upperBoundCheck!;
-        if (upperBoundCheck == null) return lowerBoundCheck;
-        return new BinaryExpression(BinaryOperator.AndAlso, lowerBoundCheck, upperBoundCheck);
-    }
+    public override Expression GetMatchTest(Expression arg) =>
+        new BinaryExpression(BinaryOperator.AndAlso,
+                             new TypeVerification(arg, Class.String.Name),
+                             base.GetMatchTest(arg));
 }
 
 
@@ -129,12 +103,29 @@ public class TypePattern(string typeName) : Pattern
         : new TypeVerification(arg, typeName);
 }
 
+/// <summary>
+/// A pattern that matches a property of an object against another pattern.
+/// </summary>
+/// <param name="propertyName">The name of the property to match</param>
+/// <param name="pattern">The pattern to match the property against</param>
 public class PropertyMatcher(string propertyName, Pattern pattern) : ScriptElement
 {
+    /// <summary>
+    /// The name of the property to match.
+    /// </summary>
     public string PropertyName => propertyName;
 
+    /// <summary>
+    /// The pattern to match the property against.
+    /// </summary>
     public Pattern Pattern => pattern;
 
+    /// <summary>
+    /// Gets the <see cref="Expression"/> that will be evaluated to tell whether the property
+    /// of <paramref name="ownerRef"/> matches the pattern or not.
+    /// </summary>
+    /// <param name="ownerRef">The expression representing the object owning the property</param>
+    /// <returns>>An <see cref="Expression"/> that evaluates to <b>true</b> or <b>false</b></returns>
     public Expression GetMatchTest(Expression ownerRef)
     {
         var propRef = new PropertyRef(ownerRef, propertyName);
@@ -161,15 +152,25 @@ public class ObjectPattern(string typeName, PropertyMatcher[] propertyMatchers) 
     /// </summary>
     public PropertyMatcher[] PropertyMatchers => propertyMatchers;
 
-    public override Expression GetMatchTest(Expression arg)
-    {
-        Expression matchTest = base.GetMatchTest(arg);
+    public override Expression GetMatchTest(Expression arg) =>
+        propertyMatchers.Aggregate(base.GetMatchTest(arg), (current, next) =>
+            new BinaryExpression(BinaryOperator.AndAlso, current, next.GetMatchTest(arg)));
+}
 
-        foreach (var matcher in propertyMatchers)
-            matchTest = new BinaryExpression(BinaryOperator.AndAlso, matchTest, matcher.GetMatchTest(arg));
 
-        return matchTest;
-    }
+public class DestructuringPattern(string typeName, string[] propertyNames) : TypePattern(typeName)
+{
+    public string[] PropertyNames => propertyNames;
+
+    public override Expression GetMatchTest(Expression arg) =>
+        propertyNames.Select(name => new TypeVerification(new PropertyRef(arg, name), Class.Void.Name))
+                     .Select(test => new UnaryExpression(UnaryOperator.Not, test))
+                     .Aggregate(base.GetMatchTest(arg), (current, next) =>
+                        new BinaryExpression(BinaryOperator.AndAlso, current, next));
+
+    public override Statement GetExtractionAction(Expression arg) =>
+        new Assignment(new SetInitializer([.. propertyNames.Select(name => new Argument(new VariableRef(name)))]),
+                       arg);
 }
 
 
@@ -210,12 +211,12 @@ public class NegativePattern(Pattern child) : GroupingPattern(child)
 /// It checks that the value to match satisfies either one or both of its children.
 /// </summary>
 /// <remarks>
-/// Initializes a new instance of <see cref="CompositePattern"/>.
+/// Initializes a new instance of <see cref="LogicalPattern"/>.
 /// </remarks>
 /// <param name="inclusive">Controls how children are combined</param>
 /// <param name="left">The first child pattern</param>
 /// <param name="right">The second child pattern</param>
-public class CompositePattern(bool inclusive, Pattern left, Pattern right) : Pattern
+public class LogicalPattern(bool inclusive, Pattern left, Pattern right) : Pattern
 {
     /// <summary>
     /// Controls how children are combined.
@@ -223,16 +224,88 @@ public class CompositePattern(bool inclusive, Pattern left, Pattern right) : Pat
     public bool Inclusive => inclusive;
 
     /// <summary>
-    /// The first child of this <see cref="CompositePattern"/>.
+    /// The first child of this <see cref="LogicalPattern"/>.
     /// </summary>
     public Pattern Left => left;
 
     /// <summary>
-    /// The second child of this <see cref="CompositePattern"/>.
+    /// The second child of this <see cref="LogicalPattern"/>.
     /// </summary>
     public Pattern Right => right;
 
-    public override Expression GetMatchTest(Expression arg) => inclusive
-        ? new BinaryExpression(BinaryOperator.AndAlso, left.GetMatchTest(arg), right.GetMatchTest(arg))
-        : new BinaryExpression(BinaryOperator.OrElse, left.GetMatchTest(arg), right.GetMatchTest(arg));
+    public override Expression GetMatchTest(Expression arg) =>
+        new BinaryExpression(inclusive ? BinaryOperator.AndAlso : BinaryOperator.OrElse,
+                             left.GetMatchTest(arg),
+                             right.GetMatchTest(arg));
+}
+
+
+/// <summary>
+/// A subclass of <see cref="Pattern"/> that matches a positional collection against a set of patterns.
+/// It checks that the value to match is an iterable collection with the same number of items as
+/// the number of patterns, and that each item matches the corresponding pattern.
+/// </summary>
+/// <param name="items">The patterns to match each item of the collection</param>
+public class PositionalPattern(params Pattern[] items) : Pattern
+{
+    /// <summary>
+    /// An inner function that checks if its argument is iterable.
+    /// </summary>
+    private static readonly InnerFunction IsIterable = new ("isIterable", [new ("arg")], IsIterableLogic);
+    
+    /// <summary>
+    /// The patterns to match each item of the collection.
+    /// </summary>
+    public Pattern[] Items => items;
+
+    public override Expression GetMatchTest(Expression arg)
+    {
+        var tupleRef = new VariableRef("__" + Guid.NewGuid().ToString("N"));
+        var tupleAssignment = new Assignment(tupleRef, new TupleInitializer(new Argument(arg, true)));
+        var initialTest = new BinaryExpression(BinaryOperator.AndAlso,
+                                               new InnerFunctionCall(IsIterable, arg),
+                                               new BinaryExpression(BinaryOperator.Equal,
+                                                                    new PropertyRef(tupleAssignment, "size"),
+                                                                    new Literal(new Integer(items.Length))));
+        
+        return items.Select((item, index) => item.GetMatchTest(new ItemRef(tupleRef, new Literal(new Integer(index)))))
+                    .Aggregate(initialTest, (current, next) => new BinaryExpression(BinaryOperator.AndAlso, current, next));
+    }
+
+    /// <summary>
+    /// The logic of the inner function <see cref="IsIterable"/>.
+    /// </summary>
+    /// <param name="arguments">The arguments passed to the function</param>
+    /// <returns>A <see cref="Boolean"/> indicating whether the argument is iterable</returns>
+    private static DataItem IsIterableLogic(DataItem[] arguments)
+    {
+        DataItem arg = arguments[0];
+        return Boolean.FromBool(arg.Class.IsSequential ||
+                                arg is Resource { AsNativeObject: IEnumerable } ||
+                                HasIterator(arg.Class)); 
+    }
+
+    /// <summary>
+    /// Determines whether the given class has iterator methods.
+    /// </summary>
+    /// <param name="klass">The class to check</param>
+    /// <returns>><b>true</b> if the class has iterator methods; otherwise, <b>false</b></returns>
+    private static bool HasIterator(Class klass)
+    {
+        var iteratorMethod = klass.GetMethod("iterator");
+        if (isIteratorMethod(iteratorMethod)) return true;
+        
+        var moveFirstMethod = klass.GetMethod("moveFirst");
+        var hasNextMethod = klass.GetMethod("hasNext");
+        var moveNextMethod = klass.GetMethod("moveNext");
+        return isIteratorMethod(moveFirstMethod) && isIteratorMethod(hasNextMethod) && isIteratorMethod(moveNextMethod);
+    }
+    
+    /// <summary>
+    /// Checks whether the given method is a valid iterator method.
+    /// </summary>
+    /// <param name="method">The method to check</param>
+    /// <returns>><b>true</b> if the method is a valid iterator method; otherwise, <b>false</b></returns>
+    private static bool isIteratorMethod(ClassMethod method) =>
+        method is { Scope: Scope.Public, Modifier: Modifier.Default or Modifier.Final, Function.Parameters.Length: 0 };
 }

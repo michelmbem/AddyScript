@@ -23,7 +23,14 @@ public sealed class Float(double value) : DataItem
 
     public override BigInteger AsBigInteger => new (value);
 
-    public override Rational32 AsRational32 => new ((int)value);
+    public override Rational32 AsRational32
+    {
+        get
+        {
+            var (num, den) = MathUtil.ToRational(value);
+            return new((int)num, (int)den);
+        }
+    }
 
     public override double AsDouble => value;
 
@@ -33,8 +40,8 @@ public sealed class Float(double value) : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other)
     {

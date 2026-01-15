@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using AddyScript.Runtime.OOP;
@@ -69,9 +70,6 @@ public sealed class Queue : DataItem
         _ => base.GetProperty(propertyName),
     };
 
-    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
-    {
-        foreach (DataItem item in queue)
-            yield return (Void.Value, item);
-    }
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable() =>
+        queue.Select(item => ((DataItem)Void.Value, item));
 }

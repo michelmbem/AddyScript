@@ -266,7 +266,13 @@ public class DataItemBinder : Binder
                 {
                     TypeCode.DateTime => 0,
                     TypeCode.String => 3,
-                    _ => 4,
+                    _ => t == typeof(DateOnly) || t == typeof(TimeOnly) ? 2 : 4,
+                };
+            case ClassID.Duration:
+                return Type.GetTypeCode(t) switch
+                {
+                    TypeCode.String => 3,
+                    _ => t == typeof(TimeSpan) ? 0 : t == typeof(TimeOnly) ? 1 : 4,
                 };
             case ClassID.String:
                 return Type.GetTypeCode(t) switch

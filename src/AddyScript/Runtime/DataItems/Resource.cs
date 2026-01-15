@@ -57,15 +57,15 @@ public sealed class Resource(object handle) : DataItem
         return handle.GetType().IsAssignableTo(targetType)
              ? handle
              : handle is IConvertible convertible
-             ? convertible.ToType(targetType, CultureInfo.CurrentUICulture)
-             : base.ConvertTo(targetType);
+                 ? convertible.ToType(targetType, CultureInfo.CurrentUICulture)
+                 : base.ConvertTo(targetType);
     }
 
-    public override DataItem GetProperty(string propertyName)
-        => Reflector.GetValue(handle.GetType(), propertyName, handle);
+    public override DataItem GetProperty(string propertyName) =>
+        Reflector.GetValue(handle.GetType(), propertyName, handle);
 
-    public override void SetProperty(string propertyName, DataItem value)
-        => Reflector.SetValue(handle.GetType(), propertyName, handle, value);
+    public override void SetProperty(string propertyName, DataItem value) =>
+        Reflector.SetValue(handle.GetType(), propertyName, handle, value);
 
     public override DataItem GetItem(DataItem index) => Reflector.GetItem(handle, index);
 
@@ -73,19 +73,24 @@ public sealed class Resource(object handle) : DataItem
 
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {
-        if (handle is IDictionary dictionary)
+        switch (handle)
         {
-            foreach (DictionaryEntry entry in dictionary)
-                yield return (DataItemFactory.CreateDataItem(entry.Key),
-                              DataItemFactory.CreateDataItem(entry.Value));
+            case IDictionary dictionary:
+            {
+                foreach (DictionaryEntry entry in dictionary)
+                    yield return (DataItemFactory.CreateDataItem(entry.Key),
+                                  DataItemFactory.CreateDataItem(entry.Value));
+                break;
+            }
+            case IEnumerable enumerable:
+            {
+                int i = 0;
+                foreach (object item in enumerable)
+                    yield return (new Integer(i++), DataItemFactory.CreateDataItem(item));
+                break;
+            }
+            default:
+                throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, handle.GetType().FullName));
         }
-        else if (handle is IEnumerable enumerable)
-        {
-            int i = 0;
-            foreach (object item in enumerable)
-                yield return (new Integer(i++), DataItemFactory.CreateDataItem(item));
-        }
-        else
-            throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, handle.GetType().FullName));
     }
 }

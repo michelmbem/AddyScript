@@ -37,18 +37,15 @@ public class InlineFunction(ParameterDecl[] parameters, Block body) : Expression
     /// </returns>
     public bool IsLambda()
     {
-        Statement[] statements = Body.Statements;
-        return statements.Length > 0 && statements[0] is Return ret && ret.Expression != null;
+        var statements = Body.Statements;
+        return statements.Length > 0 && statements[0] is Return { Expression: not null };
     }
 
     /// <summary>
     /// Create a <see cref="Function"/> from this instance.
     /// </summary>
     /// <returns>A <see cref="Function"/></returns>
-    public Function ToFunction()
-    {
-        return new Function(Parameters.Select(p => p.ToParameter()).ToArray(), Body);
-    }
+    public Function ToFunction() => new ([.. Parameters.Select(p => p.ToParameter())], Body);
 
     /// <summary>
     /// Translates this node.

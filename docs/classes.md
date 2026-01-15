@@ -44,7 +44,9 @@ The specification of a method is just a function declaration embedded into the c
 
 #### Specifying a property:
 
-A property is a pair of methods used to read and/or write the value of a field. AddyScript provides a dedicated syntax for defining properties of a class. The specification of a property follows this syntax:
+A property is a pair of methods used to read and/or write the value of a field.
+AddyScript provides a dedicated syntax for defining properties of a class.
+The specification of a property follows this syntax:
 
 ```
 property property_name
@@ -73,23 +75,35 @@ Where
 
 #### Automatic properties:
 
-Since defining a property consists of declaring a backing field, then defining the property's read and write accessors, AddyScript can help the programmer save time by doing most of the work automatically. To this end, the scripting language supports a shorter syntax for the definition of a property:
+Since defining a property consists of declaring a backing field, then defining the property's read and write accessors,
+AddyScript can help the programmer save time by doing most of the work automatically.
+To this end, the scripting language supports a shorter syntax for the definition of a property:
 
 ```
 property property_name { [scope] read; [scope] write; }
 ```
 
-As you can see, with this syntax, accessors are reduced to the contextual keywords **read** and **write** optionally preceded by a scope. For such a property, the scripting engine automatically generates a backing field as well as the accessors logic. The content between braces can even be omitted if no accessors have a different scope than the property itself, resulting in something as short as: `property property_name;` which is equivalent to `property property_name { read; write; }`.
+As you can see, with this syntax, accessors are reduced to the contextual keywords **read** and **write** optionally preceded by a scope.
+For such a property, the scripting engine automatically generates a backing field as well as the accessors logic.
+The content between braces can even be omitted if no accessors have a different scope than the property itself,
+resulting in something as short as: `property property_name;` which is equivalent to `property property_name { read; write; }`.
 
 **Remark**: The specification of an automatic property is identical to that of an abstract property except that the scripting engine doesn't generate any logic for an abstract property. It expects concrete subclasses to do so.
 
 #### Indexers:
 
-Indexers are a special type of property that allows instances of user-defined classes to behave like collections. A class can have only one indexer, and it cannot be static. An indexer is always declared as a property with an empty pair of square brackets ([]) as its name. It cannot be automatic: you must provide logic for its accessors. An indexer's accessors take an implicit parameter called **__key** that contains the value of the expression enclosed in the square brackets (i.e., the index or key) at the time the indexer is invoked. An indexer's writer also takes the implicit parameter **__value** like any other writer.
+Indexers are a special type of property that allows instances of user-defined classes to behave like collections.
+A class can have only one indexer, and it cannot be static.
+An indexer is always declared as a property with an empty pair of square brackets ([ ]) as its name.
+It cannot be automatic: you must provide logic for its accessors.
+An indexer's accessors take an implicit parameter called **__key** that contains the value of
+the expression enclosed in the square brackets (i.e., the index or key) at the time the indexer is invoked.
+An indexer's writer also takes the implicit parameter **__value** like any other writer.
 
 #### Specifying an event:
 
-An event specification consists of the **event** keyword followed by the prototype of the event. The prototype is a name (an identifier) ​​followed by a comma-separated list of parameters in parentheses.
+An event specification consists of the **event** keyword followed by the prototype of the event.
+The prototype is a name (an identifier) followed by a comma-separated list of parameters in parentheses.
 Once an _foo_ event is defined in a class, this automatically adds three methods to the class:
 
 * A method to add handlers to the _foo_ event: `void add_foo(closure handler)`
@@ -103,7 +117,7 @@ Once an _foo_ event is defined in a class, this automatically adds three methods
 An operator overload specification consists of the **operator** keyword followed by the operator itself and its parameters. Depending on the operator being overloaded, the list may be empty or contain a single parameter. The complete list of operators that can be overloaded is as follows:
 
 * Unary operators: +, -, ++, --, ~
-* Binary operators: +, -, *, /, %, &, |, ^, <<, >>, ==, !=, <, >, <=, >=, **startswith**, **endswith**, **contains**, **matches**
+* Binary operators: +, -, \*, /, %, &amp;, |, ^, &lt;&lt;, &gt;&gt;, ==, !=, &lt;, &gt;, &lt;=, &gt;=, **startswith**, **endswith**, **contains**, **matches**
 
 **Remarks**:
 
@@ -176,13 +190,16 @@ john.sex = 'Female';
 println(john.summary());
 ```
 
-### The this keyword
+### The **this** keyword
 
-In the body of a method, the **this** keyword can be used to refer to the current instance of the class (the one on which the method is invoked). Most of the time, you will use this feature to access other members of a class from the body of one of its methods.
+In the body of a method, the **this** keyword can be used to refer to the current instance of the class (the one on which the method is invoked).
+Most of the time, you will use this feature to access other members of a class from the body of one of its methods.
 
 ### Constructors
 
-A **constructor** is a special method that is automatically invoked by the scripting engine when an instance of a class is created to initialize that instance. In AddyScript, a class has only one constructor since the language does not support method overloading. The definition of a constructor follows this special syntax:
+A **constructor** is a special method that is automatically invoked by the scripting engine when an instance of a class is created to initialize that instance.
+In AddyScript, a class has only one constructor since the language does not support method overloading.
+The definition of a constructor follows this special syntax:
 
 ```
  [scope] constructor (list_of_parameters) [: super(list_of_arguments)]
@@ -196,11 +213,12 @@ Where
 * _scope_ is one of the **private**, **protected** and **public** keywords. If no scope is provided, **private** is assumed by default.
 
     _scope_ has the following effects on instance creation:
+
     * **private**: Only the class will be able to create instances of itself.
     * **protected**: Only the class and its derived classes will be able to create instances of itself.
     * **public**: Instances of the class can be created anywhere in the code.
 
-* The optional 'column-super' part is used to invoke the constructor of the parent class (if any) prior to any other statement.
+* The optional 'colon-super' part is used to invoke the constructor of the parent class (if any) prior to any other statement.
 * A constructor is not allowed to return a value.
 
 Example: let's add a constructor in the Person class
@@ -273,7 +291,10 @@ println(jane.summary());
 
 #### Constructors and property initializers
 
-A constructor call can be followed by a set of property initializers. This allows you to quickly initialize fields or properties that are not initialized by the constructor. It can also be used to add undeclared fields to a specific instance of a class. When using property initializers, if the constructor has no parameters, there is no need to add parentheses to it.
+A constructor call can be followed by a set of property initializers.
+This allows you to quickly initialize fields or properties that are not initialized by the constructor.
+It can also be used to add undeclared fields to a specific instance of a class.
+When using property initializers, if the constructor has no parameters, there is no need to add parentheses to it.
 
 Example:
 

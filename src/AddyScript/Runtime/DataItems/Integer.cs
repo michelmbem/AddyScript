@@ -35,8 +35,8 @@ public sealed class Integer(int value) : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsInt32;
 
@@ -64,14 +64,13 @@ public sealed class Integer(int value) : DataItem
             {
                 BinaryOperator.Plus => new Integer(checked(value + operand.AsInt32)),
                 BinaryOperator.Minus => new Integer(value - operand.AsInt32),
-                BinaryOperator.Times => operand.Class.ClassID switch
-                {
-                    ClassID.String or ClassID.Blob or ClassID.Tuple or ClassID.List => operand.BinaryOperation(_operator, this),
-                    _ => new Integer(checked(value * operand.AsInt32))
-                },
+                BinaryOperator.Times when operand.Class.ClassID is
+                        ClassID.String or ClassID.Blob or ClassID.Tuple or ClassID.List =>
+                    operand.BinaryOperation(_operator, this),
+                BinaryOperator.Times => new Integer(checked(value * operand.AsInt32)),
                 BinaryOperator.Divide => Rational.Simplify(new Rational32(value, operand.AsInt32)),
                 BinaryOperator.Modulo => new Integer(value % operand.AsInt32),
-                BinaryOperator.Power => new Integer(MathUtil.Power(value, operand.AsInt32)),
+                BinaryOperator.Power => new Integer(MathUtil.Pow(value, operand.AsInt32)),
                 BinaryOperator.And => new Integer(value & operand.AsInt32),
                 BinaryOperator.Or => new Integer(value | operand.AsInt32),
                 BinaryOperator.ExclusiveOr => new Integer(value ^ operand.AsInt32),

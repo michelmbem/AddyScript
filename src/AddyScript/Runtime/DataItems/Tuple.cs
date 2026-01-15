@@ -17,9 +17,9 @@ public sealed class Tuple(DataItem[] items) : DataItem
 
     public override DataItem[] AsArray => items;
 
-    public override List<DataItem> AsList => new (items);
+    public override List<DataItem> AsList => [.. items];
 
-    public override HashSet<DataItem> AsHashSet => new (items);
+    public override HashSet<DataItem> AsHashSet => [.. items];
 
     public override Queue<DataItem> AsQueue => new (items);
 
@@ -55,13 +55,9 @@ public sealed class Tuple(DataItem[] items) : DataItem
     protected override bool UnsafeEquals(DataItem other)
     {
         var otherItems = other.AsArray;
-        if (items.Length != otherItems.Length) return false;
-
-        for (int i = 0; i < items.Length; ++i)
-            if (!items[i].Equals(otherItems[i]))
-                return false;
-
-        return true;
+        return items.Length == otherItems.Length &&
+               !items.Where((item, index) => !item.Equals(otherItems[index]))
+                     .Any();
     }
 
     public override int GetHashCode()
@@ -119,20 +115,20 @@ public sealed class Tuple(DataItem[] items) : DataItem
         switch (_operator)
         {
             case BinaryOperator.Plus:
-                {
-                    var operandItems = operand.AsArray;
-                    var result = new DataItem[items.Length + operandItems.Length];
-                    Array.Copy(items, result, items.Length);
-                    Array.Copy(operandItems, 0, result, items.Length, operandItems.Length);
-                    return new Tuple(result);
-                }
+            {
+                var operandItems = operand.AsArray;
+                var result = new DataItem[items.Length + operandItems.Length];
+                Array.Copy(items, result, items.Length);
+                Array.Copy(operandItems, 0, result, items.Length, operandItems.Length);
+                return new Tuple(result);
+            }
             case BinaryOperator.Times:
-                {
-                    var result = new List<DataItem>();
-                    int n = operand.AsInt32;
-                    for (int i = 0; i < n; ++i) result.AddRange(items);
-                    return new Tuple([.. result]);
-                }
+            {
+                var result = new List<DataItem>();
+                int n = operand.AsInt32;
+                for (int i = 0; i < n; ++i) result.AddRange(items);
+                return new Tuple([.. result]);
+            }
             case BinaryOperator.Contains:
                 return Boolean.FromBool(Array.IndexOf(items, operand) >= 0);
             default:
@@ -165,8 +161,8 @@ public sealed class Tuple(DataItem[] items) : DataItem
         return new Tuple(items[lBound..uBound]);
     }
 
-    public override void SetItemRange(int lBound, int uBound, DataItem value)
-        => throw new InvalidOperationException(Resources.TuplesAreImmutable);
+    public override void SetItemRange(int lBound, int uBound, DataItem value) =>
+        throw new InvalidOperationException(Resources.TuplesAreImmutable);
 
     public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
     {

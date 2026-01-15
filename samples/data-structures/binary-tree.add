@@ -1,14 +1,19 @@
 import sys::console; // for 'setForeground', 'resetColor' and 'clearScreen'
 
 // Adds an element to the tree
-function treeAdd(&node, elem, prn = null)
+function treeAdd(&node, value, parent = null)
 {
 	if (node === null)
-		node = new {value = elem, parent = prn, left = null, right = null};
-	else if (elem <= node.value)
-		treeAdd(node.left, elem, node);
+		node = new {
+			value = value,
+			parent = parent,
+			left = null,
+			right = null
+		};
+	else if (value <= node.value)
+		treeAdd(node.left, value, node);
 	else
-		treeAdd(node.right, elem, node);
+		treeAdd(node.right, value, node);
 }
 
 // Computes the depth of the tree
@@ -16,11 +21,10 @@ function treeDepth(node) =>
 	node === null ? 0 : 1 + max(treeDepth(node.left), treeDepth(node.right));
 
 // Finds a node in the tree
-function findNode(node, elem)
+function findNode(node, value)
 {
-	if (node === null) return null;
-	if (node.value === elem) return node;
-	return findNode(node.left, elem) ?? findNode(node.right, elem);
+	if (node === null || node.value === value) return node;
+	return findNode(node.left, value) ?? findNode(node.right, value);
 }
 
 // Prints the tree
@@ -45,7 +49,7 @@ function printTree(node, bookmark = null, prefix = "")
 }
 
 /**
-* Prints the leading part of a line according to the tree's depth and position
+* Prints the leading part of a line according to the corresponding node's depth and position
 */
 function printLineLead(node, prefix)
 {
@@ -63,7 +67,7 @@ function printLineLead(node, prefix)
 			lineLead = "    " + lineLead;
 		
 		tmpNode = tmpParent;
-		tmpParent = tmpParent.parent;
+		tmpParent = tmpNode.parent;
 	}
 	
 	print($'{lineLead}+--{prefix}');
@@ -72,25 +76,26 @@ function printLineLead(node, prefix)
 /********************** MAIN PROGRAM **********************/
 
 if (__name == "main") {
-	node = null;
+	root = null;
+	
 	for (i = 0; i < 20; i++)
 	{
-	    treeAdd(node, randint(100));
+	    treeAdd(root, randint(100));
 	}
 	
-	printTree(node);
+	printTree(root);
 	println();
 	
-	println("node depth: {0}", treeDepth(node));
+	println("tree depth: {0}", treeDepth(root));
 	println();
 	
 	value = (int) readln("value to find = ");
-	found = findNode(node, value);
+	found = findNode(root, value);
 	
 	if (found !== null)
 	{
 		clear();
-		printTree(node, found);
+		printTree(root, found);
 	}
 	else
 		println($"Could not find {value} in the tree");

@@ -42,10 +42,10 @@ public class ClassMethodDecl(string name, Scope scope, Modifier modifier, Parame
               Parameters.Length == method.Function.Parameters.Length)) return false;
 
 
-        for (int i = 0; i < Parameters.Length; ++i)
+        for (var i = 0; i < Parameters.Length; ++i)
         {
-            ParameterDecl p1 = Parameters[i];
-            Parameter p2 = method.Function.Parameters[i];
+            var p1 = Parameters[i];
+            var p2 = method.Function.Parameters[i];
 
             if (p1.ByRef != p2.ByRef ||
                 p1.VaList != p2.VaList ||
@@ -62,7 +62,7 @@ public class ClassMethodDecl(string name, Scope scope, Modifier modifier, Parame
     /// </summary>
     public override ClassMember ToClassMember()
     {
-        Parameter[] parameters = [.. Parameters.Select(p => p.ToParameter())];
-        return new ClassMethod(Name, Scope, Modifier, new Function(parameters, Body));
+        Parameter[] memberParams = [.. Parameters.Select(p => p.ToParameter())];
+        return new ClassMethod(Name, Scope, Modifier, new Function(memberParams, Body));
     }
 }

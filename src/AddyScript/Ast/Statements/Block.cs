@@ -17,17 +17,7 @@ namespace AddyScript.Ast.Statements;
 public class Block(params Statement[] statements) : Statement
 {
     /// <summary>
-    /// Block's statements
-    /// </summary>
-    public Statement[] Statements { get; private set; } = statements;
-
-    /// <summary>
-    /// The labels declared in the block.
-    /// </summary>
-    public Dictionary<string, Label> Labels { get; set; } = [];
-
-    /// <summary>
-    /// Represents an empty block.
+    /// Creates an empty block.
     /// </summary>
     public static Block Empty => new ();
 
@@ -43,6 +33,33 @@ public class Block(params Statement[] statements) : Statement
     /// <param name="expression">The expression to be returned</param>
     /// <returns>An <see cref="Expression"/></returns>
     public static Block WithReturn(Expression expression) => new (new Return(expression));
+
+    /// <summary>
+    /// Block's statements
+    /// </summary>
+    public Statement[] Statements { get; private set; } = statements;
+
+    /// <summary>
+    /// The labels declared in the block.
+    /// </summary>
+    public Dictionary<string, Label> Labels { get; set; } = [];
+    
+    /// <summary>
+    /// Determines whether the block is empty.
+    /// </summary>
+    public bool IsEmpty => Statements.Length == 0;
+    
+    /// <summary>
+    /// Determines whether the block contains a single empty return statement.
+    /// </summary>
+    public bool IsEmptyBody =>
+        Statements.Length > 0 && Statements[0] is Return { Expression: null };
+    
+    /// <summary>
+    /// Determines whether the block contains a single return statement with an expression.
+    /// </summary>
+    public bool IsExpressionBody =>
+        Statements.Length > 0 && Statements[0] is Return { Expression: not null };
 
     /// <summary>
     /// Appends a statement to the block.

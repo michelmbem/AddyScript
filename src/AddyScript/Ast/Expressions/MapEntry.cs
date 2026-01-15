@@ -2,22 +2,22 @@ namespace AddyScript.Ast.Expressions;
 
 
 /// <summary>
-/// An item as it appears in an map initializer.
+/// Represents a key-value pair in a map initializer.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of MapEntry
 /// </remarks>
-/// <param name="key">The item's key</param>
-/// <param name="value">The item's value</param>
+/// <param name="key">The entry's key</param>
+/// <param name="value">The entry's value</param>
 public class MapEntry(Expression key, Expression value) : ScriptElement
 {
     /// <summary>
-    /// The item's key.
+    /// The entry's key.
     /// </summary>
     public Expression Key => key;
 
     /// <summary>
-    /// The item's value.
+    /// The entry's value.
     /// </summary>
     public Expression Value => value;
 

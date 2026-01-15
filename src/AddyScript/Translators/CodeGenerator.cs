@@ -13,6 +13,8 @@ using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 using AddyScript.Translators.Utility;
 
+using Boolean = AddyScript.Runtime.DataItems.Boolean;
+
 
 namespace AddyScript.Translators;
 
@@ -29,16 +31,17 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private static readonly string[] keywords = [
         "abstract", "break", "case", "catch", "class", "const", "constructor", "contains", "continue", "default",
         "do", "else", "endswith", "extern", "event", "false", "final", "finally", "for", "foreach", "function",
-        "goto", "if", "import", "in", "is", "local", "matches", "new", "null", "private", "property", "protected",
-        "public", "return", "startswith", "static", "super", "switch", "this", "throw", "true", "try", "typeof",
-        "using", "yield", "while"
+        "goto", "if", "import", "in", "is", "let", "local", "matches", "new", "null", "private", "property",
+        "protected", "public", "return", "startswith", "static", "super", "switch", "this", "throw", "true", "try",
+        "typeof","using", "yield", "when", "while"
     ];
 
     #endregion
 
-    private readonly IndentedTextWriter textWriter = textWriter is IndentedTextWriter itw ? itw : new IndentedTextWriter(textWriter);
+    private readonly IndentedTextWriter textWriter =
+        textWriter is IndentedTextWriter itw ? itw : new IndentedTextWriter(textWriter);
     private bool inFunctionBody, inForLoopInitializer, isBlockInline;
-    private char stringWrapper = '\'';
+    private char stringWrapper = '"';
 
     #region Members of ITranslator
 
@@ -50,13 +53,13 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         while (counter < program.Statements.Length)
         {
             foreach (var pair in program.Labels.Where(pair => pair.Value.Address == counter))
-                textWriter.WriteLine("{0}:", SafeName(pair.Key));
+                textWriter.WriteLine($"{SafeName(pair.Key)}:");
 
             Statement statement = program.Statements[counter];
             if (prevStatement != null && (
-                statement is ClassDefinition || prevStatement is ClassDefinition ||
-                statement is FunctionDecl || prevStatement is FunctionDecl ||
-                (statement is ImportDirective ^ prevStatement is ImportDirective)))
+                statement is StatementWithAttributes ||
+                prevStatement is  StatementWithAttributes ||
+                statement is ImportDirective ^ prevStatement is ImportDirective))
                 textWriter.WriteLine();
 
             statement.AcceptTranslator(this);
@@ -68,23 +71,22 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateImportDirective(ImportDirective import)
     {
-        if (string.IsNullOrEmpty(import.Alias))
-            textWriter.WriteLine("import {0};", SafeName(import.ModuleName));
-        else
-            textWriter.WriteLine("import {0} as {1};", SafeName(import.ModuleName), SafeName(import.Alias));
+        textWriter.WriteLine(string.IsNullOrEmpty(import.Alias)
+            ? $"import {SafeName(import.ModuleName)};"
+            : $"import {SafeName(import.ModuleName)} as {SafeName(import.Alias)};");
     }
 
     public void TranslateClassDefinition(ClassDefinition classDef)
     {
-        if (classDef.Attributes != null && classDef.Attributes.Length > 0)
+        if (classDef.Attributes is { Length: > 0 })
             DumpAttributesList(classDef.Attributes, true);
 
         if (classDef.Modifier != Modifier.Default)
-            textWriter.Write("{0} ", classDef.Modifier.ToString().ToLower());
+            textWriter.Write($"{classDef.Modifier} ".ToLower());
 
-        textWriter.Write("class {0}", SafeName(classDef.ClassName));
+        textWriter.Write($"class {SafeName(classDef.ClassName)}");
         if (!string.IsNullOrEmpty(classDef.SuperClassName))
-            textWriter.Write(" : {0}", SafeTypeName(classDef.SuperClassName));
+            textWriter.Write($" : {SafeTypeName(classDef.SuperClassName)}");
 
         textWriter.WriteLine();
         textWriter.WriteLine('{');
@@ -117,15 +119,15 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             DumpMethod(method);
 
         --textWriter.Indentation;
-        textWriter.Write('}');
+        textWriter.WriteLine('}');
     }
 
     public void TranslateFunctionDecl(FunctionDecl fnDecl)
     {
-        if (fnDecl.Attributes != null && fnDecl.Attributes.Length > 0)
+        if (fnDecl.Attributes is { Length: > 0 })
             DumpAttributesList(fnDecl.Attributes, true);
 
-        textWriter.Write("function {0}", SafeName(fnDecl.Name));
+        textWriter.Write($"function {SafeName(fnDecl.Name)}");
         DumpParametersList(fnDecl.Parameters);
         DumpFunctionBody(fnDecl.Body);
     }
@@ -135,7 +137,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         if (extDecl.Attributes != null && extDecl.Attributes.Length > 0)
             DumpAttributesList(extDecl.Attributes, true);
 
-        textWriter.Write("extern function {0}", SafeName(extDecl.Name));
+        textWriter.Write($"extern function {SafeName(extDecl.Name)}");
         DumpParametersList(extDecl.Parameters);
         textWriter.WriteLine(';');
     }
@@ -147,7 +149,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         for (int i = 0; i < cstDecl.Setters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
-            DumpPropertyInitializer(cstDecl.Setters[i]);
+            DumpVariableSetter(cstDecl.Setters[i]);
         }
 
         textWriter.WriteLine(';');
@@ -160,7 +162,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         for (int i = 0; i < varDecl.Setters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
-            DumpPropertyInitializer(varDecl.Setters[i]);
+            DumpVariableSetter(varDecl.Setters[i]);
         }
 
         if (!inForLoopInitializer) textWriter.WriteLine(';');
@@ -171,17 +173,14 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.WriteLine('{');
         ++textWriter.Indentation;
 
-        bool wasFunctionBody = inFunctionBody;
-        inFunctionBody = false;
-        bool wasBlockInline = isBlockInline;
-        isBlockInline = false;
-
-        int counter = 0;
-        int length = block.Statements.Length;
+        var (wasInFunctionBody, wasBlockInline) = (inFunctionBody, isBlockInline);
+        inFunctionBody = isBlockInline = false;
         
-        if (wasFunctionBody && length > 0 &&
-            block.Statements[length - 1] is Return ret &&
-            ret.Expression == null) --length;
+        var (counter, length) = (0, block.Statements.Length);
+        
+        if (wasInFunctionBody && length > 0 &&
+            block.Statements[^1] is Return { Expression: null })
+            --length;
 
         while (counter < length)
         {
@@ -192,7 +191,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             }
 
             foreach (var pair in block.Labels.Where(pair => pair.Value.Address == counter))
-                textWriter.WriteLine("{0}:", SafeName(pair.Key));
+                textWriter.WriteLine($"{SafeName(pair.Key)}:");
 
             Statement stmt = block.Statements[counter];
             stmt.AcceptTranslator(this);
@@ -204,8 +203,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write("}");
         if (!wasBlockInline) textWriter.WriteLine();
 
-        isBlockInline = wasBlockInline;
-        inFunctionBody = wasFunctionBody;
+        (inFunctionBody, isBlockInline) = (wasInFunctionBody, wasBlockInline);
     }
 
     public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
@@ -219,10 +217,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateAssignment(Assignment assignment)
     {
         assignment.LeftOperand.AcceptTranslator(this);
-        if (assignment.Operator == BinaryOperator.IfEmpty)
-            textWriter.Write(" ?? ");
-        else
-            textWriter.Write(" {0}= ", BinaryOperatorToString(assignment.Operator));
+        textWriter.Write(assignment.Operator == BinaryOperator.IfEmpty
+            ? " ?? "
+            : $" {BinaryOperatorToString(assignment.Operator)}= ");
         MayBeParenthesize(assignment.RightOperand);
     }
 
@@ -235,27 +232,24 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         MayBeParenthesize(terExpr.FalsePart);
     }
 
-    public void TranslateBinaryExpression(BinaryExpression binaryExpr)
+    public void TranslateBinaryExpression(BinaryExpression binExpr)
     {
-        MayBeParenthesize(binaryExpr.LeftOperand);
-        textWriter.Write(" {0} ", BinaryOperatorToString(binaryExpr.Operator));
-        MayBeParenthesize(binaryExpr.RightOperand);
+        MayBeParenthesize(binExpr.LeftOperand);
+        textWriter.Write($" {BinaryOperatorToString(binExpr.Operator)} ");
+        MayBeParenthesize(binExpr.RightOperand);
     }
 
     public void TranslateUnaryExpression(UnaryExpression unExpr)
     {
-        switch (unExpr.Operator)
+        if (unExpr.Operator is UnaryOperator.NotEmpty or UnaryOperator.PostIncrement or UnaryOperator.PostDecrement)
         {
-            case UnaryOperator.NotEmpty:
-            case UnaryOperator.PostIncrement:
-            case UnaryOperator.PostDecrement:
-                MayBeParenthesize(unExpr.Operand);
-                textWriter.Write(UnaryOperatorToString(unExpr.Operator));
-                break;
-            default:
-                textWriter.Write(UnaryOperatorToString(unExpr.Operator));
-                MayBeParenthesize(unExpr.Operand);
-                break;
+            MayBeParenthesize(unExpr.Operand);
+            textWriter.Write(UnaryOperatorToString(unExpr.Operator));
+        }
+        else
+        {
+            textWriter.Write(UnaryOperatorToString(unExpr.Operator));
+            MayBeParenthesize(unExpr.Operand);
         }
     }
 
@@ -273,55 +267,55 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(')');
     }
 
-    public void TranslateTupleInitializer(TupleInitializer tupleInit)
+    public void TranslateTupleInitializer(TupleInitializer tupleInitializer)
     {
-        DumpList(tupleInit.Items, "(", ")");
+        DumpArgumentList(tupleInitializer.Items, "(", ")");
     }
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
-        DumpList(listInit.Items);
+        DumpArgumentList(listInit.Items);
     }
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
-        DumpList(setInit.Items, "{", "}");
+        DumpArgumentList(setInit.Items, "{", "}");
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
     {
-        DumpMapItemInitializersList(mapInit.Entries);
+        DumpMapEntryList(mapInit.Entries);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objInit)
     {
         textWriter.Write("new ");
-        DumpPropertyInitializersList(objInit.PropertySetters);
+        DumpVariableSetterList(objInit.PropertySetters);
     }
 
     public void TranslateInlineFunction(InlineFunction inlineFn)
     {
         if (inlineFn.IsLambda())
         {
-            ParameterDecl[] parameters = inlineFn.Parameters;
+            var parameters = inlineFn.Parameters;
 
             textWriter.Write("|");
-            if (parameters.Length <= 0)
+            if (parameters.Length == 0)
                 textWriter.Write(' ');
             else
-                for (int i = 0; i < parameters.Length; ++i)
+                for (var i = 0; i < parameters.Length; ++i)
                 {
                     if (i > 0) textWriter.Write(", ");
                     textWriter.Write(SafeName(parameters[i].Name));
                 }
             textWriter.Write("| => ");
 
-            var _return = (Return)inlineFn.Body.Statements[0];
-            _return.Expression.AcceptTranslator(this);
+            var ret = (Return)inlineFn.Body.Statements[0];
+            ret.Expression.AcceptTranslator(this);
         }
         else
         {
-            bool wasBlockInline = isBlockInline;
+            var wasBlockInline = isBlockInline;
             isBlockInline = true;
 
             textWriter.PushPrefix();
@@ -334,9 +328,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
     }
 
-    public void TranslateVariableRef(VariableRef variableRef)
+    public void TranslateVariableRef(VariableRef varRef)
     {
-        textWriter.Write(SafeName(variableRef.Name));
+        textWriter.Write(SafeName(varRef.Name));
     }
 
     public void TranslateItemRef(ItemRef itemRef)
@@ -377,13 +371,13 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateFunctionCall(FunctionCall fnCall)
     {
         textWriter.Write(SafeName(fnCall.FunctionName));
-        DumpArgumentsList(fnCall.Arguments, fnCall.NamedArgs);
+        DumpArgumentList(fnCall.Arguments, fnCall.NamedArgs);
     }
 
     public void TranslateAnonymousCall(AnonymousCall anCall)
     {
         MayBeParenthesize(anCall.Callee);
-        DumpArgumentsList(anCall.Arguments, anCall.NamedArgs);
+        DumpArgumentList(anCall.Arguments, anCall.NamedArgs);
     }
 
     public void TranslateMethodCall(MethodCall methodCall)
@@ -391,30 +385,30 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         MayBeParenthesize(methodCall.Target);
         if (methodCall.Optional) textWriter.Write('?');
         textWriter.Write(".{0}", SafeName(methodCall.FunctionName));
-        DumpArgumentsList(methodCall.Arguments, methodCall.NamedArgs);
+        DumpArgumentList(methodCall.Arguments, methodCall.NamedArgs);
     }
 
     public void TranslateStaticMethodCall(StaticMethodCall staticCall)
     {
         textWriter.Write(SafeName(staticCall.Name));
-        DumpArgumentsList(staticCall.Arguments, staticCall.NamedArgs);
+        DumpArgumentList(staticCall.Arguments, staticCall.NamedArgs);
     }
 
     public void TranslateConstructorCall(ConstructorCall ctorCall)
     {
-        textWriter.Write("new {0}", SafeName(ctorCall.Name));
-        DumpArgumentsList(ctorCall.Arguments, ctorCall.NamedArgs);
+        textWriter.Write($"new {SafeName(ctorCall.Name)}");
+        DumpArgumentList(ctorCall.Arguments, ctorCall.NamedArgs);
 
         if (ctorCall.PropertySetters == null) return;
 
         textWriter.Write(' ');
-        DumpPropertyInitializersList(ctorCall.PropertySetters);
+        DumpVariableSetterList(ctorCall.PropertySetters);
     }
 
     public void TranslateParentMethodCall(ParentMethodCall pmc)
     {
-        textWriter.Write("super::{0}", SafeName(pmc.FunctionName));
-        DumpArgumentsList(pmc.Arguments, pmc.NamedArgs);
+        textWriter.Write($"super::{SafeName(pmc.FunctionName)}");
+        DumpArgumentList(pmc.Arguments, pmc.NamedArgs);
     }
 
     public void TranslateParentConstructorCall(ParentConstructorCall pcc)
@@ -423,12 +417,12 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         ++textWriter.Indentation;
         textWriter.Write(" : super");
         --textWriter.Indentation;
-        DumpArgumentsList(pcc.Arguments, pcc.NamedArgs);
+        DumpArgumentList(pcc.Arguments, pcc.NamedArgs);
     }
 
     public void TranslateParentPropertyRef(ParentPropertyRef ppr)
     {
-        textWriter.Write("super::{0}", SafeName(ppr.PropertyName));
+        textWriter.Write($"super::{SafeName(ppr.PropertyName)}");
     }
 
     public void TranslateParentIndexerRef(ParentIndexerRef pir)
@@ -449,17 +443,17 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateTypeVerification(TypeVerification typeVerif)
     {
         MayBeParenthesize(typeVerif.Expression);
-        textWriter.Write(" is {0}", SafeTypeName(typeVerif.TypeName));
+        textWriter.Write($" is {SafeTypeName(typeVerif.TypeName)}");
     }
 
     public void TranslateTypeOfExpression(TypeOfExpression typeOf)
     {
-        textWriter.Write("typeof({0})", SafeTypeName(typeOf.TypeName));
+        textWriter.Write($"typeof({SafeTypeName(typeOf.TypeName)})");
     }
 
     public void TranslateConversion(Conversion conversion)
     {
-        textWriter.Write("({0}) ", SafeTypeName(conversion.TypeName));
+        textWriter.Write($"({SafeTypeName(conversion.TypeName)}) ");
         MayBeParenthesize(conversion.Expression);
     }
 
@@ -509,13 +503,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             if (counter == switchBlock.DefaultCase)
                 textWriter.WriteLine("default:");
 
-            foreach (var pair in switchBlock.Labels)
+            foreach (var pair in switchBlock.Labels
+                .Where(pair => !pair.Key.StartsWith('@') && pair.Value.Address == counter))
             {
-                if (pair.Key.StartsWith('@') || pair.Value.Address != counter)
-                    continue;
-
                 ++textWriter.Indentation;
-                textWriter.WriteLine("{0}:", SafeName(pair.Key));
+                textWriter.WriteLine($"{SafeName(pair.Key)}:");
                 --textWriter.Indentation;
             }
 
@@ -539,8 +531,8 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
         else
         {
-            bool comma1 = false;
-            foreach (Statement initializer in forLoop.Initializers)
+            var comma1 = false;
+            foreach (var initializer in forLoop.Initializers)
             {
                 if (comma1) textWriter.Write(", ");
                 initializer.AcceptTranslator(this);
@@ -552,8 +544,8 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         forLoop.Guard?.AcceptTranslator(this);
         textWriter.Write("; ");
 
-        bool comma2 = false;
-        foreach (Expression updater in forLoop.Incrementers)
+        var comma2 = false;
+        foreach (var updater in forLoop.Incrementers)
         {
             if (comma2) textWriter.Write(", ");
             updater.AcceptTranslator(this);
@@ -568,8 +560,8 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.Write("foreach (");
         if (forEach.KeyName != ForEachLoop.DEFAULT_KEY_NAME)
-            textWriter.Write("{0} => ", SafeName(forEach.KeyName));
-        textWriter.Write("{0} in ", SafeName(forEach.ValueName));
+            textWriter.Write($"{SafeName(forEach.KeyName)} => ");
+        textWriter.Write($"{SafeName(forEach.ValueName)} in ");
         forEach.Guard.AcceptTranslator(this);
         textWriter.WriteLine(')');
         MayBeIndent(forEach.Action);
@@ -605,12 +597,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     public void TranslateGoto(Goto _goto)
     {
         textWriter.Write("goto ");
-
-        if (_goto.LabelName.StartsWith('@'))
-            textWriter.Write(_goto.LabelName[1..]);
-        else
-            textWriter.Write(SafeName(_goto.LabelName));
-
+        textWriter.Write(_goto.LabelName.StartsWith('@') ? _goto.LabelName[1..] : SafeName(_goto.LabelName));
         textWriter.WriteLine(';');
     }
 
@@ -704,31 +691,39 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         MayBeParenthesize(patMatch.Expression);
 
-        textWriter.WriteLine(" switch {");
-        ++textWriter.Indentation;
-
-        bool firstCase = true;
-
-        foreach (MatchCase matchCase in patMatch.MatchCases)
+        if (patMatch.IsSimple)
         {
-            if (firstCase)
-                firstCase = false;
-            else
-                textWriter.WriteLine(',');
-
-            DumpMatchCase(matchCase);
+            textWriter.Write(" is ");
+            DumpMatchCasePattern(patMatch.MatchCases[0].Pattern);
         }
+        else
+        {
+            textWriter.WriteLine(" switch {");
+            ++textWriter.Indentation;
 
-        textWriter.WriteLine();
-        --textWriter.Indentation;
-        textWriter.Write('}');
+            var firstCase = true;
+
+            foreach (var matchCase in patMatch.MatchCases)
+            {
+                if (firstCase)
+                    firstCase = false;
+                else
+                    textWriter.WriteLine(',');
+
+                DumpMatchCase(matchCase);
+            }
+
+            textWriter.WriteLine();
+            --textWriter.Indentation;
+            textWriter.Write('}');
+        }
     }
 
     public void TranslateMutableCopy(MutableCopy mutableCopy)
     {
         MayBeParenthesize(mutableCopy.Original);
         textWriter.Write(" with ");
-        DumpPropertyInitializersList(mutableCopy.PropertySetters);
+        DumpVariableSetterList(mutableCopy.PropertySetters);
     }
 
     #endregion
@@ -767,11 +762,11 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write(" static final");
                 break;
             default:
-                textWriter.Write(" {0}", field.Modifier.ToString().ToLower());
+                textWriter.Write($" {field.Modifier}".ToLower());
                 break;
         }
         
-        textWriter.Write(" {0}", SafeName(field.Name));
+        textWriter.Write($" {SafeName(field.Name)}");
 
         if (field.Initializer != null)
         {
@@ -787,49 +782,56 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(property.Scope.ToString().ToLower());
 
         if (property.Modifier != Modifier.Default)
-            textWriter.Write(" {0}", property.Modifier.ToString().ToLower());
+            textWriter.Write($" {property.Modifier}".ToLower());
 
-        textWriter.Write(" property {0}", property.IsIndexer ? "[]" : SafeName(property.Name));
+        var propertyName = property.IsIndexer ? "[]" : SafeName(property.Name);
+        textWriter.Write($" property {propertyName}");
 
-        if (property.ReaderBody == null && property.WriterBody == null)
+        switch (property.ReaderBody)
         {
-            if (property.Access == PropertyAccess.ReadWrite &&
-                property.ReaderScope == property.Scope &&
-                property.WriterScope == property.Scope)
-            {
+            case null when property.WriterBody is null:
+                if (property.Access == PropertyAccess.ReadWrite &&
+                    property.ReaderScope == property.Scope &&
+                    property.WriterScope == property.Scope)
+                {
+                    textWriter.WriteLine(';');
+                }
+                else
+                {
+                    textWriter.Write(" { ");
+
+                    if (property.CanRead)
+                        DumpPropertyAccessor(property.Scope, property.ReaderScope, property.ReaderBody,
+                                             Parser.PROPERTY_READER_START, true);
+
+                    if (property.CanWrite)
+                        DumpPropertyAccessor(property.Scope, property.WriterScope, property.WriterBody,
+                                             Parser.PROPERTY_WRITER_START, true);
+
+                    textWriter.WriteLine('}');
+                }
+                break;
+            case { IsExpressionBody: true } when !property.CanWrite:
+                textWriter.Write(" => ");
+                ((Return)property.ReaderBody.Statements[0]).Expression.AcceptTranslator(this);
                 textWriter.WriteLine(';');
-            }
-            else
-            {
-                textWriter.Write(" { ");
+                break;
+            default:
+                textWriter.WriteLine();
+                textWriter.WriteLine('{');
+                ++textWriter.Indentation;
 
                 if (property.CanRead)
-                    DumpPropertyAccessor(property.Scope, property.ReaderScope,
-                                         property.ReaderBody, Parser.PROPERTY_READER_START, true);
+                    DumpPropertyAccessor(property.Scope, property.ReaderScope, property.ReaderBody,
+                                         Parser.PROPERTY_READER_START, false);
 
                 if (property.CanWrite)
-                    DumpPropertyAccessor(property.Scope, property.WriterScope,
-                                         property.WriterBody, Parser.PROPERTY_WRITER_START, true);
+                    DumpPropertyAccessor(property.Scope, property.WriterScope, property.WriterBody,
+                                         Parser.PROPERTY_WRITER_START, false);
 
+                --textWriter.Indentation;
                 textWriter.WriteLine('}');
-            }
-        }
-        else
-        {
-            textWriter.WriteLine();
-            textWriter.WriteLine('{');
-            ++textWriter.Indentation;
-
-            if (property.CanRead)
-                DumpPropertyAccessor(property.Scope, property.ReaderScope,
-                                     property.ReaderBody, Parser.PROPERTY_READER_START, false);
-
-            if (property.CanWrite)
-                DumpPropertyAccessor(property.Scope, property.WriterScope,
-                                     property.WriterBody, Parser.PROPERTY_WRITER_START, false);
-
-            --textWriter.Indentation;
-            textWriter.WriteLine('}');
+                break;
         }
 
         textWriter.WriteLine();
@@ -839,7 +841,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                                       Block accessorBody, string keyword, bool inline)
     {
         if (accessorScope != propertyScope)
-            textWriter.Write("{0} ", accessorScope.ToString().ToLower());
+            textWriter.Write($"{accessorScope} ".ToLower());
 
         textWriter.Write(keyword);
 
@@ -863,10 +865,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         else
         {
             var binaryOperator = ClassMethod.GetBinaryOperator(method.Name);
-            if (binaryOperator != BinaryOperator.None)
-                textWriter.Write(" operator {0}", BinaryOperatorToString(binaryOperator));
-            else
-                textWriter.Write(" function {0}", SafeName(method.Name));
+            textWriter.Write(binaryOperator != BinaryOperator.None
+                ? $" operator {BinaryOperatorToString(binaryOperator)}"
+                : $" function {SafeName(method.Name)}");
         }
 
         DumpParametersList(method.Parameters);
@@ -883,23 +884,23 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.Write(_event.Scope.ToString().ToLower());
         if (_event.Modifier != Modifier.Default)
-            textWriter.Write(" {0}", _event.Modifier.ToString().ToLower());
-        textWriter.Write(" event {0}", SafeName(_event.Name));
+            textWriter.Write($" {_event.Modifier}".ToLower());
+        textWriter.Write($" event {SafeName(_event.Name)}");
         DumpParametersList(_event.Parameters);
         textWriter.WriteLine(';');
     }
 
     private void DumpFunctionBody(Block body)
     {
-        if (body.Statements?[0] is Return ret && ret.Expression != null)
+        if (body.IsExpressionBody)
         {
             textWriter.Write(" => ");
-            ret.Expression.AcceptTranslator(this);
+            ((Return)body.Statements[0]).Expression.AcceptTranslator(this);
             textWriter.WriteLine(';');
         }
         else
         {
-            bool wasFunctionBody = inFunctionBody;
+            var wasFunctionBody = inFunctionBody;
             inFunctionBody = true;
             textWriter.WriteLine();
             body.AcceptTranslator(this);
@@ -911,7 +912,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.Write('(');
         
-        for (int i = 0; i < parameters.Length; ++i)
+        for (var i = 0; i < parameters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
             DumpParameter(parameters[i]);
@@ -950,7 +951,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write("null");
                 break;
             case ClassID.Boolean:
-                textWriter.Write(dataItem.AsBoolean ? "true" : "false");
+                textWriter.Write(dataItem.AsBoolean ? Boolean.TRUE_STRING : Boolean.FALSE_STRING);
                 break;
             case ClassID.Integer:
                 textWriter.Write(dataItem.ToString("g", fp));
@@ -962,7 +963,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write(dataItem.ToString("g", fp) + "F");
                 break;
             case ClassID.Decimal:
-                textWriter.Write(dataItem.ToString("", fp) + "D");
+                textWriter.Write(dataItem.ToString(string.Empty, fp) + "D");
                 break;
             case ClassID.Date:
                 textWriter.Write("`" + dataItem.ToString("u", fp) + "`");
@@ -976,16 +977,39 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         }
     }
 
-    private void DumpArgumentsList(Argument[] positionalArgs, Dictionary<string, Expression> namedArgs,
-                                   string prefix = "(", string suffix = ")")
+    private void DumpVariableSetterList(VariableSetter[] variableSetters, string prefix = "{", string suffix = "}")
+    {
+        textWriter.Write(prefix);
+
+        for (var i = 0; i < variableSetters.Length; ++i)
+        {
+            if (i > 0) textWriter.Write(", ");
+            DumpVariableSetter(variableSetters[i]);
+        }
+
+        textWriter.Write(suffix);
+    }
+
+    private void DumpVariableSetter(VariableSetter variableSetter)
+    {
+        textWriter.Write(SafeName(variableSetter.Name));
+        
+        if (variableSetter.Value == null) return;
+        
+        textWriter.Write(" = ");
+        variableSetter.Value.AcceptTranslator(this);
+    }
+
+    private void DumpArgumentList(Argument[] positionalArgs, Dictionary<string, Expression> namedArgs,
+                                  string prefix = "(", string suffix = ")")
     {
         textWriter.Write(prefix);
 
         bool firstArg = true;
 
-        if (positionalArgs != null && positionalArgs.Length > 0)
+        if (positionalArgs?.Length > 0)
         {
-            DumpList(positionalArgs, string.Empty, string.Empty);
+            DumpArgumentList(positionalArgs, string.Empty, string.Empty);
             firstArg = false;
         }
 
@@ -1004,71 +1028,34 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpExpressionsList(Expression[] expressions, string prefix = "(", string suffix = ")")
+    private void DumpArgumentList(Argument[] arguments, string prefix = "[", string suffix = "]")
     {
         textWriter.Write(prefix);
 
-        for (int i = 0; i < expressions.Length; ++i)
+        for (var i = 0; i < arguments.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
-            expressions[i].AcceptTranslator(this);
+            DumpArgument(arguments[i]);
         }
 
         textWriter.Write(suffix);
     }
 
-    private void DumpPropertyInitializersList(VariableSetter[] propertyInitializers, string prefix = "{", string suffix = "}")
+    private void DumpArgument(Argument argument)
+    {
+        if (argument.Spread) textWriter.Write(".. ");
+        argument.Value.AcceptTranslator(this);
+    }
+
+    private void DumpMapEntryList(MapEntry[] mapEntries, string prefix = "{", string suffix = "}")
     {
         textWriter.Write(prefix);
 
-        for (int i = 0; i < propertyInitializers.Length; ++i)
-        {
-            if (i > 0) textWriter.Write(", ");
-            DumpPropertyInitializer(propertyInitializers[i]);
-        }
-
-        textWriter.Write(suffix);
-    }
-
-    private void DumpPropertyInitializer(VariableSetter variableSetter)
-    {
-        textWriter.Write(SafeName(variableSetter.Name));
-
-        if (variableSetter.Expression != null)
-        {
-            textWriter.Write(" = ");
-            variableSetter.Expression.AcceptTranslator(this);
-        }
-    }
-
-    private void DumpList(Argument[] items, string prefix = "[", string suffix = "]")
-    {
-        textWriter.Write(prefix);
-
-        for (int i = 0; i < items.Length; ++i)
-        {
-            if (i > 0) textWriter.Write(", ");
-            DumpListItem(items[i]);
-        }
-
-        textWriter.Write(suffix);
-    }
-
-    private void DumpListItem(Argument item)
-    {
-        if (item.Spread) textWriter.Write(".. ");
-        item.Expression.AcceptTranslator(this);
-    }
-
-    private void DumpMapItemInitializersList(MapEntry[] itemInitializers, string prefix = "{", string suffix = "}")
-    {
-        textWriter.Write(prefix);
-
-        if (itemInitializers.Length > 0)
-            for (int i = 0; i < itemInitializers.Length; ++i)
+        if (mapEntries.Length > 0)
+            for (var i = 0; i < mapEntries.Length; ++i)
             {
                 if (i > 0) textWriter.Write(", ");
-                DumpMapItemInitializer(itemInitializers[i]);
+                DumpMapEntry(mapEntries[i]);
             }
         else
             textWriter.Write("=>");
@@ -1076,7 +1063,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         textWriter.Write(suffix);
     }
 
-    private void DumpMapItemInitializer(MapEntry entry)
+    private void DumpMapEntry(MapEntry entry)
     {
         entry.Key.AcceptTranslator(this);
         textWriter.Write(" => ");
@@ -1095,7 +1082,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         else
             textWriter.Write('[');
 
-        for (int i = 0; i < attributes.Length; ++i)
+        for (var i = 0; i < attributes.Length; ++i)
         {
             if (i > 0) textWriter.WriteLine(", ");
             DumpAttribute(attributes[i]);
@@ -1116,7 +1103,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpAttribute(AttributeDecl attribute)
     {
         textWriter.Write(SafeName(attribute.Name));
-        DumpPropertyInitializersList(attribute.PropertySetters, "(", ")");
+        DumpVariableSetterList(attribute.Fields, "(", ")");
     }
 
     private void DumpMatchCase(MatchCase matchCase)
@@ -1133,62 +1120,98 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     private void DumpMatchCasePattern(Pattern pattern)
     {
-        if (pattern is AlwaysPattern)
-            textWriter.Write(AlwaysPattern.Symbol);
-        else if (pattern is NullPattern)
-            textWriter.Write(NullPattern.Symbol);
-        else if (pattern is ValuePattern valuePat)
-            DumpDataItem(valuePat.Value);
-        else if (pattern is RangePattern rangePat)
+        switch (pattern)
         {
-            if (rangePat.LowerBound != null) DumpDataItem(rangePat.LowerBound);
-            textWriter.Write("..");
-            if (rangePat.UpperBound != null) DumpDataItem(rangePat.UpperBound);
-        }
-        else if (pattern is ObjectPattern objectPat)
-        {
-            // We check ObjectPattern before TypePattern to avoid problems with inheritance!!
-            if (objectPat.TypeName != Class.Object.Name)
+            case AlwaysTruePattern:
+                textWriter.Write(AlwaysTruePattern.Symbol);
+                break;
+            case RelationalPattern relational:
+                if (relational.Operator is not (BinaryOperator.Equal or BinaryOperator.Identical))
+                    textWriter.Write($"{BinaryOperatorToString(relational.Operator)} ");
+                DumpDataItem(relational.Value);
+                break;
+            case ObjectPattern objectPat:
             {
-                textWriter.Write(objectPat.TypeName);
-                textWriter.Write(' ');
+                // We check ObjectPattern before TypePattern to avoid problems with inheritance!!
+                if (objectPat.TypeName != Class.Object.Name)
+                {
+                    textWriter.Write(objectPat.TypeName);
+                    textWriter.Write(' ');
+                }
+
+                textWriter.Write("{ ");
+
+                var firstProp = true;
+                foreach (var matcher in objectPat.PropertyMatchers)
+                {
+                    if (firstProp)
+                        firstProp = false;
+                    else
+                        textWriter.Write(", ");
+
+                    textWriter.Write(matcher.PropertyName);
+                    textWriter.Write(" : ");
+                    DumpMatchCasePattern(matcher.Pattern);
+                }
+
+                textWriter.Write(" }");
+                break;
             }
-
-            textWriter.Write("{ ");
-
-            bool firstProp = true;
-            foreach (var matcher in objectPat.PropertyMatchers)
+            case DestructuringPattern destructuring:
             {
-                if (firstProp)
-                    firstProp = false;
-                else
-                    textWriter.Write(", ");
+                // We check DestructuringPattern before TypePattern to avoid problems with inheritance!!
+                textWriter.Write(destructuring.TypeName);
+                textWriter.Write('(');
 
-                textWriter.Write(matcher.PropertyName);
-                textWriter.Write(" : ");
-                DumpMatchCasePattern(matcher.Pattern);
+                var firstElem = true;
+                foreach (var propName in destructuring.PropertyNames)
+                {
+                    if (firstElem)
+                        firstElem = false;
+                    else
+                        textWriter.Write(", ");
+
+                    textWriter.Write(propName);
+                }
+
+                textWriter.Write(')');
+                break;
             }
+            case TypePattern type:
+                textWriter.Write(type.TypeName);
+                break;
+            case NegativePattern negative:
+                textWriter.Write("not ");
+                DumpMatchCasePattern(negative.Child);
+                break;
+            case GroupingPattern grouping:
+                textWriter.Write('(');
+                DumpMatchCasePattern(grouping.Child);
+                textWriter.Write(')');
+                break;
+            case LogicalPattern logical:
+                DumpMatchCasePattern(logical.Left);
+                textWriter.Write(logical.Inclusive ? " and " : " or ");
+                DumpMatchCasePattern(logical.Right);
+                break;
+            case PositionalPattern positional:
+            {
+                textWriter.Write('(');
 
-            textWriter.Write(" }");
-        }
-        else if (pattern is TypePattern typePat)
-            textWriter.Write(typePat.TypeName);
-        else if (pattern is NegativePattern negPat)
-        {
-            textWriter.Write("not ");
-            DumpMatchCasePattern(negPat.Child);
-        }
-        else if (pattern is GroupingPattern groupPat)
-        {
-            textWriter.Write('(');
-            DumpMatchCasePattern(groupPat.Child);
-            textWriter.Write(')');
-        }
-        else if (pattern is CompositePattern compPat)
-        {
-            DumpMatchCasePattern(compPat.Left);
-            textWriter.Write(compPat.Inclusive ? " and " : " or ");
-            DumpMatchCasePattern(compPat.Right);
+                var firstElem = true;
+                foreach (var item in positional.Items)
+                {
+                    if (firstElem)
+                        firstElem = false;
+                    else
+                        textWriter.Write(", ");
+
+                    DumpMatchCasePattern(item);
+                }
+
+                textWriter.Write(')');
+                break;
+            }
         }
     }
 
@@ -1246,7 +1269,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         var sb = new StringBuilder();
 
-        foreach (char ch in original)
+        foreach (var ch in original)
         {
             if (Lexer.IsLegalIdChar(ch))
                 sb.Append(ch);
@@ -1259,9 +1282,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public static string EscapedString(string original, bool duplicateBraces)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
 
-        foreach (char c in original)
+        foreach (var c in original)
             switch (c)
             {
                 case '\\' or '\'' or '"':
@@ -1294,13 +1317,14 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 case '}':
                     sb.Append(duplicateBraces ? "}}" : "}");
                     break;
+                case >= (char)32 and < (char)127:
+                    sb.Append(c);
+                    break;
+                case <= (char)255:
+                    sb.Append($"\\x{(int)c:x2}");
+                    break;
                 default:
-                    if (32 <= c && c < 127)
-                        sb.Append(c);
-                    else if (c <= 255)
-                        sb.AppendFormat("\\x{0:x2}", (int)c);
-                    else
-                        sb.AppendFormat("\\u{0:x4}", (int)c);
+                    sb.Append($"\\u{(int)c:x4}");
                     break;
             }
 
@@ -1323,22 +1347,18 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public static string SafeName(QualifiedName name)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
 
-        for (int i = 0; i < name.Length; ++i)
+        for (var i = 0; i < name.Length; ++i)
         {
             if (i > 0) sb.Append("::");
             
             NamePart part = name[i];
-
             sb.Append(SafeName(part.Value));
-
-            if (part.ParamCount > 0)
-            {
-                sb.Append('{');
-                sb.Append(part.ParamCount);
-                sb.Append('}');
-            }
+            
+            if (part.ParamCount == 0) continue;
+            
+            sb.Append('{').Append(part.ParamCount).Append('}');
         }
 
         return sb.ToString();

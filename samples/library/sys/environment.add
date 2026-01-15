@@ -1,6 +1,7 @@
 import System::Environment;
 import System::Threading::Thread;
 import System::Diagnostics::Process;
+import System::Diagnostics::ProcessStartInfo;
 import System::Runtime::InteropServices::OSPlatform;
 import System::Runtime::InteropServices::RuntimeInformation;
 
@@ -24,6 +25,11 @@ function getEnvMap()
 	return Environment::GetEnvironmentVariables();
 }
 
+function getFolderPath(specialFolder)
+{
+	return Environment::GetFolderPath(specialFolder);
+}
+
 function getTickCount()
 {
 	return Environment::TickCount;
@@ -34,7 +40,17 @@ function sleep(timeout)
 	return Thread::Sleep(timeout);
 }
 
-function exec(fileName, arguments = "")
+function execl(fileName, arguments = '')
 {
 	return Process::Start(fileName, arguments);
+}
+
+function execv(fileName, arguments = null, useShell = false)
+{
+	var psi = new ProcessStartInfo(fileName, arguments ?? [])
+	{
+		UseShellExecute = useShell
+	};
+	
+	return Process::Start(psi);
 }

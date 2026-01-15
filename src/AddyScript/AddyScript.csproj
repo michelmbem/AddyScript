@@ -35,6 +35,12 @@
 		<EmbeddedResource Update="Properties\Resources.fr.resx">
 			<DependentUpon>Resources.resx</DependentUpon>
 		</EmbeddedResource>
+		<EmbeddedResource Update="Properties\Resources.es.resx">
+			<DependentUpon>Resources.resx</DependentUpon>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Properties\Resources.pt.resx">
+			<DependentUpon>Resources.resx</DependentUpon>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

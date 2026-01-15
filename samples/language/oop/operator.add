@@ -7,7 +7,7 @@ class Number
 {
     // It's not necessary to declare fields in general!
 	// But explicitly declaring them is useful for access control and introspection.
-	// private value;
+	private value;
 	
 	public constructor (value)
 	{

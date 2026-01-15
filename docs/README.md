@@ -1,7 +1,7 @@
 ![Banner](AddyScript.jpg)
 # Welcome to AddyScript
 
-AddyScript is a lightweight scripting engine for the .Net platform. It can be used to add scripting features to applications that target that platform or simply as a learning tool for young people.
+AddyScript is a lightweight scripting engine for the .NET platform. It can be used to add scripting features to applications that target that platform or simply as a learning tool for young people.
 
 AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you prefer) with dynamic typing and consistent OOP features. You can learn about this syntax by looking at the sample scripts provided with the source code.
 
@@ -26,7 +26,7 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
         * [Classes](classes.md)
         * [Inheritance and polymorphism](inheritance.md)
         * [Introspection](introspection.md)
-        * [Interacting with .Net and the host platform](interop.md)
+        * [Interacting with .NET and the host platform](interop.md)
     * [Exceptions handling](exceptions.md)
     * [AddyScript grammar](grammar.md)
 * Extending AddyScript
@@ -36,5 +36,3 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
 * [Licensing](license.md)
 * [About the author](aboutauth.md)
 * [Changes history](history.md)
-
-_Note: this documentation is still under construction. I'm progressively migrating it from a legacy .chm file._

@@ -20,4 +20,8 @@ public interface IAssignmentProcessor
     void AssignToParentItem(ParentIndexerRef pir, DataItem rValue);
 
     void AssignToParentProperty(ParentPropertyRef ppr, DataItem rValue);
+
+    void AssignToTuple(TupleInitializer tupleInit, DataItem rValue);
+
+    void AssignToSet(SetInitializer setInit, DataItem rValue);
 }

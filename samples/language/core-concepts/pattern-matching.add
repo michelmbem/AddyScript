@@ -31,7 +31,46 @@ class Developper : Employee
 	public property languages;
 	
 	public function toString(fmt = '') =>
-		$'Developper {{name: {this.name}, age: {this.age}, salary: {this.salary}, dateHired: {this.dateHired:d}, languages: {this.languages.join("|")}}}';
+		$'Developper {{name: {this.name}, age: {this.age}, salary: {this.salary}, dateHired: {this.dateHired:d}, languages: {"|".join(..this.languages)}}}';
+}
+
+final class Box
+{
+	public constructor (width, height, depth)
+	{
+		this.width = width;
+		this.height = height;
+		this.depth = depth;
+	}
+	
+	public property width { read; private write; }
+	
+	public property height { read; private write; }
+	
+	public property depth { read; private write; }
+	
+	public function toString(fmt = '') =>
+		$'Box {{width: {this.width}, height: {this.height}, depth: {this.depth}}}';
+}
+
+class Vector
+{
+	public constructor (..items)
+	{
+		this.__items = items;
+	}
+	
+	public property size => this.__items.size;
+	
+	public property [] => this.__items[__key];
+	
+	public function iterator()
+	{
+		foreach (item in this.__items)
+			yield item;
+	}
+	
+	public function toString(fmt = '') => 'Vector ' + this.__items.toString(fmt);
 }
 
 o = new {name = 'my object', size = 18, color = 'blue'};
@@ -47,31 +86,29 @@ println();
 
 res = PI switch {
 	3.14 => 'three-point-fourteen',
-	0..3 or 4..9 => 'from 0 to 3 or from 4 to 9',
-	3.. and not (4.. or float) => '>= 3 but neither >= 4 nor a float',
-	float => 'a floatting-point number'
+	>= 3 and < 4 => 'between 3 (inclusive) and 4 (exclusive)',
+	decimal => 'a decimal number'
 };
 println($'result with PI: {res}');
 println();
 
 res = ((int)readln('type a number: ')) switch {
-	..-1 => 'negative',
-	0..4 => 'from 0 to 4',
-	5..10 and not 10 => {
+	< 0 => 'negative',
+	0 or 1 or 2 or 3 or 4 => 'from 0 to 4',
+	not >= 10 => {
 		print('yeah i know, ');
 		println('it\'s between 5 and 9!');
 		yield __value;
 	},
-	10.. => '10 and above'
+	_ => '10 and above'
 };
 println($'result: {res}');
 println();
 
-const number_regex = @'[+-]?\d+(\.\d+)?([Ee][+-]?\d+)?';
-
 res = readln('type some text: ') switch {
-	_ when __value matches number_regex && ((decimal)__value) > 0 => $'{__value} is a positive number',
-	_ when __value matches number_regex => $'{__value} is just a number',
+	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' when decimal(__value) > 0 =>
+		$'{__value} is a positive number',
+	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' => $'{__value} is just a number',
 	_ => $'{__value} is not a number'
 };
 println($'result: {res}');
@@ -82,7 +119,12 @@ l = [
 	new Employee('Jeanette Diabaté', 32, 3500, `2014-09-30`),
 	new Developper('Dereck Musa', 44, 4200, `2010-07-28`, ['C++', 'C#', 'Java']),
 	null,
-	new Exception('this is an exception')
+	new Box(15, 7, 9),
+	new Vector(4, 7, 18),
+	new Exception('this is an exception'),
+	[4, randint(10), now()],
+	new Box(12, 8, 4),
+	new Vector(4, 1.5, 'Hi!')
 ];
 
 l.add(l[0] with { name = 'Ahmadu Suleyman', salary = 7000 });
@@ -93,7 +135,9 @@ l.each(|item| => {
 		null => 'this item is null',
 		Employee {age : 44, dateHired : {year: 2010}} =>
 			$'{item.name} is 44 years old employee hired in 2010 that earns ${item.salary}/month',
-		_ => 'neither null nor a 44 years old employee hired in 2010'
+		(4, int and <= 10, _) => 'a sequence of 3 that starts with 4',
+		Box(width, depth) => $'a box of width: {width} and depth: {depth}',
+		_ => 'unmatched'
 	};
 	println($'item = {item}');
 	println($'result with item: {res}');
@@ -102,12 +146,12 @@ l.each(|item| => {
 println();
 
 l.where(|item| => item is Employee {languages : {}})
-	.each(|item| => println($'{item.name} is a {item.languages.join(" and ")} developper'));
+	.each(|item| => println($'{item.name} is a {" and ".join(..item.languages)} developper'));
 println();
 
 try {
 	randint(-5, 5) switch {
-		0.. => println($'{__value} is OK!'),
+		>= 0 => println($'{__value} is OK!'),
 		_ => throw 'I don\'t like negative values'
 	};
 } catch (e) {

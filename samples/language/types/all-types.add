@@ -1,0 +1,47 @@
+import sys::console;
+import sys::environment;
+
+t = [
+	null,
+	true,
+	0x7fc,
+	9_876_543_210,
+	1/3,
+	PI,
+	-9_876_543_210.123_456_789d,
+	2 - 1i,
+	`1975-3-18`,
+	hours(14) + minutes(37) + seconds(28),
+	b'AddyScript is awesome',
+	"Hello world!",
+	(1, 2, 3, 4),
+	['a', 'b', 'c'],
+	{'name' => 'spencer', 'age' => 21},
+	{8, 6, 7},
+	queue::of(3, 0, 5),
+	stack::of(9, 7),
+	new {shape = "Square", color = "Blue"},
+	getOSVersion(),
+	format
+];
+
+println('{0, -39} | {1}', 'Value', 'Type');
+println('-' * 40 + '+' + '-' * 35);
+
+foreach (item in t) {
+	print('{0, -39} | ', item);
+	
+	setForeground('Blue');
+	print(item.type.name);
+	resetColor();
+	
+	if (item is resource) {
+		setForeground('Green');
+		print(' ({0})', item.GetType().FullName);
+		resetColor();
+	}
+
+	println();
+}
+
+readln();

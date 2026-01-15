@@ -6,10 +6,8 @@ for (i = 1; i < 1000; i *= 2)
 
 println('LinkedList{1}:');
 println('--------------');
-foreach(item in l)
-	print($'[{item}]->');
-println('END');
-println('\n');
+println('[' + ']->['.join(..l) + ']');
+println(NEWLINE);
 
 d = new SortedDictionary{2}();
 names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
@@ -18,8 +16,8 @@ names.each(|name| => d[name] = randint(18, 40));
 println('SortedDictionary{2}:');
 println('--------------------');
 foreach(key => value in d)
-	println($"{key}\t: {value}");
-println('\n');
+	println($"{key, 6} : {value}");
+println(NEWLINE);
 
 println('System::Tuple{3}:');
 println('-----------------');

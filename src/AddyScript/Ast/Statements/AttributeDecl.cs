@@ -6,35 +6,35 @@ namespace AddyScript.Ast.Statements;
 
 
 /// <summary>
-/// Attribute's declaration, used to attach additional informations to an element in the code.
+/// The declaration of an attribute, used to attach additional information to some symbols in the code.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of AttributeDecl.
 /// </remarks>
-/// <param name="name">The attribute's name</param>
-/// <param name="setters">A list of setters for the properties of the declared attribute</param>
+/// <param name="name">The name of this attribute</param>
+/// <param name="setters">A list of (field name, field value) pairs</param>
 public class AttributeDecl(string name, params VariableSetter[] setters) : ScriptElement
 {
     /// <summary>
-    /// The name of the default attribute's field.
+    /// The name of the default field.
     /// </summary>
     public const string DEFAULT_FIELD_NAME = "value";
 
     /// <summary>
-    /// The attribute's name.
+    /// The name of this attribute.
     /// </summary>
     public string Name => name;
 
     /// <summary>
-    /// A list of setters for the properties of the declared attribute.
+    /// The list of (field name, field value) pairs supplied for this attribute.
     /// </summary>
-    public VariableSetter[] PropertySetters => setters;
+    public VariableSetter[] Fields => setters;
 
     /// <summary>
-    /// Gets a property initializer in an attribute by its name.
+    /// Gets a <see cref="VariableSetter"/> in an attribute given a field name.
     /// </summary>
-    /// <param name="propertyName">The name of the property to find</param>
+    /// <param name="fieldName">The name of the field to find</param>
     /// <returns>A reference to <see cref="VariableSetter"/></returns>
-    public VariableSetter GetPropertySetter(string propertyName) =>
-        PropertySetters?.FirstOrDefault(setter => setter.Name == propertyName);
+    public VariableSetter GetField(string fieldName) =>
+        Fields?.FirstOrDefault(field => field.Name == fieldName);
 }

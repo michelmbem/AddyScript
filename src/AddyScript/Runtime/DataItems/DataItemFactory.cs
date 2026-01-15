@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
-using System.Runtime.CompilerServices;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -37,6 +37,7 @@ public static class DataItemFactory
                 BigDecimal bigdec => new Decimal(bigdec),
                 Rational32 rational => new Rational(rational),
                 Complex64 complex => new Complex(complex),
+                TimeSpan timespan => new Duration(timespan),
                 byte[] bytes => new Blob(bytes),
                 DataItem[] items => new Tuple(items),
                 List<DataItem> list => new List(list),
@@ -47,9 +48,11 @@ public static class DataItemFactory
                 Dictionary<string, DataItem> fields => new Object(Class.Object, fields),
                 (Class klass, Dictionary<string, DataItem> fields) => new Object(klass, fields),
                 Function function => new Closure(function),
+                DateOnly dateOnly => new Date(dateOnly.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local)),
+                TimeOnly timeOnly => new Duration(timeOnly.ToTimeSpan()),
                 char[] chars => new String(new string(chars)),
-                ITuple tuple => new Tuple(GetItems(tuple)),
-                Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)),
+                ITuple tuple => new Tuple(GetItems(tuple)), // Order matters
+                Array => new List(((IEnumerable<object>)value).Select(CreateDataItem)), // Order matters
                 _ => new Resource(value),
             },
         };

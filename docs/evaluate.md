@@ -52,8 +52,4 @@ do
  } while (x < end);
 ```
 
-This example is very similar to what is done in the source code of AddyScript Plotter (**asplot**), a demo tool provided with the scripting engine and which could be used for real needs of plotting mathematical function curves. Here is an overview:
-
-![asplot](asplot.jpg)
-
 [Home](README.md) | [Previous](interpret.md) | [Next](scriptengine.md)

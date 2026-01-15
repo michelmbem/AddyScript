@@ -3,11 +3,10 @@ namespace AddyScript.Runtime.OOP;
 
 /// <summary>
 /// Class identifiers: uniquely identify each primitive type.<br/>
-/// Play the same role than TypeCodes in .Net.
+/// Play the same role as TypeCodes in .NET.
 /// </summary>
 public enum ClassID
 {
-    Undefined,
     Void,
     Boolean,
     Integer,
@@ -17,6 +16,7 @@ public enum ClassID
     Decimal,
     Complex,
     Date,
+    Duration,
     String,
     Blob,
     Tuple,

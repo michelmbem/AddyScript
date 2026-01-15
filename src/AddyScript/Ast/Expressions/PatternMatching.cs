@@ -1,4 +1,5 @@
-﻿using AddyScript.Translators;
+﻿using AddyScript.Runtime.DataItems;
+using AddyScript.Translators;
 
 
 namespace AddyScript.Ast.Expressions;
@@ -23,6 +24,15 @@ public class PatternMatching(Expression expression, params MatchCase[] cases) : 
     /// The patterns to match with associated expressions.
     /// </summary>
     public MatchCase[] MatchCases => cases;
+    
+    /// <summary>
+    /// Determines whether this is a simple boolean pattern matching.
+    /// </summary>
+    public bool IsSimple => cases.Length == 2 &&
+                            cases[0] is { Guard: null, Expression: Literal literal1 } &&
+                            cases[1] is { Pattern: AlwaysTruePattern,  Guard: null, Expression: Literal literal2 } &&
+                            Equals(literal1.Value, Boolean.True) &&
+                            Equals(literal2.Value, Boolean.False);
 
     /// <summary>
     /// Translates this node.

@@ -22,6 +22,6 @@ println($'name = {name}');
 println($'surname = {surname}');
 println($'age = {age}');
 println($'address = {number} {street}, {city}');
-println($'job = {title} at {company} since {rest.date_hired:d}');
+println($'job = {title} at {company}');
 println($'rest = {rest}');
 readln();

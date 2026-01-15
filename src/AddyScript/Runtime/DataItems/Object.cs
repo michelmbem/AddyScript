@@ -29,7 +29,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
     {
         get
         {
-            var dict = new Dictionary<DataItem, DataItem>();
+            Dictionary<DataItem, DataItem> dict = [];
 
             foreach (var pair in fields)
                 dict.Add(new String(pair.Key), pair.Value);
@@ -44,10 +44,11 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
 
     public override object Clone()
     {
-        if (IsOverridden("clone")) return RuntimeServices.Clone(this);
+        if (IsOverridden("clone"))
+            return RuntimeServices.Clone(this);
 
-        var cloneFields = new Dictionary<string, DataItem>();
-
+        Dictionary<string, DataItem> cloneFields = [];
+        
         foreach (var pair in fields)
             cloneFields.Add(pair.Key, (DataItem)pair.Value.Clone());
 
@@ -56,7 +57,8 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        if (IsOverridden("toString")) return RuntimeServices.ToString(this, format);
+        if (IsOverridden("toString"))
+            return RuntimeServices.ToString(this, format);
 
         var sb = new StringBuilder();
         sb.Append($"<{Class.Name} {{");
@@ -66,7 +68,8 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         foreach (var pair in fields)
         {
             ClassField field = klass.GetField(pair.Key);
-            if (!(field == null || field.Scope == Scope.Public)) continue;
+            if (field is { Scope: not Scope.Public }) continue;
+            
             sb.Append($"{pair.Key} = {pair.Value.ToString(format, formatProvider)}, ");
             trimEnd = true;
         }
@@ -136,8 +139,6 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         fields[propertyName] = value;
     }
 
-    private bool IsOverridden(string methodName)
-    {
-        return klass != Class.Object && klass.GetDeclaredMember(methodName, MemberKind.Method) != null;
-    }
+    private bool IsOverridden(string methodName) =>
+        klass != Class.Object && klass.GetDeclaredMember(methodName, MemberKind.Method) != null;
 }

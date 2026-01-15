@@ -26,7 +26,7 @@ public sealed class List : DataItem
 
     public override List<DataItem> AsList => list;
 
-    public override HashSet<DataItem> AsHashSet => new (list);
+    public override HashSet<DataItem> AsHashSet => [..list];
 
     public override Queue<DataItem> AsQueue => new (list);
 
@@ -61,13 +61,9 @@ public sealed class List : DataItem
     protected override bool UnsafeEquals(DataItem other)
     {
         var otherList = other.AsList;
-        if (list.Count != otherList.Count) return false;
-
-        for (int i = 0; i < list.Count; ++i)
-            if (!list[i].Equals(otherList[i]))
-                return false;
-
-        return true;
+        return list.Count == otherList.Count &&
+               !list.Where((item, index) => !item.Equals(otherList[index]))
+                    .Any();
     }
 
     public override int GetHashCode()
@@ -127,18 +123,18 @@ public sealed class List : DataItem
         switch (_operator)
         {
             case BinaryOperator.Plus:
-                {
-                    var result = new List<DataItem>(list);
-                    result.AddRange(operand.AsList);
-                    return new List(result);
-                }
+            {
+                var result = new List<DataItem>(list);
+                result.AddRange(operand.AsList);
+                return new List(result);
+            }
             case BinaryOperator.Times:
-                {
-                    var result = new List<DataItem>();
-                    int n = operand.AsInt32;
-                    for (int i = 0; i < n; ++i) result.AddRange(list);
-                    return new List(result);
-                }
+            {
+                var result = new List<DataItem>();
+                int n = operand.AsInt32;
+                for (int i = 0; i < n; ++i) result.AddRange(list);
+                return new List(result);
+            }
             case BinaryOperator.Contains:
                 return Boolean.FromBool(list.Contains(operand));
             default:

@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Text;
+
+using Complex64 = System.Numerics.Complex;
+
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
-using Complex64 = System.Numerics.Complex;
-using Void = AddyScript.Runtime.DataItems.Void;
-using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using Decimal = AddyScript.Runtime.DataItems.Decimal;
-using Complex = AddyScript.Runtime.DataItems.Complex;
-using String = AddyScript.Runtime.DataItems.String;
+
 using Blob = AddyScript.Runtime.DataItems.Blob;
+using Boolean = AddyScript.Runtime.DataItems.Boolean;
+using Complex = AddyScript.Runtime.DataItems.Complex;
+using Decimal = AddyScript.Runtime.DataItems.Decimal;
+using String = AddyScript.Runtime.DataItems.String;
+using Void = AddyScript.Runtime.DataItems.Void;
 
 
 namespace AddyScript.Parsers;
@@ -188,7 +191,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Match(TokenID.KW_In);
         var container = Required(Term, Resources.ExpressionRequired);
         Expression expr = new BinaryExpression(BinaryOperator.Contains, container, element);
-        if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+        
+        if (negate)
+        {
+            expr.IsParenthesized = true;
+            expr = new UnaryExpression(UnaryOperator.Not, expr);
+        }
+
         expr.SetLocation(element.Start, container.End);
         return expr;
     }
@@ -207,26 +216,18 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private Expression SimplePatternMatching(Expression checkedExpr)
     {
         Match(TokenID.KW_Is);
-        
-        bool negate = false;
-        if (TryMatch(TokenID.KW_Not))
-        {
-            negate = true;
-            Consume(1);
-        }
 
         var pattern = MatchCasePattern();
         Expression expr = pattern switch
         {
             null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
-            TypePattern typePattern and not ObjectPattern =>
-                new TypeVerification(checkedExpr, typePattern.TypeName),
+            TypePattern type and not (ObjectPattern or DestructuringPattern) =>
+                new TypeVerification(checkedExpr, type.TypeName),
             _ => new PatternMatching(checkedExpr,
-                new (pattern, new Literal(Boolean.True)),
-                new (new AlwaysPattern(), new Literal(Boolean.False))),
+                                     new (pattern, new Literal(Boolean.True)),
+                                     new (new AlwaysTruePattern(), new Literal(Boolean.False))),
         };
-
-        if (negate) expr = new UnaryExpression(UnaryOperator.Not, expr);
+        
         expr.SetLocation(expr.Start, pattern.End);
         return expr;
     }
@@ -517,8 +518,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
             TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
             TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
-            TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
             TokenID.LT_String => Literal(new String((string)token.Value)),
+            TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
             TokenID.KW_This => SelfReference(),
             TokenID.KW_Super => AtomStartingWithSuper(),
             TokenID.KW_New => AtomStartingWithNew(),
@@ -648,7 +649,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     fields = List(VariableSetter, true, Resources.DuplicatedProperty);
                     last = Match(TokenID.RightBrace);
                 }
-                else if (last.TokenID != TokenID.RightParenthesis) // Require an empty pair of parenthesis when no initializer is supplied
+                else if (last.TokenID != TokenID.RightParenthesis) // Require an empty pair of parenthesis when no initializer is given
                 {
                     Match(TokenID.LeftParenthesis);
                     last = Match(TokenID.RightParenthesis);
@@ -691,29 +692,37 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Recognizes expressions that start with a type's name.
     /// </summary>
     /// <returns>
-    /// A <see cref="StaticMethodCall"/> or a <see cref="StaticPropertyRef"/>
+    /// A <see cref="Conversion"/>, a <see cref="StaticMethodCall"/>, or a <see cref="StaticPropertyRef"/>.
     /// </returns>
     private Expression AtomStartingWithTypeName()
     {
         Expression expr;
-
-        Token first = Match(TokenID.TypeName);
-        Match(TokenID.DoubleColon);
-        Token last = Match(TokenID.Identifier);
-        var name = new QualifiedName(first.ToString(), last.ToString());
+        Token first = Match(TokenID.TypeName), last;
 
         if (TryMatch(TokenID.LeftParenthesis))
         {
-            Consume(1);
-            var (positionalArgs, namedArgs) = FunctionArguments();
-            expr = new StaticMethodCall(name, positionalArgs, namedArgs);
+            Consume(1); // To skip the left parenthesis
+            expr = new Conversion(RequiredExpression(), first.ToString());
             last = Match(TokenID.RightParenthesis);
         }
         else
-            expr = new StaticPropertyRef(name);
+        {
+            Match(TokenID.DoubleColon);
+            last = Match(TokenID.Identifier);
+            var name = new QualifiedName(first.ToString(), last.ToString());
+
+            if (TryMatch(TokenID.LeftParenthesis))
+            {
+                Consume(1); // To skip the left parenthesis
+                var (positionalArgs, namedArgs) = FunctionArguments();
+                expr = new StaticMethodCall(name, positionalArgs, namedArgs);
+                last = Match(TokenID.RightParenthesis);
+            }
+            else
+                expr = new StaticPropertyRef(name);
+        }
 
         expr.SetLocation(first.Start, last.End);
-
         return expr;
     }
 
@@ -796,7 +805,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             expr = new TupleInitializer([.. listItems]);
         else
         {
-            expr = listItems[0].Expression;
+            expr = listItems[0].Value;
             expr.IsParenthesized = true;
         }
 
@@ -834,7 +843,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
                 Consume(1);
                 var value = RequiredExpression();
-                var entry = new MapEntry(firstItem.Expression, value);
+                var entry = new MapEntry(firstItem.Value, value);
                 entry.SetLocation(firstItem.Start, value.End);
                 mapEntries.Add(entry);
             }
@@ -981,23 +990,24 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Construct a chain of binary expressions associative to the left by combining a first operand
-    /// with subsequent operands stored in a queue with corresponding operators.
+    /// Construct a left-associative binary expression chain by combining a first operand
+    /// with subsequent operands and corresponding operators stored in a queue.
     /// </summary>
     /// <param name="firstOperand">The first operand of the chain of binary expressions</param>
-    /// <param name="moreOps">A <see cref="Queue{T}"/> of (BinaryOperator, Expression) pairs</param>
+    /// <param name="subsequentOps">A <see cref="Queue{T}"/> of (BinaryOperator, Expression) pairs</param>
     /// <returns>A  <see cref="BinaryExpression"/></returns>
-    private static Expression LeftAssociativeChain(Expression firstOperand, Queue<(BinaryOperator, Expression)> moreOps)
+    private static Expression LeftAssociativeChain(Expression firstOperand,
+                                                   Queue<(BinaryOperator, Expression)> subsequentOps)
     {
-        Expression chainExpr = firstOperand;
+        Expression chainedExpr = firstOperand;
 
-        while (moreOps.Count > 0)
+        while (subsequentOps.Count > 0)
         {
-            var (_operator, operand) = moreOps.Dequeue();
-            chainExpr = new BinaryExpression(_operator, chainExpr, operand);
+            var (_operator, operand) = subsequentOps.Dequeue();
+            chainedExpr = new BinaryExpression(_operator, chainedExpr, operand);
         }
 
-        return chainExpr;
+        return chainedExpr;
     }
 
     /// <summary>
@@ -1040,7 +1050,37 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a property's initializer.
+    /// Recognizes a function positional argument or an item in a sequence initializer.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.Argument"/></returns>
+    private Argument Argument()
+    {
+        ScriptLocation start = null;
+        Expression value;
+        bool spread;
+
+        if (TryMatch(TokenID.DoubleDot))
+        {
+            start = token.Start;
+            Consume(1);
+            value = RequiredExpression();
+            spread = true;
+        }
+        else
+        {
+            value = Expression();
+            spread = false;
+        }
+
+        if (value == null) return null;
+
+        var argument = new Argument(value, spread);
+        argument.SetLocation(start ?? value.Start, value.End);
+        return argument;
+    }
+
+    /// <summary>
+    /// Recognizes a constant or property setter.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
     protected VariableSetter VariableSetter()
@@ -1048,48 +1088,18 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (!TryMatch(TokenID.Identifier)) return null;
 
         Token first = token;
-        string fieldName = first.ToString();
+        string name = first.ToString();
         Consume(1);
         Match(TokenID.Equal);
-        Expression fieldValue = RequiredExpression();
+        Expression value = RequiredExpression();
         
-        var initializer = new VariableSetter(fieldName, fieldValue);
-        initializer.SetLocation(first.Start, fieldValue.End);
-        return initializer;
+        var setter = new VariableSetter(name, value);
+        setter.SetLocation(first.Start, value.End);
+        return setter;
     }
 
     /// <summary>
-    /// Recognizes a list or set item initializer.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.Argument"/></returns>
-    private Argument Argument()
-    {
-        ScriptLocation start = null;
-        Expression expr;
-        bool spread;
-
-        if (TryMatch(TokenID.DoubleDot))
-        {
-            start = token.Start;
-            Consume(1);
-            expr = RequiredExpression();
-            spread = true;
-        }
-        else
-        {
-            expr = Expression();
-            spread = false;
-        }
-
-        if (expr == null) return null;
-
-        var item = new Argument(expr, spread);
-        item.SetLocation(start ?? expr.Start, expr.End);
-        return item;
-    }
-
-    /// <summary>
-    /// Recognizes a map item initializer.
+    /// Recognizes an entry in a map initializer.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.MapEntry"/></returns>
     private MapEntry MapEntry()
@@ -1100,9 +1110,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Match(TokenID.Arrow);
         var value = RequiredExpression();
 
-        var initializer = new MapEntry(key, value);
-        initializer.SetLocation(key.Start, value.End);
-        return initializer;
+        var entry = new MapEntry(key, value);
+        entry.SetLocation(key.Start, value.End);
+        return entry;
     }
 
     /// <summary>
@@ -1144,7 +1154,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     else
                         section = -1;
                 }
-                else if (positionalArgs.Count > 0)
+                else if (positionalArgs.Count > 0) // no trailing coma
                     throw new SyntaxError(FileName, token, Resources.AbnormalListTermination);
                 else
                     section = -1;
@@ -1162,7 +1172,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
             catch (ArgumentException ex)
             {
-                throw new SyntaxError(FileName, argName, ex);
+                throw new SyntaxError(FileName, argName, ex); // named argument duplicated
             }
 
             if (TryMatch(TokenID.Comma))
@@ -1205,7 +1215,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private Pattern MatchCasePattern()
     {
         Queue<(Pattern, bool)> pairs = [];
-        bool inclusiveCmp = false; // inclusive composition ('and' instead of 'or')
+        bool inclusive = false; // inclusive composition ('and' instead of 'or')
         bool morePatterns; // look-up for more pattern => chaining
 
         do
@@ -1228,23 +1238,29 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             {
                 if (negate) pattern = new NegativePattern(pattern);
                 pattern.SetLocation(first.Start, last.End);
-                pairs.Enqueue((pattern, inclusiveCmp));
+                pairs.Enqueue((pattern, inclusive));
             }
             else if (negate) // 'not' used without a following pattern
                 throw new SyntaxError(FileName, first);
 
             SkipComments();
 
-            if (token.TokenID is TokenID.KW_And or TokenID.KW_Or)
+            switch (token.TokenID)
             {
-                morePatterns = true;
-                inclusiveCmp = token.TokenID == TokenID.KW_And;
-                Consume(1);
+                case TokenID.KW_And:
+                    morePatterns = inclusive = true;
+                    Consume(1);
+                    break;
+                case TokenID.KW_Or:
+                    morePatterns = true;
+                    inclusive = false;
+                    Consume(1);
+                    break;
+                default:
+                    morePatterns = false;
+                    break;
             }
-            else
-                morePatterns = false;
-        }
-        while (morePatterns);
+        } while (morePatterns);
 
         if (pairs.Count == 0) return null;
 
@@ -1252,7 +1268,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         while (pairs.Count > 0)
         {
             var (right, incl) = pairs.Dequeue();
-            left = new CompositePattern(incl, left, right);
+            left = new LogicalPattern(incl, left, right);
             left.SetLocation(left.Start, right.End);
         }
         return left;
@@ -1260,13 +1276,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
     /// <summary>
     /// Recognizes a simple pattern <see cref="Pattern"/>.
-    /// One that does not include the <b>not</b>, <b>and</b>, <b>or</b> operators.
-    /// Conditionally recognizes the <b>when</b> operator.
+    /// One that does not include any of the <b>not</b>, <b>and</b>, and <b>or</b> operators.
     /// </summary>
-    /// <param name="predicateAllowed">Determines whether <b>when</b> is allowed or not</param>
     /// <param name="last">A reference to the last terminal symbol that should be returned</param>
     /// <returns>A <see cref="Pattern"/></returns>
-    /// <exception cref="SyntaxError">If an invalid symbol is met</exception>
     private Pattern MatchCaseSimplePattern(ref Token last)
     {
         Pattern pattern = null;
@@ -1274,33 +1287,46 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         switch (token.TokenID)
         {
             case TokenID.LT_Null:
-                pattern = new NullPattern();
+                pattern = new RelationalPattern(BinaryOperator.Identical, Void.Value);
                 Consume(1);
                 break;
             case TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
                  TokenID.LT_Decimal or TokenID.LT_Date or TokenID.LT_String:
-                pattern = MatchCaseValueOrRangePattern(true, false, ref last);
+                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(false, ref last));
                 break;
-            case TokenID.DoubleDot:
-                pattern = MatchCaseValueOrRangePattern(false, false, ref last);
-                break;
-            case TokenID.Plus or TokenID.Minus:
-            {
-                if (!LookAhead(t => t.IsNumeric, out int pos)) throw new SyntaxError(FileName, token);
-                bool negateLBound = token.TokenID == TokenID.Minus;
+            case TokenID.Plus when LookAhead(t => t.IsNumeric, out var pos):
                 Consume(pos - 1);
-                pattern = MatchCaseValueOrRangePattern(true, negateLBound, ref last);
+                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(false, ref last));
+                break;
+            case TokenID.Minus when LookAhead(t => t.IsNumeric, out var pos):
+                Consume(pos - 1);
+                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(true, ref last));
+                break;
+            case TokenID.LessThan or TokenID.GreaterThan or TokenID.LessThanEqual or TokenID.GreaterThanEqual:
+            {
+                var _operator = token.ToBinaryOperator();
+                Consume(1);
+                pattern = new RelationalPattern(_operator, MatchCasePatternLiteralValue(false, ref last));
+                break;
+            }
+            case TokenID.KW_Matches:
+            {
+                Consume(1);
+                var regex = Match(TokenID.LT_String).ToString();
+                pattern = new RegexPattern(new String(regex));
                 break;
             }
             case TokenID.TypeName or TokenID.Identifier:
             {
-                string typeName = token.ToString();
+                var typeName = token.ToString();
                 Consume(1);
 
-                if (typeName == AlwaysPattern.Symbol)
-                    pattern = new AlwaysPattern();
+                if (typeName == AlwaysTruePattern.Symbol)
+                    pattern = new AlwaysTruePattern();
                 else if (TryMatch(TokenID.LeftBrace))
                     pattern = MatchCaseObjectPattern(typeName, ref last);
+                else if (TryMatch(TokenID.LeftParenthesis))
+                    pattern = MatchCaseDestructuringPattern(typeName, ref last);
                 else
                     pattern = new TypePattern(typeName);
                 break;
@@ -1309,61 +1335,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 pattern = MatchCaseObjectPattern(null, ref last);
                 break;
             case TokenID.LeftParenthesis:
-            {
-                Token first = token;
-                Consume(1);
-                pattern = new GroupingPattern(MatchCasePattern());
-                last = Match(TokenID.RightParenthesis);
-                pattern.SetLocation(first.Start, last.End);
+                pattern = MatchCaseGroupingOrPositionalPattern(ref last);
                 break;
-            }
         }
-
-        return pattern;
-    }
-
-    /// <summary>
-    /// Recognizes a <see cref="ValuePattern"/> or a <see cref="RangePattern"/>.
-    /// </summary>
-    /// <param name="withLBound">Determines if the lower bound of arange should be parsed</param>
-    /// <param name="negateLBound">Determines if a negative signed was initially met for the lower bound</param>
-    /// <param name="last">A reference to the last terminal symbol that should be returned</param>
-    /// <returns>A <see cref="Pattern"/></returns>
-    private Pattern MatchCaseValueOrRangePattern(bool withLBound, bool negateLBound, ref Token last)
-    {
-        Pattern pattern;
-        DataItem lBound = null;
-        TokenID? lBoundID = null;
-
-        if (withLBound)
-        {
-            lBound = MatchCasePatternLiteralValue(negateLBound, ref last);
-            lBoundID = last.TokenID;
-        }
-
-        if (TryMatch(TokenID.DoubleDot))
-        {
-            last = token;
-            Consume(1);
-
-            bool negateUBound = false;
-            if (TryMatchAny(TokenID.Plus, TokenID.Minus) &&
-                LookAhead(t => t.IsNumeric, out int pos))
-            {
-                negateUBound = token.TokenID == TokenID.Minus;
-                Consume(pos - 1);
-            }
-
-            if (lBoundID == null || TryMatch(lBoundID.Value))
-            {
-                DataItem uBound = MatchCasePatternLiteralValue(negateUBound, ref last);
-                pattern = new RangePattern(lBound, uBound);
-            }
-            else
-                pattern = new RangePattern(lBound, null);
-        }
-        else
-            pattern = new ValuePattern(lBound);
 
         return pattern;
     }
@@ -1384,6 +1358,56 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         var objPattern = new ObjectPattern(typeName, [.. matchers]);
         objPattern.SetLocation(first.Start, last.End);
         return objPattern;
+    }
+
+    /// <summary>
+    /// Parses a destructuring pattern from the input stream, matching the specified type name and updating the token
+    /// reference to the last token consumed.
+    /// </summary>
+    /// <param name="typeName">The name of the type to associate with the parsed object pattern.</param>
+    /// <param name="last">When this method returns, contains a reference to the last token consumed during parsing.</param>
+    /// <returns>A DestructuringPattern instance representing the parsed object pattern with the specified type name.</returns>
+    private Pattern MatchCaseDestructuringPattern(string typeName, ref Token last)
+    {
+        Token first = Match(TokenID.LeftParenthesis);
+        
+        List<string> propNames = [];
+        while (TryMatch(TokenID.Identifier))
+        {
+            propNames.Add(token.ToString());
+            Consume(1);
+            if (TryMatch(TokenID.Comma))
+                Consume(1);
+        }
+        
+        last = Match(TokenID.RightParenthesis);
+
+        var destPattern = new DestructuringPattern(typeName, [.. propNames]);
+        destPattern.SetLocation(first.Start, last.End);
+        return destPattern;
+    }
+
+    /// <summary>
+    /// Parses either a grouping pattern or a positional pattern from the input stream, updating the token
+    /// reference to the last token consumed.
+    /// </summary>
+    /// <param name="last">When this method returns, contains a reference to the last token consumed during parsing.</param>
+    /// <returns>A Pattern instance representing either a grouping pattern or a positional pattern.</returns>
+    private Pattern MatchCaseGroupingOrPositionalPattern(ref Token last)
+    {
+        Token first = Match(TokenID.LeftParenthesis);
+        Pattern[] subPatterns = List(MatchCasePattern, false, null);
+        last = Match(TokenID.RightParenthesis);
+        
+        Pattern pattern = subPatterns.Length switch
+        {
+            0 => throw new SyntaxError(FileName, last, Resources.EmptyPatternGroup),
+            1 => new GroupingPattern(subPatterns[0]),
+            _ => new PositionalPattern(subPatterns),
+        };
+
+        pattern.SetLocation(first.Start, last.End);
+        return pattern;
     }
 
     /// <summary>
@@ -1430,8 +1454,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// This basic implementation only recognizes simple expressions.
     /// The full-featured parser overrides it to recognize a richer syntax with blocks.
     /// </remarks>
-    protected virtual Expression MatchCaseExpression()
-    {
-        return TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
-    }
+    protected virtual Expression MatchCaseExpression() =>
+        TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
 }

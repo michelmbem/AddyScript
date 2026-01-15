@@ -17,8 +17,8 @@ public sealed class Date(DateTime value) : DataItem
 
     public override object Clone() => new Date(value);
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsDateTime;
 
@@ -28,8 +28,8 @@ public sealed class Date(DateTime value) : DataItem
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
-        BinaryOperator.Plus => new Date(value + TimeSpan.FromDays(operand.AsDouble)), // ToDo: Maybe introduce a 'Duration' type to handle this!
-        BinaryOperator.Minus => new Float((value - operand.AsDateTime).TotalDays), // ToDo: Maybe introduce a 'Duration' type to handle this!
+        BinaryOperator.Plus => new Date(value + operand.AsTimeSpan),
+        BinaryOperator.Minus => new Duration(value - operand.AsDateTime),
         BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsDateTime),
         BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsDateTime),
         BinaryOperator.GreaterThan => Boolean.FromBool(value > operand.AsDateTime),
@@ -40,7 +40,7 @@ public sealed class Date(DateTime value) : DataItem
     public override DataItem GetProperty(string propertyName) => propertyName switch
     {
         "date" => new Date(value.Date),
-        "time" => new Date(new DateTime(value.TimeOfDay.Ticks, DateTimeKind.Local)),
+        "time" => new Duration(value.TimeOfDay),
         "year" => new Integer(value.Year),
         "month" => new Integer(value.Month),
         "day" => new Integer(value.Day),

@@ -8,8 +8,8 @@ namespace AddyScript.Runtime.NativeTypes;
 
 
 [Serializable]
-public readonly struct Rational32
-    : IFormattable, IConvertible, IComparable, IComparable<Rational32>, IEquatable<Rational32>
+public readonly struct Rational32 :
+    IFormattable, IConvertible, IComparable, IComparable<Rational32>, IEquatable<Rational32>
 {
     #region Fields
 
@@ -17,7 +17,7 @@ public readonly struct Rational32
     public static readonly Rational32 Zero = new (0);
     public static readonly Rational32 One = new (1);
     public static readonly Rational32 Half = new (1, 2);
-    public static readonly Rational32 Quarter = new (1, 4);
+    public static readonly Rational32 Third = new (1, 3);
 
     private readonly int numerator;
     private readonly int denominator;
@@ -26,18 +26,12 @@ public readonly struct Rational32
 
     #region Constructors
 
-    public Rational32(int num, int den)
+    public Rational32(int num, int den = 1)
     {
         if (den == 0) throw new DivideByZeroException();
 
         numerator = num * Math.Sign(den);
         denominator = Math.Abs(den);
-    }
-
-    public Rational32(int num)
-    {
-        numerator = num;
-        denominator = 1;
     }
 
     #endregion

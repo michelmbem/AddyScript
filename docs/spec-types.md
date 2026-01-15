@@ -4,7 +4,10 @@ AddyScript supports a number of special data types that can be used for various 
 
 ### Rational Numbers
 
-A rational number is a pair of integers resulting from their division. The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive. The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division. Thus, rational numbers are represented in AddyScript by the **rational** data type. Variables of this type can be used in arithmetic operations like other numeric data. However, there is no literal or initializer for the **rational** type. The only way to get a rational number is to divide two integers. Also note that some operations on rational numbers can return an integer. Here is an example of a script using rational numbers:
+A rational number is a pair of integers resulting from their division. The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive.
+The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division. Thus, rational numbers are represented in AddyScript by the **rational** data type.
+Variables of this type can be used in arithmetic operations like other numeric data. However, there is no literal or initializer for the **rational** type. The only way to get a rational number is to divide two integers.
+Also note that some operations on rational numbers can return an integer. Here is an example of a script using rational numbers:
 
 Example:
 
@@ -25,6 +28,22 @@ println('sign({0}) = {1}', a, sign(a));
 println('abs({0}) = {1}', a, abs(a));
 ```
 
+**Output**:
+
+```
+the numerator of (3/4) is 3
+the denominator of (3/4) is 4
+the inverse of (3/4) is (4/3)
+the inverse of (1/4) is 4
+(3/4) + (1/4) = 1
+(3/4) - (1/4) = (1/2)
+(3/4) * (1/4) = (3/16)
+(3/4) / (1/4) = 3
+(3/4) ** 2 = (9/16)
+sign((3/4)) = 1
+abs((3/4)) = (3/4)
+```
+
 #### Rational Number API
 
 The following table summarizes the members of the **rational** type and their usage:
@@ -37,13 +56,19 @@ The following table summarizes the members of the **rational** type and their us
 
 ### Complex Numbers
 
-A complex number is a pair of floating-point numbers treated as a single unit. The first member of the pair is called the **real part** while the second is called the **imaginary part**. AddyScript supports complex numbers as a primitive type. This type is represented by the **complex** class. Variables of this type can be used in arithmetic operations like other numeric data types (of course, **complex** is a numeric data type). There is also a predefined constant in AddyScript called **I** that is equal to the complex number that has 0 as its real part and 1 as its imaginary part. The _sqrt_ (square root) function always returns a complex number when its argument is negative (for example, it returns **I** for -1). There is no literal for the **complex** type but there are complex initializers. A complex initializer is a pair of expressions in parentheses separated by a comma. Here is an example script using complex numbers:
+AddyScript also supports complex numbers as a primitive data type. This type is represented by the **complex** class.
+Internally, a complex number is represented as a pair of real numbers, the first member of the pair is called the **real part** while the second is called the **imaginary part**.
+The language supports literal values for purely imaginary complex numbers. Those are numeric literal values with the **i** or **I** suffix (**e.g.:** `2i` or `-5I`).
+Complex numbers can be involved in arithmetic operations like other numeric data types. Any arithmetic operation involving a real number and a purely imaginary complex number will produce a complex number as a result.
+So in an expression like `3 + 2i`, `3` is a real number, `2i` is a purely imaginary complex number and the result is a complex number.
+The purely _imaginary one_ **i** is always represented as `1i`, so instead of `2 + i` use `2 + 1i`. The _sqrt_ (square root) function always returns a complex number when its argument is negative (**e.g.:** `sqrt(-1)` returns `1i`).
+Here is an example script using complex numbers:
 
 Example:
 
 ```JS
-a = (2, -1); // 2-i
-b = (1, 2); // 1+2i
+a = 2 - 1i;
+b = 1 + 2i;
 
 println('the real part of {0} is {1}', a, a.real);
 println('the imaginary part of {0} is {1}', a, a.imag);
@@ -54,6 +79,20 @@ println('{0} * {1} = {2}', a, b, a * b);
 println('{0} / {1} = {2}', a, b, a / b);
 println('{0} ** 2 = {1}', a, a ** 2);
 println('abs({0}) = {1}', a, abs(a));
+```
+
+**Output**:
+
+```
+the real part of (2 - 1i) is 2
+the imaginary part of (2 - 1i) is -1
+the conjugate of (2 - 1i) is (2 + 1i)
+(2 - 1i) + (1 + 2i) = (3 + 1i)
+(2 - 1i) - (1 + 2i) = (1 - 3i)
+(2 - 1i) * (1 + 2i) = (4 + 3i)
+(2 - 1i) / (1 + 2i) = (0.8 - 0.4i)
+(2 - 1i) ** 2 = (3 - 4i)
+abs((2 - 1i)) = 2.23606797749979
 ```
 
 #### Complex Number API
@@ -68,42 +107,108 @@ The following table summarizes the members of the **complex** class and their us
 
 ### Dates
 
-Date/time values ​​are instances of the **date** class. You will typically create **date** instances either by calling the global **now** function (which returns the current date and time) or by using a date literal. A date literal is anything enclosed in backticks (\`) that can be translated by the .Net runtime to a value of type _System.DateTime_. They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`). Here is an example of a script that manipulates dates:
+Date/time values are instances of the **date** class. You will typically create **date** instances either by calling the global **now** function (which returns the current date and time) or by using a date literal. A date literal is anything enclosed in backticks (\`) that can be translated by the .NET runtime to a value of type _System.DateTime_. They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`). Here is an example of a script that manipulates dates:
 
 Example:
 
 ```JS
 println("hello! it's {0:t} o'clock", now());
 d = (date)readln("what's your birth date? ");
-println("it was a " + d["weekday"]);
+println("it was a " + d.weekday);
 today = now().$date;
 println("you are {0} years old now", today.subtract(d, "year"));
 d = d.add(1, "year");
 println("your first birthday was on {0:d}", d);
-println("it's happened since {0} days", today - d);
 ```
 
 #### Date API
 
 The **date** class supports the following operators:
 
-|Operator|Operands|Description|
-|:-:|-|-|
-|\+|A date to the left and a float to the right|Adds a number of days to a date.<br>This number of days may not necessarily be integral.|
-|\-|Two dates|Computes the difference in days of two dates.<br>The result may have a decimal part representing hours, minutes, seconds and milliseconds.|
+|Operator| Operands                                            | Description                                                  |
+|:-:|-----------------------------------------------------|--------------------------------------------------------------|
+|\+| A date on one side and a duration on the other side | Adds the given duration to the given date.                   |
+|\-| Two dates                                           | Computes the difference of two dates and returns a duration. |
 
 In addition to those operators, the **date** class exposes the following members:
 
-|Member|Nature|Description|
-|-|-|-|
-|`date of(params int[] values)`|static method|A static factory method for creating dates.<br>Accepts 3, 4, 6 or 7 arguments (all of the **int** type).<br>The arguments are interpreted like this:<ul><li>3 arguments: year, month, day.</li><li>4 arguments: hour, minute, second, millisecond.</li><li>6 arguments: year, month, day, hour, minute, second.</li><li>7 arguments: year, month, day, hour, minute, second, millisecond.</li></ul>|
-|`int\|string [string part]`|indexer|Extracts some part from the target date object. Known parts are: "year", "month", "yearday", "weekday", "day", "hour", "minute", "second" and "millisecond".|
-|`date $date { read; }`|property|Extracts the "date" component (in the strict sense of the term) of a date object.|
-|`date time { read; }`|property|Extracts the "time" component of a date object.|
-|`long ticks { read; }`|property|Gets the number of ticks stored in the target date's instance.|
-|`date add(int amount, string unit)`|method|Adds some amount of the given unit to the target date object and returns an altered copy of it. The target itself remains unchanged. Accepted units are: "year", "month", "day", "hour", "minute", "second" and "millisecond".|
-|`date addTicks(long ticks)`|method|Adds some ticks to the target date object and returns an altered copy of it. The target itself remains unchanged.|
-|`int subtract(date d, string unit)`|method|Computes the difference in the given unit between the target date object and its first argument. Accepted units are: "year", "month", "day","hour", "minute", "second" and "millisecond".|
+| Member                                                                                                     | Nature        | Description                                                                                                                                                                                                                  |
+|------------------------------------------------------------------------------------------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `date of(int year, int month, int day, int hour = 0, int minute = 0, int sesond = 0, int millisecond = 0)` | static method | A static factory method for creating dates. The _hour_, _minute_, _second_ and _millisecond_ arguments are optional. Only _year_, _month_ and _day_ are required.                                                            |
+| `int year`                                                                                                 | property      | Extracts the _year_ component of the target date object.                                                                                                                                                                     |
+| `int month`                                                                                                | property      | Extracts the _month_ component of the target date object.                                                                                                                                                                    |
+| `int yearday`                                                                                              | property      | Extracts the _day-of-year_ component of the target date object.                                                                                                                                                              |
+| `string weekday`                                                                                           | property      | Extracts the _day-of-week_ component of the target date object.                                                                                                                                                              |
+| `int day`                                                                                                  | property      | Extracts the _day-of-month_ component of the target date object.                                                                                                                                                             |
+| `int hour`                                                                                                 | property      | Extracts the _hour_ component of the target date object.                                                                                                                                                                     |
+| `int minute`                                                                                               | property      | Extracts the _minute_ component of the target date object.                                                                                                                                                                   |
+| `int second`                                                                                               | property      | Extracts the _second_ component of the target date object.                                                                                                                                                                   |
+| `int millisecond`                                                                                          | property      | Extracts the _millisecond_ component of the target date object.                                                                                                                                                              |
+| `date $date { read; }`                                                                                     | property      | Extracts the _date-only_ part (in the strict sense of the term) of a date object.                                                                                                                                            |
+| `duration time { read; }`                                                                                  | property      | Extracts the _time-only_ part of a date object as a duration.                                                                                                                                                                |
+| `long ticks { read; }`                                                                                     | property      | Gets the number of ticks stored in the target date instance.                                                                                                                                                                 |
+| `date add(int amount, string unit)`                                                                        | method        | Adds some amount of the given unit to the target date object and returns an altered copy of it. The target itself remains unchanged. Accepted units are: "year", "month", "day", "hour", "minute", "second" and "millisecond". |
+| `date addTicks(long ticks)`                                                                                | method        | Adds some ticks to the target date object and returns an altered copy of it. The target itself remains unchanged.                                                                                                            |
+| `int subtract(date d, string unit)`                                                                        | method        | Computes the difference in the given unit between the target date object and its first argument. Accepted units are: "year", "month", "day","hour", "minute", "second" and "millisecond".                                    |
+
+### Durations
+
+A duration is the amount of time elapsed between two dates. Durations are very important in AddyScript as some operations on dates involve and/or return durations.
+The language syntax doesn't provide neither literal values nor initializers for duration. A duration can only be obtained by computing the difference of two dates
+or by invoking a factory function. AddyScript has five (5) functions that all take a numeric value as argument and return a properly initialized duration.
+Those are described in one of the tables bellow.
+
+Example:
+
+```JS
+d1 = `2025-09-17 14:30`;
+d2 = date::of(2019, 8, 30, 19, 15);
+elapsed = d1 - d2;
+println("time elapsed between {1} and {0} : {2}", d1, d2, elapsed);
+println("number of days {0}", elapsed.days);
+println("number of hours {0}", elapsed.hours);
+println("number of minutes {0}", elapsed.minutes);
+println("total number of hours {0}", elapsed.totalHours);
+println("total number of minutes {0}", elapsed.totalMinutes);
+d3 = now() + days(100) + hours(15) + minutes(45);
+println("in 100 days 15 hours and 45 minutes we will be on {0}", d3);
+```
+
+#### Duration API
+
+The functions bellow can be used to create **duration** instances:
+
+| Function                         | Description                                               |
+|----------------------------------|-----------------------------------------------------------|
+| duration days(any value)         | Creates a duration with the given number of days.         |
+| duration hours(any value)        | Creates a duration with the given number of hours.        |
+| duration minutes(any value)      | Creates a duration with the given number of minutes.      |
+| duration seconds(any value)      | Creates a duration with the given number of seconds.      |
+| duration milliseconds(any value) | Creates a duration with the given number of milliseconds. |
+
+The **duration** class supports the following operators:
+
+| Operator | Operands                 | Description                               |
+|:--------:|--------------------------|-------------------------------------------|
+|    \+    | A duration on both sides | Computes the sum of two durations.        |
+|    \-    | A duration on both sides | Computes the difference of two durations. |
+
+In addition to those operators, the **date** class exposes the following members:
+
+| Member                                                                         | Nature        | Description                                                                                       |
+|--------------------------------------------------------------------------------|---------------|---------------------------------------------------------------------------------------------------|
+| `duration of(int days, int hours, int minutes, int sesonds, int milliseconds)` | static method | A static factory method for creating durations. All parameters are mandatory.                     |
+| `int days`                                                                     | property      | Extracts the _days_ component of the target date object.                                          |
+| `int hours`                                                                    | property      | Extracts the _hours_ component of the target date object.                                         |
+| `int minutes`                                                                  | property      | Extracts the _minutes_ component of the target date object.                                       |
+| `int seconds`                                                                  | property      | Extracts the _seconds_ component of the target date object.                                       |
+| `int milliseconds`                                                             | property      | Extracts the _milliseconds_ component of the target date object.                                  |
+| `float totalDays`                                                              | property      | Extracts the total number of days (eventually factional) stored in the target date object.        |
+| `float totalHours`                                                             | property      | Extracts the otal number of hours (eventually factional) stored in the target date object.        |
+| `float totalMinutes`                                                           | property      | Extracts the otal number of minutes (eventually factional) stored in the target date object.      |
+| `float totalSeconds`                                                           | property      | Extracts the _otal number of seconds (eventually factional) stored in the target date object.     |
+| `float totalMilliseconds`                                                      | property      | Extracts the otal number of milliseconds (eventually factional) stored in the target date object. |
+| `long ticks { read; }`                                                         | property      | Gets the number of ticks stored in the target duration instance.                                  |
 
 ### Strings
 
@@ -116,7 +221,7 @@ s = readln("Type some text: ");
 
 println("Lower case: " + s.toLower());
 println("Upper case: " + s.toUpper());
-println("Words: " + s.split(@"\s+").join(", "));
+println("Words: " + ", ".join(..s.split(@"\s+")));
 
 w = readln("Type some word: ");
 
@@ -155,31 +260,32 @@ The **string** class supports the following operators:
 
 In addition to those operators, the **string** class exposes the following members:
 
-|Member|Nature|Description|
-|-|-|-|
-|`int length { read; }`|property|Gets the length of the string.|
-|`int indexOf(string value, int start = 0, int length = 0)`|method|Searches for a substring and returns its position in the target string if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the string to search. if "start" is negative, it will be evaluated modulo the total length of the target string. if "length" is negative or zero, it will be ignored.|
-|`int lastIndexOf(string value, int start = -1, int length = 0)`|method|Searches for a substring backward and returns its position in the target string if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the string to search. if "start" is negative, it will be evaluated modulo the total length of the target string. if "length" is negative or zero, it will be ignored.|
-|`string toLower()`|method|Converts the target instance to lowercase.|
-|`string toUpper()`|method|Converts the target instance to uppercase.|
-|`string capitalize()`|method|Converts the first character of the target instance to uppercase.|
-|`string uncapitalize()`|method|Converts the first character of the target instance to lowercase.|
-|`string substring(int start, int length = 0)`|method|Extracts a substring (or slice) of the given length from the target string at the given position. If "position" is negative, it is evaluated modulo the length of the target string. If "length" is omitted (or 0 or negative), the part of the target string that's to the right of the given position is returned.|
-|`string insert(int index, string value)`|method|Inserts a string into the target instance at the given position. If "position" is negative, it is evaluated modulo the length of the target string.|
-|`string remove(int index, int count = 0)`|method|Removes "count" characters from the target string starting at the position indicated by "index" or simply truncates the target string at that position if "count" is omitted (or negative or 0). If "index" is negative, it is evaluated modulo the length of the target string.|
-|`string replace(string pattern, string value)`|method|Replaces each occurrence of the given pattern (a regular expression) with "value" in the target string.|
-|`string ltrim(string chars = " ")`|method|Removes each of the given characters from the left of the target string.|
-|`string rtrim(string chars = " ")`|method|Removes each of the given characters from the right of the target string.|
-|`string trim(string chars = " ")`|method|Removes any of the given characters from both ends of the target string.|
-|`string lpad(int width, string padding = " ")`|method|Repeatedly adds the given character to the left of the target string until it reaches the length specified by "width".|
-|`string rpad(int width, string padding = " ")`|method|Repeatedly adds the given character to the right of the target string until it reaches the length specified by "width".|
-|`list split(string pattern = @"\s+")`|method|Creates a list of substrings of the target string separated by the given separator. The separator must be a regular expression.|
+| Member                                                          |Nature| Description                                                                                                                                                                                                                                                                                                                                     |
+|-----------------------------------------------------------------|-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `int length { read; }`                                          |property| Gets the length of the string.                                                                                                                                                                                                                                                                                                                  |
+| `int indexOf(string value, int start = 0, int length = 0)`      |method| Searches for a substring and returns its position in the target string if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the string to search. if "start" is negative, it will be evaluated modulo the total length of the target string. if "length" is negative or zero, it will be ignored.          |
+| `int lastIndexOf(string value, int start = -1, int length = 0)` |method| Searches for a substring backward and returns its position in the target string if found or -1 otherwise. The optional "start" and "length" parameters tell which part of the string to search. if "start" is negative, it will be evaluated modulo the total length of the target string. if "length" is negative or zero, it will be ignored. |
+| `string toLower()`                                              |method| Converts the target instance to lowercase.                                                                                                                                                                                                                                                                                                      |
+| `string toUpper()`                                              |method| Converts the target instance to uppercase.                                                                                                                                                                                                                                                                                                      |
+| `string capitalize()`                                           |method| Converts the first character of the target instance to uppercase.                                                                                                                                                                                                                                                                               |
+| `string uncapitalize()`                                         |method| Converts the first character of the target instance to lowercase.                                                                                                                                                                                                                                                                               |
+| `string substring(int start, int length = 0)`                   |method| Extracts a substring (or slice) of the given length from the target string at the given position. If "position" is negative, it is evaluated modulo the length of the target string. If "length" is omitted (or 0 or negative), the part of the target string that's to the right of the given position is returned.                            |
+| `string insert(int index, string value)`                        |method| Inserts a string into the target instance at the given position. If "position" is negative, it is evaluated modulo the length of the target string.                                                                                                                                                                                             |
+| `string remove(int index, int count = 0)`                       |method| Removes "count" characters from the target string starting at the position indicated by "index" or simply truncates the target string at that position if "count" is omitted (or negative or 0). If "index" is negative, it is evaluated modulo the length of the target string.                                                                |
+| `string replace(string pattern, string value)`                  |method| Replaces each occurrence of the given pattern (a regular expression) with "value" in the target string.                                                                                                                                                                                                                                         |
+| `string ltrim(string chars = " ")`                              |method| Removes each of the given characters from the left of the target string.                                                                                                                                                                                                                                                                        |
+| `string rtrim(string chars = " ")`                              |method| Removes each of the given characters from the right of the target string.                                                                                                                                                                                                                                                                       |
+| `string trim(string chars = " ")`                               |method| Removes any of the given characters from both ends of the target string.                                                                                                                                                                                                                                                                        |
+| `string lpad(int width, string padding = " ")`                  |method| Repeatedly adds the given character to the left of the target string until it reaches the length specified by "width".                                                                                                                                                                                                                          |
+| `string rpad(int width, string padding = " ")`                  |method| Repeatedly adds the given character to the right of the target string until it reaches the length specified by "width".                                                                                                                                                                                                                         |
+| `tuple split(string pattern = @"\s+")`                          |method| Creates a tuple of substrings of the target string separated by the given separator. The separator must be a regular expression.                                                                                                                                                                                                                |
+| `string join(..values)`                                         |method| Creates a string by concatenating the given values. The target instance is used as a separator. When invoked with a collection as an argument, the _spread_ operator (..) must be used to expand the collection.                                                                                                                                |
 
 **Note**: none of the above methods alters the target string. They simply create a modified copy of it return that copy. The original string remains unchanged.
 
 ### Blobs
 
-A **blob** is AddyScript's abstraction of a byte array. Blobs are especially useful when it comes to using methods in .Net classes that take a byte array as an argument (such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
+A **blob** is AddyScript's abstraction of a byte array. Blobs are especially useful when it comes to using methods in .NET classes that take a byte array as an argument (such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
 
 There are several ways to get blobs, such as using a blob literal value (a string literal preceded by a "b" or "B"), or invoking the static method _blob::of_ (which expects the desired length in bytes as an argument), or invoking one of the other static methods "fromHexString" and "fromBase64String" of the blob class which as their name suggests, convert strings to blobs using base-16 or base-64 encoding. You can also convert a string to a blob, which will convert each of its characters to a byte.
 

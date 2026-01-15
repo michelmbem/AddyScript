@@ -63,7 +63,7 @@ As in most languages, a function invocation in AddyScript consists of its name f
 
 A positional argument is any expression that appears at a particular position in an argument list. It is automatically mapped at runtime to the parameter that appears at the same position in the function header.
 
-A named argument is one that consists of a name (i.e., an identifier) ​​followed by a colon (:) and then an expression. It is mapped to the parameter that has the same name in the function header. Named arguments are particularly useful when you are calling a function that has optional parameters and you do not want to provide values ​​for some of the ones that come first in the function header.
+A named argument is one that consists of a name (i.e., an identifier) followed by a colon (:) and then an expression. It is mapped to the parameter that has the same name in the function header. Named arguments are particularly useful when you are calling a function that has optional parameters and you do not want to provide values ​​for some of the ones that come first in the function header.
 
 Positional arguments must always come first in an argument list. Once a named argument is encountered by the parser, it expects all subsequent arguments to be named as well.
 
@@ -72,7 +72,7 @@ Example:
 ```JS
 // A function that concatenates values and wrap between a prefix and a suffix
 function concat(values, separator = ', ', prefix = '{', suffix = '}')
-	=> prefix + values.join(separator) + suffix;
+	=> prefix + separator.join(..values) + suffix;
 
 // A list to concatenate:
 l = [8, 3, 4, 9, 2, 4, 6, 0, 7];

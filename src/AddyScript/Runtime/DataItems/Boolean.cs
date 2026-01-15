@@ -1,8 +1,6 @@
 using System;
 using System.Numerics;
-
 using AddyScript.Ast.Expressions;
-using AddyScript.Properties;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
 
@@ -12,6 +10,9 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Boolean : DataItem
 {
+    public const string FALSE_STRING = "false";
+    public const string TRUE_STRING = "true";
+    
     public static readonly Boolean False = new (false);
     public static readonly Boolean True = new (true);
 
@@ -39,8 +40,8 @@ public sealed class Boolean : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value ? Resources.TRUE : Resources.FALSE;
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value ? TRUE_STRING : FALSE_STRING;
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsBoolean;
 
@@ -56,8 +57,8 @@ public sealed class Boolean : DataItem
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
-        BinaryOperator.And => FromBool(value & operand.AsBoolean),
-        BinaryOperator.Or => FromBool(value | operand.AsBoolean),
+        BinaryOperator.And => FromBool(value && operand.AsBoolean),
+        BinaryOperator.Or => FromBool(value || operand.AsBoolean),
         BinaryOperator.ExclusiveOr => FromBool(value ^ operand.AsBoolean),
         _ => base.BinaryOperation(_operator, operand),
     };

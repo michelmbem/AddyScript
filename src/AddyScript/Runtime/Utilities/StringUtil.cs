@@ -8,6 +8,8 @@ namespace AddyScript.Runtime.Utilities;
 
 public static class StringUtil
 {
+    private static readonly UTF8Encoding Encoding = new (false, false);
+    
     public static string Capitalize(string value) =>
         value == null
             ? null
@@ -24,7 +26,7 @@ public static class StringUtil
 
     public static string Repeat(string value, int times)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
 
         for (int i = 0; i < times; ++i)
             sb.Append(value);
@@ -44,10 +46,8 @@ public static class StringUtil
                 string optionStr = pattern[(lastSlash + 1)..];
                 pattern = pattern[1..lastSlash];
 
-                for (int i = 0; i < optionStr.Length; ++i)
+                foreach (var ch in optionStr)
                 {
-                    char ch = optionStr[i];
-
                     options |= ch switch
                     {
                         's' => RegexOptions.Singleline,
@@ -65,19 +65,7 @@ public static class StringUtil
         return new Regex(pattern, options);
     }
 
-    public static byte[] String2ByteArray(string str)
-    {
-        var bytes = new byte[str.Length];
-        for (int i = 0; i < str.Length; ++i)
-            bytes[i] = (byte)str[i];
-        return bytes;
-    }
+    public static byte[] String2ByteArray(string str) => Encoding.GetBytes(str);
 
-    public static string ByteArray2String(byte[] bytes)
-    {
-        var sb = new StringBuilder();
-        for (int i = 0; i < bytes.Length; ++i)
-            sb.Append((char)bytes[i]);
-        return sb.ToString();
-    }
+    public static string ByteArray2String(byte[] bytes) => Encoding.GetString(bytes);
 }

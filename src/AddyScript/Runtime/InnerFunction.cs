@@ -19,6 +19,7 @@ using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
 using String = AddyScript.Runtime.DataItems.String;
+using Tuple = AddyScript.Runtime.DataItems.Tuple;
 using Void = AddyScript.Runtime.DataItems.Void;
 
 
@@ -53,7 +54,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// The random numbers generator.
     /// </summary>
-    private static readonly RandomNumberGenerator random = RandomNumberGenerator.Create();
+    private static readonly RandomNumberGenerator RandomNumberGenerator = RandomNumberGenerator.Create();
+
+    /// <summary>
+    /// Represents a localized Gregorian calendar used for date and time calculations.
+    /// </summary>
+    private static readonly Calendar Calendar = new GregorianCalendar(GregorianCalendarTypes.Localized);
 
     #endregion
 
@@ -101,25 +107,30 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             PrintLine,
             Evaluate,
             Pack,
-            UnPack
+            UnPack,
+            Hash,
+            Days,
+            Hours,
+            Minutes,
+            Seconds,
+            Milliseconds,
         ];
 
         InnerFunction[] commonFunctions = [EqualsFunction, HashCodeFunction, CompareToFunction, ToStringFunction, CloneFunction, DisposeFunction];
         InnerFunction[] dateFunctions = [DateAdd, DateSubtract];
-        InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit];
+        InnerFunction[] stringFunctions = [StringIndexOf, StringLastIndexOf, StringToLower, StringToUpper, StringCapitalize, StringUncapitalize, StringSubstring, StringInsert, StringRemove, StringReplace, StringTrimLeft, StringTrimRight, StringTrim, StringPadLeft, StringPadRight, StringSplit, StringJoin];
         InnerFunction[] blobStaticFunctions = [BlobOf, BlobFromHexString, BlobFromBase64String];
         InnerFunction[] blobFunctions = [BlobToHexString, BlobToBase64String, BlobIndexOf, BlobLastIndexOf, BlobFill, BlobCopyTo, BlobResize];
         InnerFunction[] tupleFunctions = [TupleIndexOf, TupleLastIndexOf];
-        InnerFunction[] listFunctions = [ListJoin, ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
+        InnerFunction[] listFunctions = [ListAdd, ListInsert, ListInsertAll, ListIndexOf, ListLastIndexOf, ListBinarySearch, ListFrequencyOf, ListRemove, ListRemoveAt, ListClear, ListSort, ListShuffle, ListInverse, ListSublist, ListUnique, ListMapTo];
         InnerFunction[] setFunctions = [SetAdd, SetRemove, SetClear];
         InnerFunction[] queueFunctions = [QueueEnqueue, QueueDequeue, QueueClear];
         InnerFunction[] stackFunctions = [StackPush, StackPop, StackClear];
         InnerFunction[] mapFunctions = [MapGet, MapUpdate, MapAdd, MapContainsValue, MapFrequencyOf, MapKeysOf, MapInverse, MapRemove, MapRemoveAll, MapClear];
 
-        foreach (InnerFunction function in commonFunctions)
-            foreach (Class cls in Class.Predefined)
-                if (cls.SuperClass == null)
-                    cls.RegisterMethod(function.ToInstanceMethod());
+        foreach (var function in commonFunctions)
+            foreach (var cls in Class.Predefined.Where(cls => cls.SuperClass == null))
+                cls.RegisterMethod(function.ToInstanceMethod());
 
         Class.Rational.RegisterMethod(RationalInverse.ToInstanceMethod());
 
@@ -127,35 +138,37 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         Class.Complex.RegisterMethod(ComplexConjugate.ToInstanceMethod());
 
         Class.Date.RegisterMethod(DateOf.ToStaticMethod());
-        foreach (InnerFunction function in dateFunctions)
+        foreach (var function in dateFunctions)
             Class.Date.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in stringFunctions)
+        Class.Duration.RegisterMethod(DurationOf.ToStaticMethod());
+
+        foreach (var function in stringFunctions)
             Class.String.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in blobStaticFunctions)
+        foreach (var function in blobStaticFunctions)
             Class.Blob.RegisterMethod(function.ToStaticMethod());
-        foreach (InnerFunction function in blobFunctions)
+        foreach (var function in blobFunctions)
             Class.Blob.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in tupleFunctions)
+        foreach (var function in tupleFunctions)
             Class.Tuple.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in listFunctions)
+        foreach (var function in listFunctions)
             Class.List.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in setFunctions)
+        foreach (var function in setFunctions)
             Class.Set.RegisterMethod(function.ToInstanceMethod());
 
         Class.Queue.RegisterMethod(QueueOf.ToStaticMethod());
-        foreach (InnerFunction function in queueFunctions)
+        foreach (var function in queueFunctions)
             Class.Queue.RegisterMethod(function.ToInstanceMethod());
 
         Class.Stack.RegisterMethod(StackOf.ToStaticMethod());
-        foreach (InnerFunction function in stackFunctions)
+        foreach (var function in stackFunctions)
             Class.Stack.RegisterMethod(function.ToInstanceMethod());
 
-        foreach (InnerFunction function in mapFunctions)
+        foreach (var function in mapFunctions)
             Class.Map.RegisterMethod(function.ToInstanceMethod());
 
         Class.Closure.RegisterMethod(ClosureBind.ToInstanceMethod());
@@ -203,101 +216,138 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new Integer(Convert.ToInt32(s[0]));
     }
 
-    private static DataItem RandomLogic(DataItem[] arguments)
-    {
-        return new Float(NextDouble(random));
-    }
+    private static DataItem RandomLogic(DataItem[] arguments) =>
+        new Float(NextDouble(RandomNumberGenerator));
 
     private static DataItem RandomIntegerLogic(DataItem[] arguments)
     {
         int min = arguments[0].AsInt32, max = arguments[1].AsInt32;
         if (min > max) (min, max) = (max, min);
-        return new Integer(min + (int)(NextDouble(random) * (max - min)));
+        return new Integer(min + (int)(NextDouble(RandomNumberGenerator) * (max - min)));
     }
 
     private static DataItem SineLogic(DataItem[] arguments)
     {
-        return new Float(Math.Sin(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Sin(arg.AsComplex64))
+             : new Float(Math.Sin(arg.AsDouble));
     }
 
     private static DataItem CosineLogic(DataItem[] arguments)
     {
-        return new Float(Math.Cos(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Cos(arg.AsComplex64))
+             : new Float(Math.Cos(arg.AsDouble));
     }
 
     private static DataItem TangentLogic(DataItem[] arguments)
     {
-        return new Float(Math.Tan(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Tan(arg.AsComplex64))
+             : new Float(Math.Tan(arg.AsDouble));
     }
 
     private static DataItem ArcSineLogic(DataItem[] arguments)
     {
-        return new Float(Math.Asin(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Asin(arg.AsComplex64))
+             : new Float(Math.Asin(arg.AsDouble));
     }
 
     private static DataItem ArcCosineLogic(DataItem[] arguments)
     {
-        return new Float(Math.Acos(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Acos(arg.AsComplex64))
+             : new Float(Math.Acos(arg.AsDouble));
     }
 
     private static DataItem ArcTangentLogic(DataItem[] arguments)
     {
-        return new Float(Math.Atan(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Atan(arg.AsComplex64))
+             : new Float(Math.Atan(arg.AsDouble));
     }
 
-    private static DataItem ArcTangent2Logic(DataItem[] arguments)
-    {
-        return new Float(Math.Atan2(arguments[0].AsDouble, arguments[1].AsDouble));
-    }
+    private static DataItem ArcTangent2Logic(DataItem[] arguments) =>
+        new Float(Math.Atan2(arguments[0].AsDouble, arguments[1].AsDouble));
 
     private static DataItem SineHyperbolicLogic(DataItem[] arguments)
     {
-        return new Float(Math.Sinh(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Sinh(arg.AsComplex64))
+             : new Float(Math.Sinh(arg.AsDouble));
     }
 
     private static DataItem CosineHyperbolicLogic(DataItem[] arguments)
     {
-        return new Float(Math.Cosh(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Cosh(arg.AsComplex64))
+             : new Float(Math.Cosh(arg.AsDouble));
     }
 
     private static DataItem TangentHyperbolicLogic(DataItem[] arguments)
     {
-        return new Float(Math.Tanh(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Tanh(arg.AsComplex64))
+             : new Float(Math.Tanh(arg.AsDouble));
     }
 
-    private static DataItem DegreesToRadiansLogic(DataItem[] arguments)
-    {
-        return new Float(arguments[0].AsDouble * Math.PI / 180.0);
-    }
+    private static DataItem DegreesToRadiansLogic(DataItem[] arguments) =>
+        new Float(arguments[0].AsDouble * Math.PI / 180.0);
 
-    private static DataItem RadiansToDegreesLogic(DataItem[] arguments)
-    {
-        return new Float(arguments[0].AsDouble * 180.0 / Math.PI);
-    }
+    private static DataItem RadiansToDegreesLogic(DataItem[] arguments) =>
+        new Float(arguments[0].AsDouble * 180.0 / Math.PI);
 
     private static DataItem LogarithmLogic(DataItem[] arguments)
     {
-        return new Float(Math.Log(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Log(arg.AsComplex64))
+             : new Float(Math.Log(arg.AsDouble));
     }
 
     private static DataItem LogarithmBase10Logic(DataItem[] arguments)
     {
-        return new Float(Math.Log10(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Log10(arg.AsComplex64))
+             : new Float(Math.Log10(arg.AsDouble));
     }
 
     private static DataItem LogarithmBaseNLogic(DataItem[] arguments)
     {
-        return new Float(Math.Log(arguments[0].AsDouble, arguments[1].AsDouble));
+        DataItem arg = arguments[0];
+        double baseValue = arguments[1].AsDouble;
+        return arg is Complex
+             ? new Complex(Complex64.Log(arg.AsComplex64, baseValue))
+             : new Float(Math.Log(arg.AsDouble, baseValue));
     }
 
     private static DataItem ExponentialLogic(DataItem[] arguments)
     {
-        return new Float(Math.Exp(arguments[0].AsDouble));
+        DataItem arg = arguments[0];
+        return arg is Complex
+             ? new Complex(Complex64.Exp(arg.AsComplex64))
+             : new Float(Math.Exp(arg.AsDouble));
     }
 
     private static DataItem SquareRootLogic(DataItem[] arguments)
     {
-        double x = arguments[0].AsDouble;
+        DataItem arg = arguments[0];
+
+        if (arg is Complex)
+            return new Complex(Complex64.Sqrt(arg.AsComplex64));
+
+        double x = arg.AsDouble;
         return x < 0
              ? new Complex(Complex64.ImaginaryOne * Math.Sqrt(-x))
              : new Float(Math.Sqrt(x));
@@ -306,13 +356,13 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem SignLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        return arg.Class.ClassID switch
+        return arg switch
         {
-            ClassID.Integer => new Integer(Math.Sign(arg.AsInt32)),
-            ClassID.Long => new Integer(arg.AsBigInteger.Sign),
-            ClassID.Rational => new Integer(arg.AsRational32.Sign),
-            ClassID.Float => new Integer(Math.Sign(arg.AsDouble)),
-            ClassID.Decimal => new Integer(arg.AsBigDecimal.Sign),
+            Integer => new Integer(Math.Sign(arg.AsInt32)),
+            Long => new Integer(arg.AsBigInteger.Sign),
+            Rational => new Integer(arg.AsRational32.Sign),
+            Float => new Integer(Math.Sign(arg.AsDouble)),
+            Decimal => new Integer(arg.AsBigDecimal.Sign),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "sign,", arg.Class.Name)),
         };
     }
@@ -320,36 +370,28 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem AbsoluteValueLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        return arg.Class.ClassID switch
+        return arg switch
         {
-            ClassID.Integer => new Integer(Math.Abs(arg.AsInt32)),
-            ClassID.Long => new Long(BigInteger.Abs(arg.AsBigInteger)),
-            ClassID.Rational => new Rational(arg.AsRational32.Abs()),
-            ClassID.Float => new Float(Math.Abs(arg.AsDouble)),
-            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Abs()),
-            ClassID.Complex => new Float(Complex64.Abs(arg.AsComplex64)),
+            Integer => new Integer(Math.Abs(arg.AsInt32)),
+            Long => new Long(BigInteger.Abs(arg.AsBigInteger)),
+            Rational => new Rational(arg.AsRational32.Abs()),
+            Float => new Float(Math.Abs(arg.AsDouble)),
+            Decimal => new Decimal(arg.AsBigDecimal.Abs()),
+            Complex => new Float(Complex64.Abs(arg.AsComplex64)),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "abs,", arg.Class.Name)),
         };
     }
 
     private static DataItem MinimumLogic(DataItem[] arguments)
     {
-        List<DataItem> list = arguments[0].AsList;
-        return list.Count switch
-        {
-            0 => Void.Value,
-            _ => list.Skip(1).Aggregate(list[0], (acc, val) => val.CompareTo(acc) < 0 ? val : acc),
-        };
+        List<DataItem> args = [arguments[1], ..arguments[2].AsList];
+        return args.Aggregate(arguments[0], (acc, val) => val.CompareTo(acc) < 0 ? val : acc);
     }
 
     private static DataItem MaximumLogic(DataItem[] arguments)
     {
-        List<DataItem> list = arguments[0].AsList;
-        return list.Count switch
-        {
-            0 => Void.Value,
-            _ => list.Skip(1).Aggregate(list[0], (acc, val) => val.CompareTo(acc) > 0 ? val : acc),
-        };
+        List<DataItem> args = [arguments[1], ..arguments[2].AsList];
+        return args.Aggregate(arguments[0], (acc, val) => val.CompareTo(acc) > 0 ? val : acc);
     }
 
     private static DataItem TruncateLogic(DataItem[] arguments)
@@ -377,10 +419,10 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem CeilingLogic(DataItem[] arguments)
     {
         DataItem arg = arguments[0];
-        return arg.Class.ClassID switch
+        return arg switch
         {
-            ClassID.Float => new Float(Math.Ceiling(arg.AsDouble)),
-            ClassID.Decimal => new Decimal(arg.AsBigDecimal.Ceiling()),
+            Float => new Float(Math.Ceiling(arg.AsDouble)),
+            Decimal => new Decimal(arg.AsBigDecimal.Ceiling()),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "ceil,", arg.Class.Name)),
         };
     }
@@ -388,10 +430,10 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem RoundLogic(DataItem[] arguments)
     {
         DataItem arg1 = arguments[0], arg2 = arguments[1];
-        return arg1.Class.ClassID switch
+        return arg1 switch
         {
-            ClassID.Float => new Float(Math.Round(arg1.AsDouble, arg2.AsInt32)),
-            ClassID.Decimal => new Decimal(arg1.AsBigDecimal.Round(arg2.AsInt32)),
+            Float => new Float(Math.Round(arg1.AsDouble, arg2.AsInt32)),
+            Decimal => new Decimal(arg1.AsBigDecimal.Round(arg2.AsInt32)),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "round,", arg1.Class.Name)),
         };
     }
@@ -676,27 +718,56 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
                         break;
                 }
 
-        return new List(list);
+        return new Tuple([..list]);
     }
+
+    private static DataItem HashLogic(DataItem[] arguments)
+    {
+        List<DataItem> args = [arguments[0], ..arguments[1].AsList];
+        int hashCode = args.Count switch
+        {
+            1 => HashCode.Combine(args[0]),
+            2 => HashCode.Combine(args[0], args[1]),
+            3 => HashCode.Combine(args[0], args[1], args[2]),
+            4 => HashCode.Combine(args[0], args[1], args[2], args[3]),
+            5 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4]),
+            6 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4], args[5]),
+            7 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4], args[5], args[6]),
+            8 => HashCode.Combine(args[0], args[1], args[2], args[3], args[5], args[6], args[7]),
+            9 => HashCode.Combine(args[0], args[1], args[2], args[3], args[5], args[6], args[7], args[8]),
+            _ => throw new ArgumentException(string.Format(Resources.TooManyArgs, "hash")),
+        };
+        
+        return new Integer(hashCode);
+    }
+
+    private static DataItem DaysLogic(DataItem[] arguments) =>
+        new Duration(TimeSpan.FromDays(arguments[0].AsDouble));
+
+    private static DataItem HoursLogic(DataItem[] arguments) =>
+        new Duration(TimeSpan.FromHours(arguments[0].AsDouble));
+
+    private static DataItem MinutesLogic(DataItem[] arguments) =>
+        new Duration(TimeSpan.FromMinutes(arguments[0].AsDouble));
+
+    private static DataItem SecondsLogic(DataItem[] arguments) =>
+        new Duration(TimeSpan.FromSeconds(arguments[0].AsDouble));
+
+    private static DataItem MillisecondsLogic(DataItem[] arguments) =>
+        new Duration(TimeSpan.FromMilliseconds(arguments[0].AsDouble));
 
     #endregion
 
     #region Common methods
 
-    private static DataItem EqualsLogic(DataItem[] arguments)
-    {
-        return Boolean.FromBool(arguments[0].Equals(arguments[1]));
-    }
+    private static DataItem EqualsLogic(DataItem[] arguments) =>
+        Boolean.FromBool(arguments[0].Equals(arguments[1]));
 
-    private static DataItem HashCodeLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].GetHashCode());
-    }
+    private static DataItem HashCodeLogic(DataItem[] arguments) =>
+        new Integer(arguments[0].GetHashCode());
 
-    private static DataItem CompareToLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].CompareTo(arguments[1]));
-    }
+    private static DataItem CompareToLogic(DataItem[] arguments) =>
+        new Integer(arguments[0].CompareTo(arguments[1]));
 
     private static DataItem ToStringLogic(DataItem[] arguments)
     {
@@ -704,10 +775,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new String(s);
     }
 
-    private static DataItem CloneLogic(DataItem[] arguments)
-    {
-        return (DataItem)arguments[0].Clone();
-    }
+    private static DataItem CloneLogic(DataItem[] arguments) => (DataItem)arguments[0].Clone();
 
     private static DataItem DisposeLogic(DataItem[] arguments)
     {
@@ -719,24 +787,18 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Rational specific methods
 
-    private static DataItem RationalInverseLogic(DataItem[] arguments)
-    {
-        return new Rational(arguments[0].AsRational32.Inverse());
-    }
+    private static DataItem RationalInverseLogic(DataItem[] arguments) =>
+        new Rational(arguments[0].AsRational32.Inverse());
 
     #endregion
 
     #region Complex specific methods
 
-    private static DataItem ComplexOfLogic(DataItem[] arguments)
-    {
-        return new Complex(arguments[0].AsDouble, arguments[1].AsDouble);
-    }
+    private static DataItem ComplexOfLogic(DataItem[] arguments) =>
+        new Complex(arguments[0].AsDouble, arguments[1].AsDouble);
 
-    private static DataItem ComplexConjugateLogic(DataItem[] arguments)
-    {
-        return new Complex(Complex64.Conjugate(arguments[0].AsComplex64));
-    }
+    private static DataItem ComplexConjugateLogic(DataItem[] arguments) =>
+        new Complex(Complex64.Conjugate(arguments[0].AsComplex64));
 
     #endregion
 
@@ -744,24 +806,9 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem DateOfLogic(DataItem[] arguments)
     {
-        DataItem[] values = [.. arguments[0].AsList];
-        var date = values.Length switch
-        {
-            // ticks
-            1 => new DateTime((long)values[0].AsBigInteger),
-            // year, month and day
-            3 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32),
-            // hour, minute, second and millisecond
-            4 => new DateTime(1, 1, 1, values[0].AsInt32, values[1].AsInt32, values[2].AsInt32, values[3].AsInt32),
-            // year, month, day, hour, minute and second
-            6 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32,
-                              values[3].AsInt32, values[4].AsInt32, values[5].AsInt32),
-            // year, month, day, hour, minute, second and millisecond
-            7 => new DateTime(values[0].AsInt32, values[1].AsInt32, values[2].AsInt32,
-                              values[3].AsInt32, values[4].AsInt32, values[5].AsInt32, values[6].AsInt32),
-            _ => throw new InvalidOperationException(string.Format(Resources.BadDateOfCall, values.Length)),
-        };
-
+        var date = new DateTime(arguments[0].AsInt32, arguments[1].AsInt32, arguments[2].AsInt32,
+                                arguments[3].AsInt32, arguments[4].AsInt32, arguments[5].AsInt32,
+                                arguments[6].AsInt32, Calendar, DateTimeKind.Local);
         return new Date(date);
     }
 
@@ -791,16 +838,28 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         return arg2.ToString() switch
         {
-            "year" => new Integer(YearDiff(self.AsDateTime, arg1.AsDateTime)),
-            "month" => new Integer(MonthDiff(self.AsDateTime, arg1.AsDateTime)),
+            "year" => new Integer(YearDelta(self.AsDateTime, arg1.AsDateTime)),
+            "month" => new Integer(MonthDelta(self.AsDateTime, arg1.AsDateTime)),
             "day" => new Integer((self.AsDateTime - arg1.AsDateTime).Days),
             "hour" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalHours),
             "minute" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMinutes),
             "second" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalSeconds),
             "millisecond" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).TotalMilliseconds),
-            "ticks" => new Long((BigInteger)(self.AsDateTime - arg1.AsDateTime).Ticks),
+            "ticks" => new Long((self.AsDateTime - arg1.AsDateTime).Ticks),
             _ => throw new ArgumentException(string.Format(Resources.InvalidDatePart, arg2)),
         };
+    }
+
+    #endregion
+
+    #region Duration specific methods
+
+    private static DataItem DurationOfLogic(DataItem[] arguments)
+    {
+        var duration = new TimeSpan(arguments[0].AsInt32, arguments[1].AsInt32, arguments[2].AsInt32,
+                                    arguments[3].AsInt32, arguments[4].AsInt32);
+
+        return new Duration(duration);
     }
 
     #endregion
@@ -820,34 +879,30 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         var length = arguments[3].AsInt32;
         if (length <= 0) length = self.Length - start;
 
-        return new Integer(self.IndexOf(arg1.ToString(), start, length));
+        return new Integer(self.IndexOf(arg1.ToString(), start, length, StringComparison.Ordinal));
     }
 
     private static DataItem StringLastIndexOfLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
+        var self = arguments[0].ToString();
 
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::lastIndexOf", 1);
         
-        int start = arguments[2].AsInt32;
+        var start = arguments[2].AsInt32;
         while (start < 0) start += self.Length;
 
         var length = arguments[3].AsInt32;
         if (length <= 0) length = start + 1;
 
-        return new Integer(self.LastIndexOf(arg1.ToString(), start, length));
+        return new Integer(self.LastIndexOf(arg1.ToString(), start, length, StringComparison.Ordinal));
     }
 
-    private static DataItem StringToLowerLogic(DataItem[] arguments)
-    {
-        return new String(arguments[0].ToString().ToLower());
-    }
+    private static DataItem StringToLowerLogic(DataItem[] arguments) =>
+        new String(arguments[0].ToString().ToLower());
 
-    private static DataItem StringToUpperLogic(DataItem[] arguments)
-    {
-        return new String(arguments[0].ToString().ToUpper());
-    }
+    private static DataItem StringToUpperLogic(DataItem[] arguments) =>
+        new String(arguments[0].ToString().ToUpper());
 
     private static DataItem StringCapitalizeLogic(DataItem[] arguments)
     {
@@ -857,27 +912,27 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem StringUncapitalizeLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
+        var self = arguments[0].ToString();
         return new String(StringUtil.Uncapitalize(self));
     }
 
     private static DataItem StringSubstringLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
-        int length = arguments[2].AsInt32;
+        var self = arguments[0].ToString();
+        var length = arguments[2].AsInt32;
 
-        int index = arguments[1].AsInt32;
+        var index = arguments[1].AsInt32;
         while (index < 0) index += self.Length;
 
-        string substr = length > 0 ? self.Substring(index, length) : self.Substring(index);
+        var substr = length > 0 ? self.Substring(index, length) : self.Substring(index);
         return new String(substr);
     }
 
     private static DataItem StringInsertLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
+        var self = arguments[0].ToString();
 
-        int index = arguments[1].AsInt32;
+        var index = arguments[1].AsInt32;
         while (index < 0) index += self.Length;
 
         var arg2 = arguments[2];
@@ -888,19 +943,19 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem StringRemoveLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
-        int count = arguments[2].AsInt32;
+        var self = arguments[0].ToString();
+        var count = arguments[2].AsInt32;
 
-        int index = arguments[1].AsInt32;
+        var index = arguments[1].AsInt32;
         while (index < 0) index += self.Length;
 
-        string s = count <= 0 ? self.Remove(index) : self.Remove(index, count);
-        return new String(s);
+        var removed = count <= 0 ? self.Remove(index) : self.Remove(index, count);
+        return new String(removed);
     }
 
     private static DataItem StringReplaceLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
+        var self = arguments[0].ToString();
 
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::replace", 1);
@@ -908,16 +963,16 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         var arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "string::insert", 2);
 
-        string s = StringUtil.GetRegex(arg1.ToString()).Replace(self, arg2.ToString());
-        return new String(s);
+        var replaced = StringUtil.GetRegex(arg1.ToString()).Replace(self, arg2.ToString());
+        return new String(replaced);
     }
 
     private static DataItem StringTrimLeftLogic(DataItem[] arguments)
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::ltrim", 1);
-        char[] trimChars = arg1.ToString().ToCharArray();
-
+        
+        var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().TrimStart(trimChars));
     }
 
@@ -925,8 +980,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::rtrim", 1);
-        char[] trimChars = arg1.ToString().ToCharArray();
-
+        
+        var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().TrimEnd(trimChars));
     }
 
@@ -934,20 +989,20 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::trim", 1);
-        char[] trimChars = arg1.ToString().ToCharArray();
-
+        
+        var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().Trim(trimChars));
     }
 
     private static DataItem StringPadLeftLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
-        int width = arguments[1].AsInt32;
+        var self = arguments[0].ToString();
+        var width = arguments[1].AsInt32;
 
         DataItem arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "string::lpad", 2);
         
-        string padding = arg2.ToString();
+        var padding = arg2.ToString();
         CheckSingleChar(padding, "string::lpad", 2);
 
         return new String(self.PadLeft(width, padding[0]));
@@ -955,13 +1010,13 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem StringPadRightLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
-        int width = arguments[1].AsInt32;
+        var self = arguments[0].ToString();
+        var width = arguments[1].AsInt32;
 
         DataItem arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "string::rpad", 2);
 
-        string padding = arg2.ToString();
+        var padding = arg2.ToString();
         CheckSingleChar(padding, "string::rpad", 2);
 
         return new String(self.PadRight(width, padding[0]));
@@ -969,47 +1024,45 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem StringSplitLogic(DataItem[] arguments)
     {
-        string self = arguments[0].ToString();
+        var self = arguments[0].ToString();
 
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::split", 1);
 
-        string[] parts = StringUtil.GetRegex(arg1.ToString()).Split(self);
-        var items = new List<DataItem>();
-        for (int i = 0; i < parts.Length; ++i)
-            items.Add(new String(parts[i]));
+        var items = StringUtil.GetRegex(arg1.ToString())
+                              .Split(self)
+                              .Select(t => new String(t))
+                              .ToList();
 
-        return new List(items);
+        return new Tuple([..items]);
+    }
+
+    private static DataItem StringJoinLogic(DataItem[] arguments)
+    {
+        var self = arguments[0].ToString();
+        var values = arguments[1].AsList.ConvertAll(RuntimeServices.ToString);
+        var joined = string.Join(self, values.ToArray());
+        return new String(joined);
     }
 
     #endregion
 
     #region Blob specific methods
 
-    private static DataItem BlobOfLogic(DataItem[] arguments)
-    {
-        return new Blob(new byte[arguments[0].AsInt32]);
-    }
+    private static DataItem BlobOfLogic(DataItem[] arguments) =>
+        new Blob(new byte[arguments[0].AsInt32]);
 
-    private static DataItem BlobFromHexStringLogic(DataItem[] arguments)
-    {
-        return new Blob(Convert.FromHexString(arguments[0].ToString()));
-    }
+    private static DataItem BlobFromHexStringLogic(DataItem[] arguments) =>
+        new Blob(Convert.FromHexString(arguments[0].ToString()));
 
-    private static DataItem BlobToHexStringLogic(DataItem[] arguments)
-    {
-        return new String(Convert.ToHexString(arguments[0].AsByteArray));
-    }
+    private static DataItem BlobToHexStringLogic(DataItem[] arguments) =>
+        new String(Convert.ToHexString(arguments[0].AsByteArray));
 
-    private static DataItem BlobToBase64StringLogic(DataItem[] arguments)
-    {
-        return new String(Convert.ToBase64String(arguments[0].AsByteArray));
-    }
+    private static DataItem BlobToBase64StringLogic(DataItem[] arguments) =>
+        new String(Convert.ToBase64String(arguments[0].AsByteArray));
 
-    private static DataItem BlobFromBase64StringLogic(DataItem[] arguments)
-    {
-        return new Blob(Convert.FromBase64String(arguments[0].ToString()));
-    }
+    private static DataItem BlobFromBase64StringLogic(DataItem[] arguments) =>
+        new Blob(Convert.FromBase64String(arguments[0].ToString()));
 
     private static DataItem BlobIndexOfLogic(DataItem[] arguments)
     {
@@ -1114,17 +1167,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region List specific methods
 
-    private static DataItem ListJoinLogic(DataItem[] arguments)
-    {
-        DataItem self = arguments[0], arg1 = arguments[1];
-        CheckArgType(arg1, Class.String, "list::join", 1);
-
-        var values = self.AsList.ConvertAll(x => RuntimeServices.ToString(x));
-        string s = string.Join(arg1.ToString(), values.ToArray());
-
-        return new String(s);
-    }
-
     private static DataItem ListAddLogic(DataItem[] arguments)
     {
         arguments[0].AsList.Add(arguments[1]);
@@ -1179,10 +1221,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new Integer(self.LastIndexOf(arguments[1], start, count));
     }
 
-    private static DataItem ListBinarySearchLogic(DataItem[] arguments)
-    {
-        return new Integer(arguments[0].AsList.BinarySearch(arguments[1]));
-    }
+    private static DataItem ListBinarySearchLogic(DataItem[] arguments) =>
+        new Integer(arguments[0].AsList.BinarySearch(arguments[1]));
 
     private static DataItem ListFrequencyOfLogic(DataItem[] arguments)
     {
@@ -1248,10 +1288,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return sorted;
     }
 
-    private static DataItem ListShuffleLogic(DataItem[] arguments)
-    {
-        return new List(arguments[0].AsList.OrderBy(x => NextUInt32(random)).ToList());
-    }
+    private static DataItem ListShuffleLogic(DataItem[] arguments) =>
+        new List([.. arguments[0].AsList.OrderBy(x => NextUInt32(RandomNumberGenerator))]);
 
     private static DataItem ListInverseLogic(DataItem[] arguments)
     {
@@ -1270,26 +1308,17 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return new List(self.GetRange(index, arguments[2].AsInt32));
     }
 
-    private static DataItem ListUniqueLogic(DataItem[] arguments)
-    {
-        List<DataItem> self = arguments[0].AsList;
-        var unique = new List<DataItem>();
-
-        foreach (DataItem item in self)
-            if (!unique.Contains(item))
-                unique.Add(item);
-
-        return new List(unique);
-    }
+    private static DataItem ListUniqueLogic(DataItem[] arguments) => new List(arguments[0].AsHashSet);
 
     private static DataItem ListMapToLogic(DataItem[] arguments)
     {
         List<DataItem> self = arguments[0].AsList;
         List<DataItem> other = arguments[1].AsList;
+
         if (self.Count != other.Count)
             throw new ArgumentException("list::mapTo requires that both lists be of the same length");
 
-        var dict = new Dictionary<DataItem, DataItem>();
+        Dictionary<DataItem, DataItem> dict = [];
         for (int i = 0; i < self.Count; ++i)
             dict.Add(self[i], other[i]);
         
@@ -1322,10 +1351,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Queue specific methods
 
-    private static DataItem QueueOfLogic(DataItem[] arguments)
-    {
-        return new Queue(new Queue<DataItem>(arguments[0].AsList));
-    }
+    private static DataItem QueueOfLogic(DataItem[] arguments) =>
+        new Queue(new Queue<DataItem>(arguments[0].AsList));
 
     private static DataItem QueueEnqueueLogic(DataItem[] arguments)
     {
@@ -1333,10 +1360,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem QueueDequeueLogic(DataItem[] arguments)
-    {
-        return arguments[0].AsQueue.Dequeue();
-    }
+    private static DataItem QueueDequeueLogic(DataItem[] arguments) => arguments[0].AsQueue.Dequeue();
 
     private static DataItem QueueClearLogic(DataItem[] arguments)
     {
@@ -1348,10 +1372,8 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Stack specific methods
 
-    private static DataItem StackOfLogic(DataItem[] arguments)
-    {
-        return new Stack(new Stack<DataItem>(arguments[0].AsList));
-    }
+    private static DataItem StackOfLogic(DataItem[] arguments) =>
+        new Stack(new Stack<DataItem>(arguments[0].AsList));
 
     private static DataItem StackPushLogic(DataItem[] arguments)
     {
@@ -1359,10 +1381,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return Void.Value;
     }
 
-    private static DataItem StackPopLogic(DataItem[] arguments)
-    {
-        return arguments[0].AsStack.Pop();
-    }
+    private static DataItem StackPopLogic(DataItem[] arguments) => arguments[0].AsStack.Pop();
 
     private static DataItem StackClearLogic(DataItem[] arguments)
     {
@@ -1409,36 +1428,29 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem MapFrequencyOfLogic(DataItem[] arguments)
     {
-        int frequency = 0;
-        var dict = arguments[0].AsDictionary;
-
-        foreach (KeyValuePair<DataItem, DataItem> pair in dict)
-            if (pair.Value.Equals(arguments[1]))
-                ++frequency;
+        int frequency = arguments[0].AsDictionary
+                                    .Count(pair => pair.Value.Equals(arguments[1]));
 
         return new Integer(frequency);
     }
 
     private static DataItem MapKeysOfLogic(DataItem[] arguments)
     {
-        var keySet = new HashSet<DataItem>();
-        var map = arguments[0].AsDictionary;
-
-        foreach (KeyValuePair<DataItem, DataItem> pair in map)
-            if (pair.Value.Equals(arguments[1]))
-                keySet.Add(pair.Key);
+        var keySet = arguments[0].AsDictionary
+                                 .Where(pair => pair.Value.Equals(arguments[1]))
+                                 .Select(pair => pair.Key)
+                                 .ToHashSet();
 
         return new Set(keySet);
     }
 
     private static DataItem MapInverseLogic(DataItem[] arguments)
     {
-        var inverse = new Dictionary<DataItem, DataItem>();
         var map = arguments[0].AsDictionary;
+        Dictionary<DataItem, DataItem> inverse = [];
 
-        foreach (KeyValuePair<DataItem, DataItem> pair in map)
-            if (!inverse.ContainsKey(pair.Value))
-                inverse.Add(pair.Value, pair.Key);
+        foreach (var pair in map.Where(pair => !inverse.ContainsKey(pair.Value)))
+            inverse.Add(pair.Value, pair.Key);
 
         return new Map(inverse);
     }
@@ -1452,11 +1464,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem MapRemoveAllLogic(DataItem[] arguments)
     {
         var self = arguments[0].AsDictionary;
-        int removed = 0;
-
-        foreach (DataItem key in arguments[1].AsHashSet)
-            if (self.Remove(key))
-                ++removed;
+        int removed = arguments[1].AsHashSet.Count(key => self.Remove(key));
 
         return new Integer(removed);
     }
@@ -1497,7 +1505,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             body.Insert(0, VariableDecl.Single(nameArg.ToString(), new Literal(arguments[2])));
         }
 
-        return new Closure(new Function(parameters, body) { DeclaringFrame = self.DeclaringFrame });
+        return new Closure(new Function(parameters, body) { ParentFrame = self.ParentFrame });
     }
 
     #endregion
@@ -1644,24 +1652,24 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     public static readonly InnerFunction Round = new ("round", [new ("value"), new ("precision", new Integer(0))], RoundLogic);
 
     /// <summary>
-    /// Determines the minimum of two number.
+    /// Determines the minimum of two or more values.
     /// </summary>
-    public static readonly InnerFunction Minimum = new ("min", [new ("values", false, true, null)], MinimumLogic);
+    public static readonly InnerFunction Minimum = new ("min", [new ("first"), new ("second"), new ("more", false, true, null)], MinimumLogic);
 
     /// <summary>
-    /// Determines the maximum of two number.
+    /// Determines the maximum of two or more values.
     /// </summary>
-    public static readonly InnerFunction Maximum = new ("max", [new ("values", false, true, null)], MaximumLogic);
+    public static readonly InnerFunction Maximum = new ("max", [new ("first"), new ("second"), new ("more", false, true, null)], MaximumLogic);
 
     /// <summary>
-    /// Gets the current date.
+    /// Gets the current date and time.
     /// </summary>
     public static readonly InnerFunction Now = new ("now", [], NowLogic);
 
     /// <summary>
     /// Format a string with the given mask.
     /// </summary>
-    public static readonly InnerFunction Format = new ("format", [new ("mask"), new ("values", false, true, null)], FormatLogic);
+    public static readonly InnerFunction Format = new ("format", [new ("pattern"), new ("substitutions", false, true, null)], FormatLogic);
 
     /// <summary>
     /// Reads a line of text from the standard input device.
@@ -1671,12 +1679,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Prints some text to the standard output device.
     /// </summary>
-    public static readonly InnerFunction Print = new ("print", [new ("mask"), new ("values", false, true, null)], PrintLogic);
+    public static readonly InnerFunction Print = new ("print", [new ("pattern"), new ("substitutions", false, true, null)], PrintLogic);
 
     /// <summary>
     /// Prints a line of text to the standard output device.
     /// </summary>
-    public static readonly InnerFunction PrintLine = new ("println", [new ("mask", new String("")), new ("values", false, true, null)], PrintLineLogic);
+    public static readonly InnerFunction PrintLine = new ("println", [new ("pattern", new String("")), new ("substitutions", false, true, null)], PrintLineLogic);
 
     /// <summary>
     /// Evaluates the expression contained in a string.
@@ -1686,12 +1694,42 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Packs several values in a binary string: a way to create structured data objects.
     /// </summary>
-    public static readonly InnerFunction Pack = new ("pack", [new ("fmt"), new ("values", false, true, null)], PackLogic);
+    public static readonly InnerFunction Pack = new ("pack", [new ("format"), new ("values", false, true, null)], PackLogic);
 
     /// <summary>
     /// Unpacks the values combined in a binary string following the given format.
     /// </summary>
-    public static readonly InnerFunction UnPack = new ("unpack", [new ("fmt"), new ("str")], UnPackLogic);
+    public static readonly InnerFunction UnPack = new ("unpack", [new ("format"), new ("bytes")], UnPackLogic);
+
+    /// <summary>
+    /// Combines several values and computes their hash code.
+    /// </summary>
+    public static readonly InnerFunction Hash = new ("hash", [new ("first"), new ("more", false, true)], HashLogic);
+
+    /// <summary>
+    /// Creates a <see cref="Duration"/> with the given number of days.
+    /// </summary>
+    public static readonly InnerFunction Days = new ("days", [new ("value")], DaysLogic);
+
+    /// <summary>
+    /// Creates a <see cref="Duration"/> with the given number of hours.
+    /// </summary>
+    public static readonly InnerFunction Hours = new ("hours", [new ("value")], HoursLogic);
+
+    /// <summary>
+    /// Creates a <see cref="Duration"/> with the given number of minutes.
+    /// </summary>
+    public static readonly InnerFunction Minutes = new ("minutes", [new ("value")], MinutesLogic);
+
+    /// <summary>
+    /// Creates a <see cref="Duration"/> with the given number of seconds.
+    /// </summary>
+    public static readonly InnerFunction Seconds = new ("seconds", [new ("value")], SecondsLogic);
+
+    /// <summary>
+    /// Creates a <see cref="Duration"/> with the given number of milliseconds.
+    /// </summary>
+    public static readonly InnerFunction Milliseconds = new ("milliseconds", [new ("value")], MillisecondsLogic);
 
     #endregion
 
@@ -1757,7 +1795,9 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// <summary>
     /// Creates a date from the given values.
     /// </summary>
-    public static readonly InnerFunction DateOf = new ("of", [new ("values", false, true, null)], DateOfLogic);
+    public static readonly InnerFunction DateOf = new ("of", [new ("year"), new ("month"), new ("day"), new ("hour", new Float(0)),
+                                                              new ("minute", new Float(0)), new ("seccond", new Float(0)),
+                                                              new ("millisecond", new Float(0))], DateOfLogic);
 
     /// <summary>
     /// Adds some time units to a date.
@@ -1768,6 +1808,15 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Computes the difference between two dates.
     /// </summary>
     public static readonly InnerFunction DateSubtract = new ("subtract", [new ("self"), new ("other"), new ("unit")], DateSubtractLogic);
+
+    #endregion
+
+    #region Duration specific methods
+
+    /// <summary>
+    /// Creates a duration from the given values.
+    /// </summary>
+    public static readonly InnerFunction DurationOf = new ("of", [new ("days"), new ("hours"), new ("minutes"), new ("secconds"), new ("milliseconds")], DurationOfLogic);
 
     #endregion
 
@@ -1853,6 +1902,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// </summary>
     public static readonly InnerFunction StringSplit = new ("split", [new ("self"), new ("pattern", new String("/\\s+/"))], StringSplitLogic);
 
+    /// <summary>
+    /// Joins several values in a single string using the target string as a separator.
+    /// </summary>
+    public static readonly InnerFunction StringJoin = new ("join", [new ("self"), new ("values", false, true)], StringJoinLogic);
+
     #endregion
 
     #region Blob specific methods
@@ -1924,11 +1978,6 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #endregion
 
     #region List specific methods
-
-    /// <summary>
-    /// Joins several strings into one.
-    /// </summary>
-    public static readonly InnerFunction ListJoin = new ("join", [new ("self"), new ("separator", new String(""))], ListJoinLogic);
 
     /// <summary>
     /// Adds an item in a list.
@@ -2195,32 +2244,29 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static uint NextUInt32(RandomNumberGenerator rng)
     {
-        var uintBytes = new byte[4];
-        rng.GetBytes(uintBytes);
-        return BitConverter.ToUInt32(uintBytes, 0);
+        var uiBytes = new byte[4];
+        rng.GetBytes(uiBytes);
+        return BitConverter.ToUInt32(uiBytes, 0);
     }
 
-    private static double NextDouble(RandomNumberGenerator rng)
-    {
-        return (double)NextUInt32(rng) / uint.MaxValue;
-    }
+    private static double NextDouble(RandomNumberGenerator rng) => (double)NextUInt32(rng) / uint.MaxValue;
 
     private static void CheckArgType(DataItem arg, Class klass, string function, int rank)
     {
-        if (arg.Class != klass)
-            throw new ArgumentException(string.Format(Resources.ArgMustBeOfType, rank, function, klass.Name));
+        if (arg.InstanceOf(klass)) return;
+        throw new ArgumentException(string.Format(Resources.ArgMustBeOfType, rank, function, klass.Name));
     }
 
     private static void CheckSingleChar(string s, string function, int rank)
     {
-        if (s.Length != 1)
-            throw new ArgumentException(string.Format(Resources.SingleCharExpected, rank, function));
+        if (s.Length == 1) return;
+        throw new ArgumentException(string.Format(Resources.SingleCharExpected, rank, function));
     }
 
     private static string FormatList(string mask, List<DataItem> values)
     {
-        var sbResult = new StringBuilder();
-        var sbItem = new StringBuilder();
+        StringBuilder sbResult = new ();
+        StringBuilder sbItem = new ();
         int i = 0, l = mask.Length;
 
         while (i < l)
@@ -2297,33 +2343,35 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         return value;
     }
 
-    private static int YearDiff(DateTime d1, DateTime d2)
+    private static int YearDelta(DateTime date1, DateTime date2)
     {
-        int yearDiff = d1.Year - d2.Year;
-        int monthDiff = d1.Month - d2.Month;
-        int dayDiff = d1.Day - d2.Day;
+        var yearDelta = date1.Year - date2.Year;
+        var monthDelta = date1.Month - date2.Month;
+        var dayDelta = date1.Day - date2.Day;
 
-        if (monthDiff < 0 || (monthDiff == 0 & dayDiff < 0))
-            --yearDiff;
+        if (monthDelta < 0 || (monthDelta == 0 && dayDelta < 0))
+            --yearDelta;
 
-        return yearDiff;
+        return yearDelta;
     }
 
-    private static int MonthDiff(DateTime d1, DateTime d2)
+    private static int MonthDelta(DateTime date1, DateTime date2)
     {
-        int yearDiff = d1.Year - d2.Year;
-        int monthDiff = d1.Month - d2.Month;
-        int dayDiff = d1.Day - d2.Day;
+        const int MONTHS_PER_YEAR = 12;
+        
+        var yearDelta = date1.Year - date2.Year;
+        var monthDelta = date1.Month - date2.Month;
+        var dayDelta = date1.Day - date2.Day;
 
-        if (monthDiff < 0)
+        if (monthDelta < 0)
         {
-            monthDiff += 12;
-            --yearDiff;
+            monthDelta += MONTHS_PER_YEAR;
+            --yearDelta;
         }
 
-        if (dayDiff < 0) --monthDiff;
+        if (dayDelta < 0) --monthDelta;
 
-        return 12 * yearDiff + monthDiff;
+        return MONTHS_PER_YEAR * yearDelta + monthDelta;
     }
 
     #endregion

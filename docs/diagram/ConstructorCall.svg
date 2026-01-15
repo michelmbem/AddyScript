@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="755" height="177">
+<svg xmlns="http://www.w3.org/2000/svg" width="731" height="177">
    <defs>
       <style type="text/css">
     @namespace "http://www.w3.org/2000/svg";
-    .line                 {fill: none; stroke: #174B00; stroke-width: 1;}
-    .bold-line            {stroke: #061400; shape-rendering: crispEdges; stroke-width: 2;}
-    .thin-line            {stroke: #091F00; shape-rendering: crispEdges}
-    .filled               {fill: #174B00; stroke: none;}
+    .line                 {fill: none; stroke: #004900; stroke-width: 1;}
+    .bold-line            {stroke: #001400; shape-rendering: crispEdges; stroke-width: 2;}
+    .thin-line            {stroke: #001F00; shape-rendering: crispEdges}
+    .filled               {fill: #004900; stroke: none;}
     text.terminal         {font-family: Verdana, Sans-serif;
                             font-size: 12px;
-                            fill: #061400;
+                            fill: #001400;
                             font-weight: bold;
                           }
     text.nonterminal      {font-family: Verdana, Sans-serif;
                             font-size: 12px;
-                            fill: #081A00;
+                            fill: #001A00;
                             font-weight: normal;
                           }
     text.regexp           {font-family: Verdana, Sans-serif;
                             font-size: 12px;
-                            fill: #091F00;
+                            fill: #001F00;
                             font-weight: normal;
                           }
-    rect, circle, polygon {fill: #174B00; stroke: #174B00;}
-    rect.terminal         {fill: #F8FFF5; stroke: #174B00; stroke-width: 1;}
-    rect.nonterminal      {fill: #FBFFFA; stroke: #174B00; stroke-width: 1;}
+    rect, circle, polygon {fill: #004900; stroke: #004900;}
+    rect.terminal         {fill: #E5FFE5; stroke: #004900; stroke-width: 1;}
+    rect.nonterminal      {fill: #F1FFF1; stroke: #004900; stroke-width: 1;}
     rect.text             {fill: none; stroke: none;}
-    polygon.regexp        {fill: #FDFFFC; stroke: #174B00; stroke-width: 1;}
+    polygon.regexp        {fill: #F7FFF7; stroke: #004900; stroke-width: 1;}
   </style>
    </defs>
    <polygon points="9 17 1 13 1 21"/>
@@ -62,20 +62,20 @@
          rx="10"/>
    <text class="terminal" x="403" y="53">{</text>
    <a xmlns:xlink="http://www.w3.org/1999/xlink"
-      xlink:href="#PropertyInitializerList"
-      xlink:title="PropertyInitializerList">
-      <rect x="463" y="67" width="156" height="32"/>
-      <rect x="461" y="65" width="156" height="32" class="nonterminal"/>
-      <text class="nonterminal" x="471" y="85">PropertyInitializerList</text>
+      xlink:href="#VariableSetterList"
+      xlink:title="VariableSetterList">
+      <rect x="463" y="67" width="132" height="32"/>
+      <rect x="461" y="65" width="132" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="471" y="85">VariableSetterList</text>
    </a>
-   <rect x="659" y="35" width="28" height="32" rx="10"/>
-   <rect x="657"
+   <rect x="635" y="35" width="28" height="32" rx="10"/>
+   <rect x="633"
          y="33"
          width="28"
          height="32"
          class="terminal"
          rx="10"/>
-   <text class="terminal" x="667" y="53">}</text>
+   <text class="terminal" x="643" y="53">}</text>
    <rect x="251" y="111" width="28" height="32" rx="10"/>
    <rect x="249"
          y="109"
@@ -85,22 +85,22 @@
          rx="10"/>
    <text class="terminal" x="259" y="129">{</text>
    <a xmlns:xlink="http://www.w3.org/1999/xlink"
-      xlink:href="#PropertyInitializerList"
-      xlink:title="PropertyInitializerList">
-      <rect x="319" y="143" width="156" height="32"/>
-      <rect x="317" y="141" width="156" height="32" class="nonterminal"/>
-      <text class="nonterminal" x="327" y="161">PropertyInitializerList</text>
+      xlink:href="#VariableSetterList"
+      xlink:title="VariableSetterList">
+      <rect x="319" y="143" width="132" height="32"/>
+      <rect x="317" y="141" width="132" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="327" y="161">VariableSetterList</text>
    </a>
-   <rect x="515" y="111" width="28" height="32" rx="10"/>
-   <rect x="513"
+   <rect x="491" y="111" width="28" height="32" rx="10"/>
+   <rect x="489"
          y="109"
          width="28"
          height="32"
          class="terminal"
          rx="10"/>
-   <text class="terminal" x="523" y="129">}</text>
+   <text class="terminal" x="499" y="129">}</text>
    <path class="line"
-         d="m17 17 h2 m0 0 h10 m48 0 h10 m0 0 h10 m112 0 h10 m20 0 h10 m104 0 h10 m20 0 h10 m0 0 h302 m-332 0 h20 m312 0 h20 m-352 0 q10 0 10 10 m332 0 q0 -10 10 -10 m-342 10 v12 m332 0 v-12 m-332 12 q0 10 10 10 m312 0 q10 0 10 -10 m-322 10 h10 m28 0 h10 m20 0 h10 m0 0 h166 m-196 0 h20 m176 0 h20 m-216 0 q10 0 10 10 m196 0 q0 -10 10 -10 m-206 10 v12 m196 0 v-12 m-196 12 q0 10 10 10 m176 0 q10 0 10 -10 m-186 10 h10 m156 0 h10 m20 -32 h10 m28 0 h10 m-476 -32 h20 m476 0 h20 m-516 0 q10 0 10 10 m496 0 q0 -10 10 -10 m-506 10 v88 m496 0 v-88 m-496 88 q0 10 10 10 m476 0 q10 0 10 -10 m-486 10 h10 m28 0 h10 m20 0 h10 m0 0 h166 m-196 0 h20 m176 0 h20 m-216 0 q10 0 10 10 m196 0 q0 -10 10 -10 m-206 10 v12 m196 0 v-12 m-196 12 q0 10 10 10 m176 0 q10 0 10 -10 m-186 10 h10 m156 0 h10 m20 -32 h10 m28 0 h10 m0 0 h164 m23 -108 h-3"/>
-   <polygon points="745 17 753 13 753 21"/>
-   <polygon points="745 17 737 13 737 21"/>
+         d="m17 17 h2 m0 0 h10 m48 0 h10 m0 0 h10 m112 0 h10 m20 0 h10 m104 0 h10 m20 0 h10 m0 0 h278 m-308 0 h20 m288 0 h20 m-328 0 q10 0 10 10 m308 0 q0 -10 10 -10 m-318 10 v12 m308 0 v-12 m-308 12 q0 10 10 10 m288 0 q10 0 10 -10 m-298 10 h10 m28 0 h10 m20 0 h10 m0 0 h142 m-172 0 h20 m152 0 h20 m-192 0 q10 0 10 10 m172 0 q0 -10 10 -10 m-182 10 v12 m172 0 v-12 m-172 12 q0 10 10 10 m152 0 q10 0 10 -10 m-162 10 h10 m132 0 h10 m20 -32 h10 m28 0 h10 m-452 -32 h20 m452 0 h20 m-492 0 q10 0 10 10 m472 0 q0 -10 10 -10 m-482 10 v88 m472 0 v-88 m-472 88 q0 10 10 10 m452 0 q10 0 10 -10 m-462 10 h10 m28 0 h10 m20 0 h10 m0 0 h142 m-172 0 h20 m152 0 h20 m-192 0 q10 0 10 10 m172 0 q0 -10 10 -10 m-182 10 v12 m172 0 v-12 m-172 12 q0 10 10 10 m152 0 q10 0 10 -10 m-162 10 h10 m132 0 h10 m20 -32 h10 m28 0 h10 m0 0 h164 m23 -108 h-3"/>
+   <polygon points="721 17 729 13 729 21"/>
+   <polygon points="721 17 713 13 713 21"/>
 </svg>

@@ -1,0 +1,550 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AbnormalListTermination" xml:space="preserve">
+    <value>terminación anormal de la lista, se esperaba otro elemento</value>
+  </data>
+  <data name="AbstractMemberCantHaveBody" xml:space="preserve">
+    <value>Un miembro abstracto no puede tener un cuerpo</value>
+  </data>
+  <data name="AbstractMemberInNonAbstractClass" xml:space="preserve">
+    <value>Una clase no abstracta no puede tener miembros abstractos</value>
+  </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>No se puede acceder a {0} desde {1}</value>
+  </data>
+  <data name="AccessorScopeMustBeMoreRestrictive" xml:space="preserve">
+    <value>El alcance de un descriptor de acceso debe ser más restrictivo que el alcance de la propiedad.</value>
+  </data>
+  <data name="ArgMustBeOfType" xml:space="preserve">
+    <value>El argumento {0} de '{1}' debe ser del tipo {2}</value>
+  </data>
+  <data name="AttributesNotSupported" xml:space="preserve">
+    <value>La siguiente declaración no admite atributos</value>
+  </data>
+  <data name="BadDateOfCall" xml:space="preserve">
+    <value>date::of espera 3, 4, 6 o 7 argumentos. El número o los argumentos ({0}) proporcionados no son válidos.</value>
+  </data>
+  <data name="BothAccessorsCantRedefineScope" xml:space="preserve">
+    <value>El alcance no se puede redefinir para ambos descriptores de acceso de una propiedad</value>
+  </data>
+  <data name="CalleeIsNotClosure" xml:space="preserve">
+    <value>La expresión dada no es un cierre.</value>
+  </data>
+  <data name="CannotAccessAbstractProperty" xml:space="preserve">
+    <value>No se puede acceder a la propiedad abstracta {0}</value>
+  </data>
+  <data name="CannotAlterConstant" xml:space="preserve">
+    <value>No se puede alterar un objeto constante</value>
+  </data>
+  <data name="CannotComputeGcdForNegative" xml:space="preserve">
+    <value>No se puede calcular el MCD de números negativos</value>
+  </data>
+  <data name="CannotConvert" xml:space="preserve">
+    <value>No se puede convertir de {0} a {1}</value>
+  </data>
+  <data name="CannotConvertFrom" xml:space="preserve">
+    <value>No se pueden gestionar automáticamente las conversiones de {0}</value>
+  </data>
+  <data name="CannotConvertTo" xml:space="preserve">
+    <value>No se puede convertir la expresión a {0}</value>
+  </data>
+  <data name="CannotCreateEmptyTuple" xml:space="preserve">
+    <value>No se pudo crear una tupla vacía</value>
+  </data>
+  <data name="CannotCreateInstance" xml:space="preserve">
+    <value>No se puede crear una instancia de clase abstracta o estática {0}</value>
+  </data>
+  <data name="CannotCreateSubclass" xml:space="preserve">
+    <value>No se puede crear una subclase de clase final o estática {0}</value>
+  </data>
+  <data name="CannotInvokeAbstractMember" xml:space="preserve">
+    <value>No se puede invocar el miembro abstracto {0}</value>
+  </data>
+  <data name="CannotJumpOutOfFinallyBlock" xml:space="preserve">
+    <value>No puedo saltar del bloque final</value>
+  </data>
+  <data name="CannotReadProperty" xml:space="preserve">
+    <value>No se puede leer una propiedad de solo escritura</value>
+  </data>
+  <data name="CannotReturnFromFinallyBlock" xml:space="preserve">
+    <value>No se puede regresar del bloque finalmente</value>
+  </data>
+  <data name="CannotWriteFinalField" xml:space="preserve">
+    <value>No se puede cambiar el valor de un campo final</value>
+  </data>
+  <data name="CannotWriteProperty" xml:space="preserve">
+    <value>No se puede escribir una propiedad de solo lectura</value>
+  </data>
+  <data name="CaseLabelRequired" xml:space="preserve">
+    <value>Un bloque de interruptores debe contener al menos una etiqueta de caja.</value>
+  </data>
+  <data name="CatchOrFinallyBlockRequired" xml:space="preserve">
+    <value>Una declaración de prueba sin recursos debe tener un bloque catch o un bloque finalmente</value>
+  </data>
+  <data name="ClassHasNoIndexReader" xml:space="preserve">
+    <value>El tipo {0} no admite la lectura de elemento por índice</value>
+  </data>
+  <data name="ClassHasNoIndexWriter" xml:space="preserve">
+    <value>El tipo {0} no admite la escritura elemento por índice</value>
+  </data>
+  <data name="ClassHasNoProperty" xml:space="preserve">
+    <value>El tipo {0} no tiene ninguna propiedad denominada {1}</value>
+  </data>
+  <data name="ClassHasNoRangeReader" xml:space="preserve">
+    <value>El tipo {0} no admite la extracción de sectores</value>
+  </data>
+  <data name="ClassHasNoRangeWriter" xml:space="preserve">
+    <value>El tipo {0} no admite el reemplazo de sectores</value>
+  </data>
+  <data name="ConstantFieldShouldBeInitialized" xml:space="preserve">
+    <value>Un campo constante debe inicializarse tras la declaración.</value>
+  </data>
+  <data name="ConstructorCantReturnValue" xml:space="preserve">
+    <value>Un constructor no puede devolver un valor</value>
+  </data>
+  <data name="DuplicatedAttribute" xml:space="preserve">
+    <value>Cada atributo debe ser único en la lista.</value>
+  </data>
+  <data name="DuplicatedAttributeField" xml:space="preserve">
+    <value>Cada campo de un atributo debe ser único</value>
+  </data>
+  <data name="DuplicatedAttributeValue" xml:space="preserve">
+    <value>El valor del atributo solo se puede configurar una vez</value>
+  </data>
+  <data name="DuplicatedCaseLabel" xml:space="preserve">
+    <value>Cada etiqueta de caja debe ser única en un bloque de interruptores.</value>
+  </data>
+  <data name="DuplicatedConstant" xml:space="preserve">
+    <value>Cada constante debe ser única.</value>
+  </data>
+  <data name="DuplicatedItem" xml:space="preserve">
+    <value>Cada valor debe ser único en un conjunto.</value>
+  </data>
+  <data name="DuplicatedKey" xml:space="preserve">
+    <value>Cada elemento de un mapa debe tener una clave única.</value>
+  </data>
+  <data name="DuplicatedLabel" xml:space="preserve">
+    <value>Ya existe una etiqueta {0} en el ámbito actual</value>
+  </data>
+  <data name="DuplicatedParameter" xml:space="preserve">
+    <value>Cada parámetro debe ser único en la lista.</value>
+  </data>
+  <data name="DuplicatedProperty" xml:space="preserve">
+    <value>Cada propiedad de un objeto debe tener un nombre único.</value>
+  </data>
+  <data name="DuplicatedVariable" xml:space="preserve">
+    <value>Cada variable debe declararse una vez en su alcance.</value>
+  </data>
+  <data name="EventDeclaredInAncestor" xml:space="preserve">
+    <value>El evento {0} ya está declarado en el antecesor {1}</value>
+  </data>
+  <data name="EventHidesHomonymous" xml:space="preserve">
+    <value>El evento {0} oculta un campo, propiedad o método homónimo heredado</value>
+  </data>
+  <data name="ExpressionRequired" xml:space="preserve">
+    <value>Se requiere una expresión</value>
+  </data>
+  <data name="FieldDeclaredInAncestor" xml:space="preserve">
+    <value>El campo {0} ya está declarado en el antecesor {1}</value>
+  </data>
+  <data name="FieldHidesHomonymous" xml:space="preserve">
+    <value>El campo {0} oculta una propiedad, método o evento homónimo heredado</value>
+  </data>
+  <data name="FunctionHasNoParameterNamed" xml:space="preserve">
+    <value>{0} no tiene ningún parámetro llamado {1}</value>
+  </data>
+  <data name="IndexerCantBeAuto" xml:space="preserve">
+    <value>La generación automática de accesos no es compatible con los indexadores</value>
+  </data>
+  <data name="IndexerCantBeStatic" xml:space="preserve">
+    <value>Un indexador no puede ser estático</value>
+  </data>
+  <data name="IndexNotFound" xml:space="preserve">
+    <value>No hay ningún elemento {0} en la colección</value>
+  </data>
+  <data name="InvalidAccessorsScope" xml:space="preserve">
+    <value>Al menos, un descriptor de acceso debe tener el mismo alcance que la propiedad.</value>
+  </data>
+  <data name="InvalidConstantType" xml:space="preserve">
+    <value>Una constante no puede ser del tipo {0}. Sólo se aceptan bool, int, long, float, decimal, complex, date y string.</value>
+  </data>
+  <data name="InvalidConstructorModifier" xml:space="preserve">
+    <value>No se permite ningún modificador para el constructor.</value>
+  </data>
+  <data name="InvalidDatePart" xml:space="preserve">
+    <value>'{0}' no es una parte de fecha válida. Sólo se aceptan "año", "mes", "día del año", "día de la semana", "día", "hora", "minuto", "segundo" y "milisegundo".</value>
+  </data>
+  <data name="InvalidDateUnit" xml:space="preserve">
+    <value>'{0}' no es una unidad de tiempo válida. Sólo se aceptan "año", "mes", "día", "hora", "minuto", "segundo" y "milisegundo".</value>
+  </data>
+  <data name="InvalidEvalParam" xml:space="preserve">
+    <value>La cadena dada no contiene una expresión válida</value>
+  </data>
+  <data name="InvalidFieldModifier" xml:space="preserve">
+    <value>El modificador '{0}' no se puede aplicar a un campo</value>
+  </data>
+  <data name="InvalidLValue" xml:space="preserve">
+    <value>El operando izquierdo no es un valor l válido</value>
+  </data>
+  <data name="InvalidMemberModifier" xml:space="preserve">
+    <value>Modificador no válido para el miembro {0}. Sólo se permite 'final'</value>
+  </data>
+  <data name="InvalidNewUsage" xml:space="preserve">
+    <value>Terminación de expresión no válida; Se espera un inicializador de objeto o una llamada a un constructor.</value>
+  </data>
+  <data name="InvalidOperandCount" xml:space="preserve">
+    <value>Recuento de operandos no válidos para el operador {0}</value>
+  </data>
+  <data name="InvalidOperandForWith" xml:space="preserve">
+    <value>El operando izquierdo de 'con' debería ser un objeto</value>
+  </data>
+  <data name="InvalidOperatorModifier" xml:space="preserve">
+    <value>No se permite ningún modificador por sobrecarga del operador.</value>
+  </data>
+  <data name="InvalidTypeReference" xml:space="preserve">
+    <value>Referencia de tipo externo no válida: {0}</value>
+  </data>
+  <data name="IterationNotSupported" xml:space="preserve">
+    <value>No se puede iterar a través de una variable de tipo {0}</value>
+  </data>
+  <data name="IteratorCantReturnValue" xml:space="preserve">
+    <value>Un iterador no puede devolver ningún valor.</value>
+  </data>
+  <data name="JumpToCaseLabelOutOfSwitchBlock" xml:space="preserve">
+    <value>El script intenta saltar a la etiqueta de un caso desde un bloque de interruptores.</value>
+  </data>
+  <data name="ListCantBeEmpty" xml:space="preserve">
+    <value>La lista de variables no puede estar vacía.</value>
+  </data>
+  <data name="ListLengthMismatch" xml:space="preserve">
+    <value>Ambas listas deben tener la misma longitud.</value>
+  </data>
+  <data name="LiteralRequired" xml:space="preserve">
+    <value>La expresión debe ser un valor literal.</value>
+  </data>
+  <data name="MandatoryParamsPrecede" xml:space="preserve">
+    <value>Un parámetro obligatorio no puede seguir a uno opcional</value>
+  </data>
+  <data name="MemberCantOverride" xml:space="preserve">
+    <value>El miembro {0} no se puede anular</value>
+  </data>
+  <data name="MemberNameConfict" xml:space="preserve">
+    <value>Se declara otro miembro con el nombre {0}</value>
+  </data>
+  <data name="MethodHidesHomonymous" xml:space="preserve">
+    <value>El método {0} oculta un campo, propiedad o evento homónimo heredado</value>
+  </data>
+  <data name="MethodNotFound" xml:space="preserve">
+    <value>No hay ningún método {0} en la clase {1}</value>
+  </data>
+  <data name="MethodUsedAsProperty" xml:space="preserve">
+    <value>{0} es un método pero se usa como propiedad</value>
+  </data>
+  <data name="MissingAttribute" xml:space="preserve">
+    <value>No se adjunta ningún atributo '{0}' a la función externa {1}</value>
+  </data>
+  <data name="MissingAttributeProperty" xml:space="preserve">
+    <value>Falta un campo '{0}' en el atributo '{1}'</value>
+  </data>
+  <data name="MissingClosingBrace" xml:space="preserve">
+    <value>Falta un '}'</value>
+  </data>
+  <data name="MissingClosingParen" xml:space="preserve">
+    <value>Falta paréntesis de cierre</value>
+  </data>
+  <data name="MissingLabel" xml:space="preserve">
+    <value>La etiqueta '{0}' no está declarada en el ámbito actual</value>
+  </data>
+  <data name="MissingPameter" xml:space="preserve">
+    <value>No se proporcionó ningún valor para el parámetro '{0}' de {1}</value>
+  </data>
+  <data name="ModuleNotFound" xml:space="preserve">
+    <value>No se puede cargar el módulo {0}. Verifique la propiedad 'ImportPaths' de su ScriptContext</value>
+  </data>
+  <data name="MustMatchSignature" xml:space="preserve">
+    <value>{0} debe tener la misma firma que {1}</value>
+  </data>
+  <data name="MustOverride" xml:space="preserve">
+    <value>{0} debe anular a {1} o marcarse como resumen</value>
+  </data>
+  <data name="NameConflict" xml:space="preserve">
+    <value>El nombre {0} ya está en uso</value>
+  </data>
+  <data name="NoBreakOutOfLoop" xml:space="preserve">
+    <value>La palabra clave 'break' no se puede utilizar fuera de un bucle o de un bloque de conmutación</value>
+  </data>
+  <data name="NoContinueOutOfLoop" xml:space="preserve">
+    <value>La palabra clave 'continuar' no se puede utilizar fuera de un bucle</value>
+  </data>
+  <data name="NoEmptyProperty" xml:space="preserve">
+    <value>Se debe definir un acceso de lectura o un acceso de escritura.</value>
+  </data>
+  <data name="NoMatchingIndexer" xml:space="preserve">
+    <value>No se encontró ningún indexador coincidente en {0}</value>
+  </data>
+  <data name="NoMatchingProperty" xml:space="preserve">
+    <value>No se encontró ninguna propiedad coincidente en {0}</value>
+  </data>
+  <data name="NonStaticMember" xml:space="preserve">
+    <value>{0} no es estático</value>
+  </data>
+  <data name="NotAReference" xml:space="preserve">
+    <value>La expresión dada no es una referencia.</value>
+  </data>
+  <data name="NotAVariable" xml:space="preserve">
+    <value>{0} no es una variable</value>
+  </data>
+  <data name="NotEnumerable" xml:space="preserve">
+    <value>El tipo de objeto no es enumerable.</value>
+  </data>
+  <data name="ObjectInInvalidState" xml:space="preserve">
+    <value>El objeto se encuentra en un estado intermedio.
+Requiere cierta inicialización para admitir la operación esperada.</value>
+  </data>
+  <data name="OnlyBoolIntOrString" xml:space="preserve">
+    <value>Se esperaba: un valor booleano, entero o de cadena</value>
+  </data>
+  <data name="OperatorCantBeApplied" xml:space="preserve">
+    <value>El operador {0} no se puede aplicar a {1}</value>
+  </data>
+  <data name="PackInvalidFormat" xml:space="preserve">
+    <value>Formato no válido para una llamada para empacar o desempacar</value>
+  </data>
+  <data name="PackValuesDontMatchFormat" xml:space="preserve">
+    <value>La cantidad de valores proporcionados no coincide con la cantidad de especificadores de formato</value>
+  </data>
+  <data name="ParameterIsNotOptional" xml:space="preserve">
+    <value>El parámetro {0} de {1} no es opcional</value>
+  </data>
+  <data name="ParameterNameExpected" xml:space="preserve">
+    <value>Aquí se espera un nombre de parámetro</value>
+  </data>
+  <data name="ParameterSuppliedTwice" xml:space="preserve">
+    <value>Se proporcionan varios argumentos para el parámetro {0}</value>
+  </data>
+  <data name="PropertyHidesHomonymous" xml:space="preserve">
+    <value>La propiedad {0} oculta un campo, método o evento homónimo heredado</value>
+  </data>
+  <data name="PropertyNotFoundInClass" xml:space="preserve">
+    <value>No hay ninguna propiedad {0} en la clase {1}</value>
+  </data>
+  <data name="PropertyNotFoundInObject" xml:space="preserve">
+    <value>El objeto no tiene ninguna propiedad {0}</value>
+  </data>
+  <data name="PropertyUsedAsMethod" xml:space="preserve">
+    <value>{0} es una propiedad pero se utiliza como método</value>
+  </data>
+  <data name="ScriptCannotReturnValue" xml:space="preserve">
+    <value>El script no puede devolver un valor</value>
+  </data>
+  <data name="SingleCharExpected" xml:space="preserve">
+    <value>El argumento {0} de '{1}' debe ser un solo carácter</value>
+  </data>
+  <data name="SingleConstructor" xml:space="preserve">
+    <value>Ya hay un constructor definido para esta clase.</value>
+  </data>
+  <data name="SingleIndexer" xml:space="preserve">
+    <value>Ya hay un indexador definido para esta clase.</value>
+  </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>El tipo {0} no admite la extracción de sectores</value>
+  </data>
+  <data name="SpecificFieldModifier" xml:space="preserve">
+    <value>La combinación de los modificadores 'estático' y 'final' solo se puede aplicar a un campo</value>
+  </data>
+  <data name="StatementRequired" xml:space="preserve">
+    <value>Se requiere una declaración</value>
+  </data>
+  <data name="StaticClassHasNoSuperClass" xml:space="preserve">
+    <value>Una clase estática no puede tener una superclase. Elimine la palabra clave 'estática' o elimine la especificación de superclase</value>
+  </data>
+  <data name="StaticClassMember" xml:space="preserve">
+    <value>Cualquier miembro de una clase estática debe ser estático.</value>
+  </data>
+  <data name="StringsAreImmutable" xml:space="preserve">
+    <value>Las cadenas son inmutables</value>
+  </data>
+  <data name="SuperUsedOutOfMethod" xml:space="preserve">
+    <value>La palabra clave 'super' no se puede utilizar fuera del cuerpo de un método.</value>
+  </data>
+  <data name="ThisUsedOutOfMethod" xml:space="preserve">
+    <value>La palabra clave 'this' no se puede utilizar fuera del cuerpo de un método no estático.</value>
+  </data>
+  <data name="TooFewArgs" xml:space="preserve">
+    <value>Muy pocos argumentos para una llamada a {0}</value>
+  </data>
+  <data name="TooManyArgs" xml:space="preserve">
+    <value>Demasiados argumentos para una llamada a {0}</value>
+  </data>
+  <data name="TuplesAreImmutable" xml:space="preserve">
+    <value>Las tuplas son inmutables.</value>
+  </data>
+  <data name="TypeDoesNotSupportFunction" xml:space="preserve">
+    <value>La función {0} no acepta argumentos de tipo {1}</value>
+  </data>
+  <data name="TypeNameExpected" xml:space="preserve">
+    <value>Se espera un nombre de tipo o patrón.</value>
+  </data>
+  <data name="UnableToFindMethod" xml:space="preserve">
+    <value>No se puede encontrar el método correspondiente en {0}</value>
+  </data>
+  <data name="UndefinedFunction" xml:space="preserve">
+    <value>La función {0} no está definida</value>
+  </data>
+  <data name="UndefinedSymbol" xml:space="preserve">
+    <value>No se pudo encontrar ningún símbolo llamado {0}</value>
+  </data>
+  <data name="UndefinedType" xml:space="preserve">
+    <value>El tipo o espacio de nombres {0} no está definido</value>
+  </data>
+  <data name="UndefinedVariable" xml:space="preserve">
+    <value>La variable {0} no está definida</value>
+  </data>
+  <data name="UnexpectedToken" xml:space="preserve">
+    <value>Token inesperado {0}</value>
+  </data>
+  <data name="UninitializedVariable" xml:space="preserve">
+    <value>A la variable {0} no se le ha asignado un valor</value>
+  </data>
+  <data name="UnorderedType" xml:space="preserve">
+    <value>El tipo {0} no tiene un orden predefinido</value>
+  </data>
+  <data name="UnoverloadableOperator" xml:space="preserve">
+    <value>{0} no es un operador sobrecargable</value>
+  </data>
+  <data name="UnresolvedMemberRef" xml:space="preserve">
+    <value>Referencia de miembro no resuelta: {0}</value>
+  </data>
+  <data name="UseParserForInlineFuncs" xml:space="preserve">
+    <value>Utilice Parser para reconocer funciones en línea y expresiones lambda</value>
+  </data>
+  <data name="VaArgsMustBeTheLast" xml:space="preserve">
+    <value>Una lista de argumentos de tamaño variable debe ser la última en el encabezado de la función.</value>
+  </data>
+  <data name="ValueShouldNotBeEmpty" xml:space="preserve">
+    <value>El valor no debe estar vacío.</value>
+  </data>
+  <data name="YieldUsedOutOfIterator" xml:space="preserve">
+    <value>El rendimiento solo se puede utilizar en un iterador.</value>
+  </data>
+  <data name="EmptyPatternGroup" xml:space="preserve">
+    <value>Se esperaba una coincidencia de patrones entre los paréntesis.</value>
+  </data>
+</root>

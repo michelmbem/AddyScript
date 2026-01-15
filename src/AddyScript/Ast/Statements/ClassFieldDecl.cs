@@ -1,5 +1,4 @@
 ﻿using AddyScript.Ast.Expressions;
-using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 
 
@@ -17,13 +16,11 @@ public class ClassFieldDecl : ClassMemberDecl
     /// <param name="name">The field's name</param>
     /// <param name="scope">The scope of this field</param>
     /// <param name="modifier">Determines whether this field is final, static or not</param>
-    /// <param name="init">Provides the default value of the field</param>
-    public ClassFieldDecl(string name, Scope scope, Modifier modifier, Expression init)
+    /// <param name="initializer">Provides the default value of the field</param>
+    public ClassFieldDecl(string name, Scope scope, Modifier modifier, Expression initializer)
         : base(name, scope, modifier)
     {
-        Initializer = init;
-        if (modifier == Modifier.Static)
-            SharedValue = Void.Value;
+        Initializer = initializer;
     }
 
     /// <summary>
@@ -32,13 +29,7 @@ public class ClassFieldDecl : ClassMemberDecl
     public Expression Initializer { get; }
 
     /// <summary>
-    /// Holds the value of a static field.
-    /// </summary>
-    public DataItem SharedValue { get; set; }
-
-    /// <summary>
     /// Creates a <see cref="ClassMember"/> from this instance.
     /// </summary>
-    public override ClassMember ToClassMember() =>
-        new ClassField(Name, Scope, Modifier, Initializer) { SharedValue = SharedValue };
+    public override ClassMember ToClassMember() => new ClassField(Name, Scope, Modifier, Initializer);
 }

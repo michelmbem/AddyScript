@@ -50,14 +50,12 @@ public class ClassPropertyDecl(string name, Scope scope, Modifier modifier, Prop
     /// <summary>
     /// Gets if this property has a read accessor or not.
     /// </summary>
-    public bool CanRead =>
-        ReaderBody != null || (access & PropertyAccess.Read) != PropertyAccess.None;
+    public bool CanRead => ReaderBody != null || access.HasFlag(PropertyAccess.Read);
 
     /// <summary>
     /// Gets if this property has a write accessor or not.
     /// </summary>
-    public bool CanWrite =>
-        WriterBody != null || (access & PropertyAccess.Write) != PropertyAccess.None;
+    public bool CanWrite => WriterBody != null || access.HasFlag(PropertyAccess.Write);
 
     /// <summary>
     /// Gets if this property is an indexer or not.

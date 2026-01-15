@@ -46,10 +46,7 @@ class Point3D : Point
 	
 	public property z => this._z;
 	
-	public function move(x, y)
-	{
-		throw 'Please use move3D for a Point3D';
-	}
+	public function move(x, y) => throw 'Please use move3D for a Point3D';
 	
 	public function move3D(x, y, z)
 	{

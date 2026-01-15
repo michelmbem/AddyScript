@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using AddyScript.Ast;
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using String = AddyScript.Runtime.DataItems.String;
 
@@ -179,7 +181,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="ClassDefinition"/></returns>
     private ClassDefinition Class()
     {
-        Token first = null;
+        Token first = null, last;
 
         Modifier modifier = Modifier.Default;
         if (TryMatch(TokenID.Modifier))
@@ -189,10 +191,11 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             Consume(1);
         }
 
-        Match(TokenID.KW_Class);
-        first ??= token;
-        string className = Match(TokenID.Identifier).ToString();
+        last = Match(TokenID.KW_Class);
+        first ??= last;
 
+        string className = Match(TokenID.Identifier).ToString();
+        
         string superClassName = null;
         if (TryMatch(TokenID.Colon))
         {
@@ -208,7 +211,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         var (constructor, indexer, fields, properties, methods, events) =
             IdentifiyClassMembers(modifier, Asterisk(ClassMember));
         PopClass();
-        Token last = Match(TokenID.RightBrace);
+        last = Match(TokenID.RightBrace);
 
         var classDef = new ClassDefinition(className, superClassName, modifier, constructor, indexer,
                                            [.. fields], [.. properties], [.. methods], [.. events]);
@@ -256,25 +259,20 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Token first = Match(TokenID.VerticalBar);
         ParameterDecl[] parameters = List(Parameter, true, Resources.DuplicatedParameter);
         Match(TokenID.VerticalBar);
-
         Match(TokenID.Arrow);
-
-        Block body;
+        
         PushFunction(null, CurrentFunction.IsMethod, false, CurrentFunction.IsStatic);
-
+        
+        Block body;
         if (TryMatch(TokenID.LeftBrace))
-        {
-
-            body = Block();
-            body.Append(new Return());
-        }
+            body = BlockBody();
         else
         {
             var returned = RequiredExpression();
             body = Ast.Statements.Block.WithReturn(returned);
             body.CopyLocation(returned);
         }
-
+        
         PopFunction();
 
         var lambda = new InlineFunction(parameters, body);
@@ -286,12 +284,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the expression returned by a <see cref="MatchCase"/>.
     /// </summary>
     /// <returns>An <see cref="Expression"/></returns>
-    protected override Expression MatchCaseExpression()
-    {
-        return TryMatch(TokenID.LeftBrace)
-             ? new BlockAsExpression(Block(true))
-             : base.MatchCaseExpression();
-    }
+    protected override Expression MatchCaseExpression() =>
+        TryMatch(TokenID.LeftBrace)
+            ? new BlockAsExpression(Block(true))
+            : base.MatchCaseExpression();
 
     /// <summary>
     /// Recognizes an external function's declaration.
@@ -802,7 +798,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private Block ExpressionBody(bool isInline)
     {
         Consume(1); // Skip the arrow (=>)
-        var returned = RequiredExpression();
+        var returned = base.MatchCaseExpression();
 
         ScriptElement last = returned;
         if (!isInline) last = Match(TokenID.SemiColon);
@@ -825,7 +821,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="ClassMemberDecl"/></returns>
     private ClassMemberDecl ClassMember()
     {
-        var (scope, modifier, attributes) = ClassMemberPrefix(out Token first);
+        var (attributes, scope, modifier) = ClassMemberPrefix(out Token first);
 
         SkipComments();
 
@@ -857,13 +853,13 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// Recognizes the scope, modifier and attributes of a class member.
     /// </summary>
     /// <param name="first">The initial <see cref="Token"/> of the member being recognized</param>
-    /// <returns>A (Scope, Modifier, AttributeDecl[]) tuple</returns>
+    /// <returns>A (AttributeDecl[], Scope, Modifier) tuple</returns>
     /// <exception cref="SyntaxError">Malformed prefix</exception>
-    private (Scope, Modifier, AttributeDecl[]) ClassMemberPrefix(out Token first)
+    private (AttributeDecl[], Scope, Modifier) ClassMemberPrefix(out Token first)
     {
+        AttributeDecl[] attributes = null;
         Scope? scope = null;
         Modifier? modifier = null;
-        AttributeDecl[] attributes = null;
         first = null;
 
         if (TryMatch(TokenID.LeftBracket))
@@ -893,9 +889,20 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 break;
         }
 
-        return (scope ?? Scope.Private, modifier ?? Modifier.Default, attributes);
+        return (attributes, scope ?? Scope.Private, modifier ?? Modifier.Default);
     }
 
+    /// <summary>
+    /// Determines the modifier for a class member based on the current token and advances the token stream as needed.
+    /// </summary>
+    /// <remarks>
+    /// This method combines static and final modifiers into a single <see cref="Modifier.StaticFinal"/> value
+    /// when both are detected in sequence. The token stream is advanced to reflect consumed modifiers.
+    /// </remarks>
+    /// <returns>
+    /// A <see cref="Modifier"/> value representing the detected modifier for the class member.
+    /// Returns <see cref="Modifier.StaticFinal"/> if both static and final modifiers are present.
+    /// </returns>
     private Modifier ClassMemberModifier()
     {
         var modifier = (Modifier)token.Value;
@@ -982,31 +989,58 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Token first = Match(TokenID.KW_Property);
 
         string name;
+        bool isIndexer;
+
         if (TryMatch(TokenID.LeftBracket))
         {
             Consume(1); // To skip '['
             Match(TokenID.RightBracket);
             name = ClassProperty.INDEXER_NAME;
-
-            // Indexers are not compatible with the "static" modifier
-            if (modifier == Modifier.Static)
-                throw new SyntaxError(FileName, first, Resources.IndexerCantBeStatic);
+            isIndexer = true;
         }
         else
+        {
             name = Match(TokenID.Identifier).ToString();
+            isIndexer = false;
+        }
 
         var (access, readerScope, readerBody, writerScope, writerBody) =
             ProperyBody(name, scope, modifier, out ScriptElement last);
 
-        // Validate that the user is not trying to define an automatic indexer
-        if (name == ClassProperty.INDEXER_NAME && modifier != Modifier.Abstract && readerBody == null && writerBody == null)
-            throw new SyntaxError(FileName, first, Resources.IndexerCantBeAuto);
+        if (isIndexer)
+            switch (modifier)
+            {
+                case Modifier.Static:
+                    // Indexers are not compatible with the "static" modifier
+                    throw new SyntaxError(FileName, first, Resources.IndexerCantBeStatic);
+                case not Modifier.Abstract when readerBody == null && writerBody == null:
+                    // Validate that the user is not trying to define an automatic indexer
+                    throw new SyntaxError(FileName, first, Resources.IndexerCantBeAuto);
+            }
 
         var classProperty = new ClassPropertyDecl(name, scope, modifier, access, readerScope, readerBody, writerScope, writerBody);
         classProperty.SetLocation(first.Start, last.End);
         return classProperty;
     }
 
+    /// <summary>
+    /// Parses the body of a property declaration and returns the access type, reader and writer scopes, and their
+    /// corresponding bodies.
+    /// </summary>
+    /// <remarks>
+    /// The method supports multiple property declaration syntaxes, including automatic,
+    /// expression-bodied, and expanded forms. The returned scopes and bodies correspond to the reader and writer
+    /// accessors as defined in the property declaration.
+    /// </remarks>
+    /// <param name="name">The name of the property being parsed.</param>
+    /// <param name="scope">The scope in which the property is declared.</param>
+    /// <param name="modifier">The modifier applied to the property, such as static or abstract.</param>
+    /// <param name="last">When this method returns, contains the last script element processed during parsing.</param>
+    /// <returns>
+    /// A tuple containing the property access type, the reader scope and body, and the writer scope and body. If the
+    /// property is read-only or write-only, the corresponding body or scope may be null.
+    /// </returns>
+    /// <exception cref="SyntaxError">Thrown if an abstract property is declared with a body, which is not allowed.</exception>
     private (PropertyAccess access, Scope readerScope, Block readerBody, Scope writerScope, Block writerBody)
         ProperyBody(string name, Scope scope, Modifier modifier, out ScriptElement last)
     {
@@ -1043,6 +1077,24 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         return (access, readerScope, readerBody, writerScope, writerBody);
     }
 
+    /// <summary>
+    /// Parses property accessor blocks for the specified property name and scope, determining the read and write
+    /// accessors and their associated scopes and bodies.
+    /// </summary>
+    /// <remarks>
+    /// The method supports parsing both read and write accessors, including cases where only one
+    /// accessor is present. The returned scopes may differ depending on the order and presence of accessor
+    /// definitions.
+    /// </remarks>
+    /// <param name="name">The name of the property for which accessors are being parsed.</param>
+    /// <param name="scope">The parent scope in which the property is defined. Used as the base for accessor scopes.</param>
+    /// <param name="modifier">The modifier to apply to the accessor methods, such as visibility or other attributes.</param>
+    /// <param name="last">A reference to the last parsed script element. Updated to reflect the last token processed during parsing.</param>
+    /// <returns>
+    /// A tuple containing the property access type, the scope and body for the reader accessor, and the scope and body
+    /// for the writer accessor. If an accessor is not defined, its body will be null.
+    /// </returns>
+    /// <exception cref="SyntaxError">Thrown if the accessor block is malformed, missing required definitions, or contains invalid syntax.</exception>
     private (PropertyAccess access, Scope readerScope, Block readerBody, Scope writerScope, Block writerBody)
         PropertyAccessors(string name, Scope scope, Modifier modifier, ref ScriptElement last)
     {
@@ -1097,6 +1149,18 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         return (access, readerScope ?? scope, readerBody, writerScope ?? scope, writerBody);
     }
 
+    /// <summary>
+    /// Determines the scope for an accessor based on the specified property scope and the scope of the other accessor, if present.
+    /// </summary>
+    /// <param name="propertyScope">
+    /// The scope defined for the property to which the accessor belongs.
+    /// Used as a reference to ensure the accessor scope is more restrictive.
+    /// </param>
+    /// <param name="otherAccessorScope">The scope of the other accessor, if already defined. If specified, both accessors cannot redefine the scope.</param>
+    /// <returns>A nullable value indicating the scope of the accessor if explicitly specified; otherwise, null if no scope is defined.</returns>
+    /// <exception cref="SyntaxError">
+    /// Thrown if both accessors attempt to redefine the scope, or if the specified accessor scope is not more restrictive than the property scope.
+    /// </exception>
     private Scope? AccessorScope(Scope propertyScope, Scope? otherAccessorScope)
     {
         Scope? accessorScope = null;
@@ -1114,6 +1178,17 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         return accessorScope;
     }
 
+    /// <summary>
+    /// Parses and returns the body of an accessor for the specified member, or null if the accessor is declared without a body.
+    /// </summary>
+    /// <param name="name">The name of the member whose accessor body is being parsed.</param>
+    /// <param name="modifier">The modifier applied to the accessor. Must not be <see cref="Modifier.Abstract"/>.</param>
+    /// <returns>
+    /// A <see cref="Block"/> representing the parsed accessor body, or null if the accessor is declared with a semicolon and no body.
+    /// </returns>
+    /// <exception cref="SyntaxError">
+    /// Thrown if <paramref name="modifier"/> is <see cref="Modifier.Abstract"/>, as abstract members cannot have a body.
+    /// </exception>
     private Block AccessorBody(string name, Modifier modifier)
     {
         if (TryMatch(TokenID.SemiColon))
@@ -1218,12 +1293,11 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         foreach (ClassMemberDecl member in members)
         {
             // Check that each member has a unique name
-            foreach (ClassMemberDecl otherMember in members)
-                if (member != otherMember && member.Name == otherMember.Name)
-                    throw new ScriptError(FileName, member, string.Format(Resources.MemberNameConfict, member.Name));
+            if (members.Any(m => m != member && m.Name == member.Name))
+                throw new ScriptError(FileName, member, string.Format(Resources.MemberNameConfict, member.Name));
 
             // Check that each member of a static class is also static
-            if (modifier == Modifier.Static && !(member.Modifier == Modifier.Static || member.Modifier == Modifier.StaticFinal))
+            if (modifier == Modifier.Static && !member.IsStatic)
                 throw new ScriptError(FileName, member, Resources.StaticClassMember);
 
             // Check that there is no abstract member in a non-abstract class
@@ -1319,76 +1393,66 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="ParameterDecl"/></returns>
     private ParameterDecl Parameter()
     {
-        string name = null;
-        bool byRef = false, vaList = false, canBeEmpty = true;
-        DataItem defaultValue = null;
+        string name;
         AttributeDecl[] attributes = null;
-        Token first = null, last = null;
-        bool gotAttributes = false, gotPrefix = false, gotName = false;
-        bool loop = true;
+        bool isByRef = false, isVaList = false, canBeEmpty = true;
+        DataItem defaultValue = null;
+        Token first = null;
+        ScriptElement last;
 
-        while (loop)
+        if (TryMatch(TokenID.LeftBracket))
         {
-            SkipComments();
-
-            switch (token.TokenID)
-            {
-                case TokenID.LeftBracket:
-                    if (gotAttributes || gotName) throw new SyntaxError(FileName, token);
-
-                    first ??= token;
-                    Consume(1);
-                    attributes = List(Attribute, true, Resources.DuplicatedAttribute);
-                    Match(TokenID.RightBracket);
-                    gotAttributes = true;
-                    break;
-                case TokenID.Ampersand:
-                    if (gotPrefix || gotName) throw new SyntaxError(FileName, token);
-
-                    byRef = gotPrefix = true;
-                    first ??= token;
-                    Consume(1);
-                    break;
-                case TokenID.DoubleDot:
-                    if (gotPrefix || gotName) throw new SyntaxError(FileName, token);
-
-                    vaList = gotPrefix = true;
-                    first ??= token;
-                    Consume(1);
-                    break;
-                case TokenID.Identifier:
-                    if (gotName) throw new SyntaxError(FileName, token);
-
-                    name = token.ToString();
-                    gotName = true;
-                    last = token;
-                    first ??= last;
-                    Consume(1);
-                    break;
-                case TokenID.Exclamation:
-                    if (!(gotName && canBeEmpty)) throw new SyntaxError(FileName, token);
-
-                    canBeEmpty = false;
-                    Consume(1);
-                    break;
-                case TokenID.Equal:
-                    if (gotPrefix || !gotName) throw new SyntaxError(FileName, token);
-
-                    Consume(1);
-                    last = Match(t => t.IsLiteral);
-                    defaultValue = DataItemFactory.CreateDataItem(last.Value);
-                    if (defaultValue.IsEmpty() && !canBeEmpty)
-                        throw new SyntaxError(FileName, last, Resources.ValueShouldNotBeEmpty);
-                    break;
-                default:
-                    loop = false;
-                    break;
-            }
+            first = token;
+            Consume(1);
+            attributes = List(Attribute, true, Resources.DuplicatedAttribute);
+            Match(TokenID.RightBracket);
         }
 
-        if (name == null) return null;
+        SkipComments();
+        first ??= token;
 
-        var param = new ParameterDecl(name, byRef, vaList, defaultValue, canBeEmpty) { Attributes = attributes };
+        switch (token.TokenID)
+        {
+            case TokenID.Ampersand:
+                isByRef = true;
+                Consume(1);
+                last = Match(TokenID.Identifier);
+                break;
+            case TokenID.DoubleDot:
+                isVaList = true;
+                Consume(1);
+                last = Match(TokenID.Identifier);
+                break;
+            case TokenID.Identifier:
+                last = token;
+                Consume(1);
+                break;
+            case { } when attributes is not null:
+                // At least the name should be present when attributes are defined
+                throw new SyntaxError(FileName, token, Resources.ParameterNameExpected);
+            default:
+                return null;
+        }
+
+        name = last.ToString();
+
+        if (TryMatch(TokenID.Exclamation))
+        {
+            canBeEmpty = false;
+            last = token;
+            Consume(1);
+        }
+
+        if (TryMatch(TokenID.Equal))
+        {
+            Consume(1);
+            last = RequiredExpression();
+            if (last is not Literal literal)
+                throw new ScriptError(FileName, last, Resources.LiteralRequired);
+            defaultValue = literal.Value;
+        }
+
+        var param = new ParameterDecl(name, isByRef, isVaList, defaultValue, canBeEmpty) { Attributes = attributes };
         param.SetLocation(first.Start, last.End);
         return param;
     }
@@ -1440,38 +1504,33 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private AttributeDecl Attribute()
     {
         Token first = Match(TokenID.Identifier), last = first;
-        string typeName = first.ToString();
-        List<VariableSetter> props = [];
+        string name = first.ToString();
+        List<VariableSetter> fields = [];
 
         if (TryMatch(TokenID.LeftParenthesis))
         {
-            Consume(1);
+            Consume(1); // Skip '('
 
             // If the opening parenthesis is not followed by an identifier and equal sign,
-            if (!(TryMatch(TokenID.Identifier) && LookAhead(TokenID.Equal, out int pos)))
+            if (!(TryMatch(TokenID.Identifier) && LookAhead(TokenID.Equal, out var _)))
             {
-                var valueProp = Expression();
-
-                if (valueProp != null)
+                var value = Expression();
+                if (value != null)
                 {
-                    props.Add(new (AttributeDecl.DEFAULT_FIELD_NAME, valueProp));
+                    fields.Add(new (AttributeDecl.DEFAULT_FIELD_NAME, value));
                     if (TryMatch(TokenID.Comma)) Consume(1);
                 }
             }
 
-            var moreProps = List(VariableSetter, true, Resources.DuplicatedAttributeProperty);
-
-            if (props.Count > 0)
-            {
-                var otherValueProp = moreProps.FirstOrDefault(p => p.Name == AttributeDecl.DEFAULT_FIELD_NAME);
-                if (otherValueProp != null) throw new ScriptError(FileName, otherValueProp, Resources.DuplicatedProperty);
-            }
+            var moreFields = List(VariableSetter, true, Resources.DuplicatedAttributeField);
+            if (fields.Count > 0 && moreFields.Any(p => p.Name == AttributeDecl.DEFAULT_FIELD_NAME))
+                throw new ScriptError(FileName, fields[0], Resources.DuplicatedAttributeValue);
             
-            props.AddRange(moreProps);
+            fields.AddRange(moreFields);
             last = Match(TokenID.RightParenthesis);
         }
 
-        var attribute = new AttributeDecl(typeName, [.. props]);
+        var attribute = new AttributeDecl(name, [.. fields]);
         attribute.SetLocation(first.Start, last.End);
         return attribute;
     }
@@ -1512,8 +1571,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     {
         return tokenID switch
         {
-            TokenID.Plus or TokenID.DoublePlus or TokenID.Minus or
-            TokenID.DoubleMinus => count == 0 || count == 1,
+            TokenID.Plus or TokenID.Minus or TokenID.DoublePlus or TokenID.DoubleMinus => count is 0 or 1,
             TokenID.Tilda => count == 0,
             _ => count == 1,
         };
@@ -1528,15 +1586,13 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A boolean</returns>
     private static bool IsUnaryOperator(TokenID tokenID, int count, out bool postfix)
     {
-        switch (tokenID)
+        if (tokenID is TokenID.DoublePlus or TokenID.DoubleMinus)
         {
-            case TokenID.DoublePlus:
-            case TokenID.DoubleMinus:
-                postfix = count == 1;
-                return true;
-            default:
-                postfix = false;
-                return count == 0;
+            postfix = count == 1;
+            return true;
         }
+
+        postfix = false;
+        return count == 0;
     }
 }

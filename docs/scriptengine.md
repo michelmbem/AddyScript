@@ -1,13 +1,13 @@
 # More with the ScriptEngine class
 
-### Exporting the AST to Xml
+### Exporting the AST to XML
 
 You can easily export an Abstract Syntax Tree to Xml format by invoking the _ExportXml_ static method of the _ScriptEngine_ class. Simply do as follows:
 
 ```CSharp
 var program = ScriptEngine.ParseString(txtScript.Text);
 // Alternatively: var program = ScriptEngine.ParseFile('path/To/My/Script');
-ScriptEngine.ExportXml(program, "C:\\myScript.xml");
+ScriptEngine.ExportXml(program, @"C:\myScript.xml");
 // Alternatively: ScriptEngine.ExportXml(program, someStream);
 ```
 

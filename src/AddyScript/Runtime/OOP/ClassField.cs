@@ -16,11 +16,11 @@ public class ClassField : ClassMember
     /// <param name="name">The field's name</param>
     /// <param name="scope">The scope of this field</param>
     /// <param name="modifier">Determines whether this field is static or not</param>
-    /// <param name="init">Provides the default value of the field</param>
-    public ClassField(string name, Scope scope, Modifier modifier, Expression init)
+    /// <param name="initializer">Provides the default value of the field</param>
+    public ClassField(string name, Scope scope, Modifier modifier, Expression initializer)
         : base(name, scope, modifier)
     {
-        Initializer = init;
+        Initializer = initializer;
         if (modifier == Modifier.Static)
             SharedValue = Void.Value;
     }
@@ -28,20 +28,10 @@ public class ClassField : ClassMember
     /// <summary>
     /// Provides the default value of the field.
     /// </summary>
-    public Expression Initializer { get; private set; }
+    public Expression Initializer { get; }
 
     /// <summary>
     /// Holds the value of a static field.
     /// </summary>
     public DataItem SharedValue { get; set; }
-
-    /// <summary>
-    /// Gets if this field is static.
-    /// </summary>
-    public bool IsStatic => Modifier is Modifier.Static or Modifier.StaticFinal;
-
-    /// <summary>
-    /// Gets if this field is final.
-    /// </summary>
-    public bool IsFinal => Modifier is Modifier.Final or Modifier.StaticFinal;
 }

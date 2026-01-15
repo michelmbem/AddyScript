@@ -13,7 +13,7 @@ try
 }
 catch (e)
 {
-    println(e.name + ' : ' + e.message);
+    println($'{e.name} : {e.message} in {e.source} at line {e.line}');
 }
 finally
 {

@@ -137,14 +137,14 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("ConstantDecl");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertySetters(tmpElement, cstDecl.Setters);
+        ProcessVariableSetters(tmpElement, cstDecl.Setters);
     }
 
     public void TranslateVariableDecl(VariableDecl varDecl)
     {
         XmlElement tmpElement = document.CreateElement("VariableDecl");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertySetters(tmpElement, varDecl.Setters);
+        ProcessVariableSetters(tmpElement, varDecl.Setters);
     }
 
     public void TranslateBlock(Block block)
@@ -276,35 +276,35 @@ public class XmlGenerator : ITranslator
     {
         XmlElement tmpElement = document.CreateElement("TupleInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessListItems(tmpElement, tupleInit.Items);
+        ProcessArguments(tmpElement, tupleInit.Items);
     }
 
     public void TranslateListInitializer(ListInitializer listInit)
     {
         XmlElement tmpElement = document.CreateElement("ListInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessListItems(tmpElement, listInit.Items);
+        ProcessArguments(tmpElement, listInit.Items);
     }
 
     public void TranslateSetInitializer(SetInitializer setInit)
     {
         XmlElement tmpElement = document.CreateElement("SetInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessListItems(tmpElement, setInit.Items);
+        ProcessArguments(tmpElement, setInit.Items);
     }
 
     public void TranslateMapInitializer(MapInitializer mapInit)
     {
         XmlElement tmpElement = document.CreateElement("MapInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessMapItemInitializers(tmpElement, mapInit.Entries);
+        ProcessMapEntries(tmpElement, mapInit.Entries);
     }
 
     public void TranslateObjectInitializer(ObjectInitializer objectInit)
     {
         XmlElement tmpElement = document.CreateElement("ObjectInitializer");
         currentElement.AppendChild(tmpElement);
-        ProcessPropertySetters(tmpElement, objectInit.PropertySetters);
+        ProcessVariableSetters(tmpElement, objectInit.PropertySetters);
     }
 
     public void TranslateInlineFunction(InlineFunction inline)
@@ -474,7 +474,7 @@ public class XmlGenerator : ITranslator
             XmlElement propsElement = document.CreateElement("PropertySetters");
             tmpElement.AppendChild(propsElement);
 
-            ProcessPropertySetters(propsElement, constCall.PropertySetters);
+            ProcessVariableSetters(propsElement, constCall.PropertySetters);
         }
     }
 
@@ -826,40 +826,12 @@ public class XmlGenerator : ITranslator
         XmlElement propsElement = document.CreateElement("PropertySetters");
         tmpElement.AppendChild(propsElement);
 
-        ProcessPropertySetters(propsElement, mutableCopy.PropertySetters);
+        ProcessVariableSetters(propsElement, mutableCopy.PropertySetters);
     }
 
     #endregion
 
     #region Utility
-
-    private void ProcessArguments(XmlElement parent, CallWithNamedArgs call)
-    {
-        XmlElement previousElement = currentElement;
-
-        if (call.Arguments != null)
-        {
-            currentElement = document.CreateElement("Arguments");
-            parent.AppendChild(currentElement);
-            ProcessListItems(currentElement, call.Arguments);
-        }
-
-        if (call.NamedArgs != null)
-        {
-            XmlElement tmpElement = document.CreateElement("NamedArgs");
-            parent.AppendChild(tmpElement);
-
-            foreach (var argPair in call.NamedArgs)
-            {
-                currentElement = document.CreateElement("Arg");
-                currentElement.SetAttribute("Name", argPair.Key);
-                tmpElement.AppendChild(currentElement);
-                argPair.Value.AcceptTranslator(this);
-            }
-        }
-
-        currentElement = previousElement;
-    }
 
     private void ProcessAttributes(XmlElement parent, AttributeDecl[] attributes)
     {
@@ -876,10 +848,10 @@ public class XmlGenerator : ITranslator
         tmpElement.SetAttribute("Name", attribute.Name);
         parent.AppendChild(tmpElement);
 
-        XmlElement propsElement = document.CreateElement("PropertySetters");
+        XmlElement propsElement = document.CreateElement("Fields");
         tmpElement.AppendChild(propsElement);
 
-        ProcessPropertySetters(propsElement, attribute.PropertySetters);
+        ProcessVariableSetters(propsElement, attribute.Fields);
     }
 
     private void ProcessParameters(XmlElement parent, ParameterDecl[] parameters)
@@ -904,56 +876,84 @@ public class XmlGenerator : ITranslator
             ProcessAttributes(tmpElement, parameter.Attributes);
     }
 
-    private void ProcessPropertySetters(XmlElement parent, VariableSetter[] initializers)
+    private void ProcessVariableSetters(XmlElement parent, VariableSetter[] initializers)
     {
         foreach (VariableSetter initializer in initializers)
-            ProcessPropertyInitializer(parent, initializer);
+            ProcessVariableSetter(parent, initializer);
     }
 
-    private void ProcessPropertyInitializer(XmlElement parent, VariableSetter initializer)
+    private void ProcessVariableSetter(XmlElement parent, VariableSetter initializer)
     {
         XmlElement tmpElement = document.CreateElement("VariableSetter");
         parent.AppendChild(tmpElement);
         tmpElement.SetAttribute("Name", initializer.Name);
 
-        if (initializer.Expression != null)
+        if (initializer.Value != null)
         {
             XmlElement previousElement = currentElement;
             currentElement = document.CreateElement("Value");
             tmpElement.AppendChild(currentElement);
-            initializer.Expression.AcceptTranslator(this);
+            initializer.Value.AcceptTranslator(this);
             currentElement = previousElement;
         }
     }
 
-    private void ProcessListItems(XmlElement parent, Argument[] initializers)
+    private void ProcessArguments(XmlElement parent, CallWithNamedArgs call)
     {
-        foreach (Argument initializer in initializers)
-            ProcessListItem(parent, initializer);
-    }
-
-    private void ProcessListItem(XmlElement parent, Argument initializer)
-    {
-        XmlElement tmpElement = document.CreateElement("Item");
-        tmpElement.SetAttribute("Spread", initializer.Spread.ToString());
-        parent.AppendChild(tmpElement);
-
         XmlElement previousElement = currentElement;
 
-        currentElement = document.CreateElement("Expression");
-        tmpElement.AppendChild(currentElement);
-        initializer.Expression.AcceptTranslator(this);
+        if (call.Arguments != null)
+        {
+            currentElement = document.CreateElement("Arguments");
+            parent.AppendChild(currentElement);
+            ProcessArguments(currentElement, call.Arguments);
+        }
+
+        if (call.NamedArgs != null)
+        {
+            XmlElement tmpElement = document.CreateElement("NamedArgs");
+            parent.AppendChild(tmpElement);
+
+            foreach (var argPair in call.NamedArgs)
+            {
+                currentElement = document.CreateElement("Arg");
+                currentElement.SetAttribute("Name", argPair.Key);
+                tmpElement.AppendChild(currentElement);
+                argPair.Value.AcceptTranslator(this);
+            }
+        }
 
         currentElement = previousElement;
     }
 
-    private void ProcessMapItemInitializers(XmlElement parent, MapEntry[] initializers)
+    private void ProcessArguments(XmlElement parent, Argument[] arguments)
     {
-        foreach (MapEntry initializer in initializers)
-            ProcessMapItemInitializer(parent, initializer);
+        foreach (Argument argument in arguments)
+            ProcessArgument(parent, argument);
     }
 
-    private void ProcessMapItemInitializer(XmlElement parent, MapEntry initializer)
+    private void ProcessArgument(XmlElement parent, Argument argument)
+    {
+        XmlElement tmpElement = document.CreateElement("Argument");
+        tmpElement.SetAttribute("Spread", argument.Spread.ToString());
+        parent.AppendChild(tmpElement);
+
+        XmlElement previousElement = currentElement;
+
+        currentElement = document.CreateElement("Value");
+        tmpElement.AppendChild(currentElement);
+        argument.Value.AcceptTranslator(this);
+
+        currentElement = previousElement;
+    }
+
+    private void ProcessMapEntries(XmlElement parent, MapEntry[] entries)
+    {
+        foreach (MapEntry entry in entries)
+            ProcessMapEntry(parent, entry);
+    }
+
+    private void ProcessMapEntry(XmlElement parent, MapEntry entry)
     {
         XmlElement tmpElement = document.CreateElement("MapEntry");
         parent.AppendChild(tmpElement);
@@ -962,11 +962,11 @@ public class XmlGenerator : ITranslator
 
         currentElement = document.CreateElement("Key");
         previousElement.AppendChild(currentElement);
-        initializer.Key.AcceptTranslator(this);
+        entry.Key.AcceptTranslator(this);
 
         currentElement = document.CreateElement("Value");
         previousElement.AppendChild(currentElement);
-        initializer.Value.AcceptTranslator(this);
+        entry.Value.AcceptTranslator(this);
 
         currentElement = previousElement;
     }
@@ -1004,15 +1004,12 @@ public class XmlGenerator : ITranslator
         if (field.Modifier != Modifier.Default)
             tmpElement.SetAttribute("Modifier", field.Modifier.ToString());
 
-        XmlElement savedElement = currentElement;
-        
-        if (field.Initializer != null)
-        {
-            currentElement = document.CreateElement("Initializer");
-            tmpElement.AppendChild(currentElement);
-            field.Initializer.AcceptTranslator(this);
-        }
+        if (field.Initializer == null) return;
 
+        XmlElement savedElement = currentElement;
+        currentElement = document.CreateElement("Initializer");
+        tmpElement.AppendChild(currentElement);
+        field.Initializer.AcceptTranslator(this);
         currentElement = savedElement;
     }
 
@@ -1029,35 +1026,25 @@ public class XmlGenerator : ITranslator
         if (property.Access != PropertyAccess.None)
             tmpElement.SetAttribute("Access", property.Access.ToString());
 
-        if ((property.Access & PropertyAccess.Write) != PropertyAccess.None)
+        if (property.ReaderScope != property.Scope)
+            tmpElement.SetAttribute("ReaderScope", property.ReaderScope.ToString());
+
+        if (property.WriterScope != property.Scope)
             tmpElement.SetAttribute("WriterScope", property.WriterScope.ToString());
 
         XmlElement savedElement = currentElement;
+        currentElement = tmpElement;
 
-        if (property.CanRead)
+        if (property.ReaderBody != null)
         {
-            currentElement = document.CreateElement("Reader");
-            currentElement.SetAttribute("Scope", property.ReaderScope.ToString());
-            tmpElement.AppendChild(currentElement);
-
-            if (property.ReaderBody != null)
-            {
-                blockElementName = "Body";
-                property.ReaderBody.AcceptTranslator(this);
-            }
+            blockElementName = "ReaderBody";
+            property.ReaderBody.AcceptTranslator(this);
         }
 
-        if (property.CanWrite)
+        if (property.WriterBody != null)
         {
-            currentElement = document.CreateElement("Writer");
-            currentElement.SetAttribute("Scope", property.WriterScope.ToString());
-            tmpElement.AppendChild(currentElement);
-
-            if (property.ReaderBody != null)
-            {
-                blockElementName = "Body";
-                property.WriterBody.AcceptTranslator(this);
-            }
+            blockElementName = "WriterBody";
+            property.WriterBody.AcceptTranslator(this);
         }
 
         currentElement = savedElement;
@@ -1071,20 +1058,17 @@ public class XmlGenerator : ITranslator
         if (method.Modifier != Modifier.Default)
             tmpElement.SetAttribute("Modifier", method.Modifier.ToString());
         parent.AppendChild(tmpElement);
-        
+
         XmlElement paramElement = document.CreateElement("Parameters");
         tmpElement.AppendChild(paramElement);
         ProcessParameters(paramElement, method.Parameters);
 
+        if (method.Body == null) return;
+
         XmlElement savedElement = currentElement;
         currentElement = tmpElement;
-
-        if (method.Body != null)
-        {
-            blockElementName = "Body";
-            method.Body.AcceptTranslator(this);
-        }
-
+        blockElementName = "Body";
+        method.Body.AcceptTranslator(this);
         currentElement = savedElement;
     }
 
@@ -1099,11 +1083,9 @@ public class XmlGenerator : ITranslator
             tmpElement.SetAttribute("Modifier", _event.Modifier.ToString());
 
         XmlElement savedElement = currentElement;
-        
         currentElement = document.CreateElement("Parameters");
         ProcessParameters(currentElement, _event.Parameters);
         tmpElement.AppendChild(currentElement);
-
         currentElement = savedElement;
     }
 
@@ -1143,29 +1125,23 @@ public class XmlGenerator : ITranslator
     {
         switch (pattern)
         {
-            case AlwaysPattern:
-                parent.AppendChild(document.CreateElement("AlwaysPattern"));
+            case AlwaysTruePattern:
+                parent.AppendChild(document.CreateElement("AlwaysTruePattern"));
                 break;
-            case NullPattern:
-                parent.AppendChild(document.CreateElement("NullPattern"));
-                break;
-            case ValuePattern valuePat:
+            case RegexPattern regex:
             {
-                XmlElement tmpElement = document.CreateElement("ValuePattern");
-                tmpElement.SetAttribute("Value", valuePat.Value.ToString());
+                // We check RegexPattern before RelationalPattern to avoid problems with inheritance!!
+                XmlElement tmpElement = document.CreateElement("RegexPattern");
+                tmpElement.SetAttribute("Regex", regex.Value.ToString());
                 parent.AppendChild(tmpElement);
                 break;
             }
-            case RangePattern rangePat:
+            case RelationalPattern relational:
             {
-                XmlElement tmpElement = document.CreateElement("RangePattern");
+                XmlElement tmpElement = document.CreateElement("RelationalPattern");
+                tmpElement.SetAttribute("Operator", relational.Operator.ToString());
+                tmpElement.SetAttribute("Value", relational.Value.ToString());
                 parent.AppendChild(tmpElement);
-
-                if (rangePat.LowerBound != null)
-                    tmpElement.SetAttribute("LowerBound", rangePat.LowerBound.ToString());
-
-                if (rangePat.UpperBound != null)
-                    tmpElement.SetAttribute("UpperBound", rangePat.UpperBound.ToString());
                 break;
             }
             case ObjectPattern objectPat:
@@ -1184,53 +1160,73 @@ public class XmlGenerator : ITranslator
                     ProcessPattern(propertyElement, matcher.Pattern);
                     matchersElement.AppendChild(propertyElement);
                 }
-
                 break;
             }
-            case TypePattern typePat:
+            case DestructuringPattern destructuring:
             {
-                XmlElement tmpElement = document.CreateElement("TypePattern");
-                tmpElement.SetAttribute("TypeName", typePat.TypeName);
+                // We check DestructuringPattern before TypePattern to avoid problems with inheritance!!
+                XmlElement tmpElement = document.CreateElement("DestructuringPattern");
+                tmpElement.SetAttribute("TypeName", destructuring.TypeName);
+                tmpElement.SetAttribute("PropertyNames", string.Join(", ", destructuring.PropertyNames));
                 parent.AppendChild(tmpElement);
                 break;
             }
-            case NegativePattern negPat:
+            case TypePattern type:
+            {
+                XmlElement tmpElement = document.CreateElement("TypePattern");
+                tmpElement.SetAttribute("TypeName", type.TypeName);
+                parent.AppendChild(tmpElement);
+                break;
+            }
+            case NegativePattern negative:
             {
                 XmlElement tmpElement = document.CreateElement("NegativePattern");
 
                 XmlElement childElement = document.CreateElement("Child");
-                ProcessPattern(childElement, negPat.Child);
+                ProcessPattern(childElement, negative.Child);
                 tmpElement.AppendChild(childElement);
 
                 parent.AppendChild(tmpElement);
                 break;
             }
-            case GroupingPattern groupPat:
+            case GroupingPattern grouping:
             {
                 XmlElement tmpElement = document.CreateElement("GroupingPattern");
 
                 XmlElement childElement = document.CreateElement("Child");
-                ProcessPattern(childElement, groupPat.Child);
+                ProcessPattern(childElement, grouping.Child);
                 tmpElement.AppendChild(childElement);
 
                 parent.AppendChild(tmpElement);
                 break;
             }
-            case CompositePattern compPat:
+            case LogicalPattern logical:
             {
-                XmlElement tmpElement = document.CreateElement("CompositePattern");
-                tmpElement.SetAttribute("Inclusive", compPat.Inclusive.ToString());
+                XmlElement tmpElement = document.CreateElement("LogicalPattern");
+                tmpElement.SetAttribute("Inclusive", logical.Inclusive.ToString());
 
                 XmlElement childElement = document.CreateElement("Left");
-                ProcessPattern(childElement, compPat.Left);
+                ProcessPattern(childElement, logical.Left);
                 tmpElement.AppendChild(childElement);
 
 
                 childElement = document.CreateElement("Right");
-                ProcessPattern(childElement, compPat.Right);
+                ProcessPattern(childElement, logical.Right);
                 tmpElement.AppendChild(childElement);
 
                 parent.AppendChild(tmpElement);
+                break;
+            }
+            case PositionalPattern positional:
+            {
+                XmlElement tmpElement = document.CreateElement("PositionalPattern");
+                parent.AppendChild(tmpElement);
+
+                XmlElement itemsElement = document.CreateElement("Items");
+                tmpElement.AppendChild(itemsElement);
+
+                foreach (var item in positional.Items)
+                    ProcessPattern(itemsElement, item);
                 break;
             }
         }

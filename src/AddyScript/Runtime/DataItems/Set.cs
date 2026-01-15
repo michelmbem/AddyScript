@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using AddyScript.Ast.Expressions;
@@ -21,7 +22,7 @@ public sealed class Set : DataItem
 
     public override DataItem[] AsArray => [..hashSet];
 
-    public override List<DataItem> AsList => new (hashSet);
+    public override List<DataItem> AsList => [..hashSet];
 
     public override HashSet<DataItem> AsHashSet => hashSet;
 
@@ -125,9 +126,6 @@ public sealed class Set : DataItem
         _ => base.GetProperty(propertyName),
     };
 
-    public override IEnumerable<(DataItem, DataItem)> GetEnumerable()
-    {
-        foreach (DataItem element in hashSet)
-            yield return (element, element);
-    }
+    public override IEnumerable<(DataItem, DataItem)> GetEnumerable() =>
+        hashSet.Select(element => (element, element));
 }

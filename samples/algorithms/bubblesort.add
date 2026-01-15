@@ -1,5 +1,5 @@
 import std::util; // for 'swap' and 'randlst'
-import sys::environment; // for 'getTickCount'
+import System::Diagnostics::Stopwatch;
 
 function bubblesort(t, n)
 {
@@ -11,29 +11,31 @@ function bubblesort(t, n)
 
 if (__name == 'main')
 {
-	n = (int) readln('how many items? ');
-	low = (int) readln('lower bound = ');
-	upp = (int) readln('upper bound = ');
-	pre = (int) readln('precision = ');
+	n = (int)readln('how many items? ');
+	low = (int)readln('lower bound = ');
+	up = (int)readln('upper bound = ');
+	prec = (int)readln('precision = ');
     println();
 	
 	println("generating values...");
     println();
     
-    // generates a list of n floating-point values comprised between low and upp with pre decimal digits
-	t = randlst(n, low, upp, pre);
+    // generates a list of n floating-point values comprised between low and up with prec decimal digits
+	t = randlst(n, low, up, prec);
 	println("generated list : " + t);
     println();
 	
 	println("sorting...");
-	startTime = getTickCount();
+	stopwatch = new Stopwatch();
+	stopwatch.Start();
 	bubblesort(t, n);
-	duration = getTickCount() - startTime;
+	stopwatch.Stop();
+	elapsedTime = stopwatch.Elapsed;
     println();
 	
 	println("sorted list : " + t);
     println();
     
-	println("total runtime : " + duration);
+	println($"total runtime : {elapsedTime.totalMilliseconds} ms");
 	readln();
 }

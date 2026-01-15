@@ -52,6 +52,16 @@ bar();
 println('back to main, toto = ' + toto);
 ```
 
+**Output**:
+
+```
+in main, toto = 10
+in foo, toto = 15
+back to main, toto = 10
+in bar, toto = 20
+back to main, toto = 20
+```
+
 ### Constants
 
 A constant is a read-only variable. That is: it's assigned a value once and cannot be altered afterward. You will typically declare constants using the **const** keyword like in the following example.
@@ -88,37 +98,38 @@ MAX_ITEMS = 100;
 
 Even if you don't have to explicitly define the type of your variables in AddyScript, they still have a type. In fact, AddyScript recognizes a set of 29 predefined data types. In addition to that, you can create your own classes and add them to the set of existing data types. Below are listed the AddyScript's built-in types and their meaning:
 
-|Type|Description|.Net equivalent|
-|:-:|-|-|
-|void|The type of **null** or any undefined symbol|System.Void|
-|bool|A boolean: **true** or **false**|System.Boolean|
-|int|A 32-bits signed integer: ranging from -2147483648 to 2147483647. Operations on this type may produce a result of the **long** type as soon as an overflow occurs. Dividing two **int**s produces a result of the **rational** type when the dividend is not divisible by the divisor.|System.Int32|
-|long|A limitless-precision signed integer.|System.Numerics.BigInteger|
-|rational|A rational number (i.e. a fraction).|(None)|
-|float|A double precision floating-point number.|System.Double|
-|decimal|A limitless-precision decimal number. The scale is however limited to 50 decimal digits.|System.Decimal (but more like Java's BigDecimal)|
-|complex|A double precision complex number.|System.Numerics.Complex|
-|date|A date and/or time value.|System.DateTime|
-|string|An immutable sequence of unicode characters.|System.String|
-|blob|An abstraction of a byte array.|System.Byte[]|
-|tuple|An immutable sequence of data items accessible by index in read-only mode|System.Tuple&lt;T&gt;, System.ValueTuple&lt;T&gt;|
-|list|A dynamically sized sequence of data items accessible by index in read and write mode|System.Collections.ArrayList, System.Collections.Generic.List&lt;T&gt;|
-|set|An emulation of the mathematical concept of a set.|System.Collections.Generic.HashSet&lt;T&gt;|
-|queue|A _first-in-first-out_ type of collection.|System.Collections.Queue, System.Collections.Generic.Queue&lt;T&gt;|
-|stack|A _last-in-first-out_ type of collection.|System.Collections.Stack, System.Collections.Generic.Stack&lt;T&gt;|
-|map|A set of key-value pairs. Each value is accessible in read and write mode by its key.|System.Collections.HashTable, System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;|
-|object|An object in with dynamic fields. Fields are dynamic in number and type.|System.Object (but more like System.Collections.Generic.Dictionary&lt;System.String, System.Object&gt;)|
-|resource|A reference to an imported .Net or COM object|System.Object|
-|closure|A reference to a function or method, a callback.|System.Delegate|
-|Exception|The representation of an error that occurs at runtime.|System.Exception|
-|Attribute|Additional information attached to a function, class, class member, or parameter that can be used by the scripting engine to apply special processing to the target symbol|System.Attribute|
-|TypeInfo|A set of information describing a type. Used for introspection.|System.Type|
-|MemberInfo|A set of information describing a class member, the base class of FieldInfo, Property, MethodInfo and EventInfo. Used for introspection.|System.Reflection.MemberInfo|
-|FieldInfo|A set of information describing a field. Used for introspection.|System.Reflection.FieldInfo|
-|PropertyInfo|A set of information describing a property. Used for introspection.|System.Reflection.PropertyInfo|
-|MethodInfo|A set of information describing a method. Used for introspection.|System.Reflection.MethodInfo|
-|EventInfo|A set of information describing an event. Used for introspection.|System.Reflection.EventInfo|
-|ParameterInfo|A set of information describing a parameter. Used for introspection.|System.Reflection.ParameterInfo|
+|     Type      | Description                                                                                                                                                                                                                                                                            | .NET equivalent                                                                                         |
+|:-------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+|     void      | The type of **null** or any undefined symbol                                                                                                                                                                                                                                           | System.Void                                                                                             |
+|     bool      | A boolean: **true** or **false**                                                                                                                                                                                                                                                       | System.Boolean                                                                                          |
+|      int      | A 32-bits signed integer: ranging from -2147483648 to 2147483647. Operations on this type may produce a result of the **long** type as soon as an overflow occurs. Dividing two **int**s produces a result of the **rational** type when the dividend is not divisible by the divisor. | System.Int32                                                                                            |
+|     long      | A limitless-precision signed integer.                                                                                                                                                                                                                                                  | System.Numerics.BigInteger                                                                              |
+|   rational    | A rational number (i.e. a fraction).                                                                                                                                                                                                                                                   | (None)                                                                                                  |
+|     float     | A double precision floating-point number.                                                                                                                                                                                                                                              | System.Double                                                                                           |
+|    decimal    | A limitless-precision decimal number. The scale is however limited to 50 decimal digits.                                                                                                                                                                                               | System.Decimal (but more like Java's BigDecimal)                                                        |
+|    complex    | A double precision complex number.                                                                                                                                                                                                                                                     | System.Numerics.Complex                                                                                 |
+|     date      | A point in time (an instant). Basically a simple date or a date-and-time combination.                                                                                                                                                                                                  | System.DateTime                                                                                         |
+|   duration    | The time elapsed between two instants (i.e. an interval of dates). Can also be used to represent a time in a day.                                                                                                                                                                      | System.TimeSpan                                                                                         |
+|    string     | An immutable sequence of unicode characters.                                                                                                                                                                                                                                           | System.String                                                                                           |
+|     blob      | An abstraction of a byte array.                                                                                                                                                                                                                                                        | System.Byte[]                                                                                           |
+|     tuple     | An immutable sequence of data items accessible by index in read-only mode                                                                                                                                                                                                              | System.Tuple&lt;T&gt;, System.ValueTuple&lt;T&gt;                                                       |
+|     list      | A dynamically sized sequence of data items accessible by index in read and write mode                                                                                                                                                                                                  | System.Collections.ArrayList, System.Collections.Generic.List&lt;T&gt;                                  |
+|      set      | An emulation of the mathematical concept of a set.                                                                                                                                                                                                                                     | System.Collections.Generic.HashSet&lt;T&gt;                                                             |
+|     queue     | A _first-in-first-out_ type of collection.                                                                                                                                                                                                                                             | System.Collections.Queue, System.Collections.Generic.Queue&lt;T&gt;                                     |
+|     stack     | A _last-in-first-out_ type of collection.                                                                                                                                                                                                                                              | System.Collections.Stack, System.Collections.Generic.Stack&lt;T&gt;                                     |
+|      map      | A set of key-value pairs. Each value is accessible in read and write mode by its key.                                                                                                                                                                                                  | System.Collections.HashTable, System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;                 |
+|    object     | An object with dynamic fields. Fields are dynamic in number and type.                                                                                                                                                                                                                  | System.Object (but more like System.Collections.Generic.Dictionary&lt;System.String, System.Object&gt;) |
+|   resource    | A reference to an imported .NET or COM object                                                                                                                                                                                                                                          | System.Object                                                                                           |
+|    closure    | A reference to a function or method, a callback.                                                                                                                                                                                                                                       | System.Delegate                                                                                         |
+|   Exception   | The representation of an error that occurs at runtime.                                                                                                                                                                                                                                 | System.Exception                                                                                        |
+|   Attribute   | Additional information attached to a function, class, class member, or parameter that can be used by the scripting engine to apply special processing to the target symbol                                                                                                             | System.Attribute                                                                                        |
+|   TypeInfo    | A set of information describing a type. Used for introspection.                                                                                                                                                                                                                        | System.Type                                                                                             |
+|  MemberInfo   | A set of information describing a class member, the base class of FieldInfo, PropertyInfo, MethodInfo and EventInfo. Used for introspection.                                                                                                                                           | System.Reflection.MemberInfo                                                                            |
+|   FieldInfo   | A set of information describing a field. Used for introspection.                                                                                                                                                                                                                       | System.Reflection.FieldInfo                                                                             |
+| PropertyInfo  | A set of information describing a property. Used for introspection.                                                                                                                                                                                                                    | System.Reflection.PropertyInfo                                                                          |
+|  MethodInfo   | A set of information describing a method. Used for introspection.                                                                                                                                                                                                                      | System.Reflection.MethodInfo                                                                            |
+|   EventInfo   | A set of information describing an event. Used for introspection.                                                                                                                                                                                                                      | System.Reflection.EventInfo                                                                             |
+| ParameterInfo | A set of information describing a parameter. Used for introspection.                                                                                                                                                                                                                   | System.Reflection.ParameterInfo                                                                         |
 
 ### Literal values
 
@@ -203,11 +214,22 @@ foreach (item in lst)
        println('something else');
 ```
 
+**Output**:
+
+```
+int
+something else
+date
+float
+Exception
+```
+
 **Notes**:
 
 * This also works with user-defined classes and takes inheritance into account: if B is a subclass of A, then for any instance b of B, `b is A` returns **true**.
-* For any data item x, the `x is void` test is simply a way to check whether x is declared in the current scope or not (exactly like JavaScript's `x === 'undefined'`). This behavior may change in the future.
-* The **is** operator can optionally be followed by the **not** keyword to complement the result. This means that `x is not some_type` is the same as `!(x is some_type)`
+* For any data item x, the `x is void` test is simply a way to check whether x is declared in the current scope or not (exactly like JavaScript's `x === 'undefined'`).
+* The **is** operator can optionally be followed by the **not** keyword to complement the result. This means that `x is not some_type` is the same as `!(x is some_type)`.
+* The **is** operator can also be used to check if an expression matches a particular pattern. For example `x is { color: 'Blue' }` checks if _x_ is an object with a property named _color_ that has _Blue_ as its value.
 
 ### Conversion
 
@@ -218,52 +240,61 @@ d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
 
-Remember that this doesn't work for custom classes. But most of the time, it will not be required for them since AddyScript uses duck-typing.
+AddyScript also supports an alternative conversion syntax that uses type names as functions:
+
+```JS
+d = date('2026-01-10T19:35'); // d is a date
+n = decimal('1234567890.987654321'); // n is a decimal
+```
+
+Remember that this doesn't work for user-defined classes. But most of the time, it will not be required for them since AddyScript uses duck-typing.
+In the case where you need to convert an object of a user-defined class to another type, you should provide a conversion method in that class.
 
 ### Operators
 
 Below are listed AddyScript's operators with their meaning:
 
-|Operator|Description|
-|:-:|-|
-|+ (unary)|Identity, does nothing|
-|- (unary)|Opposite; transforms negative values to positive and vice-versa|
-|!|In the prefix form, it's the logical negation (it returns **true** if the operand evaluates to **false** and vice-versa). In the suffix form, it checks for non-emptiness: it throws an exception if its operand is **null** or an empty collection or string|
-|~|Bitwise complement|
-|++|Increment; can be prefix or postfix|
-|--|Decrement; can be prefix or postfix|
-|\+ (binary)|Addition|
-|- (binary)|Subtraction|
-|*|Multiplication|
-|/|Division|
-|%|Remainder of a division|
-|**|Exponentiation|
-|&lt;&lt;|Bitwise shift left|
-|&gt;&gt;|Bitwise shift right|
-|==|Equality test: tries to convert both operands to the same type before comparing them. Returns **true** anytime both operands can be considered as representing the same value. Returns **false** when both operands cannot be converted to the same type.|
-|!=|Difference test: tries to convert both operands to the same type before comparing them. Returns **false** anytime both operands can be considered as representing the same value. Returns **true** when both operands cannot be converted to the same type.|
-|===|Equality test: returns **true** if both operands are of the same type and have the same value. Returns **false** otherwise.|
-|!==|Difference test: returns **true** if both operands are of the different types or have different values. Returns **false** otherwise.|
-|&lt;|... is less than ...|
-|&lt;=|... is less than or equal to ...|
-|&gt;|... is greater than ...|
-|&gt;=|... is greater than or equal to ...|
-|&|Logical 'AND'|
-|\||Inclusive logical 'OR' (returns **true** whenever one of its operands evaluates to **true**)|
-|^|Exclusive logical 'OR' (only returns **true** when both operands have different logical values)|
-|&&|Logical short-circuiting 'AND'; the second operand is not evaluated if the first is **false**|
-|\|\||Logical short-circuiting 'OR'; the second operand is not evaluated if the first is **true**|
-|**startswith**|String comparison operator, checks that the first operand starts with the second|
-|**endswith**|String comparison operator, checks that the first operand ends with the second|
-|**contains**|For strings, it checks that the second operand is part of the first. For collections, it checks that the collection in the left contains the item in the right|
-|**matches**|String comparison operator, checks that the first operand is a match of the regular expression represented by the second|
-|=|Simple assignment; can be combined with a binary operator like in `x += y` (a shortcut for `x = x + y`) or in `x \|= y` (a shortcut for `x = x \| y`)|
-|?:|A C-like conditional ternary operator: `x ? y : z` is a shortcut for `if (x) y else z`|
-|??|returns the first operand if it's not empty (**i.e.** **null**, an empty collection or an empty string); returns the second otherwise|
-|()|Parenthesis are used to break precedence rules and force an expression to be evaluated in a certain way|
-|[]|Square braces are used to access lists and maps items. They can also be used to extract a single character from a string. If a native type exposes an indexer, objects of this type will support the [] operator too|
-|**switch**|Pattern matching operator. We'll look closer at this in the next sections|
-|**with**|Copy with modified properties operator. We'll look closer at this in the next sections|
+|    Operator    | Description                                                                                                                                                                                                                                                  |
+|:--------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|   + (unary)    | Identity, does nothing                                                                                                                                                                                                                                       |
+|   - (unary)    | Opposite; transforms negative values to positive and vice-versa                                                                                                                                                                                              |
+|       !        | In the prefix form, it's the logical negation (it returns **true** if the operand evaluates to **false** and vice-versa). In the suffix form, it checks for non-emptiness: it throws an exception if its operand is **null** or an empty collection or string |
+|       ~        | Bitwise complement                                                                                                                                                                                                                                           |
+|       ++       | Increment; can be prefix or postfix                                                                                                                                                                                                                          |
+|       --       | Decrement; can be prefix or postfix                                                                                                                                                                                                                          |
+|  \+ (binary)   | Addition                                                                                                                                                                                                                                                     |
+|   - (binary)   | Subtraction                                                                                                                                                                                                                                                  |
+|       *        | Multiplication                                                                                                                                                                                                                                               |
+|       /        | Division                                                                                                                                                                                                                                                     |
+|       %        | Remainder of a division                                                                                                                                                                                                                                      |
+|       **       | Exponentiation                                                                                                                                                                                                                                               |
+|    &lt;&lt;    | Bitwise shift left                                                                                                                                                                                                                                           |
+|    &gt;&gt;    | Bitwise shift right                                                                                                                                                                                                                                          |
+|       ==       | Equality test: tries to convert both operands to the same type before comparing them. Returns **true** anytime both operands can be considered as representing the same value. Returns **false** when both operands cannot be converted to the same type.    |
+|       !=       | Difference test: tries to convert both operands to the same type before comparing them. Returns **false** anytime both operands can be considered as representing the same value. Returns **true** when both operands cannot be converted to the same type.  |
+|      ===       | Equality test: returns **true** if both operands are of the same type and have the same value. Returns **false** otherwise.                                                                                                                                  |
+|      !==       | Difference test: returns **true** if both operands are of the different types or have different values. Returns **false** otherwise.                                                                                                                         |
+|      &lt;      | ... is less than ...                                                                                                                                                                                                                                         |
+|     &lt;=      | ... is less than or equal to ...                                                                                                                                                                                                                             |
+|      &gt;      | ... is greater than ...                                                                                                                                                                                                                                      |
+|     &gt;=      | ... is greater than or equal to ...                                                                                                                                                                                                                          |
+|       &        | Logical 'AND'                                                                                                                                                                                                                                                |
+|       \|       | Inclusive logical 'OR' (returns **true** whenever one of its operands evaluates to **true**)                                                                                                                                                                 |
+|       ^        | Exclusive logical 'OR' (only returns **true** when both operands have different logical values)                                                                                                                                                              |
+|       &&       | Logical short-circuiting 'AND'; the second operand is not evaluated if the first is **false**                                                                                                                                                                |
+|      \|\|      | Logical short-circuiting 'OR'; the second operand is not evaluated if the first is **true**                                                                                                                                                                  |
+| **startswith** | String comparison operator, checks that the first operand starts with the second                                                                                                                                                                             |
+|  **endswith**  | String comparison operator, checks that the first operand ends with the second                                                                                                                                                                               |
+|  **contains**  | For strings, it checks that the second operand is part of the first. For collections, it checks that the collection in the left contains the item in the right                                                                                               |
+|  **matches**   | String comparison operator, checks that the first operand is a match of the regular expression represented by the second                                                                                                                                     |
+|     **in**     | A reversed form of the **contains** operator, `a in b` is equivalent to `b contains a`. The **in** operator can be preceded by a **not** keyword to complement the result. Thus, `a not in b` is equivalent to `!(a in b)`                                   |
+|       =        | Simple assignment; can be combined with a binary operator like in `x += y` (a shortcut for `x = x + y`) or in `x \|= y` (a shortcut for `x = x \| y`)                                                                                                        |
+|       ?:       | A C-like conditional ternary operator: `x ? y : z` is a shortcut for `if (x) y else z`                                                                                                                                                                       |
+|       ??       | returns the first operand if it's not empty (**i.e.** **null**, an empty collection or an empty string); returns the second otherwise                                                                                                                        |
+|       ()       | Parenthesis are used to break precedence rules and force an expression to be evaluated in a certain way                                                                                                                                                      |
+|       []       | Square braces are used to access lists and maps items. They can also be used to extract a single character from a string. If a native type exposes an indexer, objects of this type will support the [] operator too                                         |
+|   **switch**   | Pattern matching operator. We'll look closer at this in the next sections                                                                                                                                                                                    |
+|    **with**    | Copy with modified properties operator. We'll look closer at this in the next sections                                                                                                                                                                       |
 
 ### Operator precedence
 
@@ -271,19 +302,19 @@ Operator precedence in AddyScript can be summarized in the following terms:
 
 From the lowest to the highest priority, we have:
 
-1. Assignment: =, +=, -=, *=, /=, %=, **=, &=, |=, ^=, &lt;&lt;=, &gt;&gt;=, ??=
+1. Assignment: =, +=, -=, \*=, /=, %=, \*\*=, &=, \|=, ^=, &lt;&lt;=, &gt;&gt;=, ??=
 
 2. The conditional ternary operator: ?:
 
-3. Conditional binary operators: &, |, ^, &&, ||, ??
+3. Conditional binary operators: &amp;, \|, ^, &amp;&amp;, \|\|, ??
 
-4. Relational operators: ==, !=, ===, !===, &lt;, &lt;=, &gt;, &gt;=, **startswith**, **endswith**, **contains**, **matches**, **is**
+4. Relational operators: ==, !=, ===, !===, &lt;, &lt;=, &gt;, &gt;=, **startswith**, **endswith**, **contains**, **matches**, **in**, **is**
 
 5. Addition and subtraction: +, -
 
-6. Multiplication, division and bitwise shift operators: *, /, %, &lt;&lt;, &gt;&gt;
+6. Multiplication, division and bitwise shift operators: \*, /, %, &lt;&lt;, &gt;&gt;
 
-7. Exponentiation: **
+7. Exponentiation: \*\*
 
 8. Postfix unary operators: ++, --, !
 
@@ -322,7 +353,7 @@ But AddyScript provides other assignment operators which are combinations of bin
 
 #### Group Assignment
 
-Sometimes you need to assign values ​​to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`. But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**. In a group assignment, a tuple of values ​​is assigned to a tuple of variables (in the broad sense of the term). This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
+Sometimes you need to assign values to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`. But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**. In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term). This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
 
 ```
 (var1, var2, ..., varN) = (val1, val2, ..., valN);
@@ -333,17 +364,38 @@ Sometimes you need to assign values ​​to multiple variables. You can do this
 * Both tuples must have exactly the same number of elements.
 * Neither tuple must be empty.
 * Each element of the left tuple must be a valid reference (such as a variable, a list item, an object property, or another tuple).
-* The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the spread operator (..). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values ​​to several variables at once from elements of a collection.
+* The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (..). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
+* Any underscore (_) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
     
     Example:
 
     ```JS
-    l = [7, 6, 4];
-    (a, b, c) = (..l);
+    l = [7, 6, 4, 2];
+    (a, b, _, c) = (..l);
     println($'a = {a}');
     println($'b = {b}');
     println($'c = {c}');
     ```
+  
+    **Output**:
+
+    ```
+    a = 7
+    b = 6
+    c = 2
+    ```
+
+### The **let** keyword
+
+AddyScript has a dedicated keyword that can be used to introduce an assignment. That's the **let** keyword. It's especially useful when there is a risk of ambiguity in the way the code is parsed (like when [destructuring an object](col-obj.md)).
+
+An assignment with the **let** keyword looks like this:
+
+```
+let lvalue = rvalue;
+```
+
+With this syntax chaining assignments is not allowed. No other operator than the equal-sign (=) can be used.
 
 ### Reading and printing values from/to the console
 

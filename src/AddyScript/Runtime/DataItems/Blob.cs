@@ -18,14 +18,14 @@ public sealed class Blob(byte[] buffer) : DataItem
 
     public override byte[] AsByteArray => buffer;
 
-    private IEnumerable<DataItem> Items
-        => buffer.Select(b => new String(b.ToString()));
+    private IEnumerable<DataItem> Items =>
+        buffer.Select(b => new String(b.ToString()));
 
-    public override DataItem[] AsArray => Items.ToArray();
+    public override DataItem[] AsArray => [.. Items];
 
-    public override List<DataItem> AsList => Items.ToList();
+    public override List<DataItem> AsList => [.. Items];
 
-    public override HashSet<DataItem> AsHashSet => Items.ToHashSet();
+    public override HashSet<DataItem> AsHashSet => [.. Items];
 
     public override object AsNativeObject => buffer;
 
@@ -80,18 +80,17 @@ public sealed class Blob(byte[] buffer) : DataItem
 
     public override DataItem UnaryOperation(UnaryOperator _operator)
     {
-        switch (_operator)
+        if (_operator == UnaryOperator.BitwiseNot)
         {
-            case UnaryOperator.BitwiseNot:
-                var result = new byte[buffer.Length];
-                
-                for (int i = 0; i < buffer.Length; ++i)
-                    result[i] = (byte)(~buffer[i]);
+            var result = new byte[buffer.Length];
 
-                return new Blob(result);
-            default:
-                return base.UnaryOperation(_operator);
+            for (int i = 0; i < buffer.Length; ++i)
+                result[i] = (byte)(~buffer[i]);
+
+            return new Blob(result);
         }
+
+        return base.UnaryOperation(_operator);
     }
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand)
@@ -99,60 +98,60 @@ public sealed class Blob(byte[] buffer) : DataItem
         switch (_operator)
         {
             case BinaryOperator.Plus:
-                {
-                    var operandBuffer = operand.AsByteArray;
-                    var result = new byte[buffer.Length + operandBuffer.Length];
-                    Array.Copy(buffer, result, buffer.Length);
-                    Array.Copy(operandBuffer, 0, result, buffer.Length, operandBuffer.Length);
-                    return new Blob(result);
-                }
+            {
+                var operandBuffer = operand.AsByteArray;
+                var result = new byte[buffer.Length + operandBuffer.Length];
+                Array.Copy(buffer, result, buffer.Length);
+                Array.Copy(operandBuffer, 0, result, buffer.Length, operandBuffer.Length);
+                return new Blob(result);
+            }
             case BinaryOperator.Times:
-                {
-                    var result = new MemoryStream();
-                    int n = operand.AsInt32;
-                    for (int i = 0; i < n; ++i) result.Write(buffer);
-                    return new Blob(result.ToArray());
-                }
+            {
+                var result = new MemoryStream();
+                int n = operand.AsInt32;
+                for (int i = 0; i < n; ++i) result.Write(buffer);
+                return new Blob(result.ToArray());
+            }
             case BinaryOperator.And:
-                {
-                    var operandBuffer = operand.AsByteArray;
-                    var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
-                    int i = 0;
-                    
-                    for (; i < Math.Min(buffer.Length, operandBuffer.Length); ++i)
-                        result[i] = (byte)(buffer[i] & operandBuffer[i]);
-                    
-                    return new Blob(result);
-                }
+            {
+                var operandBuffer = operand.AsByteArray;
+                var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
+                int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
+                
+                for (; i < limit; ++i)
+                    result[i] = (byte)(buffer[i] & operandBuffer[i]);
+                
+                return new Blob(result);
+            }
             case BinaryOperator.Or:
-                {
-                    var operandBuffer = operand.AsByteArray;
-                    var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
-                    int i = 0;
+            {
+                var operandBuffer = operand.AsByteArray;
+                var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
+                int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
+                
+                for (; i < limit; ++i)
+                    result[i] = (byte)(buffer[i] | operandBuffer[i]);
 
-                    for (; i < Math.Min(buffer.Length, operandBuffer.Length); ++i)
-                        result[i] = (byte)(buffer[i] | operandBuffer[i]);
+                while (i < buffer.Length) result[i] = buffer[i++];
+                while (i < operandBuffer.Length) result[i] = operandBuffer[i++];
 
-                    while (i < buffer.Length) result[i] = buffer[i++];
-                    while (i < operandBuffer.Length) result[i] = operandBuffer[i++];
-
-                    return new Blob(result);
-                }
+                return new Blob(result);
+            }
             case BinaryOperator.ExclusiveOr:
-                {
-                    var operandBuffer = operand.AsByteArray;
-                    var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
-                    int i = 0;
+            {
+                var operandBuffer = operand.AsByteArray;
+                var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
+                int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
+                
+                for (; i < limit; ++i)
+                    result[i] = (byte)(buffer[i] ^ operandBuffer[i]);
 
-                    for (; i < Math.Min(buffer.Length, operandBuffer.Length); ++i)
-                        result[i] = (byte)(buffer[i] ^ operandBuffer[i]);
+                while (i < result.Length) result[i] = 255;
 
-                    while (i < result.Length) result[i] = 255;
-
-                    return new Blob(result);
-                }
+                return new Blob(result);
+            }
             case BinaryOperator.Contains:
-                return Boolean.FromBool(Array.IndexOf(buffer, (byte)operand.AsInt32) >= 0); // Todo: Am�liorer!!
+                return Boolean.FromBool(Array.IndexOf(buffer, (byte)operand.AsInt32) >= 0); // Todo: Improve!!
             default:
                 return base.BinaryOperation(_operator, operand);
         }

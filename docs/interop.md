@@ -1,46 +1,49 @@
-# Interacting with .Net and the host platform
+# Interacting with .NET and the host platform
 
-### Creating instances of .Net types
+### Creating instances of .NET types
 
-AddyScript provides tight integration with the .Net platform. A script can create instances of virtually any .Net type, initialize its properties, and invoke its methods. The scripting engine has an intelligent mechanism to map .Net types to their AddyScript counterparts and vice versa. Even generic types are supported. It is also possible to use AddyScript functions as event handlers for instances of .Net classes. Just remember that for a type to be visible from the script, its assembly must be in the References property of the ScriptContext object passed to the constructor of the current instance of the ScriptEngine class when it is created. Here is an example of using the System.Collections.Generic.LinkedList<>, the System.Collections.Generic.SortedDictionary<> and the System.Tuple<> classes:
+AddyScript provides tight integration with the .NET platform.
+A script can create instances of virtually any .NET type, initialize its properties, and invoke its methods.
+The scripting engine has an intelligent mechanism to map .NET types to their AddyScript counterparts and vice versa.
+Even generic types are supported. It is also possible to use AddyScript functions as event handlers for instances of .NET classes.
+Just remember that for a type to be visible from the script, its assembly must be in the References property of
+the ScriptContext object passed to the constructor of the current instance of the ScriptEngine class when it is created.
+Here is an example of using the System.Collections.Generic.LinkedList&lt;T&gt;, the System.Collections.Generic.SortedDictionary&lt;TKey, TValue&gt;
+and the System.Tuple&lt;TItem1, TItem2, TItem3&gt; classes:
 
 ```JS
-function underline(msg)
-{
-    println(msg);
-    println('-' * msg.length);
-}
+import System;
+import System::Collections::Generic;
 
-// For generic .Net types, the number of type arguments should be specified in curly braces at the end of the name
-l = new System::Collections::Generic::LinkedList{1}();
+l = new LinkedList{1}();
 for (i = 1; i < 1000; i *= 2)
     l.AddLast(i);
 
-underline('LinkedList{1}:');
-foreach(item in l)
-    print($'[{item}]->');
-println('END');
-
+println('LinkedList{1}:');
+println('--------------');
+println('[' + ']->['.join(..l) + ']');
 println();
 
-d = new System::Collections::Generic::SortedDictionary{2}();
+d = new SortedDictionary{2}();
 names = ['john', 'audrey', 'kyle', 'phil', 'steve', 'hans'];
 names.each(|name| => d[name] = randint(18, 40));
 
-underline('SortedDictionary{2}:');
+println('SortedDictionary{2}:');
+println('--------------------');
 foreach(key => value in d)
-    println($"{key}\t: {value}");
-
+println($"{key, 6} : {value}");
 println();
 
-underline('System::Tuple{3}:');
-t = new System::Tuple{3}('Jason Donovan', 32, `2010-03-15`);
-println($"{t.Item1} is {t.Item2} years old, he works for us since {t.Item3:d}.");
+println('System::Tuple{3}:');
+println('-----------------');
+t = new Tuple{3}('Jason Donovan', 32, `2010-03-15`);
+println($"{t[0]} is {t[1]} years old, he works for us since {t[2]:d}.");
 ```
 
-The integration of AddyScript into the .Net platform is well demonstrated in some of the provided example scripts like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its dependencies).
+The integration of AddyScript into the .NET platform is well demonstrated in some of the provided example scripts
+like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its dependencies).
 
-### Accessing to .Net types static members
+### Accessing to .NET types static members
 
 Well, you do this the same way you access static members of AddyScript types. Here's an example:
 
@@ -54,7 +57,8 @@ if (System::IO::File::Exists(path))
 
 ### Avoiding to type fully qualified names
 
-The **import** directive can be used to import .Net types and/or namespaces. Here is what the previous example would look like with an import directive:
+The **import** directive can be used to import .NET types and/or namespaces.
+Here is what the previous example would look like with an import directive:
 
 ```JS
 // from the System namespace, import only the Environment type
@@ -80,7 +84,9 @@ if (IO::File::Exists(path)) IO::File::Delete(path);
 
 ### COM-Interop
 
-The scripting engine supports COM interoperability over .Net. This allows you to create and manage instances of COM objects just like you do with regular .Net classes. Below is an example of a script that automates MS Word:
+The scripting engine supports COM interoperability over .NET.
+This allows you to create and manage instances of COM objects just like you do with regular .NET classes.
+Below is an example of a script that automates MS Word:
 
 ```JS
 objWord = new Word::Application();
@@ -106,6 +112,7 @@ objDocument.Close();
 objWord.Quit();
 ```
 
-The interoperability of AddyScript and COM is well demonstrated in the _msxml.add_, _word.add_ (shown above), and _ado.add_ sample scripts. Note that the scripting engine still cannot attach handlers to a COM object's events.
+The interoperability of AddyScript and COM is well demonstrated in the _msxml.add_, _word.add_ (shown above), and _ado.add_ sample scripts.
+Note that the scripting engine still cannot attach handlers to a COM object's events.
 
 [Home](README.md) | [Previous](introspection.md) | [Next](exceptions.md)

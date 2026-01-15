@@ -47,7 +47,7 @@ public enum BinaryOperator
     And,
 
     /// <summary>
-    /// Logical And (the second operand is not evaluated if the first is false)
+    /// Short-circuiting logical And (the second operand is not evaluated if the first is false)
     /// </summary>
     AndAlso,
 
@@ -57,7 +57,7 @@ public enum BinaryOperator
     Or,
 
     /// <summary>
-    /// Logical Or (the second operand is not evaluated if the first is true)
+    /// Short-circuiting logical Or (the second operand is not evaluated if the first is true)
     /// </summary>
     OrElse,
 
@@ -128,7 +128,7 @@ public enum BinaryOperator
 
     /// <summary>
     /// String comparison operator : contains<br/>
-    /// Also used for tuples, lists and sets
+    /// Also used for tuples, lists, sets, and maps
     /// </summary>
     Contains,
 

@@ -24,6 +24,7 @@ Statement ::= ImportDirective
             | Return
             | Throw
             | TryCatchFinally
+            | AssignmentWithLet
             | (Expression ';')
 
 ImportDirective ::= 'import' QualifiedName ('as' IDENTIFIER)? ';'
@@ -34,11 +35,11 @@ ClassDefinition ::= Attributes? MODIFIER? 'class' IDENTIFIER (':' IDENTIFIER)? '
 
 Attributes ::= '[' Attribute (',' Attribute)* ']'
 
-Attribute ::= IDENTIFIER ('(' (Expression? | ((Expression ',')? PropertyInitializerList)) ')')?
+Attribute ::= IDENTIFIER ('(' (Expression? | ((Expression ',')? VariableSetterList)) ')')?
 
 ClassMember ::= MemberPrefix? MemberSpec
 
-MemberPrefix ::= (SCOPE ((MODIFIER Attributes?)? | (Attributes MODIFIER?)?)) | (MODIFIER ((SCOPE Attributes?)? |(Attributes SCOPE?)?)) | (Attributes ((SCOPE MODIFIER?)? | (MODIFIER SCOPE?)?))
+MemberPrefix ::= Attributes? ((SCOPE MODIFIER?)? | (MODIFIER SCOPE?)?)
 
 MemberSpec ::= ConstructorSpec | FieldSpec | PropertySpec | MethodSpec | OperatorSpec | EventSpec
 
@@ -46,7 +47,7 @@ ConstructorSpec ::= 'constructor' ParameterList Block
 
 ParameterList ::= '(' (Parameter (',' Parameter)*)? ')'
 
-Parameter ::= (((Attributes ('&' | '..')?) | (('&' | '..') Attributes?)) IDENTIFIER '!'?) | (Attributes? IDENTIFIER '!'? ('=' Literal)?)
+Parameter ::= Attributes? ('&' | '..')? IDENTIFIER '!'? ('=' Literal)?
 
 Literal ::= 'null' | BOOLEAN | INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL | COMPLEX | DATE | STRING | BLOB
 
@@ -70,13 +71,13 @@ FunctionBody ::= ('=>' Expression ';') | Block
 
 ExternalFunctionDecl ::= Attributes? 'extern' 'function' IDENTIFIER ParameterList ';'
 
-PropertyInitializerList ::= PropertyInitializer (',' PropertyInitializer)*
+VariableSetterList ::= VariableSetter (',' VariableSetter)*
 
-PropertyInitializer ::= IDENTIFIER '=' Expression
+VariableSetter ::= IDENTIFIER '=' Expression
 
-ConstantDecl ::= 'const' PropertyInitializerList ';'
+ConstantDecl ::= 'const' VariableSetterList ';'
 
-VariableDecl ::= 'var' PropertyInitializerList ';'
+VariableDecl ::= 'var' VariableSetterList ';'
 
 Block ::= '{' StatementWithLabels* '}'
 
@@ -110,6 +111,10 @@ Throw ::= 'throw' Expression ';'
 
 TryCatchFinally ::= 'try' ('(' Expression ')')? Block ('catch' '(' IDENTIFIER ')' Block)? ('finally' Block)?
 
+AssignmentWithLet ::= 'let' Reference '=' Expression ';'
+
+Reference ::= VariableRef | ItemRef | SliceRef | PropertyRef | StaticPropertyRef | ParentPropertyRef | ParentIndexerRef | TupleInitializer | SetInitializer
+
 Expression ::= Assignment
 
 Assignment ::= TernaryExpression (AssignmentOperator Assignment)*
@@ -122,9 +127,9 @@ Condition ::= Relation (LogicalOperator Relation)*
 
 LogicalOperator ::= '&' | '&&' | '|' | '||' | '^' | '??'
 
-Relation ::= Term ((RelationalOperator Term) | ('is' 'not'? (TYPE_NAME | IDENTIFIER)))?
+Relation ::= Term ((RelationalOperator Term) | ('is' 'not'? Pattern))?
 
-RelationalOperator ::= '==' | '!=' | '<' | '>' | '<=' | '>=' | '===' | '!==' | 'startswith' | 'endswith' | 'contains' | 'matches'
+RelationalOperator ::= '==' | '!=' | '<' | '>' | '<=' | '>=' | '===' | '!==' | 'startswith' | 'endswith' | 'contains' | 'matches' | 'not'? 'in'
 
 Term ::= Factor (('+' | '-') Factor)*
 
@@ -136,13 +141,13 @@ PostfixUnaryExpression ::= PrefixUnaryExpression ('++' | '--' | '!')*
 
 PrefixUnaryExpression ::= ('+' | '-' | '~' | '!' | '++' | '--')* Composite
 
-Composite ::= Atom (('[' (Expression | (Expression? '..' Expression?)) ']') | ('.' IDENTIFIER ArgumentList?) | ArgumentList | ('switch' '{' MatchCaseList '}') | ('with' '{' PropertyInitializerList '}'))*
+Composite ::= Atom (('[' (Expression | (Expression? '..' Expression?)) ']') | ('.' IDENTIFIER ArgumentList?) | ArgumentList | ('switch' '{' MatchCaseList '}') | ('with' '{' VariableSetterList '}'))*
 
-ArgumentList ::= '(' (ListItems (',' NamedArgList)? | NamedArgList)? ')'
+ArgumentList ::= '(' (Arguments (',' NamedArgList)? | NamedArgList)? ')'
 
-ListItems ::= ListItem (',' ListItem)*
+Arguments ::= Argument (',' Argument)*
 
-ListItem ::= '..'? Expression
+Argument ::= '..'? Expression
 
 NamedArgList ::= NamedArg (',' NamedArg)*
 
@@ -150,15 +155,21 @@ NamedArg ::= IDENTIFIER ':' Expression
 
 MatchCaseList ::= MatchCase (',' MatchCase)*
 
-MatchCase ::= Pattern '=>' MatchCaseExpression
+MatchCase ::= Pattern ('when' Expression)? '=>' MatchCaseExpression
 
-Pattern ::= '_' | 'null' | (ValuePattern ('..' ValuePattern?)?) | ('..' ValuePattern) | (TYPE_NAME ObjectPattern?) | ObjectPattern | (IDENTIFIER ':' Expression) | CompositePattern
+Pattern ::= '_' | 'null' | RangePattern | (TYPE_NAME ObjectPattern?) | ObjectPattern | NegativePattern | CompositePattern | GroupingPattern
+
+RangePattern ::= (ValuePattern ('..' ValuePattern?)?) | ('..' ValuePattern)
 
 ValuePattern ::= ([+-]? (INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL)) | BOOLEAN | DATE | STRING
 
-ObjectPattern ::= '{' IDENTIFIER '=' ValuePattern (',' IDENTIFIER '=' ValuePattern)* '}'
+ObjectPattern ::= '{' IDENTIFIER ':' Pattern (',' IDENTIFIER ':' Pattern)* '}'
 
-CompositePattern ::= Pattern (',' Pattern)+
+NegativePattern ::= 'not' Pattern
+
+CompositePattern ::= Pattern (('or' | 'and') Pattern)+
+
+GroupingPattern ::= '(' Pattern ')'
 
 MatchCaseExpression ::= Block | 'throw'? Expression
 
@@ -174,21 +185,21 @@ AtomStartingWithId ::= QualifiedName ArgumentList?
 
 AtomStartingWithNew ::= ObjectInitializer | ConstructorCall
 
-ObjectInitializer ::= 'new' '{' PropertyInitializerList? '}'
+ObjectInitializer ::= 'new' '{' VariableSetterList? '}'
 
-ConstructorCall ::= 'new' QualifiedName ((ArgumentList ('{' PropertyInitializerList? '}')?) | ('{' PropertyInitializerList? '}'))
+ConstructorCall ::= 'new' QualifiedName ((ArgumentList ('{' VariableSetterList? '}')?) | ('{' VariableSetterList? '}'))
 
 AtomStartingWithLParen ::= Conversion | TupleInitializer | ParenthesizedExpression
 
 Conversion ::= '(' TYPE_NAME ')' Expression
 
-TupleInitializer ::= '(' ListItems ','? ')'
+TupleInitializer ::= '(' Arguments ','? ')'
 
 ParenthesizedExpression ::= '(' Expression ')'
 
 AtomStartingWithLBrace ::= SetInitializer | MapInitializer
 
-SetInitializer ::= '{' ListItems? '}'
+SetInitializer ::= '{' Arguments? '}'
 
 MapInitializer ::= '{' (MapItemInitializerList | '=>') '}'
 
@@ -196,7 +207,7 @@ MapItemInitializerList ::= MapItemInitializer (',' MapItemInitializer)*
 
 MapItemInitializer ::= Expression '=>' Expression
 
-ListInitializer ::= '[' ListItems? ']'
+ListInitializer ::= '[' Arguments? ']'
 
 Lambda ::= '|' (Parameter (',' Parameter)*)? '|' '=>' ((Expression ';') | Block)
 

@@ -1,4 +1,4 @@
-for (; ; )
+for (;;)
 {
 	switch (readln('what\'s my name? '))
 	{

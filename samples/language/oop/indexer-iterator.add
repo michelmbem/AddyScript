@@ -50,7 +50,7 @@ class B : A
 	}
 	
 	public function toString(fmt = '') =>
-		this.prefix + this._list.join(this.separator) + this.suffix;
+		this.prefix + this.separator.join(..this) + this.suffix;
 }
 
 b = new B(prefix: '{', suffix: '}');
@@ -61,8 +61,11 @@ b[mid] = 10 * PI;
 println($'b[{mid}] = {b[mid]}');
 
 print('all items: ');
-foreach (x in b) print((__key > 0 ? ', ' : '') + x);
+foreach (x in b) print((__key > 0 ? '; ' : '') + x);
 println();
+
+t = (..b);
+println($'tuple slice from b: {t[3..7]}');
 
 firstGetter = b.getFirst();
 

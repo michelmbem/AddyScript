@@ -20,69 +20,71 @@ namespace AddyScript.Runtime.DataItems;
 /// <summary>
 /// The base class of all AddyScript builtin data types.
 /// </summary>
-public abstract class DataItem
-    : IFrameItem, ICloneable, IFormattable, IEquatable<DataItem>,
-      IComparable<DataItem>, IDisposable
+public abstract class DataItem :
+    IFrameItem, ICloneable, IFormattable, IEquatable<DataItem>, IComparable<DataItem>, IDisposable
 {
     public FrameItemKind Kind => FrameItemKind.Variable;
 
     public abstract Class Class { get; }
 
-    public virtual bool AsBoolean
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Boolean.Name));
+    public virtual bool AsBoolean =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Boolean.Name));
 
-    public virtual int AsInt32
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Integer.Name));
+    public virtual int AsInt32 =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Integer.Name));
 
-    public virtual BigInteger AsBigInteger
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Long.Name));
+    public virtual BigInteger AsBigInteger =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Long.Name));
 
-    public virtual Rational32 AsRational32
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Rational.Name));
+    public virtual Rational32 AsRational32 =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Rational.Name));
 
-    public virtual double AsDouble
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Float.Name));
+    public virtual double AsDouble =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Float.Name));
 
-    public virtual BigDecimal AsBigDecimal
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Decimal.Name));
+    public virtual BigDecimal AsBigDecimal =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Decimal.Name));
 
-    public virtual Complex64 AsComplex64
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Complex.Name));
+    public virtual Complex64 AsComplex64 =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Complex.Name));
 
-    public virtual DateTime AsDateTime
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Date.Name));
+    public virtual DateTime AsDateTime =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Date.Name));
 
-    public virtual byte[] AsByteArray
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Blob.Name));
+    public virtual TimeSpan AsTimeSpan =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Duration.Name));
 
-    public virtual DataItem[] AsArray
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Tuple.Name));
+    public virtual byte[] AsByteArray =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Blob.Name));
 
-    public virtual List<DataItem> AsList
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.List.Name));
+    public virtual DataItem[] AsArray =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Tuple.Name));
 
-    public virtual HashSet<DataItem> AsHashSet
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Set.Name));
+    public virtual List<DataItem> AsList =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.List.Name));
 
-    public virtual Queue<DataItem> AsQueue
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Queue.Name));
+    public virtual HashSet<DataItem> AsHashSet =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Set.Name));
 
-    public virtual Stack<DataItem> AsStack
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Stack.Name));
+    public virtual Queue<DataItem> AsQueue =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Queue.Name));
 
-    public virtual Dictionary<DataItem, DataItem> AsDictionary
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Map.Name));
+    public virtual Stack<DataItem> AsStack =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Stack.Name));
 
-    public virtual Dictionary<string, DataItem> AsDynamicObject
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Object.Name));
+    public virtual Dictionary<DataItem, DataItem> AsDictionary =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Map.Name));
 
-    public virtual object AsNativeObject
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Resource.Name));
+    public virtual Dictionary<string, DataItem> AsDynamicObject =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Object.Name));
 
-    public virtual Function AsFunction
-        => throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Closure.Name));
+    public virtual object AsNativeObject =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Resource.Name));
 
-    public bool InstanceOf(Class klass) => (Class == klass) || (Class.Inherits(klass));
+    public virtual Function AsFunction =>
+        throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Closure.Name));
+
+    public bool InstanceOf(Class klass) => Class == klass || Class.Inherits(klass);
 
     public virtual object Clone() => this;
 
@@ -104,7 +106,7 @@ public abstract class DataItem
         }
     }
 
-    public override bool Equals(object obj) => (obj is DataItem dataItem) && Equals(dataItem);
+    public override bool Equals(object obj) => obj is DataItem other && Equals(other);
 
     protected virtual int UnsafeCompareTo(DataItem other) => 0;
 
@@ -116,7 +118,7 @@ public abstract class DataItem
         }
         catch
         {
-            return ToString().CompareTo(other.ToString());
+            return string.CompareOrdinal(ToString(), other.ToString());
         }
     }
 
@@ -128,9 +130,8 @@ public abstract class DataItem
     {
         BinaryOperator.Identical or BinaryOperator.NotIdentical or BinaryOperator.Contains or
         BinaryOperator.StartsWith or BinaryOperator.EndsWith or BinaryOperator.Matches => false,
-        BinaryOperator.Plus => (Class.ClassID < targetClass.ClassID && targetClass.ClassID < ClassID.Date) ||
-                               (targetClass == Class.String),
-        _ => Class.ClassID < targetClass.ClassID && targetClass.ClassID < ClassID.Date
+        BinaryOperator.Plus => Class.IsLosslesslyConvertibleTo(targetClass) || targetClass == Class.String,
+        _ => Class.IsLosslesslyConvertibleTo(targetClass),
     };
 
     public virtual DataItem ConvertTo(Class targetClass)
@@ -186,16 +187,21 @@ public abstract class DataItem
             TypeCode.String => ToString(),
             _ => targetType switch
             {
-                Type t when t == typeof(byte[]) => AsByteArray,
-                Type t when t.IsAssignableTo(typeof(ITuple)) => Reflector.CreateInstance(t, AsArray),
+                not null when targetType == typeof(TimeSpan) => AsTimeSpan,
+                not null when targetType == typeof(byte[]) => AsByteArray,
+                not null when targetType == typeof(DateOnly) => DateOnly.FromDateTime(AsDateTime),
+                not null when targetType == typeof(TimeOnly) => TimeOnly.FromTimeSpan(AsTimeSpan),
+                not null when targetType.IsAssignableTo(typeof(ITuple)) =>
+                    Reflector.CreateInstance(targetType, AsArray),
                 _ => AsNativeObject,
             },
         };
     }
 
-    public virtual DataItem UnaryOperation(UnaryOperator _operator)
-        => throw new InvalidOperationException(string.Format(Resources.OperatorCantBeApplied,
-            CodeGenerator.UnaryOperatorToString(_operator), Class.Name));
+    public virtual DataItem UnaryOperation(UnaryOperator _operator) =>
+        throw new InvalidOperationException(string.Format(Resources.OperatorCantBeApplied,
+                                                          CodeGenerator.UnaryOperatorToString(_operator),
+                                                          Class.Name));
 
     public virtual DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
@@ -204,29 +210,30 @@ public abstract class DataItem
         BinaryOperator.Identical => Boolean.FromBool(Class == operand.Class && Equals(operand)),
         BinaryOperator.NotIdentical => Boolean.FromBool(!(Class == operand.Class && Equals(operand))),
         _ => throw new InvalidOperationException(string.Format(Resources.OperatorCantBeApplied,
-                CodeGenerator.BinaryOperatorToString(_operator), Class.Name)),
+                                                               CodeGenerator.BinaryOperatorToString(_operator),
+                                                               Class.Name)),
     };
 
-    public virtual DataItem GetProperty(string propertyName)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
+    public virtual DataItem GetProperty(string propertyName) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
 
-    public virtual void SetProperty(string propertyName, DataItem value)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
+    public virtual void SetProperty(string propertyName, DataItem value) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoProperty, Class.Name, propertyName));
 
-    public virtual DataItem GetItem(DataItem index)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexReader, Class.Name));
+    public virtual DataItem GetItem(DataItem index) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexReader, Class.Name));
 
-    public virtual void SetItem(DataItem index, DataItem value)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexWriter, Class.Name));
+    public virtual void SetItem(DataItem index, DataItem value) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoIndexWriter, Class.Name));
 
-    public virtual DataItem GetItemRange(int lBound, int uBound)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeReader, Class.Name));
+    public virtual DataItem GetItemRange(int lBound, int uBound) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeReader, Class.Name));
 
-    public virtual void SetItemRange(int lBound, int uBound, DataItem value)
-        => throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeWriter, Class.Name));
+    public virtual void SetItemRange(int lBound, int uBound, DataItem value) =>
+        throw new InvalidOperationException(string.Format(Resources.ClassHasNoRangeWriter, Class.Name));
 
-    public virtual IEnumerable<(DataItem, DataItem)> GetEnumerable()
-        => throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
+    public virtual IEnumerable<(DataItem, DataItem)> GetEnumerable() =>
+        throw new InvalidOperationException(string.Format(Resources.IterationNotSupported, Class.Name));
 
     protected static void AdjustBounds(int size, ref int lower, ref int upper)
     {

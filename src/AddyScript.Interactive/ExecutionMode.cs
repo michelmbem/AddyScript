@@ -1,10 +1,8 @@
-﻿namespace AddyScript.Interactive
+﻿namespace AddyScript.Interactive;
+public enum ExecutionMode
 {
-    public enum ExecutionMode
-    {
-        Default,
-        Interactive,
-        Evaluate,
-        RunFile
-    }
+    Default,
+    Interactive,
+    Evaluate,
+    RunFile
 }

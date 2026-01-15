@@ -4,13 +4,15 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using AddyScript.Runtime.Utilities;
+
 
 namespace AddyScript.Runtime.NativeTypes;
 
 
 [Serializable]
-public partial struct BigDecimal
-    : IFormattable, IConvertible, IComparable, IComparable<BigDecimal>, IEquatable<BigDecimal>
+public partial struct BigDecimal :
+    IFormattable, IConvertible, IComparable, IComparable<BigDecimal>, IEquatable<BigDecimal>
 {
     #region Fields
 
@@ -38,48 +40,35 @@ public partial struct BigDecimal
         this.scale = scale;
     }
 
-    public BigDecimal(int n)
-    {
-        unscaled = new BigInteger(n);
-        scale = 0;
-    }
-
-    public BigDecimal(uint n)
-    {
-        unscaled = new BigInteger(n);
-        scale = 0;
-    }
-
-    public BigDecimal(long n)
-    {
-        unscaled = new BigInteger(n);
-        scale = 0;
-    }
-
-    public BigDecimal(ulong n)
-    {
-        unscaled = new BigInteger(n);
-        scale = 0;
-    }
-
-    public BigDecimal(BigInteger i)
-    {
-        unscaled = i;
-        scale = 0;
-    }
-
-    public BigDecimal(float x)
-        : this(x.ToString(CultureInfo.InvariantCulture))
+    public BigDecimal(int n) : this(new BigInteger(n))
     {
     }
 
-    public BigDecimal(double x)
-        : this(x.ToString(CultureInfo.InvariantCulture))
+    public BigDecimal(uint n) : this(new BigInteger(n))
     {
     }
 
-    public BigDecimal(decimal d)
-        : this(d.ToString(CultureInfo.InvariantCulture))
+    public BigDecimal(long n) : this(new BigInteger(n))
+    {
+    }
+
+    public BigDecimal(ulong n) : this(new BigInteger(n))
+    {
+    }
+
+    public BigDecimal(BigInteger i) : this(i, 0)
+    {
+    }
+
+    public BigDecimal(float x) : this(x.ToString(CultureInfo.InvariantCulture))
+    {
+    }
+
+    public BigDecimal(double x) : this(x.ToString(CultureInfo.InvariantCulture))
+    {
+    }
+
+    public BigDecimal(decimal d) : this(d.ToString(CultureInfo.InvariantCulture))
     {
     }
 
@@ -104,23 +93,23 @@ public partial struct BigDecimal
 
         var sb = new StringBuilder();
 
-        Group signGroup = match.Groups[DecimalRegex.GroupNumberFromName("SIGN")];
+        Group signGroup = match.Groups["SIGN"];
         if (signGroup.Success) sb.Append(signGroup.Value);
 
-        Group integerGroup = match.Groups[DecimalRegex.GroupNumberFromName("INTEGER")];
+        Group integerGroup = match.Groups["INTEGER"];
         if (integerGroup.Success) sb.Append(integerGroup.Value);
 
         int decs = 0;
 
-        Group decimalsGroup = match.Groups[DecimalRegex.GroupNumberFromName("DECIMALS")];
+        Group decimalsGroup = match.Groups["DECIMALS"];
         if (decimalsGroup.Success)
         {
             decs = decimalsGroup.Length;
             sb.Append(decimalsGroup.Value);
         }
 
-        Group exponentGroup = match.Groups[DecimalRegex.GroupNumberFromName("EXPONENT")];
-        if (exponentGroup.Success) decs -= int.Parse(exponentGroup.Value.Substring(1));
+        Group exponentGroup = match.Groups["EXPONENT"];
+        if (exponentGroup.Success) decs -= int.Parse(exponentGroup.Value[1..]);
 
         if (decs < 0)
         {
@@ -143,7 +132,7 @@ public partial struct BigDecimal
         if ((dword & 0x80000000) != 0)
         {
             unscaled = -unscaled;
-            dword &= 0x7fffffff;
+            dword &= 0x7FFFFFFF;
         }
 
         scale = (int)dword;
@@ -153,7 +142,10 @@ public partial struct BigDecimal
 
     #region Properties
 
-    public readonly sbyte Sign => (sbyte)unscaled.Sign;
+    public readonly int Sign => unscaled.Sign;
+    
+    public readonly BigInteger Unscaled => unscaled;
+    
     public readonly int Scale => scale;
 
     #endregion
@@ -479,30 +471,15 @@ public partial struct BigDecimal
 
     #endregion
 
-    public override readonly bool Equals(object obj)
-    {
-        return obj is BigDecimal dec && this == dec;
-    }
+    public readonly override bool Equals(object obj) => obj is BigDecimal dec && this == dec;
 
-    public override readonly int GetHashCode()
-    {
-        return HashCode.Combine(unscaled, scale);
-    }
+    public readonly override int GetHashCode() => HashCode.Combine(unscaled, scale);
 
-    public override readonly string ToString()
-    {
-        return ToString(null, CultureInfo.CurrentUICulture);
-    }
+    public readonly override string ToString() => ToString(null, CultureInfo.CurrentUICulture);
 
-    public readonly BigDecimal Power(int exp)
-    {
-        return new (BigInteger.Pow(unscaled, exp), scale * exp);
-    }
+    public readonly BigDecimal Pow(int exp) => new (BigInteger.Pow(unscaled, exp), scale * exp);
 
-    public readonly BigDecimal Abs()
-    {
-        return new (BigInteger.Abs(unscaled), scale);
-    }
+    public readonly BigDecimal Abs() => new (BigInteger.Abs(unscaled), scale);
 
     public readonly BigDecimal Truncate()
     {
@@ -548,131 +525,61 @@ public partial struct BigDecimal
         return bytes;
     }
 
+    public readonly (long, long) ToRational() => ((long)unscaled, MathUtil.Pow(10, scale));
+
     #endregion
 
     #region Operators
 
     #region Conversion
 
-    public static implicit operator BigDecimal(sbyte n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(sbyte n) => new (n);
 
-    public static implicit operator BigDecimal(byte n)
-    {
-        return new ((uint) n);
-    }
+    public static implicit operator BigDecimal(byte n) => new ((uint) n);
 
-    public static implicit operator BigDecimal(short n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(short n) => new (n);
 
-    public static implicit operator BigDecimal(ushort n)
-    {
-        return new ((uint) n);
-    }
+    public static implicit operator BigDecimal(ushort n) => new ((uint) n);
 
-    public static implicit operator BigDecimal(int n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(int n) => new (n);
 
-    public static implicit operator BigDecimal(uint n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(uint n) => new (n);
 
-    public static implicit operator BigDecimal(long n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(long n) => new (n);
 
-    public static implicit operator BigDecimal(ulong n)
-    {
-        return new (n);
-    }
+    public static implicit operator BigDecimal(ulong n) => new (n);
 
-    public static implicit operator BigDecimal(BigInteger i)
-    {
-        return new (i);
-    }
+    public static implicit operator BigDecimal(BigInteger i) => new (i);
 
-    public static explicit operator BigDecimal(float x)
-    {
-        return new (x);
-    }
+    public static explicit operator BigDecimal(float x) => new (x);
 
-    public static explicit operator BigDecimal(double x)
-    {
-        return new (x);
-    }
+    public static explicit operator BigDecimal(double x) => new (x);
 
-    public static implicit operator BigDecimal(decimal d)
-    {
-        return new (d);
-    }
+    public static implicit operator BigDecimal(decimal d) => new (d);
 
-    public static explicit operator sbyte(BigDecimal self)
-    {
-        return self.ToSByte(null);
-    }
+    public static explicit operator sbyte(BigDecimal self) => self.ToSByte(null);
 
-    public static explicit operator byte(BigDecimal self)
-    {
-        return self.ToByte(null);
-    }
+    public static explicit operator byte(BigDecimal self) => self.ToByte(null);
 
-    public static explicit operator short(BigDecimal self)
-    {
-        return self.ToInt16(null);
-    }
+    public static explicit operator short(BigDecimal self) => self.ToInt16(null);
 
-    public static explicit operator ushort(BigDecimal self)
-    {
-        return self.ToUInt16(null);
-    }
+    public static explicit operator ushort(BigDecimal self) => self.ToUInt16(null);
 
-    public static explicit operator int(BigDecimal self)
-    {
-        return self.ToInt32(null);
-    }
+    public static explicit operator int(BigDecimal self) => self.ToInt32(null);
 
-    public static explicit operator uint(BigDecimal self)
-    {
-        return self.ToUInt32(null);
-    }
+    public static explicit operator uint(BigDecimal self) => self.ToUInt32(null);
 
-    public static explicit operator long(BigDecimal self)
-    {
-        return self.ToInt64(null);
-    }
+    public static explicit operator long(BigDecimal self) => self.ToInt64(null);
 
-    public static explicit operator ulong(BigDecimal self)
-    {
-        return self.ToUInt64(null);
-    }
+    public static explicit operator ulong(BigDecimal self) => self.ToUInt64(null);
 
-    public static explicit operator float(BigDecimal self)
-    {
-        return self.ToSingle(null);
-    }
+    public static explicit operator float(BigDecimal self) => self.ToSingle(null);
 
-    public static explicit operator double(BigDecimal self)
-    {
-        return self.ToDouble(null);
-    }
+    public static explicit operator double(BigDecimal self) => self.ToDouble(null);
 
-    public static explicit operator decimal(BigDecimal self)
-    {
-        return self.ToDecimal(null);
-    }
+    public static explicit operator decimal(BigDecimal self) => self.ToDecimal(null);
 
-    public static explicit operator BigInteger(BigDecimal self)
-    {
-        return self.Round(0).unscaled;
-    }
+    public static explicit operator BigInteger(BigDecimal self) => self.Round(0).unscaled;
 
     #endregion
 
@@ -724,10 +631,7 @@ public partial struct BigDecimal
 
     #region Arithmetic
 
-    public static BigDecimal operator -(BigDecimal a)
-    {
-        return a.Opposite();
-    }
+    public static BigDecimal operator -(BigDecimal a) => a.Opposite();
 
     public static BigDecimal operator +(BigDecimal a, BigDecimal b)
     {
@@ -770,7 +674,9 @@ public partial struct BigDecimal
 
     #region Private Methods
 
-    [GeneratedRegex(@"^(?<SIGN>\+|\-)?(?<INTEGER>\d+)(\.(?<DECIMALS>\d+))?(?<EXPONENT>(e|E)(\+|\-)?\d+)?$", RegexOptions.Compiled)]
+    [GeneratedRegex(
+        @"^(?<SIGN>\+|\-)?(?<INTEGER>\d+)(\.(?<DECIMALS>\d+))?(?<EXPONENT>(e|E)(\+|\-)?\d+)?$",
+        RegexOptions.Compiled)]
     private static partial Regex GetDecimalRegex();
 
     private readonly BigDecimal Inflate(int decs)

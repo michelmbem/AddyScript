@@ -11,9 +11,7 @@ public sealed class Undefined : DataItem
 {
     public static readonly Undefined Value = new ();
 
-    private Undefined()
-    {
-    }
+    private Undefined() {}
 
     public override Class Class => throw new InvalidOperationException(Resources.ObjectInInvalidState);
 }

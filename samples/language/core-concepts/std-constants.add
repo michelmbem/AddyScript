@@ -1,0 +1,14 @@
+println($'MININT = {MININT}');
+println($'MAXINT = {MAXINT}');
+println($'MINFLOAT = {MINFLOAT}');
+println($'MAXFLOAT = {MAXFLOAT}');
+println($'MINDATE = {MINDATE}');
+println($'MAXDATE = {MAXDATE}');
+println($'EPSILON = {EPSILON}');
+println($'PI = {PI}');
+println($'E = {E}');
+println($'NINFINITY = {NINFINITY}');
+println($'PINFINITY = {PINFINITY}');
+println($'NAN = {NAN}');
+println($'NEWLINE = {NEWLINE:x}');
+readln();

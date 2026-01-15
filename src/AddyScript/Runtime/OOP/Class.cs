@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -62,6 +63,11 @@ public class Class : IFrameItem
     /// Maps the <b>date</b> primitive type.
     /// </summary>
     public static readonly Class Date = new (ClassID.Date, "date", Modifier.Final);
+
+    /// <summary>
+    /// Maps the <b>duration</b> primitive type.
+    /// </summary>
+    public static readonly Class Duration = new (ClassID.Duration, "duration", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>string</b> primitive type.
@@ -163,21 +169,21 @@ public class Class : IFrameItem
     /// </summary>
     public static readonly Class FieldInfo =
         new (MemberInfo, "FieldInfo", Modifier.Final, CreateDefaultConstructor("FieldInfo", Scope.Private),
-             null, [], GetFieldInfoProperties(), null, null);
+             null, [], GetFieldInfoProperties(), GetFieldInfoMethods(), null);
 
     /// <summary>
     /// PropertyInfo type.
     /// </summary>
     public static readonly Class PropertyInfo =
         new (MemberInfo, "PropertyInfo", Modifier.Final, CreateDefaultConstructor("PropertyInfo", Scope.Private),
-             null, [], GetPropertyInfoProperties(), null, null);
+             null, [], GetPropertyInfoProperties(), GetPropertyInfoMethods(), null);
 
     /// <summary>
     /// MethodInfo type.
     /// </summary>
     public static readonly Class MethodInfo =
         new (MemberInfo, "MethodInfo", Modifier.Final, CreateDefaultConstructor("MethodInfo", Scope.Private),
-             null, [], GetMethodInfoProperties(), null, null);
+             null, [], GetMethodInfoProperties(), GetMethodInfoMethods(), null);
 
     /// <summary>
     /// EventInfo type.
@@ -219,6 +225,7 @@ public class Class : IFrameItem
             Decimal,
             Complex,
             Date,
+            Duration,
             String,
             Blob,
             Tuple,
@@ -653,6 +660,31 @@ public class Class : IFrameItem
     /// </summary>
     public DataItem[] Attributes { get; set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the current type represents an integral numeric type.
+    /// </summary>
+    public bool IsIntegral => ClassID is ClassID.Integer or ClassID.Long;
+
+    /// <summary>
+    /// Gets a value indicating whether the type represented by this instance is numeric.
+    /// </summary>
+    public bool IsNumeric => ClassID is >= ClassID.Integer and <= ClassID.Complex;
+
+    /// <summary>
+    /// Gets a value indicating whether the current instance represents a temporal type, such as a date or duration.
+    /// </summary>
+    public bool IsTemporal => ClassID is ClassID.Date or ClassID.Duration;
+
+    /// <summary>
+    /// Gets a value indicating whether the class identifier represents a sequential type.
+    /// </summary>
+    public bool IsSequential => ClassID is >= ClassID.String and <= ClassID.Stack;
+
+    /// <summary>
+    /// Gets a value indicating whether the type represents a collection, such as a tuple, list, set, or map.
+    /// </summary>
+    public bool IsCollection => ClassID is >= ClassID.Tuple and <= ClassID.Map;
+
     #endregion
 
     #region Static utility methods
@@ -763,7 +795,10 @@ public class Class : IFrameItem
     /// </summary>
     /// <returns>An array of <see cref="ClassField"/>s</returns>
     private static IEnumerable<ClassField> GetTypeInfoFields() =>
-        [new ("__superType", Scope.Private, Modifier.Default, null)];
+        [
+            new ("__superType", Scope.Private, Modifier.Default, null),
+            new ("__helper", Scope.Private, Modifier.Default, null),
+        ];
 
     /// <summary>
     /// Gets the properties of the <i>TypeInfo</i> class.
@@ -780,7 +815,12 @@ public class Class : IFrameItem
             new ("properties", Scope.Public, Modifier.Default, PropertyAccess.Read),
             new ("methods", Scope.Public, Modifier.Default, PropertyAccess.Read),
             new ("events", Scope.Public, Modifier.Default, PropertyAccess.Read),
-            new ("attributes", Scope.Public, Modifier.Default, PropertyAccess.Read)
+            new ("attributes", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("isIntegral", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("isNumeric", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("isTemporal", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("isSequential", Scope.Public, Modifier.Default, PropertyAccess.Read),
+            new ("isCollection", Scope.Public, Modifier.Default, PropertyAccess.Read),
         ];
 
     /// <summary>
@@ -792,7 +832,37 @@ public class Class : IFrameItem
         var toStringFunc = new Function([new Parameter("format", new String(""))],
                                         Block.WithReturn(PropertyRef.OfSelf("name")));
 
-        return [new ("toString", Scope.Public, Modifier.Default, toStringFunc)];
+        var subclassOfFunc = new Function([new Parameter("otherType")],
+                                          Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                          "IsSubclassOf",
+                                                                          new SelfReference(),
+                                                                          new VariableRef("otherType"))));
+
+        var assignableToFunc = new Function([new Parameter("otherType")],
+                                            Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                            "IsAssignableTo",
+                                                                            new SelfReference(),
+                                                                            new VariableRef("otherType"))));
+
+        var assignableFromFunc = new Function([new Parameter("otherType")],
+                                              Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                              "IsAssignableTo",
+                                                                              new VariableRef("otherType"),
+                                                                              new SelfReference())));
+
+        var newInstanceFunc = new Function([new Parameter("args", false, true)],
+                                           Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                           "NewInstance",
+                                                                           new SelfReference(),
+                                                                           new VariableRef("args"))));
+
+        return [
+            new ("toString", Scope.Public, Modifier.Default, toStringFunc),
+            new ("isSubclassOf", Scope.Public, Modifier.Default, subclassOfFunc),
+            new ("isAssignableTo", Scope.Public, Modifier.Default, assignableToFunc),
+            new ("isAssignableFrom", Scope.Public, Modifier.Default, assignableFromFunc),
+            new ("newInstance", Scope.Public, Modifier.Default, newInstanceFunc),
+        ];
     }
 
     /// <summary>
@@ -800,7 +870,10 @@ public class Class : IFrameItem
     /// </summary>
     /// <returns>An array of <see cref="ClassField"/>s</returns>
     private static IEnumerable<ClassField> GetMemberInfoFields() =>
-        [new ("__holder", Scope.Private, Modifier.Default, null)];
+        [
+            new ("__holder", Scope.Private, Modifier.Default, null),
+            new ("__helper", Scope.Protected, Modifier.Default, null),
+        ];
 
     /// <summary>
     /// Gets the properties of the <i>MemberInfo</i> class.
@@ -832,6 +905,31 @@ public class Class : IFrameItem
         [new ("sharedValue", Scope.Public, Modifier.Default, PropertyAccess.Read)];
 
     /// <summary>
+    /// Gets the methods of the <i>FieldInfo</i> class.
+    /// </summary>
+    /// <returns>An array of <see cref="ClassMethod"/>s</returns>
+    private static IEnumerable<ClassMethod> GetFieldInfoMethods()
+    {
+        var getValueFunc = new Function([new Parameter("target")],
+                                        Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                        "GetValue",
+                                                                        new SelfReference(),
+                                                                        new VariableRef("target"))));
+
+        var setValueFunc = new Function([new Parameter("target"), new Parameter("value")],
+                                        new Block(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                 "SetValue",
+                                                                 new SelfReference(),
+                                                                 new VariableRef("target"),
+                                                                 new VariableRef("value"))));
+
+        return [
+            new ("getValue", Scope.Public, Modifier.Default, getValueFunc),
+            new ("setValue", Scope.Public, Modifier.Default, setValueFunc),
+        ];
+    }
+
+    /// <summary>
     /// Gets the properties of the <i>PropertyInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
@@ -854,11 +952,55 @@ public class Class : IFrameItem
     }
 
     /// <summary>
+    /// Gets the methods of the <i>PropertyInfo</i> class.
+    /// </summary>
+    /// <returns>An array of <see cref="ClassMethod"/>s</returns>
+    private static IEnumerable<ClassMethod> GetPropertyInfoMethods()
+    {
+        var getItemFunc = new Function([new Parameter("target"), new Parameter("index")],
+                                       Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                       "GetItem",
+                                                                       new SelfReference(),
+                                                                       new VariableRef("target"),
+                                                                       new VariableRef("index"))));
+
+        var setItemFunc = new Function([new Parameter("target"), new Parameter("index"), new Parameter("value")],
+                                       new Block(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                "SetItem",
+                                                                new SelfReference(),
+                                                                new VariableRef("target"),
+                                                                new VariableRef("index"),
+                                                                new VariableRef("value"))));
+
+        return [
+            .. GetFieldInfoMethods(),
+            new ("getItem", Scope.Public, Modifier.Default, getItemFunc),
+            new ("setItem", Scope.Public, Modifier.Default, setItemFunc),
+        ];
+    }
+
+    /// <summary>
     /// Gets the properties of the <i>MethodInfo</i> class.
     /// </summary>
     /// <returns>An array of <see cref="ClassProperty"/>s</returns>
     private static IEnumerable<ClassProperty> GetMethodInfoProperties() =>
         [new("parameters", Scope.Public, Modifier.Default, PropertyAccess.Read)];
+
+    /// <summary>
+    /// Gets the methods of the <i>MethodInfo</i> class.
+    /// </summary>
+    /// <returns>An array of <see cref="ClassMethod"/>s</returns>
+    private static IEnumerable<ClassMethod> GetMethodInfoMethods()
+    {
+        var invokeFunc = new Function([new Parameter("target"), new Parameter("args", false, true)],
+                                      Block.WithReturn(new MethodCall(PropertyRef.OfSelf("__helper"),
+                                                                      "Invoke",
+                                                                      new SelfReference(),
+                                                                      new VariableRef("target"),
+                                                                      new VariableRef("args"))));
+
+        return [new ("invoke", Scope.Public, Modifier.Default, invokeFunc)];
+    }
 
     /// <summary>
     /// Gets the properties of the <i>EventInfo</i> class.
@@ -884,6 +1026,17 @@ public class Class : IFrameItem
     #endregion
 
     #region Instance utility methods
+
+    /// <summary>
+    /// Determines whether the current class can be losslessly converted to the specified class.
+    /// </summary>
+    /// <param name="other">The target class to which to test for lossless convertibility.</param>
+    /// <returns>
+    /// <b>true</b> if the current class can be converted to the specified class without loss of information;
+    /// otherwise, <b>false</b>.
+    /// </returns>
+    public bool IsLosslesslyConvertibleTo(Class other) =>
+        ClassID < other.ClassID && other.ClassID < ClassID.Date;
 
     /// <summary>
     /// Gets a collection of all the members declared in a class

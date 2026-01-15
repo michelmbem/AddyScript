@@ -22,7 +22,14 @@ public sealed class Decimal(BigDecimal value) : DataItem
 
     public override BigInteger AsBigInteger => (BigInteger)value;
 
-    public override Rational32 AsRational32 => new ((int)value);
+    public override Rational32 AsRational32
+    {
+        get
+        {
+            var (num, den) = value.ToRational();
+            return new Rational32((int)num, (int)den).Simplify();
+        }
+    }
 
     public override double AsDouble => (double)value;
 
@@ -32,8 +39,8 @@ public sealed class Decimal(BigDecimal value) : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsBigDecimal;
 
@@ -55,7 +62,7 @@ public sealed class Decimal(BigDecimal value) : DataItem
         BinaryOperator.Times => new Decimal(value * operand.AsBigDecimal),
         BinaryOperator.Divide => new Decimal(value / operand.AsBigDecimal),
         BinaryOperator.Modulo => new Decimal(value % operand.AsBigDecimal),
-        BinaryOperator.Power => new Decimal(value.Power(operand.AsInt32)),
+        BinaryOperator.Power => new Decimal(value.Pow(operand.AsInt32)),
         BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsBigDecimal),
         BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsBigDecimal),
         BinaryOperator.GreaterThan => Boolean.FromBool(value > operand.AsBigDecimal),

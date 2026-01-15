@@ -1,10 +1,11 @@
 # Introspection
 
-Introspection (also called reflection) allows you to discover the type of an object and its members at runtime. The following example shows how this functionality is handled in AddyScript.
+Introspection (also called reflection) allows you to discover the type of an object and its members at runtime.
+The following example shows how this functionality is handled in AddyScript.
 
-Example:
+#### Example:
 
-Introspecting the **Exception** class
+Introspection showcase
 
 ```JS
 function dumpScope(scope)
@@ -55,7 +56,7 @@ function dumpProperty($property)
 {
     dumpScope($property.scope);
     print($property.fullName);
-    
+
     print(" {");
     if ($property.canRead) {
         dumpScope($property.reader.scope);
@@ -66,19 +67,22 @@ function dumpProperty($property)
         print("write;");
     }
     print(" }");
-    
+
     dumpModifier($property.modifier);
 }
 
 function dumpParameter(parameter)
 {
     if (parameter.byRef)
-        print("ref ");
-    else if (parameter.vaArgs)
-        print("params ");
-    
+        print("&");
+    else if (parameter.vaList)
+        print("..");
+
     print(parameter.name);
-    
+
+    if (!parameter.canBeEmpty)
+        print("!");
+
     var defVal = parameter.defaultValue;
     if (defVal is string)
         print(" = '" + defVal.replace("'", "\\'") + "'");
@@ -86,21 +90,24 @@ function dumpParameter(parameter)
         print(" = " + defVal);
 }
 
+function dumpParameters(parameters)
+{
+    print("(");
+    var notFirst = false;
+    foreach (parameter in parameters)
+    {
+        if (notFirst) print(", ");
+        dumpParameter(parameter);
+        notFirst = true;
+    }
+    print(")");
+}
+
 function dumpMethod(method)
 {
     dumpScope(method.scope);
     print(method.fullName);
-    
-    print("(");
-    var comma = false;
-    foreach (parameter in method.parameters)
-    {
-        if (comma) print(", ");
-        dumpParameter(parameter);
-        comma = true;
-    }
-    print(")");
-    
+    dumpParameters(method.parameters);
     dumpModifier(method.modifier);
 }
 
@@ -108,17 +115,7 @@ function dumpEvent(_event)
 {
     dumpScope(_event.scope);
     print(_event.fullName);
-    
-    print("(");
-    var comma = false;
-    foreach (parameter in _event.parameters)
-    {
-        if (comma) print(", ");
-        dumpParameter(parameter);
-        comma = true;
-    }
-    print(")");
-    
+    dumpParameters(_event.parameters);
     dumpModifier(_event.modifier);
 }
 
@@ -128,48 +125,92 @@ function underline(msg)
     println('-' * msg.length);
 }
 
-function reflect(type)
+function doubleLine()
+{
+    println();
+    println('=' * 40);
+    println();
+}
+
+function reflect(type, otherType = null)
 {
     var title = type.name;
     for (var t = type.superType; t !== null; t = t.superType)
         title += " < " + t.name;
     underline(title);
+
+    println($"isIntegral: {type.isIntegral}");
+    println($"isNumeric: {type.isNumeric}");
+    println($"isTemporal: {type.isTemporal}");
+    println($"isSequential: {type.isSequential}");
+    println($"isCollection: {type.isCollection}");
     
+    if (otherType is not null)
+    {
+        println($"isSubclassOf({otherType.name}): {type.isSubclassOf(otherType)}");
+        println($"isAssignableTo({otherType.name}): {type.isAssignableTo(otherType)}");
+        println($"isAssignableFrom({otherType.name}): {type.isAssignableFrom(otherType)}");
+    }
+
     println();
     underline("contructor:");
     dumpMethod(type.$constructor);
-    
+
     if (type.indexer !== null) {
         println();
         underline("indexer:");
         dumpProperty(type.indexer);
     }
-    
+
     println();
     underline("fields:");
     foreach (field in type.fields)
         dumpField(field);
-    
+
     println();
     underline("properties:");
     foreach ($property in type.properties)
         dumpProperty($property);
-    
+
     println();
     underline("methods:");
     foreach (method in type.methods)
         dumpMethod(method);
-    
+
     println();
     underline("events:");
     foreach (_event in type.events)
         dumpEvent(_event);
 }
 
-reflect(typeof(Exception));
+function manipulate()
+{
+    underline('Manipulating types by reflection:');
+
+    type = typeof(Exception);
+    inst = type.newInstance('MyException', 'An error has occurred.');
+    (name, message) = (type.properties['name'].getValue(inst), type.properties['message'].getValue(inst));
+    println($'Exception created: name = {name}, message = {message}');
+
+    inst = typeof(string).methods['split'].invoke("2, 4, 6, 8, 10", ", ");
+    println($'List created: {inst}');
+    sum = typeof(list).methods['aggregate'].invoke(inst, 0, |a, b| => a + (int)b);
+    println($'Sum of items in the list: {sum}');
+}
+
+reflect(typeof(Exception), typeof(object));
+doubleLine();
+reflect(typeof(int), typeof(long));
+doubleLine();
+reflect(typeof(tuple));
+doubleLine();
+reflect(typeof(map));
+doubleLine();
+manipulate();
 readln();
 ```
 
-**Notes**: once you have discovered the members of a type by introspection, you can activate them using the eval function.
+The above code will output detailed information about the **Exception**, **int**, **tuple**, and **map** types, including their fields, properties, methods, and events.
+It will also demonstrate how to create instances and invoke methods using reflection.
 
 [Home](README.md) | [Previous](inheritance.md) | [Next](interop.md)

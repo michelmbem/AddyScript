@@ -1,3 +1,5 @@
+using System.Linq;
+
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 
@@ -18,7 +20,6 @@ namespace AddyScript.Runtime.OOP;
 public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[] parameters)
     : ClassMember(name, scope, modifier)
 {
-
     /// <summary>
     /// The signature of any closure that could be used to handle this event.
     /// </summary>
@@ -91,15 +92,12 @@ public class ClassEvent(string name, Scope scope, Modifier modifier, Parameter[]
     /// <remarks>The so generated method is always private</remarks>
     public ClassMethod CreateTriggerEventMethod()
     {
-        var arguments = new Expression[Parameters.Length];
-        for (int i = 0; i < arguments.Length; ++i)
-            arguments[i] = new VariableRef(Parameters[i].Name);
-
+        Expression[] handlerArgs = [..Parameters.Select(p => new VariableRef(p.Name))];
         var triggerEventFunc = new Function(Parameters,
                                             new Block(new ForEachLoop(ForEachLoop.DEFAULT_KEY_NAME,
                                                                       "handler",
                                                                       PropertyRef.OfSelf(HandlerSetName),
-                                                                      new FunctionCall("handler", arguments)),
+                                                                      new FunctionCall("handler", handlerArgs)),
                                                       new Return()));
 
         return new (TriggerEventName, Scope.Private, Modifier, triggerEventFunc);

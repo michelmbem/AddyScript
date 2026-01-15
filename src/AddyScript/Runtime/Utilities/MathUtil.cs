@@ -8,7 +8,9 @@ namespace AddyScript.Runtime.Utilities;
 
 public static class MathUtil
 {
-    public static int Power(int n, int exp)
+    private const double DEFAULT_TOLERANCE = 1e-12;
+
+    public static int Pow(int n, int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
 
@@ -35,7 +37,7 @@ public static class MathUtil
 
         while (b > 0)
         {
-            int r = a % b;
+            var r = a % b;
             a = b;
             b = r;
         }
@@ -45,18 +47,46 @@ public static class MathUtil
 
     public static double Modulo(double a, double b)
     {
-        double c = a / b;
-        double d = c - Math.Truncate(c);
+        var c = a / b;
+        var d = c - Math.Truncate(c);
         return d * b;
     }
 
-    public static void Decompose(double value, out ulong mantissa, out ushort exponent, out bool negative)
+    public static (bool, ushort, ulong) Decompose(double value)
     {
-        byte[] bytes = BitConverter.GetBytes(value);
-        uint lo = (bytes[0] | ((uint) bytes[1] << 8) | ((uint) bytes[2] << 16) | ((uint) bytes[3] << 24));
-        uint hi = (bytes[4] | ((uint) bytes[5] << 8) | ((uint) (bytes[6] & 0x0F) << 16));
-        mantissa = lo | ((ulong) hi << 32);
-        exponent = (ushort) ((((ushort) (bytes[7] & 0x7F)) << 4) | (((ushort) (bytes[6] & 0xF0)) >> 4));
-        negative = ((bytes[7] & 0x80) != 0);
+        // binary format: sign[1]exponent[11]mantissa[52]
+        var bits = BitConverter.DoubleToUInt64Bits(value);
+        var negative = bits >> 63 != 0UL;
+        var exponent = (ushort)((bits >> 52) & 0x7FFUL);
+        var mantissa = bits & 0xFFFFFFFFFFFFFUL;
+        
+        return (negative, exponent, mantissa);
+    }
+
+    public static (long, long) ToRational(double value, double tolerance = DEFAULT_TOLERANCE)
+    {
+        if (double.IsNaN(value) || double.IsInfinity(value))
+            throw new ArgumentException("Value must be finite.");
+
+        long h1 = 1, h2 = 0;
+        long k1 = 0, k2 = 1;
+
+        double b = value;
+
+        do
+        {
+            long a = (long)Math.Floor(b);
+            long h = a * h1 + h2;
+            long k = a * k1 + k2;
+
+            double approx = (double)h / k;
+            if (Math.Abs(approx - value) <= tolerance)
+                return (h, k);
+
+            h2 = h1; h1 = h;
+            k2 = k1; k1 = k;
+
+            b = 1.0 / (b - a);
+        } while (true);
     }
 }

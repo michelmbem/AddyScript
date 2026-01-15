@@ -12,7 +12,7 @@ public class ScriptElement
     /// </summary>
     /// <param name="start">The starting position of the element in the source code</param>
     /// <param name="end">The ending position of the element in the source code</param>
-    public ScriptElement(ScriptLocation start, ScriptLocation end)
+    protected ScriptElement(ScriptLocation start, ScriptLocation end)
     {
         SetLocation(start, end);
     }
@@ -20,7 +20,7 @@ public class ScriptElement
     /// <summary>
     /// Initializes a new instance of Element.
     /// </summary>
-    public ScriptElement()
+    protected ScriptElement()
         : this(ScriptLocation.Empty, ScriptLocation.Empty)
     {
     }

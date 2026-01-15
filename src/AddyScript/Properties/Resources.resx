@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,32 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AbnormalListTermination" xml:space="preserve">
+    <value>abnormal list termination, another item was expected</value>
+  </data>
+  <data name="AbstractMemberCantHaveBody" xml:space="preserve">
+    <value>An abstract member can't have a body</value>
+  </data>
+  <data name="AbstractMemberInNonAbstractClass" xml:space="preserve">
+    <value>A non abstract class cannot have abstract members</value>
+  </data>
   <data name="AccessDenied" xml:space="preserve">
     <value>Cannot access to {0} from {1}</value>
   </data>
-  <data name="CannotAlterConstant" xml:space="preserve">
-    <value>Cannot alter a constant object</value>
+  <data name="AccessorScopeMustBeMoreRestrictive" xml:space="preserve">
+    <value>The scope of an accessor must be more restrictive than the property's scope</value>
+  </data>
+  <data name="ArgMustBeOfType" xml:space="preserve">
+    <value>Argument {0} of '{1}' must be of the {2} type</value>
   </data>
   <data name="AttributesNotSupported" xml:space="preserve">
     <value>The following statement does not support attributes</value>
   </data>
-  <data name="IndexNotFound" xml:space="preserve">
-    <value>There is no item {0} in the collection</value>
+  <data name="BadDateOfCall" xml:space="preserve">
+    <value>date::of expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid.</value>
   </data>
-  <data name="CaseLabelRequired" xml:space="preserve">
-    <value>A switch block must contain at least one case label</value>
+  <data name="BothAccessorsCantRedefineScope" xml:space="preserve">
+    <value>The scope cannot be redefined for both accessors of a property</value>
   </data>
-  <data name="CannotCreateSubclass" xml:space="preserve">
-    <value>Cannot create a subclass of final or static class {0}</value>
+  <data name="CalleeIsNotClosure" xml:space="preserve">
+    <value>The given expression is not a closure</value>
   </data>
-  <data name="CannotCreateInstance" xml:space="preserve">
-    <value>Cannot create an instance of abstract or static class {0}</value>
+  <data name="CannotAccessAbstractProperty" xml:space="preserve">
+    <value>Cannot access to abstract property {0}</value>
   </data>
-  <data name="OnlyBoolIntOrString" xml:space="preserve">
-    <value>Expected: a boolean, an integer or a string value</value>
+  <data name="CannotAlterConstant" xml:space="preserve">
+    <value>Cannot alter a constant object</value>
   </data>
-  <data name="NoBreakOutOfLoop" xml:space="preserve">
-    <value>The keyword 'break' cannot be used out of a loop or a switch block</value>
+  <data name="CannotComputeGcdForNegative" xml:space="preserve">
+    <value>Cannot compute the Gcd of negative numbers</value>
   </data>
   <data name="CannotConvert" xml:space="preserve">
     <value>Cannot convert from {0} to {1}</value>
@@ -153,29 +165,77 @@
   <data name="CannotConvertTo" xml:space="preserve">
     <value>Cannot convert the expression to {0}</value>
   </data>
+  <data name="CannotCreateEmptyTuple" xml:space="preserve">
+    <value>Could not create an empty tuple</value>
+  </data>
+  <data name="CannotCreateInstance" xml:space="preserve">
+    <value>Cannot create an instance of abstract or static class {0}</value>
+  </data>
+  <data name="CannotCreateSubclass" xml:space="preserve">
+    <value>Cannot create a subclass of final or static class {0}</value>
+  </data>
+  <data name="CannotInvokeAbstractMember" xml:space="preserve">
+    <value>Cannot invoke abstract member {0}</value>
+  </data>
   <data name="CannotJumpOutOfFinallyBlock" xml:space="preserve">
     <value>Cannot jump out of the finally block</value>
+  </data>
+  <data name="CannotReadProperty" xml:space="preserve">
+    <value>Cannot read a write-only property</value>
   </data>
   <data name="CannotReturnFromFinallyBlock" xml:space="preserve">
     <value>Cannot return from the finally block</value>
   </data>
+  <data name="CannotWriteFinalField" xml:space="preserve">
+    <value>Cannot change the value of a final field</value>
+  </data>
+  <data name="CannotWriteProperty" xml:space="preserve">
+    <value>Cannot write a read-only property</value>
+  </data>
+  <data name="CaseLabelRequired" xml:space="preserve">
+    <value>A switch block must contain at least one case label</value>
+  </data>
+  <data name="CatchOrFinallyBlockRequired" xml:space="preserve">
+    <value>A try statement without resource should have either a catch block or a finally block</value>
+  </data>
+  <data name="ClassHasNoIndexReader" xml:space="preserve">
+    <value>Type {0} does not support reading element by index</value>
+  </data>
+  <data name="ClassHasNoIndexWriter" xml:space="preserve">
+    <value>Type {0} does not support writing element by index</value>
+  </data>
+  <data name="ClassHasNoProperty" xml:space="preserve">
+    <value>Type {0} has no property named {1}</value>
+  </data>
+  <data name="ClassHasNoRangeReader" xml:space="preserve">
+    <value>Type {0} has no support for slice extraction</value>
+  </data>
+  <data name="ClassHasNoRangeWriter" xml:space="preserve">
+    <value>Type {0} has no support for slice replacement</value>
+  </data>
+  <data name="ConstantFieldShouldBeInitialized" xml:space="preserve">
+    <value>A constant field should be initialized upon declaration</value>
+  </data>
   <data name="ConstructorCantReturnValue" xml:space="preserve">
     <value>A constructor is not allowed to return a value</value>
-  </data>
-  <data name="NoContinueOutOfLoop" xml:space="preserve">
-    <value>The keyword 'continue' cannot be used out of a loop</value>
   </data>
   <data name="DuplicatedAttribute" xml:space="preserve">
     <value>Each attribute must be unique in the list</value>
   </data>
-  <data name="DuplicatedAttributeProperty" xml:space="preserve">
-    <value>Each property must be unique in an attribute</value>
+  <data name="DuplicatedAttributeField" xml:space="preserve">
+    <value>Each field in an attribute must be unique</value>
+  </data>
+  <data name="DuplicatedAttributeValue" xml:space="preserve">
+    <value>The attribute value can only be set once</value>
   </data>
   <data name="DuplicatedCaseLabel" xml:space="preserve">
     <value>Each case label must be unique in a swith block</value>
   </data>
-  <data name="DuplicatedProperty" xml:space="preserve">
-    <value>Each property of an object must have a unique name</value>
+  <data name="DuplicatedConstant" xml:space="preserve">
+    <value>Each constant must be unique</value>
+  </data>
+  <data name="DuplicatedItem" xml:space="preserve">
+    <value>Each value must be unique in a set</value>
   </data>
   <data name="DuplicatedKey" xml:space="preserve">
     <value>Each item of a map must have a unique key</value>
@@ -183,11 +243,20 @@
   <data name="DuplicatedLabel" xml:space="preserve">
     <value>A {0} label already exists in the current scope</value>
   </data>
+  <data name="DuplicatedParameter" xml:space="preserve">
+    <value>Each parameter must be unique in the list</value>
+  </data>
+  <data name="DuplicatedProperty" xml:space="preserve">
+    <value>Each property of an object must have a unique name</value>
+  </data>
   <data name="DuplicatedVariable" xml:space="preserve">
     <value>Each variable must be declared once in its scope</value>
   </data>
-  <data name="DuplicatedParameter" xml:space="preserve">
-    <value>Each parameter must be unique in the list</value>
+  <data name="EventDeclaredInAncestor" xml:space="preserve">
+    <value>Event {0} is already declared in ancestor {1}</value>
+  </data>
+  <data name="EventHidesHomonymous" xml:space="preserve">
+    <value>Event {0} hides an inherited homonymous field, property or method</value>
   </data>
   <data name="ExpressionRequired" xml:space="preserve">
     <value>An expression is required</value>
@@ -198,14 +267,32 @@
   <data name="FieldHidesHomonymous" xml:space="preserve">
     <value>Field {0} hides an inherited homonymous property, method or event</value>
   </data>
-  <data name="PropertyNotFoundInClass" xml:space="preserve">
-    <value>There is no {0} property in class {1}</value>
+  <data name="FunctionHasNoParameterNamed" xml:space="preserve">
+    <value>{0} has no parameter named {1}</value>
   </data>
-  <data name="PropertyNotFoundInObject" xml:space="preserve">
-    <value>The object has no {0} property</value>
+  <data name="IndexerCantBeAuto" xml:space="preserve">
+    <value>Automatic accessors generation is not supported for indexers</value>
   </data>
-  <data name="PropertyUsedAsMethod" xml:space="preserve">
-    <value>{0} is a property but is used as a method</value>
+  <data name="IndexerCantBeStatic" xml:space="preserve">
+    <value>An indexer cannot be static</value>
+  </data>
+  <data name="IndexNotFound" xml:space="preserve">
+    <value>There is no item {0} in the collection</value>
+  </data>
+  <data name="InvalidAccessorsScope" xml:space="preserve">
+    <value>At least, one accessor must have the same scope than the property</value>
+  </data>
+  <data name="InvalidConstantType" xml:space="preserve">
+    <value>A constant cannot be of the {0} type. Only bool, int, long, float, decimal, complex, date and string are accepted</value>
+  </data>
+  <data name="InvalidConstructorModifier" xml:space="preserve">
+    <value>No modifier is allowed for the constructor</value>
+  </data>
+  <data name="InvalidDatePart" xml:space="preserve">
+    <value>'{0}' is not a valid date part. Only 'year', 'month', 'yearday', 'weekday', 'day', 'hour', 'minute', 'second' and 'millisecond' are accepted.</value>
+  </data>
+  <data name="InvalidDateUnit" xml:space="preserve">
+    <value>'{0}' is not a valid unit of time. Only 'year', 'month', 'day', 'hour', 'minute', 'second' and 'millisecond' are accepted.</value>
   </data>
   <data name="InvalidEvalParam" xml:space="preserve">
     <value>The given string does not contain a valid expression</value>
@@ -222,11 +309,32 @@
   <data name="InvalidNewUsage" xml:space="preserve">
     <value>Invalid expression termination; an object initializer or a call to a constructor is expected</value>
   </data>
+  <data name="InvalidOperandCount" xml:space="preserve">
+    <value>Invalid operands count for operator {0}</value>
+  </data>
+  <data name="InvalidOperandForWith" xml:space="preserve">
+    <value>The left operand of 'with' should be an object</value>
+  </data>
+  <data name="InvalidOperatorModifier" xml:space="preserve">
+    <value>No modifier is allowed for an operator overloading</value>
+  </data>
   <data name="InvalidTypeReference" xml:space="preserve">
     <value>Invalid external type reference: {0}</value>
   </data>
   <data name="IterationNotSupported" xml:space="preserve">
     <value>Cannot iterate through a variable of type {0}</value>
+  </data>
+  <data name="IteratorCantReturnValue" xml:space="preserve">
+    <value>An iterator cannot return any value</value>
+  </data>
+  <data name="JumpToCaseLabelOutOfSwitchBlock" xml:space="preserve">
+    <value>The script is trying to jump to a case label out of a switch block</value>
+  </data>
+  <data name="ListCantBeEmpty" xml:space="preserve">
+    <value>The list of variables can't be empty</value>
+  </data>
+  <data name="ListLengthMismatch" xml:space="preserve">
+    <value>Both lists should have the same length</value>
   </data>
   <data name="LiteralRequired" xml:space="preserve">
     <value>The expression must be a literal value</value>
@@ -234,11 +342,11 @@
   <data name="MandatoryParamsPrecede" xml:space="preserve">
     <value>A mandatory parameter cannot follow an optional one</value>
   </data>
-  <data name="MemberNameConfict" xml:space="preserve">
-    <value>Another member is declared with the name {0}</value>
-  </data>
   <data name="MemberCantOverride" xml:space="preserve">
     <value>Member {0} cannot be overriden</value>
+  </data>
+  <data name="MemberNameConfict" xml:space="preserve">
+    <value>Another member is declared with the name {0}</value>
   </data>
   <data name="MethodHidesHomonymous" xml:space="preserve">
     <value>Method {0} hides an inherited homonymous field, property or event</value>
@@ -249,8 +357,23 @@
   <data name="MethodUsedAsProperty" xml:space="preserve">
     <value>{0} is a method but is used as a property</value>
   </data>
+  <data name="MissingAttribute" xml:space="preserve">
+    <value>No '{0}' attribute is attached to the {1} external function</value>
+  </data>
+  <data name="MissingAttributeProperty" xml:space="preserve">
+    <value>A '{0}' field is missing in the '{1}' attribute</value>
+  </data>
+  <data name="MissingClosingBrace" xml:space="preserve">
+    <value>A '}' is missing</value>
+  </data>
+  <data name="MissingClosingParen" xml:space="preserve">
+    <value>Missing closing parenthesis</value>
+  </data>
   <data name="MissingLabel" xml:space="preserve">
     <value>Label '{0}' is not declared in the current scope</value>
+  </data>
+  <data name="MissingPameter" xml:space="preserve">
+    <value>No value was supplied for the '{0}' parameter of {1}</value>
   </data>
   <data name="ModuleNotFound" xml:space="preserve">
     <value>Cannot load module {0}. Check the 'ImportPaths' property of your ScriptContext</value>
@@ -264,8 +387,14 @@
   <data name="NameConflict" xml:space="preserve">
     <value>The name {0} is already in use</value>
   </data>
-  <data name="JumpToCaseLabelOutOfSwitchBlock" xml:space="preserve">
-    <value>The script is trying to jump to a case label out of a switch block</value>
+  <data name="NoBreakOutOfLoop" xml:space="preserve">
+    <value>The keyword 'break' cannot be used out of a loop or a switch block</value>
+  </data>
+  <data name="NoContinueOutOfLoop" xml:space="preserve">
+    <value>The keyword 'continue' cannot be used out of a loop</value>
+  </data>
+  <data name="NoEmptyProperty" xml:space="preserve">
+    <value>Either a read accessor or a write accessor must be defined</value>
   </data>
   <data name="NoMatchingIndexer" xml:space="preserve">
     <value>No matching indexer found in {0}</value>
@@ -285,14 +414,63 @@
   <data name="NotEnumerable" xml:space="preserve">
     <value>The object's type is not enumerable</value>
   </data>
+  <data name="ObjectInInvalidState" xml:space="preserve">
+    <value>The object is in an intermediary state.
+It requires some initialization to support the expected operation.</value>
+  </data>
+  <data name="OnlyBoolIntOrString" xml:space="preserve">
+    <value>Expected: a boolean, an integer or a string value</value>
+  </data>
   <data name="OperatorCantBeApplied" xml:space="preserve">
     <value>Operator {0} cannot be applied to {1}</value>
   </data>
-  <data name="StatementRequired" xml:space="preserve">
-    <value>A statement is required</value>
+  <data name="PackInvalidFormat" xml:space="preserve">
+    <value>Invalid format for a call to pack or unpack</value>
+  </data>
+  <data name="PackValuesDontMatchFormat" xml:space="preserve">
+    <value>The number of values supplied doesn't match the number of format specifiers</value>
+  </data>
+  <data name="ParameterIsNotOptional" xml:space="preserve">
+    <value>Parameter {0} of {1} is not optional</value>
+  </data>
+  <data name="ParameterNameExpected" xml:space="preserve">
+    <value>A parameter name is expected here</value>
+  </data>
+  <data name="ParameterSuppliedTwice" xml:space="preserve">
+    <value>Several arguments are supplied for parameter {0}</value>
+  </data>
+  <data name="PropertyHidesHomonymous" xml:space="preserve">
+    <value>Property {0} hides an inherited homonymous field, method or event</value>
+  </data>
+  <data name="PropertyNotFoundInClass" xml:space="preserve">
+    <value>There is no {0} property in class {1}</value>
+  </data>
+  <data name="PropertyNotFoundInObject" xml:space="preserve">
+    <value>The object has no {0} property</value>
+  </data>
+  <data name="PropertyUsedAsMethod" xml:space="preserve">
+    <value>{0} is a property but is used as a method</value>
+  </data>
+  <data name="ScriptCannotReturnValue" xml:space="preserve">
+    <value>The script cannot return a value</value>
+  </data>
+  <data name="SingleCharExpected" xml:space="preserve">
+    <value>Argument {0} of '{1}' must be a single character</value>
   </data>
   <data name="SingleConstructor" xml:space="preserve">
     <value>A constructor is already defined for this class</value>
+  </data>
+  <data name="SingleIndexer" xml:space="preserve">
+    <value>An indexer is already defined for this class</value>
+  </data>
+  <data name="SlicingNotSupported" xml:space="preserve">
+    <value>The {0} type does not have support for slice extraction</value>
+  </data>
+  <data name="SpecificFieldModifier" xml:space="preserve">
+    <value>The combination of the 'static' and 'final' modifiers can only be applied to a field</value>
+  </data>
+  <data name="StatementRequired" xml:space="preserve">
+    <value>A statement is required</value>
   </data>
   <data name="StaticClassHasNoSuperClass" xml:space="preserve">
     <value>A static class cannot have a superclass. Either remove the 'static' keyword or remove the superclass specification</value>
@@ -315,6 +493,12 @@
   <data name="TooManyArgs" xml:space="preserve">
     <value>Too many arguments for a call to {0}</value>
   </data>
+  <data name="TuplesAreImmutable" xml:space="preserve">
+    <value>Tuples are immutable</value>
+  </data>
+  <data name="TypeDoesNotSupportFunction" xml:space="preserve">
+    <value>Function {0} does not accept arguments of type {1}</value>
+  </data>
   <data name="TypeNameExpected" xml:space="preserve">
     <value>A type name or pattern is expected</value>
   </data>
@@ -323,6 +507,9 @@
   </data>
   <data name="UndefinedFunction" xml:space="preserve">
     <value>Function {0} is undefined</value>
+  </data>
+  <data name="UndefinedSymbol" xml:space="preserve">
+    <value>Could not find any symbol named {0}</value>
   </data>
   <data name="UndefinedType" xml:space="preserve">
     <value>Type or namespace {0} is undefined</value>
@@ -333,8 +520,17 @@
   <data name="UnexpectedToken" xml:space="preserve">
     <value>Unexpected token {0}</value>
   </data>
+  <data name="UninitializedVariable" xml:space="preserve">
+    <value>Variable {0} has not been set a value</value>
+  </data>
   <data name="UnorderedType" xml:space="preserve">
     <value>Type {0} does not have a predefined order</value>
+  </data>
+  <data name="UnoverloadableOperator" xml:space="preserve">
+    <value>{0} is not an overloadable operator</value>
+  </data>
+  <data name="UnresolvedMemberRef" xml:space="preserve">
+    <value>Unresolved member reference: {0}</value>
   </data>
   <data name="UseParserForInlineFuncs" xml:space="preserve">
     <value>Please use Parser to recognize inline functions and lambda expressions</value>
@@ -342,206 +538,13 @@
   <data name="VaArgsMustBeTheLast" xml:space="preserve">
     <value>A variably sized list of arguments must be the last in the function's header</value>
   </data>
-  <data name="CannotInvokeAbstractMember" xml:space="preserve">
-    <value>Cannot invoke abstract member {0}</value>
-  </data>
-  <data name="ClassHasNoProperty" xml:space="preserve">
-    <value>Type {0} has no property named {1}</value>
-  </data>
-  <data name="ClassHasNoIndexReader" xml:space="preserve">
-    <value>Type {0} does not support reading element by index</value>
-  </data>
-  <data name="MissingAttribute" xml:space="preserve">
-    <value>No '{0}' attribute is attached to the {1} external function</value>
-  </data>
-  <data name="MissingAttributeProperty" xml:space="preserve">
-    <value>A '{0}' field is missing in the '{1}' attribute</value>
-  </data>
-  <data name="UnresolvedMemberRef" xml:space="preserve">
-    <value>Unresolved member reference: {0}</value>
-  </data>
-  <data name="ScriptCannotReturnValue" xml:space="preserve">
-    <value>The script cannot return a value</value>
-  </data>
-  <data name="TypeDoesNotSupportFunction" xml:space="preserve">
-    <value>Function {0} does not accept arguments of type {1}</value>
-  </data>
-  <data name="InvalidDatePart" xml:space="preserve">
-    <value>'{0}' is not a valid date part. Only 'year', 'month', 'yearday', 'weekday', 'day', 'hour', 'minute', 'second' and 'millisecond' are accepted.</value>
-  </data>
-  <data name="AbstractMemberInNonAbstractClass" xml:space="preserve">
-    <value>A non abstract class cannot have abstract members</value>
-  </data>
-  <data name="UninitializedVariable" xml:space="preserve">
-    <value>Variable {0} has not been set a value</value>
-  </data>
-  <data name="DuplicatedConstant" xml:space="preserve">
-    <value>Each constant must be unique</value>
-  </data>
-  <data name="DuplicatedItem" xml:space="preserve">
-    <value>Each value must be unique in a set</value>
-  </data>
-  <data name="InvalidConstantType" xml:space="preserve">
-    <value>A constant cannot be of the {0} type. Only bool, int, long, float, decimal, complex, date and string are accepted</value>
-  </data>
-  <data name="ObjectInInvalidState" xml:space="preserve">
-    <value>The object is in an intermediary state.
-It requires some initialization to support the expected operation.</value>
-  </data>
-  <data name="FALSE" xml:space="preserve">
-    <value>False</value>
-  </data>
-  <data name="TRUE" xml:space="preserve">
-    <value>True</value>
-  </data>
-  <data name="InvalidDateUnit" xml:space="preserve">
-    <value>'{0}' is not a valid unit of time. Only 'year', 'month', 'day', 'hour', 'minute', 'second' and 'millisecond' are accepted.</value>
-  </data>
-  <data name="MissingClosingParen" xml:space="preserve">
-    <value>Missing closing parenthesis</value>
-  </data>
-  <data name="BadDateOfCall" xml:space="preserve">
-    <value>date::of expects 3, 4, 6 or 7 arguments. The number or arguments ({0}) provided is invalid.</value>
-  </data>
-  <data name="SingleCharExpected" xml:space="preserve">
-    <value>Argument {0} of '{1}' must be a single character</value>
-  </data>
-  <data name="ArgMustBeOfType" xml:space="preserve">
-    <value>Argument {0} of '{1}' must be of the {2} type</value>
-  </data>
-  <data name="CannotAccessAbstractProperty" xml:space="preserve">
-    <value>Cannot access to abstract property {0}</value>
-  </data>
-  <data name="CannotReadProperty" xml:space="preserve">
-    <value>Cannot read a write-only property</value>
-  </data>
-  <data name="CannotWriteProperty" xml:space="preserve">
-    <value>Cannot write a read-only property</value>
-  </data>
-  <data name="PropertyHidesHomonymous" xml:space="preserve">
-    <value>Property {0} hides an inherited homonymous field, method or event</value>
-  </data>
-  <data name="InvalidAccessorsScope" xml:space="preserve">
-    <value>At least, one accessor must have the same scope than the property</value>
-  </data>
-  <data name="NoEmptyProperty" xml:space="preserve">
-    <value>Either a read accessor or a write accessor must be defined</value>
-  </data>
-  <data name="EventDeclaredInAncestor" xml:space="preserve">
-    <value>Event {0} is already declared in ancestor {1}</value>
-  </data>
-  <data name="EventHidesHomonymous" xml:space="preserve">
-    <value>Event {0} hides an inherited homonymous field, property or method</value>
-  </data>
-  <data name="AccessorScopeMustBeMoreRestrictive" xml:space="preserve">
-    <value>The scope of an accessor must be more restrictive than the property's scope</value>
-  </data>
-  <data name="InvalidOperandCount" xml:space="preserve">
-    <value>Invalid operands count for operator {0}</value>
-  </data>
-  <data name="UnoverloadableOperator" xml:space="preserve">
-    <value>{0} is not an overloadable operator</value>
-  </data>
-  <data name="InvalidOperatorModifier" xml:space="preserve">
-    <value>No modifier is allowed for an operator overloading</value>
-  </data>
-  <data name="CalleeIsNotClosure" xml:space="preserve">
-    <value>The given expression is not a closure</value>
-  </data>
-  <data name="CannotWriteFinalField" xml:space="preserve">
-    <value>Cannot change the value of a final field</value>
-  </data>
-  <data name="SpecificFieldModifier" xml:space="preserve">
-    <value>The combination of the 'static' and 'final' modifiers can only be applied to a field</value>
-  </data>
-  <data name="InvalidConstructorModifier" xml:space="preserve">
-    <value>No modifier is allowed for the constructor</value>
-  </data>
-  <data name="ConstantFieldShouldBeInitialized" xml:space="preserve">
-    <value>A constant field should be initialized upon declaration</value>
-  </data>
-  <data name="PackInvalidFormat" xml:space="preserve">
-    <value>Invalid format for a call to pack or unpack</value>
-  </data>
-  <data name="PackValuesDontMatchFormat" xml:space="preserve">
-    <value>The number of values supplied doesn't match the number of format specifiers</value>
-  </data>
   <data name="ValueShouldNotBeEmpty" xml:space="preserve">
     <value>The value should not be empty</value>
-  </data>
-  <data name="SingleIndexer" xml:space="preserve">
-    <value>An indexer is already defined for this class</value>
-  </data>
-  <data name="IndexerCantBeStatic" xml:space="preserve">
-    <value>An indexer cannot be static</value>
-  </data>
-  <data name="IndexerCantBeAuto" xml:space="preserve">
-    <value>Automatic accessors generation is not supported for indexers</value>
-  </data>
-  <data name="FunctionHasNoParameterNamed" xml:space="preserve">
-    <value>{0} has no parameter named {1}</value>
-  </data>
-  <data name="ParameterIsNotOptional" xml:space="preserve">
-    <value>Parameter {0} of {1} is not optional</value>
-  </data>
-  <data name="ParameterSuppliedTwice" xml:space="preserve">
-    <value>Several arguments are supplied for parameter {0}</value>
-  </data>
-  <data name="AbstractMemberCantHaveBody" xml:space="preserve">
-    <value>An abstract member can't have a body</value>
-  </data>
-  <data name="CatchOrFinallyBlockRequired" xml:space="preserve">
-    <value>A try statement without resource should have either a catch block or a finally block</value>
-  </data>
-  <data name="MissingClosingBrace" xml:space="preserve">
-    <value>A '}' is missing</value>
-  </data>
-  <data name="InvalidOperandForWith" xml:space="preserve">
-    <value>The left operand of 'with' should be an object</value>
-  </data>
-  <data name="SlicingNotSupported" xml:space="preserve">
-    <value>The {0} type does not have support for slice extraction</value>
-  </data>
-  <data name="ListCantBeEmpty" xml:space="preserve">
-    <value>The list of variables can't be empty</value>
-  </data>
-  <data name="ListLengthMismatch" xml:space="preserve">
-    <value>Both lists should have the same length</value>
-  </data>
-  <data name="UndefinedSymbol" xml:space="preserve">
-    <value>Could not find any symbol named {0}</value>
   </data>
   <data name="YieldUsedOutOfIterator" xml:space="preserve">
     <value>yield can only be used in an iterator</value>
   </data>
-  <data name="IteratorCantReturnValue" xml:space="preserve">
-    <value>An iterator cannot return any value</value>
-  </data>
-  <data name="MissingPameter" xml:space="preserve">
-    <value>No value was supplied for the '{0}' parameter of {1}</value>
-  </data>
-  <data name="AbnormalListTermination" xml:space="preserve">
-    <value>abnormal list termination, another item was expected</value>
-  </data>
-  <data name="TuplesAreImmutable" xml:space="preserve">
-    <value>Tuples are immutable</value>
-  </data>
-  <data name="ClassHasNoIndexWriter" xml:space="preserve">
-    <value>Type {0} does not support writing element by index</value>
-  </data>
-  <data name="CannotCreateEmptyTuple" xml:space="preserve">
-    <value>Could not create an empty tuple</value>
-  </data>
-  <data name="ClassHasNoRangeReader" xml:space="preserve">
-    <value>Type {0} has no support for slice extraction</value>
-  </data>
-  <data name="ClassHasNoRangeWriter" xml:space="preserve">
-    <value>Type {0} has no support for slice replacement</value>
-  </data>
-  <data name="CannotComputeGcdForNegative" xml:space="preserve">
-    <value>Cannot compute the Gcd of negative numbers</value>
-  </data>
-  <data name="BothAccessorsCantRedefineScope" xml:space="preserve">
-    <value>The scope cannot be redefined for both accessors of a property</value>
+  <data name="EmptyPatternGroup" xml:space="preserve">
+    <value>A pattern was expected between parentheses</value>
   </data>
 </root>

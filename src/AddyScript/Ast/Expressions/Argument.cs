@@ -2,18 +2,21 @@ namespace AddyScript.Ast.Expressions;
 
 
 /// <summary>
-/// Represents an element in a list of positional arguments.
+/// Represents a positional function argument or a tuple/list/set initializer item.
 /// </summary>
-/// <param name="expr">The argument's value</param>
-public class Argument(Expression expr, bool spread = false) : ScriptElement
+/// <param name="value">The argument's value</param>
+/// <param name="spread">
+/// Tells whether <paramref name="value"/> represents a collection that should be expanded or not
+/// </param>
+public class Argument(Expression value, bool spread = false) : ScriptElement
 {
     /// <summary>
     /// The argument's value.
     /// </summary>
-    public Expression Expression => expr;
+    public Expression Value => value;
 
     /// <summary>
-    /// Tells whether <see cref="Expression"/> represents a collection that should be spread or not.
+    /// Tells whether <see cref="Value"/> represents a collection that should be expanded or not.
     /// </summary>
     public bool Spread => spread;
 }

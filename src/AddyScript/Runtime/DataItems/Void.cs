@@ -12,9 +12,7 @@ public sealed class Void : DataItem
 {
     public static readonly Void Value = new ();
 
-    private Void()
-    {
-    }
+    private Void() {}
 
     public override Class Class => Class.Void;
 

@@ -56,9 +56,9 @@ public class ScriptEngine
     public DataItem Execute(string command)
     {
         DataItem result = null;
-        string fullCommand = (commandPrefix + Environment.NewLine + command).Trim();
+        string fullCommand = $"{commandPrefix}{Environment.NewLine}{command}";
 
-        /**
+        /*
          * Notes: never forget to assign a value to RuntimeServices.Interpreter before running a script!
          * Some features depend on the fact of globally having access to the currently running interpreter.
          */
@@ -111,9 +111,9 @@ public class ScriptEngine
         // Important: define the currently running interpreter!
         RuntimeServices.Interpreter = interpreter;
 
-        var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
-        var call = new FunctionCall(functionName, literals);
-        call.AcceptTranslator(interpreter);
+        Expression[] literals = [.. args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg)))];
+        FunctionCall fnCall = new (functionName, literals);
+        fnCall.AcceptTranslator(interpreter);
 
         return interpreter.ReturnedValue;
     }
@@ -143,10 +143,8 @@ public class ScriptEngine
     /// </summary>
     /// <param name="script">The string to be parsed</param>
     /// <returns>The AST of the script as an instance of the <see cref="Program"/> class</returns>
-    public static Program ParseString(string script)
-    {
-        return new Parser(new Lexer(new StringReader(script))).Program();
-    }
+    public static Program ParseString(string script) =>
+        new Parser(new Lexer(new StringReader(script))).Program();
 
     /// <summary>
     /// Parses a file and gets an AST from it.
@@ -164,10 +162,8 @@ public class ScriptEngine
     /// </summary>
     /// <param name="exprStr">The string to be parsed</param>
     /// <returns>The AST of an expression as an instance of the <see cref="Expression"/> class</returns>
-    public static Expression ParseExpression(string exprStr)
-    {
-        return new ExpressionParser(new Lexer(new StringReader(exprStr))).Expression();
-    }
+    public static Expression ParseExpression(string exprStr) =>
+        new ExpressionParser(new Lexer(new StringReader(exprStr))).Expression();
 
     /// <summary>
     /// Interprets an entire script.
@@ -197,10 +193,8 @@ public class ScriptEngine
     /// the parameters that you want to pass to the script
     /// and may want to retrieve upon completion.
     /// </param>
-    public static void ExecuteString(string script, ScriptContext context)
-    {
+    public static void ExecuteString(string script, ScriptContext context) =>
         Execute(ParseString(script), context);
-    }
 
     /// <summary>
     /// Interprets an entire script.
@@ -212,10 +206,8 @@ public class ScriptEngine
     /// the parameters that you want to pass to the script
     /// and may want to retrieve upon completion.
     /// </param>
-    public static void ExecuteFile(string path, ScriptContext context)
-    {
+    public static void ExecuteFile(string path, ScriptContext context) =>
         Execute(ParseFile(path), context);
-    }
 
     /// <summary>
     /// Evaluates an eventually parameterized expression and returns the result.
@@ -247,10 +239,8 @@ public class ScriptEngine
     /// the parameters that we want to pass to the expression.
     /// </param>
     /// <returns>A <see cref="DataItem"/></returns>
-    public static DataItem EvaluateString(string exprStr, ScriptContext context)
-    {
-        return Evaluate(ParseExpression(exprStr), context);
-    }
+    public static DataItem EvaluateString(string exprStr, ScriptContext context) =>
+        Evaluate(ParseExpression(exprStr), context);
 
     /// <summary>
     /// Exports the AST to Xml format.

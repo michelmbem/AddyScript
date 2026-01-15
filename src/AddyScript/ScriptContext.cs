@@ -69,60 +69,43 @@ public class ScriptContext
     /// Adds a directory to the <see cref="ImportPaths"/> property.
     /// </summary>
     /// <param name="importPath">The path to add</param>
-    public void AddImportPath(string importPath)
-    {
-        importPaths.Add(importPath);
-    }
+    public void AddImportPath(string importPath) => importPaths.Add(importPath);
 
     /// <summary>
     /// Removes a path from the set of directories where imported scripts are searched for.
     /// </summary>
     /// <param name="importPath">The path to remove</param>
-    public void RemoveImportPath(string importPath)
-    {
-        importPaths.Remove(importPath);
-    }
+    public void RemoveImportPath(string importPath) => importPaths.Remove(importPath);
 
     /// <summary>
     /// Adds an assembly along with all of its direct and indirect dependencies to the set of assemblies referenced by the script.
     /// </summary>
     /// <param name="reference">The assembly to add</param>
-    public void AddReference(Assembly reference)
-    {
-        RecursivelyAdd(reference);
-    }
+    public void AddReference(Assembly reference) => RecursivelyAdd(reference);
 
     /// <summary>
     /// Adds an assembly along with all of its direct and indirect dependencies to the set of assemblies referenced by the script.
     /// </summary>
-    /// <param name="reference">The name of the assembly to add</param>
-    public void AddReference(string reference)
-    {
-        AddReference(LoadAssembly(reference));
-    }
+    /// <param name="reference">The name of the <see cref="Assembly"/> to add</param>
+    public void AddReference(string reference) => AddReference(LoadAssembly(reference));
 
     /// <summary>
     /// Removes an assembly from the set of assemblies referenced by the script.
     /// </summary>
     /// <param name="reference">The assembly to remove</param>
-    public void RemoveReference(Assembly reference)
-    {
-        references.Remove(reference);
-    }
+    public void RemoveReference(Assembly reference) => references.Remove(reference);
 
     /// <summary>
     /// Removes an assembly from the set of assemblies referenced by the script.
     /// </summary>
-    /// <param name="reference">The full name of the assembly to remove</param>
-    public void RemoveReference(string reference)
-    {
+    /// <param name="reference">The full name of the <see cref="Assembly"/> to remove</param>
+    public void RemoveReference(string reference) =>
         references.RemoveWhere(a => a.FullName == reference);
-    }
 
     /// <summary>
     /// Recursively adds an <see cref="Assembly"/> and its dependencies to the <see cref="references"/> set.
     /// </summary>
-    /// <param name="reference"></param>
+    /// <param name="reference">The <see cref="Assembly"/> to add as a reference</param>
     private void RecursivelyAdd(Assembly reference)
     {
         if (references.Contains(reference)) return;
@@ -136,6 +119,7 @@ public class ScriptContext
             }
             catch
             {
+                // Ignore loading failures
             }
     }
 }

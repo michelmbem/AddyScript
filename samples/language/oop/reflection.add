@@ -122,12 +122,28 @@ function underline(msg)
 	println('-' * msg.length);
 }
 
-function reflect(type)
+function doubleLine()
+{
+	println();
+	println('=' * 40);
+	println();
+}
+
+function reflect(type, otherType)
 {
 	var title = type.name;
 	for (var t = type.superType; t !== null; t = t.superType)
 		title += " < " + t.name;
 	underline(title);
+	
+	println($"isIntegral: {type.isIntegral}");
+	println($"isNumeric: {type.isNumeric}");
+	println($"isTemporal: {type.isTemporal}");
+	println($"isSequential: {type.isSequential}");
+	println($"isCollection: {type.isCollection}");
+	println($"isSubclassOf({otherType.name}): {type.isSubclassOf(otherType)}");
+	println($"isAssignableTo({otherType.name}): {type.isAssignableTo(otherType)}");
+	println($"isAssignableFrom({otherType.name}): {type.isAssignableFrom(otherType)}");
 	
 	println();
 	underline("contructor:");
@@ -160,16 +176,51 @@ function reflect(type)
 		dumpEvent(_event);
 }
 
+function manipulate()
+{
+	underline('Manipulating types by reflection:');
+	
+	type = typeof(Point);
+	inst = type.newInstance(7, -3);
+	(x, y) = (type.properties['x'].getValue(inst), type.properties['y'].getValue(inst));
+	println($'The point is located at ({x}, {y})');
+	type.methods['add_moved'].invoke(inst, |p| => println($'The point has moved to ({p.x}, {p.y})'));
+	type.methods['move'].invoke(inst, -5, 2);
+	
+	type = typeof(Range);
+	inst = type.newInstance(0, 10, 2);
+	values = type.methods['toList'].invoke(inst);
+	println($'Values produced by the range: {values}');
+	item = type.indexer.getItem(inst, 2);
+	println($'Range item #2: {item}');
+	
+	type = typeof(complex);
+	inst = type.methods['of'].invoke(null, 2, 4);
+	println($'The complex number created is: {inst}');
+}
+
 if (__name == 'main')
 {
-    import point;
-	reflect(typeof(Point3D));
+	// Make the point.add script available for import
+	__context.AddImportPath('../../../samples/language/oop');
 	
-	println();
-	println();
+	import point;
+	reflect(typeof(Point3D), typeof(Point));
+	doubleLine();
 	
 	import std::xrange;
-	reflect(typeof(Range));
+	reflect(typeof(Range), typeof(list));
+	doubleLine();
 	
+	reflect(typeof(complex), typeof(float));
+	doubleLine();
+	
+	reflect(typeof(int), typeof(long));
+	doubleLine();
+	
+	reflect(typeof(list), typeof(tuple));
+	doubleLine();
+	
+	manipulate();
 	readln();
 }

@@ -83,7 +83,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
 {
     public Endianness Endianness => endianness;
 
-    public List<PackFormatItem> Items => new List<PackFormatItem>(items);
+    public List<PackFormatItem> Items => [..items];
 
     public int Length
     {
@@ -93,13 +93,10 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
             foreach (PackFormatItem item in Items)
                 switch (item.Type)
                 {
-                    case PackFormatType.PaddingByte:
-                        break;
-                    case PackFormatType.CString:
-                    case PackFormatType.PascalString:
+                    case PackFormatType.CString or PackFormatType.PascalString:
                         ++l;
                         break;
-                    default:
+                    case not PackFormatType.PaddingByte:
                         l += item.Count;
                         break;
                 }
@@ -112,7 +109,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
         Debug.Assert(!string.IsNullOrEmpty(s));
 
         var endianness = Endianness.Default;
-        var items = new List<PackFormatItem>();
+        List<PackFormatItem> items = [];
         int i = 0, count = 1;
 
         switch (s[0])
@@ -125,8 +122,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
                 endianness = Endianness.BigEndian;
                 ++i;
                 break;
-            case '@':
-            case '!':
+            case '@' or '!':
                 ++i;
                 break;
         }
@@ -165,14 +161,12 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
                     ++i;
                     count = 1;
                     break;
-                case 'i':
-                case 'l':
+                case 'i' or 'l':
                     items.Add(new PackFormatItem(PackFormatType.Integer, count));
                     ++i;
                     count = 1;
                     break;
-                case 'I':
-                case 'L':
+                case 'I' or 'L':
                     items.Add(new PackFormatItem(PackFormatType.UInteger, count));
                     ++i;
                     count = 1;
@@ -187,8 +181,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
                     ++i;
                     count = 1;
                     break;
-                case 'f':
-                case 'e':
+                case 'f' or 'e':
                     items.Add(new PackFormatItem(PackFormatType.Float, count));
                     ++i;
                     count = 1;
@@ -218,24 +211,23 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
                     ++i;
                     count = 1;
                     break;
-                default:
-                    if (char.IsWhiteSpace(s[i]))
-                        ++i;
-                    else if (char.IsDigit(s[i]))
-                    {
-                        int j = i;
-                        do
-                        {
-                            ++j;
-                        } while (j < s.Length && char.IsDigit(s[j]));
-                        if (j >= s.Length)
-                            throw new ArgumentException(Resources.PackInvalidFormat);
-                        count = int.Parse(s.Substring(i, j - i));
-                        i = j;
-                    }
-                    else
-                        throw new ArgumentException(Resources.PackInvalidFormat);
+                case var c when char.IsWhiteSpace(c):
+                    ++i;
                     break;
+                case var c when char.IsDigit(c):
+                {
+                    int j = i;
+                    do
+                        ++j;
+                    while (j < s.Length && char.IsDigit(s[j]));
+                    if (j >= s.Length)
+                        throw new ArgumentException(Resources.PackInvalidFormat);
+                    count = int.Parse(s[i..j]);
+                    i = j;
+                    break;
+                }
+                default:
+                    throw new ArgumentException(Resources.PackInvalidFormat);
             }
         }
 
@@ -244,7 +236,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
 
     public override string ToString()
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
 
         switch (Endianness)
         {
@@ -257,7 +249,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
         }
 
         foreach (var item in Items)
-            sb.Append(item.ToString());
+            sb.Append(item);
 
         return sb.ToString();
     }

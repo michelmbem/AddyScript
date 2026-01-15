@@ -28,13 +28,13 @@ public class ClassProperty : ClassMember
                          Scope readerScope, Block readerBody, Scope writerScope, Block writerBody) :
         base(name, scope, modifier)
     {
-        if (readerBody != null || (access & PropertyAccess.Read) != PropertyAccess.None)
+        if (readerBody != null || access.HasFlag(PropertyAccess.Read))
         {
             Parameter[] readerParameters = IsIndexer ? [new(ForEachLoop.DEFAULT_KEY_NAME)] : [];
             Reader = new ClassMethod(GetReaderName(name), readerScope, modifier, new (readerParameters, readerBody));
         }
 
-        if (writerBody == null && (access & PropertyAccess.Write) == PropertyAccess.None) return;
+        if (writerBody == null && !access.HasFlag(PropertyAccess.Write)) return;
         
         Parameter[] writerParameters = IsIndexer
             ? [new(ForEachLoop.DEFAULT_KEY_NAME), new(WRITER_PARAMETER_NAME)]

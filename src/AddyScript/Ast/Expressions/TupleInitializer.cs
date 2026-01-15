@@ -1,5 +1,3 @@
-using System;
-using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Translators;
 
@@ -24,20 +22,7 @@ public class TupleInitializer(params Argument[] items) : SequenceInitializer(ite
     /// <param name="rValue">The value that should be assigned to this reference</param>
     public void AcceptAssignmentProcessor(IAssignmentProcessor processor, DataItem rValue)
     {
-        DataItem[] rValueItems = rValue.AsArray;
-        
-        if (rValueItems.Length != Items.Length)
-            throw new InvalidOperationException(Resources.ListLengthMismatch);
-
-        for (int i = 0; i < Items.Length; ++i)
-        {
-            var item = Items[i];
-            
-            if (item.Spread || item.Expression is not IReference reference)
-                throw new InvalidOperationException(Resources.NotAReference);
-            
-            reference.AcceptAssignmentProcessor(processor, rValueItems[i]);
-        }
+        processor.AssignToTuple(this, rValue);
     }
 
     /// <summary>

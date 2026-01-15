@@ -15,7 +15,6 @@ namespace AddyScript.Runtime.OOP;
 /// <param name="modifier">Determines whether this member is abstract, final, static or none</param>
 public abstract class ClassMember(string name, Scope scope, Modifier modifier)
 {
-
     /// <summary>
     /// The member's name.
     /// </summary>
@@ -40,6 +39,16 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     /// The name of this member prefixed by the class name.
     /// </summary>
     public string FullName => Holder != null ? $"{Holder.Name}::{Name}" : Name;
+
+    /// <summary>
+    /// Gets if this member is static.
+    /// </summary>
+    public bool IsStatic => Modifier is Modifier.Static or Modifier.StaticFinal;
+
+    /// <summary>
+    /// Gets if this member is final.
+    /// </summary>
+    public bool IsFinal => Modifier is Modifier.Final or Modifier.StaticFinal;
 
     /// <summary>
     /// The member's attributes.

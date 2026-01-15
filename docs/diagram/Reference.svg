@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="235" height="389">
+   <defs>
+      <style type="text/css">
+    @namespace "http://www.w3.org/2000/svg";
+    .line                 {fill: none; stroke: #004900; stroke-width: 1;}
+    .bold-line            {stroke: #001400; shape-rendering: crispEdges; stroke-width: 2;}
+    .thin-line            {stroke: #001F00; shape-rendering: crispEdges}
+    .filled               {fill: #004900; stroke: none;}
+    text.terminal         {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #001400;
+                            font-weight: bold;
+                          }
+    text.nonterminal      {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #001A00;
+                            font-weight: normal;
+                          }
+    text.regexp           {font-family: Verdana, Sans-serif;
+                            font-size: 12px;
+                            fill: #001F00;
+                            font-weight: normal;
+                          }
+    rect, circle, polygon {fill: #004900; stroke: #004900;}
+    rect.terminal         {fill: #E5FFE5; stroke: #004900; stroke-width: 1;}
+    rect.nonterminal      {fill: #F1FFF1; stroke: #004900; stroke-width: 1;}
+    rect.text             {fill: none; stroke: none;}
+    polygon.regexp        {fill: #F7FFF7; stroke: #004900; stroke-width: 1;}
+  </style>
+   </defs>
+   <polygon points="9 17 1 13 1 21"/>
+   <polygon points="17 17 9 13 9 21"/>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#VariableRef"
+      xlink:title="VariableRef">
+      <rect x="51" y="3" width="92" height="32"/>
+      <rect x="49" y="1" width="92" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="21">VariableRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#ItemRef"
+      xlink:title="ItemRef">
+      <rect x="51" y="47" width="70" height="32"/>
+      <rect x="49" y="45" width="70" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="65">ItemRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#SliceRef"
+      xlink:title="SliceRef">
+      <rect x="51" y="91" width="68" height="32"/>
+      <rect x="49" y="89" width="68" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="109">SliceRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#PropertyRef"
+      xlink:title="PropertyRef">
+      <rect x="51" y="135" width="94" height="32"/>
+      <rect x="49" y="133" width="94" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="153">PropertyRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#StaticPropertyRef"
+      xlink:title="StaticPropertyRef">
+      <rect x="51" y="179" width="130" height="32"/>
+      <rect x="49" y="177" width="130" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="197">StaticPropertyRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#ParentPropertyRef"
+      xlink:title="ParentPropertyRef">
+      <rect x="51" y="223" width="136" height="32"/>
+      <rect x="49" y="221" width="136" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="241">ParentPropertyRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#ParentIndexerRef"
+      xlink:title="ParentIndexerRef">
+      <rect x="51" y="267" width="132" height="32"/>
+      <rect x="49" y="265" width="132" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="285">ParentIndexerRef</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#TupleInitializer"
+      xlink:title="TupleInitializer">
+      <rect x="51" y="311" width="114" height="32"/>
+      <rect x="49" y="309" width="114" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="329">TupleInitializer</text>
+   </a>
+   <a xmlns:xlink="http://www.w3.org/1999/xlink"
+      xlink:href="#SetInitializer"
+      xlink:title="SetInitializer">
+      <rect x="51" y="355" width="100" height="32"/>
+      <rect x="49" y="353" width="100" height="32" class="nonterminal"/>
+      <text class="nonterminal" x="59" y="373">SetInitializer</text>
+   </a>
+   <path class="line"
+         d="m17 17 h2 m20 0 h10 m92 0 h10 m0 0 h44 m-176 0 h20 m156 0 h20 m-196 0 q10 0 10 10 m176 0 q0 -10 10 -10 m-186 10 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m70 0 h10 m0 0 h66 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m68 0 h10 m0 0 h68 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m94 0 h10 m0 0 h42 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m130 0 h10 m0 0 h6 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m136 0 h10 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m132 0 h10 m0 0 h4 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m114 0 h10 m0 0 h22 m-166 -10 v20 m176 0 v-20 m-176 20 v24 m176 0 v-24 m-176 24 q0 10 10 10 m156 0 q10 0 10 -10 m-166 10 h10 m100 0 h10 m0 0 h36 m23 -352 h-3"/>
+   <polygon points="225 17 233 13 233 21"/>
+   <polygon points="225 17 217 13 217 21"/>
+</svg>

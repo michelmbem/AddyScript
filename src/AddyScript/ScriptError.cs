@@ -4,7 +4,7 @@ using System;
 namespace AddyScript;
 
 
-public class ScriptError : ApplicationException
+public class ScriptError : Exception
 {
     public ScriptError(string fileName, ScriptElement element, Exception innerException)
         : base(innerException.Message, innerException)
@@ -20,7 +20,15 @@ public class ScriptError : ApplicationException
         Element = element;
     }
 
-    public string FileName { get; private set; }
+    public string FileName { get; }
 
-    public ScriptElement Element { get; private set; }
+    public ScriptElement Element { get; }
+
+    public ScriptError LocatedAt(ScriptElement parent)
+    {
+        if (Element.Start.IsEmpty && !parent.Start.IsEmpty)
+            Element.CopyLocation(parent);
+        
+        return this;
+    }
 }

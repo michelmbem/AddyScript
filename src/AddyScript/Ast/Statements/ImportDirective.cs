@@ -36,12 +36,17 @@ public class ImportDirective : Statement
     /// replacing the directory separator, or a fully .Net type's
     /// qualified name or a .Net's namespace.
     /// </summary>
-    public QualifiedName ModuleName { get; private set; }
+    public QualifiedName ModuleName { get; }
 
     /// <summary>
     /// An eventually shorter name given to the imported type or namespace.
     /// </summary>
-    public string Alias { get; private set; }
+    public string Alias { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether an alias is defined.
+    /// </summary>
+    public bool HasAlias => !string.IsNullOrEmpty(Alias);
 
     /// <summary>
     /// Translates this node.

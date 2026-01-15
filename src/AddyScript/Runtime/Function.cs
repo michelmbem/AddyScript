@@ -11,6 +11,7 @@ using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.OOP;
 using AddyScript.Translators;
 
+
 namespace AddyScript.Runtime;
 
 
@@ -24,18 +25,14 @@ namespace AddyScript.Runtime;
 /// <param name="body">The function's body</param>
 public class Function(Parameter[] parameters, Block body) : IFrameItem
 {
+    private static readonly Dictionary<string, Function> Map = [];
+    private readonly Dictionary<Type, Delegate> delegateCache = [];
+    private MethodFrame parentFrame;
+
     /// <summary>
     /// Represents the empty function (one that does nothing).
     /// </summary>
-    public static readonly Function Empty = new ([], Block.WithReturn());
-
-    /// <summary>
-    /// Maps method names to corresponding instances of <see cref="Function"/>.
-    /// </summary>
-    public static readonly Dictionary<string, Function> Map = [];
-
-    private readonly Dictionary<Type, Delegate> delegateCache = [];
-    private MethodFrame declaringFrame;
+    public static Function Empty => new ([], Block.WithReturn());
 
     /// <summary>
     /// Gets the kind of frame item a function is.
@@ -58,28 +55,28 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     public DataItem[] Attributes { get; set; }
 
     /// <summary>
-    /// For a function declared inline, holds a reference to the parent function's frame if any.
-    /// </summary>
-    public MethodFrame DeclaringFrame
-    {
-        get => declaringFrame;
-        set
-        {
-            declaringFrame = value;
-            CapturedItems.Clear();
-
-            if (declaringFrame == null) return;
-
-            foreach (string name in declaringFrame.GetNames())
-                CapturedItems.Add(name, declaringFrame.GetItem(name));
-        }
-    }
-
-    /// <summary>
     /// Gets a reference to the items that were present in
     /// the parent function's frame when this function was created.
     /// </summary>
     public Dictionary<string, IFrameItem> CapturedItems { get; } = [];
+
+    /// <summary>
+    /// For a function declared inline, holds a reference to the parent function's frame if any.
+    /// </summary>
+    public MethodFrame ParentFrame
+    {
+        get => parentFrame;
+        set
+        {
+            parentFrame = value;
+            
+            CapturedItems.Clear();
+            if (parentFrame == null) return;
+
+            foreach (string name in parentFrame.GetNames())
+                CapturedItems.Add(name, parentFrame.GetItem(name));
+        }
+    }
 
     /// <summary>
     /// The minimum number of arguments required by a call to this function.
@@ -132,8 +129,8 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
     /// </returns>
     public Delegate ToDelegate(Type delegateType)
     {
-        if (delegateCache.TryGetValue(delegateType, out Delegate value))
-            return value;
+        if (delegateCache.TryGetValue(delegateType, out var someDelegate))
+            return someDelegate;
 
         const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
                                    BindingFlags.Static | BindingFlags.Instance;
@@ -241,9 +238,9 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
         for (int i = 0; i < parameters.Length; ++i)
             method.DefineParameter(i + 1, parameters[i].Attributes, parameters[i].Name);
 
-        var _delegate = method.CreateDelegate(delegateType);
-        delegateCache.Add(delegateType, _delegate);
+        var theDelegate = method.CreateDelegate(delegateType);
+        delegateCache.Add(delegateType, theDelegate);
         
-        return _delegate;
+        return theDelegate;
     }
 }

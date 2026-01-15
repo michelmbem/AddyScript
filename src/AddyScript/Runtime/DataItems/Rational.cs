@@ -16,14 +16,13 @@ public sealed class Rational : DataItem
 
     public Rational(Rational32 value) => this.value = value;
 
-    public Rational(int numerator, int denominator) => value = new Rational32(numerator, denominator);
-
-    public Rational(int numerator) => value = new Rational32(numerator);
+    public Rational(int numerator, int denominator = 1) =>
+        value = new Rational32(numerator, denominator);
 
     public static DataItem Simplify(Rational32 rational)
     {
-        rational = rational.Simplify();
-        return rational.Denominator == 1 ? new Integer(rational.Numerator) : new Rational(rational);
+        var simplified = rational.Simplify();
+        return simplified.Denominator == 1 ? new Integer(simplified.Numerator) : new Rational(simplified);
     }
 
     public Rational Opposite => new (-value);
@@ -48,8 +47,8 @@ public sealed class Rational : DataItem
 
     public override object AsNativeObject => value;
 
-    public override string ToString(string format, IFormatProvider formatProvider)
-        => value.ToString(format, formatProvider);
+    public override string ToString(string format, IFormatProvider formatProvider) =>
+        value.ToString(format, formatProvider);
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsRational32;
 
