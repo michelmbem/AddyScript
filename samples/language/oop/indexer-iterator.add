@@ -37,7 +37,7 @@ class B : A
 	public property []
 	{
 		read => super[__key];
-		write => super[__key] = (int)__value;
+		write => super[__key] = int(__value);
 	}
 	
 	public property size => super::size;
