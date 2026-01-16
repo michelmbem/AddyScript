@@ -49,9 +49,7 @@ public class Lexer
     {
         InitToken();
 
-        char ch = SkipWhiteSpace();
-
-        return ch switch
+        return SkipWhiteSpace() switch
         {
             EOF => MakeToken(TokenID.EndOfFile, null, true),
             ',' => MakeToken(TokenID.Comma, null, true),
@@ -79,16 +77,14 @@ public class Lexer
             '|' => Verticalbar(),
             '^' => CircumflexAccent(),
             '0' => Zero(),
+            '$' => DollarSign(),
+            '`' => LiteralDate(),
             '@' => VerbatimString(),
             '\'' or '"' => LiteralString(),
-            '$' => DollarSign(),
-            '`' => Backtick(),
-            'b' or 'B' => LetterB(),
-            _ => IsLegalFirstIdChar(ch)
-                ? Identifier()
-                : char.IsDigit(ch)
-                    ? LiteralNumber()
-                    : Unknown(),
+            'b' or 'B' when Ll(2) is '\'' or '"' => LiteralBlob(),
+            var ch when IsLegalFirstIdChar(ch) => Identifier(),
+            var ch when char.IsDigit(ch) => LiteralNumber(),
+            _ => Unknown(),
         };
     }
 
@@ -128,7 +124,7 @@ public class Lexer
          * The sequence [0-9](_?[0-9])* is macthed by IntegralNumber.
          * Whenever the sequence starts with a dot, it's prepended a literal zero.
          */
-        var nbrBldr = new StringBuilder();
+        StringBuilder numberBuilder = new ();
         CultureInfo ci = CultureInfo.InvariantCulture;
         bool isReal = false, prependZero = true;
         char ch = Ll(1);
@@ -137,38 +133,38 @@ public class Lexer
         while (char.IsDigit(ch))
         {
             prependZero = false;
-            ch = ReadDigit(nbrBldr, ch);
+            ch = ReadDigit(numberBuilder, ch);
         }
 
         // Decimal part: (\.([0-9](_?[0-9])*)+)?
         if (ch == '.' && char.IsDigit(Ll(2)))
         {
-            if (prependZero) nbrBldr.Append('0');
+            if (prependZero) numberBuilder.Append('0');
 
             isReal = true;
-            nbrBldr.Append(ch).Append(Ll(2));
+            numberBuilder.Append(ch).Append(Ll(2));
             Consume(2);
             ch = Ll(1);
 
             while (char.IsDigit(ch))
             {
-                ch = ReadDigit(nbrBldr, ch);
+                ch = ReadDigit(numberBuilder, ch);
             }
         }
 
         // Exponent part: ([Ee]?[+-]?([0-9](_?[0-9])*)+)?
-        if (ch == 'e' || ch == 'E')
+        if (ch is 'e' or 'E')
         {
             bool error = true;
 
             isReal = true;
-            nbrBldr.Append(ch);
+            numberBuilder.Append(ch);
             Consume(1);
             ch = Ll(1);
 
-            if (ch == '+' || ch == '-')
+            if (ch is '+' or '-')
             {
-                nbrBldr.Append(ch);
+                numberBuilder.Append(ch);
                 Consume(1);
                 ch = Ll(1);
             }
@@ -176,54 +172,54 @@ public class Lexer
             while (char.IsDigit(ch))
             {
                 error = false;
-                ch = ReadDigit(nbrBldr, ch);
+                ch = ReadDigit(numberBuilder, ch);
             }
 
-            if (error) return MakeToken(TokenID.Unknown, nbrBldr.ToString(), false);
+            if (error) return MakeToken(TokenID.Unknown, numberBuilder.ToString(), false);
         }
 
         // Suffix part: [LlFfDd]?
-        string nbrStr = nbrBldr.ToString();
+        string numberStr = numberBuilder.ToString();
 
         if (isReal)
             return Ll(1) switch
             {
-                'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                'f' or 'F' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                             ? MakeToken(TokenID.LT_Float, aDouble, true)
-                            : MakeToken(TokenID.Unknown, nbrStr, true),
-                'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                            : MakeToken(TokenID.Unknown, numberStr, true),
+                'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                             ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                            : MakeToken(TokenID.Unknown, nbrStr, true),
-                'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
-                _ => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                            : MakeToken(TokenID.Unknown, numberStr, true),
+                'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(numberStr), true),
+                _ => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                    ? MakeToken(TokenID.LT_Float, aDouble, false)
-                   : MakeToken(TokenID.Unknown, nbrStr, false),
+                   : MakeToken(TokenID.Unknown, numberStr, false),
             };
 
         return Ll(1) switch
         {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(nbrStr), true),
-            'f' or 'F' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr), true),
+            'f' or 'F' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                         ? MakeToken(TokenID.LT_Float, aDouble, true)
-                        : MakeToken(TokenID.Unknown, nbrStr, true),
-            'i' or 'I' => double.TryParse(nbrStr, NumberStyles.Float, ci, out double aDouble)
+                        : MakeToken(TokenID.Unknown, numberStr, true),
+            'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                         ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                        : MakeToken(TokenID.Unknown, nbrStr, true),
-            'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(nbrStr), true),
-            _ => int.TryParse(nbrStr, NumberStyles.Integer, ci, out int anInt)
+                        : MakeToken(TokenID.Unknown, numberStr, true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(numberStr), true),
+            _ => int.TryParse(numberStr, NumberStyles.Integer, ci, out int anInt)
                ? MakeToken(TokenID.LT_Integer, anInt, false)
-               : MakeToken(TokenID.LT_Long, BigInteger.Parse(nbrStr), false),
+               : MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr), false),
         };
     }
 
     /// <summary>
     /// Reads a decimal digit from the input stream. Eventually skips underscores.
     /// </summary>
-    /// <param name="buffer">The <see cref="StringBuilder"/> where to store the digits</param>
+    /// <param name="sb">The <see cref="StringBuilder"/> where to store the digits</param>
     /// <param name="c">The char read from the input stream</param>
-    private char ReadDigit(StringBuilder buffer, char c)
+    private char ReadDigit(StringBuilder sb, char c)
     {
-        buffer.Append(c);
+        sb.Append(c);
         Consume(1);
         c = Ll(1);
 
@@ -237,6 +233,42 @@ public class Lexer
     }
 
     /// <summary>
+    /// Gets a token representing a symbol that starts with <b>`</b>.
+    /// </summary>
+    /// <returns>A literal date value</returns>
+    private Token LiteralDate()
+    {
+        Consume(1);
+
+        StringBuilder dateBuilder = new ();
+        char ch = Ll(1);
+
+        while (ch is not ('`' or EOF))
+        {
+            dateBuilder.Append(ch);
+            Consume(1);
+            ch = Ll(1);
+        }
+
+        return ch == EOF
+             ? MakeToken(TokenID.Unknown, $"`{dateBuilder}", false)
+             : DateTime.TryParse(dateBuilder.ToString(), CultureInfo.InvariantCulture, out var dateTime)
+                 ? MakeToken(TokenID.LT_Date, dateTime, true)
+                 : MakeToken(TokenID.Unknown, $"`{dateBuilder}`", true);
+    }
+
+    /// <summary>
+    /// Gets a token representing a literal blob.
+    /// </summary>
+    /// <returns>A <see cref="Token"/> representing a literal blob</returns>
+    private Token LiteralBlob()
+    {
+        Consume(1); // Skip 'b' or 'B'
+        var blob = StringUtil.String2ByteArray((string)LiteralString().Value);
+        return MakeToken(TokenID.LT_Blob, blob, false);
+    }
+
+    /// <summary>
     /// Gets a token representing a literal string.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a literal string</returns>
@@ -245,7 +277,7 @@ public class Lexer
         char wrapper = Ll(1);
         Consume(1);
 
-        var strBldr = new StringBuilder();
+        StringBuilder strBuilder = new ();
         bool loop = true;
         char ch;
 
@@ -254,20 +286,20 @@ public class Lexer
             ch = Ll(1);
 
             if (ch is '\r' or '\n' or EOF)
-                return MakeToken(TokenID.Unknown, wrapper + strBldr.ToString(), false);
+                return MakeToken(TokenID.Unknown, wrapper + strBuilder.ToString(), false);
 
             if (ch == wrapper)
                 loop = false;
             else if (ch == '\\')
-                strBldr.Append(EscapeSequence());
+                strBuilder.Append(EscapeSequence());
             else
             {
-                strBldr.Append(ch);
+                strBuilder.Append(ch);
                 Consume(1);
             }
         }
 
-        return MakeToken(TokenID.LT_String, strBldr.ToString(), true);
+        return MakeToken(TokenID.LT_String, strBuilder.ToString(), true);
     }
 
     /// <summary>
@@ -277,7 +309,6 @@ public class Lexer
     private string EscapeSequence()
     {
         Consume(1); // Skip the initial \
-
         char ch = Ll(1);
 
         switch (ch)
@@ -325,7 +356,7 @@ public class Lexer
     /// <returns>A <see cref="string"/> made of hexadecimal digits</returns>
     private string HexadecimalSequence(int max)
     {
-        var hexBldr = new StringBuilder();
+        StringBuilder hexBuilder = new ();
         bool ok = true;
         char ch;
 
@@ -335,7 +366,7 @@ public class Lexer
             ch = Ll(i + 2);
 
             if (IsHexDigit(ch))
-                hexBldr.Append(ch);
+                hexBuilder.Append(ch);
             else
                 ok = false;
         }
@@ -344,7 +375,7 @@ public class Lexer
 
         if (ok)
         {
-            int value = int.Parse(hexBldr.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            var value = int.Parse(hexBuilder.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             Consume(max + 1);
             result = ((char)value).ToString();
         }
@@ -363,8 +394,8 @@ public class Lexer
     /// <returns>A <see cref="Token"/> representing an identifier or a keyword</returns>
     private Token Identifier()
     {
-        var idBldr = new StringBuilder();
-        idBldr.Append(Ll(1));
+        StringBuilder idBuilder = new ();
+        idBuilder.Append(Ll(1));
         Consume(1);
 
         bool loop = true;
@@ -376,16 +407,16 @@ public class Lexer
 
             if (IsLegalIdChar(ch))
             {
-                idBldr.Append(ch);
+                idBuilder.Append(ch);
                 Consume(1);
             }
             else if (ch == '\\')
-                idBldr.Append(EscapeSequence());
+                idBuilder.Append(EscapeSequence());
             else
                 loop = false;
         }
 
-        string word = idBldr.ToString();
+        string word = idBuilder.ToString();
 
         if (Keyword.IsDefined(word))
         {
@@ -400,10 +431,7 @@ public class Lexer
     /// Gets a token with no particular meaning.
     /// </summary>
     /// <returns>A <see cref="Token"/> with no particular meaning</returns>
-    private Token Unknown()
-    {
-        return MakeToken(TokenID.Unknown, Ll(1).ToString(), true);
-    }
+    private Token Unknown() => MakeToken(TokenID.Unknown, Ll(1).ToString(), true);
 
     /// <summary>
     /// Gets a token representing a symbol that starts with a colon.
@@ -795,7 +823,7 @@ public class Lexer
     {
         Consume(1);
 
-        var hexNbrBldr = new StringBuilder();
+        StringBuilder hexNumBuilder = new ();
         CultureInfo ci = CultureInfo.InvariantCulture;
         bool loop = true;
         char ch;
@@ -806,14 +834,14 @@ public class Lexer
 
             if (IsHexDigit(ch))
             {
-                hexNbrBldr.Append(ch);
+                hexNumBuilder.Append(ch);
                 Consume(1);
             }
             else
                 loop = false;
         }
 
-        string hexNumStr = hexNbrBldr.ToString();
+        string hexNumStr = hexNumBuilder.ToString();
 
         return Ll(1) switch
         {
@@ -840,7 +868,7 @@ public class Lexer
         // Skip the wrapper
         Consume(1);
 
-        var strBldr = new StringBuilder();
+        StringBuilder strBuilder = new ();
         bool loop = true;
         char ch;
 
@@ -849,24 +877,24 @@ public class Lexer
             ch = Ll(1);
 
             if (ch == EOF)
-                return MakeToken(TokenID.Unknown, "@" + wrapper + strBldr, false);
+                return MakeToken(TokenID.Unknown, "@" + wrapper + strBuilder, false);
 
             if (ch == wrapper)
                 if (Ll(2) == ch)
                 {
-                    strBldr.Append(ch);
+                    strBuilder.Append(ch);
                     Consume(2);
                 }
                 else
                     loop = false;
             else
             {
-                strBldr.Append(ch);
+                strBuilder.Append(ch);
                 Consume(1);
             }
         }
 
-        return MakeToken(TokenID.LT_String, strBldr.ToString(), true);
+        return MakeToken(TokenID.LT_String, strBuilder.ToString(), true);
     }
 
     /// <summary>
@@ -878,22 +906,16 @@ public class Lexer
         // Skip '$'
         Consume(1);
 
-        Token tmpTok = null;
-        char ch = Ll(1);
-
         /*
-         * Try to recognize a format string:
+         * Try to recognize a mutable string:
          * Normally we should have dedicated methods for this but LiteralString and Verbatim can do the job
          */
-        switch (ch)
+        var tmpTok = Ll(1) switch
         {
-            case '\'' or '"':
-                tmpTok = LiteralString();
-                break;
-            case '@':
-                tmpTok = VerbatimString();
-                break;
-        }
+            '\'' or '"' => LiteralString(),
+            '@' => VerbatimString(),
+            _ => null
+        };
 
         if (tmpTok != null)
             return tmpTok.TokenID == TokenID.Unknown
@@ -901,65 +923,27 @@ public class Lexer
                  : MakeToken(TokenID.MutableString, tmpTok.ToString(), false);
 
         // Try to recognize a special identifier
-        var idBldr = new StringBuilder();
+        StringBuilder idBuilder = new ();
         bool loop = true;
 
         while (loop)
         {
-            ch = Ll(1);
+            char ch = Ll(1);
 
             if (IsLegalIdChar(ch))
             {
-                idBldr.Append(ch);
+                idBuilder.Append(ch);
                 Consume(1);
             }
             else if (ch == '\\')
-                idBldr.Append(EscapeSequence());
+                idBuilder.Append(EscapeSequence());
             else
                 loop = false;
         }
 
-        return idBldr.Length > 0
-             ? MakeToken(TokenID.Identifier, idBldr.ToString(), false)
+        return idBuilder.Length > 0
+             ? MakeToken(TokenID.Identifier, idBuilder.ToString(), false)
              : MakeToken(TokenID.Unknown, "$", false);
-    }
-
-    /// <summary>
-    /// Gets a token representing a symbol that starts with <b>`</b>.
-    /// </summary>
-    /// <returns>A literal date value</returns>
-    private Token Backtick()
-    {
-        Consume(1);
-
-        var sb = new StringBuilder();
-        char ch = Ll(1);
-
-        while (ch != '`' && ch != EOF)
-        {
-            sb.Append(ch);
-            Consume(1);
-            ch = Ll(1);
-        }
-
-        return ch == EOF
-             ? MakeToken(TokenID.Unknown, "`" + sb, false)
-             : DateTime.TryParse(sb.ToString(), out DateTime aDateTime)
-                 ? MakeToken(TokenID.LT_Date, aDateTime, true)
-                 : MakeToken(TokenID.Unknown, "`" + sb + "`", true);
-    }
-
-    /// <summary>
-    /// Gets a token representing a symbol that starts with <b>b</b> or <b>B</b>.
-    /// </summary>
-    /// <returns>A literal blob, an identifier or a keyword</returns>
-    private Token LetterB()
-    {
-        if (Ll(2) is not ('\'' or '"')) return Identifier();
-        
-        Consume(1);
-        var blob = StringUtil.String2ByteArray((string)LiteralString().Value);
-        return MakeToken(TokenID.LT_Blob, blob, false);
     }
 
     /// <summary>
