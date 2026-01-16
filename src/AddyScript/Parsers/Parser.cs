@@ -795,10 +795,16 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         return body;
     }
 
+    /// <summary>
+    /// Parses an expression-bodied function or member and constructs a block representing its body.
+    /// </summary>
+    /// <param name="isInline">Indicates whether the expression body is inline. If <see langword="true"/>, the body is parsed as an inline
+    /// expression without a terminating semicolon; otherwise, a semicolon is expected to terminate the statement.</param>
+    /// <returns>A <see cref="Ast.Statements.Block"/> representing the parsed expression body, including its return value and source location.</returns>
     private Block ExpressionBody(bool isInline)
     {
         Consume(1); // Skip the arrow (=>)
-        var returned = base.MatchCaseExpression();
+        var returned = ExpressionOrThrow();
 
         ScriptElement last = returned;
         if (!isInline) last = Match(TokenID.SemiColon);
@@ -808,6 +814,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         return body;
     }
 
+    /// <summary>
+    /// Creates a block representing the body of a method or function, ensuring it concludes with a return statement.
+    /// </summary>
+    /// <returns>A <see cref="Block"/> instance containing the statements of the body, ending with a return statement.</returns>
     private Block BlockBody()
     {
         Block body = Block();

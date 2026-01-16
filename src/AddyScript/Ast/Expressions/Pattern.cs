@@ -106,14 +106,14 @@ public class TypePattern(string typeName) : Pattern
 /// <summary>
 /// A pattern that matches a property of an object against another pattern.
 /// </summary>
-/// <param name="propertyName">The name of the property to match</param>
+/// <param name="path">The path to the property to match</param>
 /// <param name="pattern">The pattern to match the property against</param>
-public class PropertyMatcher(string propertyName, Pattern pattern) : ScriptElement
+public class PropertyMatcher(string[] path, Pattern pattern) : ScriptElement
 {
     /// <summary>
-    /// The name of the property to match.
+    /// The path to the property to match.
     /// </summary>
-    public string PropertyName => propertyName;
+    public string[] Path => path;
 
     /// <summary>
     /// The pattern to match the property against.
@@ -128,7 +128,7 @@ public class PropertyMatcher(string propertyName, Pattern pattern) : ScriptEleme
     /// <returns>>An <see cref="Expression"/> that evaluates to <b>true</b> or <b>false</b></returns>
     public Expression GetMatchTest(Expression ownerRef)
     {
-        var propRef = new PropertyRef(ownerRef, propertyName);
+        var propRef = path.Aggregate(ownerRef, (current, next) => new PropertyRef(current, next));
         var propIsVoid = new TypeVerification(propRef, Class.Void.Name);
         var propIsNotVoid = new UnaryExpression(UnaryOperator.Not, propIsVoid);
         return new BinaryExpression(BinaryOperator.AndAlso, propIsNotVoid, pattern.GetMatchTest(propRef));

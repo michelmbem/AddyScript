@@ -44,13 +44,25 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <summary>
     /// Recognizes an expression.
     /// </summary>
+    /// <remarks>
+    /// Assignment operators having the lowest priority, we start by parsing an assignment.
+    /// </remarks>
     /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
-    public Expression Expression()
-    {
-        // Well, assignment operators have the lowest priority
-        // So we start by parsing an assignment
-        return Assignment();
-    }
+    public Expression Expression() => Assignment();
+
+    /// <summary>
+    /// Parses and returns an expression, or a throw expression if the current token is the 'throw' keyword.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when parsing an expression that may be replaced by a throw expression,
+    /// such as in contexts where a value or a throw is allowed.
+    /// </remarks>
+    /// <returns>
+    /// An non-null <see cref="Expression"/> representing the parsed expression.
+    /// If the current token is 'throw', returns a throw expression; otherwise, returns a standard expression.
+    /// </returns>
+    protected Expression ExpressionOrThrow() =>
+        TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
 
     /// <summary>
     /// Recognizes an expression that can be used as a valid lvalue;
@@ -100,11 +112,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         if (test == null) return null;
 
         if (!TryMatch(TokenID.Question)) return test;
-        Consume(1);
 
-        var truePart = RequiredExpression();
+        Consume(1); // To skip the '?'
+        var truePart = ExpressionOrThrow();
         Match(TokenID.Colon);
-        var falsePart = TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
+        var falsePart = ExpressionOrThrow();
 
         return new TernaryExpression(test, truePart, falsePart);
     }
@@ -126,8 +138,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             BinaryOperator oper = token.ToBinaryOperator();
             Consume(1);
 
-            var relation = oper == BinaryOperator.IfEmpty && TryMatch(TokenID.KW_Throw)
-                         ? ThrowExpression()
+            var relation = oper == BinaryOperator.IfEmpty
+                         ? ExpressionOrThrow()
                          : Required(Relation, Resources.ExpressionRequired);
             
             moreRelations.Enqueue((oper, relation));
@@ -174,61 +186,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 break;
         }
 
-        return expr;
-    }
-
-    /// <summary>
-    /// Recognizes a belonging check expression (one like <i>x in y</i>).
-    /// </summary>
-    /// <param name="element">The element whose belonging to a container is being checked</param>
-    /// <param name="negate">Determines whether the belonging check is negated (like in <i>x not in y</i>)</param>
-    /// <returns>
-    /// A <see cref="BinaryExpression"/> with the <see cref="BinaryOperator.Contains"/> operator,
-    /// possibly negated with a <see cref="UnaryExpression"/> with the <see cref="UnaryOperator.Not"/> operator
-    /// </returns>
-    private Expression BelongingCheck(Expression element, bool negate)
-    {
-        Match(TokenID.KW_In);
-        var container = Required(Term, Resources.ExpressionRequired);
-        Expression expr = new BinaryExpression(BinaryOperator.Contains, container, element);
-        
-        if (negate)
-        {
-            expr.IsParenthesized = true;
-            expr = new UnaryExpression(UnaryOperator.Not, expr);
-        }
-
-        expr.SetLocation(element.Start, container.End);
-        return expr;
-    }
-
-    /// <summary>
-    /// Recognizes a simple pattern matching expression (one like <i>expr is [not] pattern</i>).
-    /// </summary>
-    /// <param name="checkedExpr">The expression being checked against the pattern</param>
-    /// <returns>
-    /// A <see cref="TypeVerification"/> if the pattern is a type pattern;
-    /// or a <see cref="PatternMatching"/> otherwise,
-    /// </returns>
-    /// <exception cref="SyntaxError">
-    /// If no valid pattern is found after the <b>is</b> [<b>not</b>] keywords
-    /// </exception>
-    private Expression SimplePatternMatching(Expression checkedExpr)
-    {
-        Match(TokenID.KW_Is);
-
-        var pattern = MatchCasePattern();
-        Expression expr = pattern switch
-        {
-            null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
-            TypePattern type and not (ObjectPattern or DestructuringPattern) =>
-                new TypeVerification(checkedExpr, type.TypeName),
-            _ => new PatternMatching(checkedExpr,
-                                     new (pattern, new Literal(Boolean.True)),
-                                     new (new AlwaysTruePattern(), new Literal(Boolean.False))),
-        };
-        
-        expr.SetLocation(expr.Start, pattern.End);
         return expr;
     }
 
@@ -389,7 +346,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     break;
                 case TokenID.LeftParenthesis:
                 {
-                    Consume(1);
+                    Consume(1); // To skip the '('
                     var (positionalArgs, namedArgs) = FunctionArguments();
                     var last = Match(TokenID.RightParenthesis);
 
@@ -400,9 +357,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 }
                 case TokenID.KW_Switch:
                 {
-                    Consume(1);
+                    Consume(1); // To skip the 'switch'
                     Match(TokenID.LeftBrace);
-                    MatchCase[] cases = List(MatchCase, false, null);
+                    var cases = List(MatchCase, false, null);
                     Token last = Match(TokenID.RightBrace);
 
                     Expression checkedExpr = expr;
@@ -412,13 +369,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 }
                 case TokenID.KW_With:
                 {
-                    Consume(1);
+                    Consume(1); // To skip the 'with'
                     Match(TokenID.LeftBrace);
-                    VariableSetter[] fields = List(VariableSetter, true, Resources.DuplicatedProperty);
+                    var mutators = List(VariableSetter, true, Resources.DuplicatedProperty);
                     Token last = Match(TokenID.RightBrace);
 
                     Expression original = expr;
-                    expr = new MutableCopy(original, fields);
+                    expr = new MutableCopy(original, mutators);
                     expr.SetLocation(original.Start, last.End);
                     break;
                 }
@@ -430,6 +387,269 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         while (doChaining);
 
         return expr;
+    }
+
+    /// <summary>
+    /// Recognizes atomic expressions like literal values, collection initializers, simple references,
+    /// simple calls, conversions, parenthesized expressions and the <b>typeof</b> expression.
+    /// </summary>
+    /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
+    private Expression Atom()
+    {
+        SkipComments();
+
+        return token.TokenID switch
+        {
+            TokenID.LT_Null => Literal(Void.Value),
+            TokenID.LT_Boolean => Literal(Boolean.FromBool((bool)token.Value)),
+            TokenID.LT_Integer => Literal(new Integer((int)token.Value)),
+            TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
+            TokenID.LT_Float => Literal(new Float((double)token.Value)),
+            TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
+            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
+            TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
+            TokenID.LT_String => Literal(new String((string)token.Value)),
+            TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
+            TokenID.KW_This => SelfReference(),
+            TokenID.KW_Super => AtomStartingWithSuper(),
+            TokenID.KW_New => AtomStartingWithNew(),
+            TokenID.KW_TypeOf => AtomStartingWithTypeOf(),
+            TokenID.TypeName => AtomStartingWithTypeName(),
+            TokenID.Identifier => AtomStartingWithId(),
+            TokenID.LeftParenthesis => AtomStartingWithLParen(),
+            TokenID.LeftBrace => AtomStartingWithLBrace(),
+            TokenID.LeftBracket => ListInitializer(),
+            TokenID.VerticalBar => Lambda(),
+            TokenID.KW_Function => InlineFunction(),
+            TokenID.MutableString => StringInterpolation(),
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// Recognizes a <b>throw</b> statement used as an expression.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.ThrowExpression"/></returns>
+    private ThrowExpression ThrowExpression()
+    {
+        Token first = Match(TokenID.KW_Throw);
+        Expression thrown = RequiredExpression();
+
+        var _throw = new Throw(thrown);
+        _throw.SetLocation(first.Start, thrown.End);
+        return new ThrowExpression(_throw);
+    }
+
+    /// <summary>
+    /// Construct a left-associative binary expression chain by combining a first operand
+    /// with subsequent operands and corresponding operators stored in a queue.
+    /// </summary>
+    /// <param name="firstOperand">The first operand of the chain of binary expressions</param>
+    /// <param name="subsequentOps">A <see cref="Queue{T}"/> of (BinaryOperator, Expression) pairs</param>
+    /// <returns>A  <see cref="BinaryExpression"/></returns>
+    private static Expression LeftAssociativeChain(Expression firstOperand,
+                                                   Queue<(BinaryOperator, Expression)> subsequentOps)
+    {
+        Expression chainedExpr = firstOperand;
+
+        while (subsequentOps.Count > 0)
+        {
+            var (_operator, operand) = subsequentOps.Dequeue();
+            chainedExpr = new BinaryExpression(_operator, chainedExpr, operand);
+        }
+
+        return chainedExpr;
+    }
+
+    /// <summary>
+    /// Recognizes a belonging check expression (one like <i>x in y</i>).
+    /// </summary>
+    /// <param name="element">The element whose belonging to a container is being checked</param>
+    /// <param name="negate">Determines whether the belonging check is negated (like in <i>x not in y</i>)</param>
+    /// <returns>
+    /// A <see cref="BinaryExpression"/> with the <see cref="BinaryOperator.Contains"/> operator,
+    /// possibly negated with a <see cref="UnaryExpression"/> with the <see cref="UnaryOperator.Not"/> operator
+    /// </returns>
+    private Expression BelongingCheck(Expression element, bool negate)
+    {
+        Match(TokenID.KW_In);
+        var container = Required(Term, Resources.ExpressionRequired);
+        Expression expr = new BinaryExpression(BinaryOperator.Contains, container, element);
+
+        if (negate)
+        {
+            expr.IsParenthesized = true;
+            expr = new UnaryExpression(UnaryOperator.Not, expr);
+        }
+
+        expr.SetLocation(element.Start, container.End);
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes a simple pattern matching expression (one like <i>expr is [not] pattern</i>).
+    /// </summary>
+    /// <param name="checkedExpr">The expression being checked against the pattern</param>
+    /// <returns>
+    /// A <see cref="TypeVerification"/> if the pattern is a type pattern;
+    /// or a <see cref="PatternMatching"/> otherwise,
+    /// </returns>
+    /// <exception cref="SyntaxError">
+    /// If no valid pattern is found after the <b>is</b> [<b>not</b>] keywords
+    /// </exception>
+    private Expression SimplePatternMatching(Expression checkedExpr)
+    {
+        Match(TokenID.KW_Is);
+
+        var pattern = MatchCasePattern();
+        Expression expr = pattern switch
+        {
+            null => throw new SyntaxError(FileName, token, Resources.TypeNameExpected),
+            TypePattern type and not (ObjectPattern or DestructuringPattern) =>
+                new TypeVerification(checkedExpr, type.TypeName),
+            _ => new PatternMatching(checkedExpr,
+                                     new(pattern, new Literal(Boolean.True)),
+                                     new(new AlwaysTruePattern(), new Literal(Boolean.False))),
+        };
+
+        expr.SetLocation(expr.Start, pattern.End);
+        return expr;
+    }
+
+    /// <summary>
+    /// Recognizes the set of arguments passed to a function or method when it's called.
+    /// </summary>
+    /// <returns>A (Argument[], Dictionary{string, Expression})" tuple</returns>
+    protected (Argument[], Dictionary<string, Expression>) FunctionArguments()
+    {
+        List<Argument> positionalArgs = [];
+        Dictionary<string, Expression> namedArgs = [];
+        int section = 0; // 0 => positional arguments section
+
+        while (section == 0)
+        {
+            if (TryMatch(TokenID.Identifier) && LookAhead(TokenID.Colon, out int k))
+            {
+                string argName = token.ToString();
+                Consume(k);
+                namedArgs.Add(argName, RequiredExpression());
+
+                if (TryMatch(TokenID.Comma))
+                {
+                    Consume(1);
+                    section = 1; // 1 => named arguments section
+                }
+                else
+                    section = -1; // end of argument stream
+            }
+            else
+            {
+                Argument arg = Argument();
+
+                if (arg != null)
+                {
+                    positionalArgs.Add(arg);
+
+                    if (TryMatch(TokenID.Comma))
+                        Consume(1);
+                    else
+                        section = -1;
+                }
+                else if (positionalArgs.Count > 0) // no trailing coma
+                    throw new SyntaxError(FileName, token, Resources.AbnormalListTermination);
+                else
+                    section = -1;
+            }
+        }
+
+        while (section == 1)
+        {
+            Token argName = Match(TokenID.Identifier);
+            Match(TokenID.Colon);
+
+            try
+            {
+                namedArgs.Add(argName.ToString(), RequiredExpression());
+            }
+            catch (ArgumentException ex)
+            {
+                throw new SyntaxError(FileName, argName, ex); // named argument duplicated
+            }
+
+            if (TryMatch(TokenID.Comma))
+                Consume(1);
+            else
+                section = -1;
+        }
+
+        return ([.. positionalArgs], namedArgs);
+    }
+
+    /// <summary>
+    /// Recognizes a tuple/list/set initializer item or a function positional argument.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.Argument"/></returns>
+    private Argument Argument()
+    {
+        ScriptLocation start = null;
+        Expression value;
+        bool spread;
+
+        if (TryMatch(TokenID.DoubleDot))
+        {
+            spread = true;
+            start = token.Start;
+            Consume(1);
+            value = RequiredExpression();
+        }
+        else
+        {
+            spread = false;
+            value = Expression();
+        }
+
+        if (value == null) return null;
+
+        var argument = new Argument(value, spread);
+        argument.SetLocation(start ?? value.Start, value.End);
+        return argument;
+    }
+
+    /// <summary>
+    /// Recognizes an entry in a map initializer.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.MapEntry"/></returns>
+    private MapEntry MapEntry()
+    {
+        Expression key = Expression();
+        if (key == null) return null;
+
+        Match(TokenID.Arrow);
+        var value = RequiredExpression();
+
+        var entry = new MapEntry(key, value);
+        entry.SetLocation(key.Start, value.End);
+        return entry;
+    }
+
+    /// <summary>
+    /// Recognizes a constant or property setter.
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
+    protected VariableSetter VariableSetter()
+    {
+        if (!TryMatch(TokenID.Identifier)) return null;
+
+        Token first = token;
+        string name = first.ToString();
+        Consume(1);
+
+        Match(TokenID.Equal);
+        Expression value = RequiredExpression();
+
+        var setter = new VariableSetter(name, value);
+        setter.SetLocation(first.Start, value.End);
+        return setter;
     }
 
     /// <summary>
@@ -480,7 +700,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
         bool isOptional = MatchAny(TokenID.Dot, TokenID.QuestionDot)
             .TokenID == TokenID.QuestionDot;
-        
+
         var last = Match(TokenID.Identifier);
         string memberName = last.ToString();
 
@@ -497,43 +717,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         expr.SetLocation(owner.Start, last.End);
         return expr;
-    }
-
-    /// <summary>
-    /// Recognizes atomic expressions like literal values, collection initializers, simple references,
-    /// simple calls, conversions, parenthesized expressions and the <b>typeof</b> expression.
-    /// </summary>
-    /// <returns>An <see cref="Ast.Expressions.Expression"/></returns>
-    private Expression Atom()
-    {
-        SkipComments();
-
-        return token.TokenID switch
-        {
-            TokenID.LT_Null => Literal(Void.Value),
-            TokenID.LT_Boolean => Literal(Boolean.FromBool((bool)token.Value)),
-            TokenID.LT_Integer => Literal(new Integer((int)token.Value)),
-            TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
-            TokenID.LT_Float => Literal(new Float((double)token.Value)),
-            TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
-            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
-            TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
-            TokenID.LT_String => Literal(new String((string)token.Value)),
-            TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),
-            TokenID.KW_This => SelfReference(),
-            TokenID.KW_Super => AtomStartingWithSuper(),
-            TokenID.KW_New => AtomStartingWithNew(),
-            TokenID.KW_TypeOf => AtomStartingWithTypeOf(),
-            TokenID.TypeName => AtomStartingWithTypeName(),
-            TokenID.Identifier => AtomStartingWithId(),
-            TokenID.LeftParenthesis => AtomStartingWithLParen(),
-            TokenID.LeftBrace => AtomStartingWithLBrace(),
-            TokenID.LeftBracket => ListInitializer(),
-            TokenID.VerticalBar => Lambda(),
-            TokenID.KW_Function => InlineFunction(),
-            TokenID.MutableString => StringInterpolation(),
-            _ => null,
-        };
     }
 
     /// <summary>
@@ -954,29 +1137,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a <b>throw</b> statement used as an expresion.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.ThrowExpression"/></returns>
-    private ThrowExpression ThrowExpression()
-    {
-        Token first = Match(TokenID.KW_Throw);
-        Expression thrown = RequiredExpression();
-
-        var _throw = new Throw(thrown);
-        _throw.SetLocation(first.Start, thrown.End);
-        return new ThrowExpression(_throw);
-    }
-
-    /// <summary>
     /// Recognizes an inline function's declaration.
     /// This method is not really defined here.
     /// Inline functions are only recognized by the full featured parser.
     /// </summary>
     /// <returns>An <see cref="Ast.Expressions.InlineFunction"/></returns>
-    protected virtual InlineFunction InlineFunction()
-    {
+    protected virtual InlineFunction InlineFunction() =>
         throw new NotSupportedException(Resources.UseParserForInlineFuncs);
-    }
 
     /// <summary>
     /// Recognizes a lambda expression or a lambda statement.
@@ -984,31 +1151,8 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// Inline functions are only recognized by the full featured parser.
     /// </summary>
     /// <returns>An <see cref="InlineFunction"/></returns>
-    protected virtual InlineFunction Lambda()
-    {
+    protected virtual InlineFunction Lambda() =>
         throw new NotSupportedException(Resources.UseParserForInlineFuncs);
-    }
-
-    /// <summary>
-    /// Construct a left-associative binary expression chain by combining a first operand
-    /// with subsequent operands and corresponding operators stored in a queue.
-    /// </summary>
-    /// <param name="firstOperand">The first operand of the chain of binary expressions</param>
-    /// <param name="subsequentOps">A <see cref="Queue{T}"/> of (BinaryOperator, Expression) pairs</param>
-    /// <returns>A  <see cref="BinaryExpression"/></returns>
-    private static Expression LeftAssociativeChain(Expression firstOperand,
-                                                   Queue<(BinaryOperator, Expression)> subsequentOps)
-    {
-        Expression chainedExpr = firstOperand;
-
-        while (subsequentOps.Count > 0)
-        {
-            var (_operator, operand) = subsequentOps.Dequeue();
-            chainedExpr = new BinaryExpression(_operator, chainedExpr, operand);
-        }
-
-        return chainedExpr;
-    }
 
     /// <summary>
     /// Recognizes a qualified name.
@@ -1047,141 +1191,6 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         }
 
         return new QualifiedName([.. parts]);
-    }
-
-    /// <summary>
-    /// Recognizes a function positional argument or an item in a sequence initializer.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.Argument"/></returns>
-    private Argument Argument()
-    {
-        ScriptLocation start = null;
-        Expression value;
-        bool spread;
-
-        if (TryMatch(TokenID.DoubleDot))
-        {
-            start = token.Start;
-            Consume(1);
-            value = RequiredExpression();
-            spread = true;
-        }
-        else
-        {
-            value = Expression();
-            spread = false;
-        }
-
-        if (value == null) return null;
-
-        var argument = new Argument(value, spread);
-        argument.SetLocation(start ?? value.Start, value.End);
-        return argument;
-    }
-
-    /// <summary>
-    /// Recognizes a constant or property setter.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
-    protected VariableSetter VariableSetter()
-    {
-        if (!TryMatch(TokenID.Identifier)) return null;
-
-        Token first = token;
-        string name = first.ToString();
-        Consume(1);
-        Match(TokenID.Equal);
-        Expression value = RequiredExpression();
-        
-        var setter = new VariableSetter(name, value);
-        setter.SetLocation(first.Start, value.End);
-        return setter;
-    }
-
-    /// <summary>
-    /// Recognizes an entry in a map initializer.
-    /// </summary>
-    /// <returns>A <see cref="Ast.Expressions.MapEntry"/></returns>
-    private MapEntry MapEntry()
-    {
-        Expression key = Expression();
-        if (key == null) return null;
-
-        Match(TokenID.Arrow);
-        var value = RequiredExpression();
-
-        var entry = new MapEntry(key, value);
-        entry.SetLocation(key.Start, value.End);
-        return entry;
-    }
-
-    /// <summary>
-    /// Recognizes the set of arguments passed to a function or method when it's called.
-    /// </summary>
-    /// <returns>A (ListItem[], Dictionary{string, Expression})" tuple</returns>
-    protected (Argument[], Dictionary<string, Expression>) FunctionArguments()
-    {
-        List<Argument> positionalArgs = [];
-        Dictionary<string, Expression> namedArgs = [];
-        int section = 0; // 0 => positional arguments section
-
-        while (section == 0)
-        {
-            if (TryMatch(TokenID.Identifier) && LookAhead(TokenID.Colon, out int k))
-            {
-                string argName = token.ToString();
-                Consume(k);
-                namedArgs.Add(argName, RequiredExpression());
-
-                if (TryMatch(TokenID.Comma))
-                {
-                    Consume(1);
-                    section = 1; // 1 => named arguments section
-                }
-                else
-                    section = -1; // end of argument stream
-            }
-            else
-            {
-                Argument arg = Argument();
-                
-                if (arg != null)
-                {
-                    positionalArgs.Add(arg);
-
-                    if (TryMatch(TokenID.Comma))
-                        Consume(1);
-                    else
-                        section = -1;
-                }
-                else if (positionalArgs.Count > 0) // no trailing coma
-                    throw new SyntaxError(FileName, token, Resources.AbnormalListTermination);
-                else
-                    section = -1;
-            }
-        }
-
-        while (section == 1)
-        {
-            Token argName = Match(TokenID.Identifier);
-            Match(TokenID.Colon);
-
-            try
-            {
-                namedArgs.Add(argName.ToString(), RequiredExpression());
-            }
-            catch (ArgumentException ex)
-            {
-                throw new SyntaxError(FileName, argName, ex); // named argument duplicated
-            }
-
-            if (TryMatch(TokenID.Comma))
-                Consume(1);
-            else
-                section = -1;
-        }
-
-        return ([.. positionalArgs], namedArgs);
     }
 
     /// <summary>
@@ -1433,16 +1442,26 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="PropertyMatcher"/></returns>
     private PropertyMatcher ObjectPatternPropertyMatcher()
     {
-        if (!TryMatch(TokenID.Identifier)) return null;
+        Token first = null;
+        List<string> path = [];
+        
+        while (TryMatch(TokenID.Identifier))
+        {
+            first ??= token;
+            path.Add(token.ToString());
+            Consume(1);
 
-        Token first = token;
-        string fieldName = first.ToString();
-        Consume(1);
+            if (TryMatch(TokenID.Dot))
+                Consume(1);
+        }
+
+        if (path.Count == 0) return null;
+
         Match(TokenID.Colon);
-        Pattern fieldPattern = MatchCasePattern();
+        Pattern pattern = MatchCasePattern();
 
-        var matcher = new PropertyMatcher(fieldName, fieldPattern);
-        matcher.SetLocation(first.Start, fieldPattern.End);
+        var matcher = new PropertyMatcher([..path], pattern);
+        matcher.SetLocation(first.Start, pattern.End);
         return matcher;
     }
 
@@ -1454,6 +1473,5 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// This basic implementation only recognizes simple expressions.
     /// The full-featured parser overrides it to recognize a richer syntax with blocks.
     /// </remarks>
-    protected virtual Expression MatchCaseExpression() =>
-        TryMatch(TokenID.KW_Throw) ? ThrowExpression() : RequiredExpression();
+    protected virtual Expression MatchCaseExpression() => ExpressionOrThrow();
 }

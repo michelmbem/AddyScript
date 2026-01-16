@@ -1149,7 +1149,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                     else
                         textWriter.Write(", ");
 
-                    textWriter.Write(matcher.PropertyName);
+                    textWriter.Write(string.Join('.', matcher.Path));
                     textWriter.Write(" : ");
                     DumpMatchCasePattern(matcher.Pattern);
                 }

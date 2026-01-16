@@ -133,7 +133,7 @@ l.add(l[2] with { name = 'Kim Ondo', age = 36, languages = ['Python', 'TypeScrip
 l.each(|item| => {
 	res = item switch {
 		null => 'this item is null',
-		Employee {age : 44, dateHired : {year: 2010}} =>
+		Employee {age : 44, dateHired.year: 2010} =>
 			$'{item.name} is 44 years old employee hired in 2010 that earns ${item.salary}/month',
 		(4, int and <= 10, _) => 'a sequence of 3 that starts with 4',
 		Box(width, depth) => $'a box of width: {width} and depth: {depth}',

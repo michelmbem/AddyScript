@@ -1156,7 +1156,7 @@ public class XmlGenerator : ITranslator
 
                 foreach (var matcher in objectPat.PropertyMatchers)
                 {
-                    XmlElement propertyElement = document.CreateElement(matcher.PropertyName);
+                    XmlElement propertyElement = document.CreateElement(string.Join('.', matcher.Path));
                     ProcessPattern(propertyElement, matcher.Pattern);
                     matchersElement.AppendChild(propertyElement);
                 }

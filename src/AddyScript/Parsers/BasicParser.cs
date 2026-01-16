@@ -120,7 +120,7 @@ public abstract class BasicParser
     {
         SkipComments();
 
-        if (!predicate.Invoke(token))
+        if (!predicate(token))
             throw new SyntaxError(FileName, token);
 
         Token matched = token;
@@ -135,8 +135,7 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> that the next non-comment <see cref="Token"/> should have</param>
     /// <returns>The matched <see cref="Token"/></returns>
-    protected Token Match(TokenID requiredID) =>
-        Match(t => t.TokenID == requiredID);
+    protected Token Match(TokenID requiredID) => Match(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Requires the next <see cref="Token"/> that is not a comment to have one of the required <see cref="TokenID"/>s.<br/>
@@ -156,7 +155,7 @@ public abstract class BasicParser
     protected bool TryMatch(Predicate<Token> predicate)
     {
         SkipComments();
-        return predicate.Invoke(token);
+        return predicate(token);
     }
 
     /// <summary>
@@ -164,8 +163,7 @@ public abstract class BasicParser
     /// </summary>
     /// <param name="requiredID">The <see cref="TokenID"/> we may want to match</param>
     /// <returns><b>true</b> if the token's ID matches the given <see cref="TokenID"/>; <b>false</b> otherwise</returns>
-    protected bool TryMatch(TokenID requiredID) =>
-        TryMatch(t => t.TokenID == requiredID);
+    protected bool TryMatch(TokenID requiredID) => TryMatch(t => t.TokenID == requiredID);
 
     /// <summary>
     /// Tests if the next <see cref="Token"/> that is not a comment has one of the given <see cref="TokenID"/>s.
@@ -188,7 +186,7 @@ public abstract class BasicParser
         Token tmpTok = Ll(k);
         while (tmpTok.IsComment) tmpTok = Ll(++k);
 
-        return predicate.Invoke(tmpTok);
+        return predicate(tmpTok);
     }
 
     /// <summary>

@@ -11,8 +11,9 @@ namespace AddyScript.Ast.Expressions;
 /// Initializes a new instance of <see cref="MutableCopy"/>
 /// </remarks>
 /// <param name="original">The object that's being copied</param>
-/// <param name="setters">A list of setters for some of the resulting object's properties</param>
-public class MutableCopy(Expression original, params VariableSetter[] setters) : ObjectInitializer(setters)
+/// <param name="mutators">A list of mutators for some of the properties</param>
+public class MutableCopy(Expression original, params VariableSetter[] mutators)
+    : ObjectInitializer(mutators)
 {
     /// <summary>
     /// Represents the object that's being copied.
