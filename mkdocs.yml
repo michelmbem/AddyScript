@@ -15,13 +15,13 @@ plugins:
       output_path: assets/manual.pdf
       cover_title: AddyScript Manual
       cover_subtitle: Developer Documentation
-      author: Michel (Addy) Mbem
+      author: Michel Mbem
       copyright: © Addy 2009-2026
       toc_title: Table of Contents
       debug_html: false
       exclude_pages:
-        - README.md
-        - grammar.md
+        - README.*
+        - grammar.*
 
 nav:
   - Home: README.md

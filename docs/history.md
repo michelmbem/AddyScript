@@ -1,32 +1,40 @@
 # Changes history
 
-**(DRAFT! Needs more work!)**
+_(WORK IN PROGRESS!)_
 
-So many changes have occured in AddyScript since the very first release than one may wonder why so?
-Please just remember that AddyScript is still under construction and may change between versions without advice.
-If you have downloaded an earlier version of it and started your own work based on that version, you are free to ignore the changes that were introduced in subsequent versions.
-I'll try to summarize here, the most important changes that were introduced in versions of the scripting engine over the years.
+Many changes have occurred in AddyScript since its first release in 2009. It's reasonable to ask why.
+
+Simply keep in mind that AddyScript is constantly evolving. Its syntax can change from one version to the next without prior notice.
+
+If you downloaded an earlier version and started your work from there, you can ignore the changes made in later versions and continue your work as you began.
+
+In the following sections, I will attempt to summarize the most significant changes made to the various versions of the scripting engine over the years.
 
 ### Changes in the language syntax
 
 #### Data types:
 
-* The following data types are new to AddyScript: long, rational, complex, list, map, set, queue and stack.
-* The array data type no more belongs to AddyScript: The former sole collection type of AddyScript is now replaced by list, map, set, queue and stack. That type was very close to the PHP's array type: it had a double indexed-associative nature, was very dynamic (indexes had not to be contiguous) and could participate to some kind of arithmetic like sets. I hope the new AddyScript's collection framework is richer in features than this array type. You can still simulate a dynamic array by using a map with integral keys.
-* The following data types have changed:
-* float: formerly called double, nothing has changed apart the name. I think, even if values of this type are double-precision floatting-point numbers, float is more natural as name than double.
-* decimal: The internal representation has changed. Initially, it was a wrapper around the .NET's Decimal type. Now, it wraps a big decimal value. It's somehow similar to the long type in that it can handle very large (really very large) values. In fact, a long can be considered as a decimal with its decimal part fixed to zero. Both types have been created in regard to handle overflow in arithmetic operations and/or provide more accuracy than the float type does.
-* resource: formerly named native, then handle and finally resource. The new name is influenced by the fact that in PHP, anything that comes from the outter world is of the resource type.
-* ClassInfo is now called TypeInfo; it still plays the same role but most of its former methods have been replaced by properties. Similar changes have been made to the Exception, MemberInfo, FieldInfo, MethodInfo and ParameterInfo types. There are now a PropertyInfo and an EventInfo types; those are subclasses of MemberInfo that provide additionnal informations about the properties and events of a class.
+* Introduction of the **date** and **decimal** types: version 0.7.
+* Replacement of the initial (PHP-like) **array** data type with a more robust collection framework made of the **list**, **map**, **set**, **queue**, and **stack** data types: version 0.9.5.
+* Introduction of the **long**, **rational**, and **complex** data types; **long** was designed to map to a big integer type: version 0.9.5.
+* Renaming of the **double** data type to **float** for simplicity's sake, the internal representation remaining the same: version 0.9.5.
+* Redesign of the **decimal** data type: it then mapped to a (Java-like) big decimal type instead of the .NET builtin Decimal type: version 0.9.5.
+* Renaming of the **native** data type to initially **handle**, then **resource**. The new name was influenced by the fact that in PHP, anything that comes from the outer world is a _resource_: version 0.9.5.
+* Renaming of the _ClassInfo_ class to _TypeInfo_; it kept playing the same role but most of its former methods were replaced by properties. Similar changes were made to the _Exception_, _MemberInfo_, _FieldInfo_, _MethodInfo_, and _ParameterInfo_ classes. The _PropertyInfo_ and _EventInfo_ classes were introduced; those are subclasses of _MemberInfo_ that provide additional information about the properties and events of a class: version 0.9.5.
+* Added support for .NET generic types: version 0.9.9.
+* Introduction of a **blob** type as an abstraction for arrays of byte: version 0.9.9.9.
+* Introduction of tuples and **tuple** initializers: version 0.9.9.9.
+* Introduction of a **duration** data type that better handles date arithmetic: version 0.9.9.9.
 
 #### Literals:
 
-* There are now literals for all scalar types including dates. Most compound types have initializers which act like literals for those types.
-* Numeric literals can include underscores to make them more readable.
+* Literal values for most scalar types including dates, strings and blobs: version 0.9.9.
+* Initializers that act like literals for most compound types: version 0.9.9.
+* Numeric literals can include underscores to make them more readable: version 0.9.5.
 
 #### Constants:
 
-* Declaring constants is a new feature to AddyScript. In versions earlier than 0.9.5, const was a reserved word but not a keyword. From version 0.9.5 it's used to evaluate expressions and mark the result as read-only.
+* Support for declaring constants: version 0.9.9. In versions earlier than 0.9.5, **const** was a reserved word but not a keyword. From version 0.9.5 it was used to evaluate expressions and mark the result as read-only.
 
 #### Variables:
 
