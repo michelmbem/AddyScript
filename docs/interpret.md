@@ -44,7 +44,7 @@ foreach (var item in myArray)
     ScriptEngine.Execute(program, context);
     Console.WriteLine("myValue = " + context.Bindings["myValue"]);
  }
- ```
+```
 
 This will typically run the same script multiple times with different values of the "myValue" context variable
 without needing to parse the source code each time.
