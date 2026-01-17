@@ -20,7 +20,6 @@ plugins:
       toc_title: Table of Contents
       debug_html: false
       exclude_pages:
-        - README.*
         - grammar.*
 
 nav:
