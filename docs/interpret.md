@@ -18,8 +18,8 @@ context.Bindings["myString"] = "Hello!";
 context.Bindings["myFloat"] = 0.9;
 ScriptEngine.ExecuteString(txtScript.Text, context);
 // Alternatively: ScriptEngine.ExecuteFile(@"path/to/my/script", context);
-Console.WriteLine($"myString = {context.Bindings["myString"]}");
-Console.WriteLine($"myFloat = {context.Bindings["myFloat"]}");
+Console.WriteLine("myString = " + context.Bindings["myString"]);
+Console.WriteLine("myFloat = " + context.Bindings["myFloat"]);
 ```
 
 #### Notes:
@@ -42,7 +42,7 @@ foreach (var item in myArray)
 {
     context.Bindings["myValue"] = item;
     ScriptEngine.Execute(program, context);
-    Console.WriteLine($"myValue = {context.Bindings["myValue"]}");
+    Console.WriteLine("myValue = " + context.Bindings["myValue"]);
  }
  ```
 
