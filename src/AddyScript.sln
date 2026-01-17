@@ -57,6 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6EBB68CC-3
 		..\docs\aboutauth.md = ..\docs\aboutauth.md
 		..\docs\history.md = ..\docs\history.md
 		..\docs\license.md = ..\docs\license.md
+		..\docs\addy.jpg = ..\docs\addy.jpg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagram", "diagram", "{409F11D0-0D63-4D73-9DAB-D79C38FC68DC}"
