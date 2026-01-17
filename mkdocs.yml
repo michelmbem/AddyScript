@@ -9,6 +9,13 @@ theme:
     - search.suggest
     - search.highlight
 
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
+
 plugins:
   - search
   - with-pdf:
@@ -21,6 +28,8 @@ plugins:
       debug_html: false
       exclude_pages:
         - grammar.*
+      stylesheets:
+        - assets/pdf.css
 
 nav:
   - Home: README.md
