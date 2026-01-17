@@ -233,7 +233,7 @@ public class Lexer
     }
 
     /// <summary>
-    /// Gets a token representing a symbol that starts with <b>`</b>.
+    /// Gets a token representing a literal date and/or time.
     /// </summary>
     /// <returns>A literal date value</returns>
     private Token LiteralDate()
