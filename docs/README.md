@@ -6,6 +6,7 @@ AddyScript is a lightweight scripting engine for the .NET platform. It can be us
 AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you prefer) with dynamic typing and consistent OOP features. You can learn about this syntax by looking at the sample scripts provided with the source code.
 
 # What's next?
+
 * Introduction
     * [Features](features.md)
     * Tutorials
@@ -36,3 +37,4 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
 * [Licensing](license.md)
 * [About the author](aboutauth.md)
 * [Changes history](history.md)
+* [PDF version of the documentation](assets/manual.pdf)

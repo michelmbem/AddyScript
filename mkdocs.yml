@@ -1,5 +1,6 @@
 site_name: AddyScript Wiki
 docs_dir: docs
+
 theme:
   name: material
   features:
@@ -7,6 +8,16 @@ theme:
     - navigation.sections
     - search.suggest
     - search.highlight
+
+plugins:
+  - search
+  - with-pdf:
+      output_path: assets/manual.pdf
+      cover_title: AddyScript Manual
+      cover_subtitle: Developer Documentation
+      author: Michel Mbem
+      toc_title: Table of Contents
+      debug_html: false
 
 nav:
   - Home: README.md
@@ -40,3 +51,4 @@ nav:
   - Licensing: license.md
   - About the author: aboutauth.md
   - Changes history: history.md
+  - PDF version of the documentation: assets/manual.pdf

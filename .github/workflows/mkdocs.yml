@@ -1,9 +1,12 @@
 name: Deploy Wiki
+
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   pull_request:
-    branches: [master]
+    branches:
+      - master
 
 permissions:
   contents: read
@@ -14,13 +17,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        
+      - name: Setup Python 3.x
+        uses: actions/setup-python@v6
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material
-      - run: mkdocs build
-      - uses: actions/upload-pages-artifact@v3
+          
+      - name: Install fonts
+        run: sudo apt-get install -y fonts-dejavu
+
+      - name: Install Python dependencies
+        run: pip install mkdocs-material mkdocs-with-pdf
+
+      - name: Run MkDocs build
+        run: mkdocs build
+        
+      - name: Upload site to GitHub pages
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
-      - uses: actions/deploy-pages@v4
+          
+      - name: Deploy pages
+        uses: actions/deploy-pages@v4
