@@ -37,4 +37,4 @@ AddyScript has a simple C-like syntax (or JavaScript-like or PHP-like if you pre
 * [Licensing](license.md)
 * [About the author](aboutauth.md)
 * [Changes history](history.md)
-* [PDF version of the documentation](assets/manual.pdf)
+* [Download the PDF version of this manual](assets/manual.pdf)

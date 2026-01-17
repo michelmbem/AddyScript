@@ -18,6 +18,8 @@ plugins:
       author: Michel Mbem
       toc_title: Table of Contents
       debug_html: false
+      exclude_pages:
+        - README.md
 
 nav:
   - Home: README.md
@@ -51,4 +53,4 @@ nav:
   - Licensing: license.md
   - About the author: aboutauth.md
   - Changes history: history.md
-  - PDF version of the documentation: assets/manual.pdf
+  - PDF version: assets/manual.pdf

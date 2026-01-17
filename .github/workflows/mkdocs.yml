@@ -26,9 +26,9 @@ jobs:
           python-version: 3.x
           
       - name: Install fonts
-        run: sudo apt-get install -y fonts-dejavu
+        run: sudo apt install -y fonts-dejavu
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: pip install mkdocs-material mkdocs-with-pdf
 
       - name: Run MkDocs build
