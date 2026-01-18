@@ -105,49 +105,14 @@ var res2 = dummy(4);
 Console.WriteLine(res2);
 ```
 
-## Features added over time
+## Recently added features
 
-* Date and decimal types (ver. 0.7)
-* Support for object-oriented programming (ver. 0.8)
-* A **try-catch-finally** statement (ver. 0.8)
-* Support for introspection (ver. 0.8)
-* An **import** directive (ver. 0.8)
-* Date, string and array arithmetic (ver. 0.8)
-* Function references and inline function declarations (ver. 0.8)
-* Localized error messages (ver. 0.9. From version 0.9.2, French language support was added)
-* A C-like type conversion syntax (ver. 0.9)
-* Better handling of assignment and parameters passed by reference (ver. 0.9)
-* An empty for loop is equivalent to an infinite loop (ver. 0.9)
-* Better support for foreach loop including iterator protocol for user-defined classes (demonstrated in the _xrange.add_ sample script) (ver. 0.9)
-* Support for a **goto** statement and labels (ver. 0.9)
-* Better control over the use of **continue**, **break**, **this**, **super** and **return** keywords (ver. 0.9)
-* Complete redesign of the GUI, with the ability to load multiple scripts simultaneously (ver. 0.9)
-* Ability to export the AST to XML (ver. 0.9)
-* Ability to regenerate source code from the AST (mostly used for automatic code formatting) (ver. 0.9.1. Improved in 0.9.2)
-* Improved **try-catch-finally** instruction: no **return** in the **finally** block; no jump out of the **finally** block; jumps invoked from **try** or **catch** blocks are well remembered after the **finally** block is executed. (ver. 0.9.1)
-* Ability to create instances of .NET and COM types and invoke their members (ver. 0.9.4)
-* Ability to convert a closure to a delegate and attach it as an event handler for a .NET object (ver. 0.9.4)
-* Reworked external functions functionality (now targets native functions; ver. 0.9.4.1)
-* Replaced the initial array type with a more robust collection framework (ver. 0.9.5).
-* **long**, **rational**, and **complex** data types; **long** maps to a large integer type (ver. 0.9.5).
-* New kinds of class members: properties, events, and operators (ver. 0.9.5).
-* Reimplemented the **decimal** data type: it now maps to a big decimal type (ver. 0.9.5).
-* A search interface for the ScriptEngine class (ver. 0.9.5).
-* Replaced the **local** keyword with a **var** keyword (ver. 0.9.5).
-* Introduced constant declaration and **const** keyword (which was just a reserved word in older versions (ver. 0.9.5).
-* An interactive shell (ver. 0.9.5).
-* Better closure handling (ver. 0.9.5).
-* Support for indexers in custom classes (ver. 0.9.9).
-* Support for .NET generic types (ver. 0.9.9).
-* Ability to overload postfix unary operators in custom classes (ver. 0.9.9).
-* Ability to invoke a base type property or indexer in derived classes (ver. 0.9.9).
-* Ability to invoke functions with explicitly named parameters in random order (ver. 0.9.9).
 * Migration to .NET 8.0 (ver. 0.9.9).
 * Introduction of a **blob** type as an abstraction for arrays of byte (ver. 0.9.9.9).
 * Tuples and tuple initializers (ver. 0.9.9.9).
 * Support for indexers in user-defined classes (ver. 0.9.9.9).
-* Support for using the overriden version of _equals_, _hashCode_ and _toString_ methods in user-defined classes for searches in collections (ver. 0.9.9.9).
-* Migration of the GUI to [AvaloniaUI](https://avaloniaui.net/) for better cross-platform support (ver. 0.9.9.9).
+* Support for using the overridden version of _equals_, _hashCode_ and _toString_ methods in user-defined classes for indexing and/or search in collections (ver. 0.9.9.9).
+* Migration of the GUI to [AvaloniaUI](https://avaloniaui.net/) for an improved cross-platform support (ver. 0.9.9.9).
 * Pattern matching using the **switch** and **is** operators (ver. 0.9.9.9).
 * Object destructuring (ver. 0.9.9.9).
 * A better handling of conversions from **float** or **decimal** to **rational** (ver. 0.9.9.9).
