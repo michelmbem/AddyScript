@@ -83,10 +83,10 @@ public static class MyExtensions
     {
         var ctorFunc = new Function([new Parameter("name"), new Parameter("msg", DataItems.Void.Value)],
                                     new Block(new IfElse(new BinaryExpression(BinaryOperator.Identical, new VariableRef("msg"), new Literal()),
-                                                         new Assignment(PropertyRef.This("_message"), new VariableRef("name")),
-                                                         new Block(new Assignment(PropertyRef.This("_name"),
+                                                         new Assignment(PropertyRef.OfSelf("_message"), new VariableRef("name")),
+                                                         new Block(new Assignment(PropertyRef.OfSelf("_name"),
                                                                                   new UnaryExpression(UnaryOperator.NotEmpty, new VariableRef("name"))),
-                                                                   new Assignment(PropertyRef.This("_message"), new VariableRef("msg")))),
+                                                                   new Assignment(PropertyRef.OfSelf("_message"), new VariableRef("msg")))),
                                               new Return()));
 
         return new ClassMethod("Exception", Scope.Public, Modifier.Default, ctorFunc);
@@ -131,7 +131,7 @@ public static class MyExtensions
     private static IEnumerable<ClassMethod> GetExceptionMethods()
     {
         var toStringFunc = new Function([new Parameter("format", new String(""))],
-                                        Block.Return(PropertyRef.This("name")));
+                                        Block.WithReturn(PropertyRef.OfSelf("name")));
 
         return [new ClassMethod("toString", Scope.Public, Modifier.Default, toStringFunc)];
     }
