@@ -47,11 +47,11 @@ At the time of writing this manual page, AddyScript has a set of 42 predefined f
 ### Factory functions
 
 * `date now()` : gets the current date and time.
-* `duration days(float value)` : creates a duration with the given number of days.         |
-* `duration hours(float value)` : creates a duration with the given number of hours.        |
-* `duration minutes(float value)` : creates a duration with the given number of minutes.      |
-* `duration seconds(float value)` : creates a duration with the given number of seconds.      |
-* `duration milliseconds(float value)` : creates a duration with the given number of milliseconds. |
+* `duration days(float value)` : creates a duration with the given number of days.
+* `duration hours(float value)` : creates a duration with the given number of hours.
+* `duration minutes(float value)` : creates a duration with the given number of minutes. 
+* `duration seconds(float value)` : creates a duration with the given number of seconds.
+* `duration milliseconds(float value)` : creates a duration with the given number of milliseconds.
 * `string format(string pattern, ..substitutions)` : interpolates a string with the given pattern and values. using a mutable string is equivalent to invoking this function.
 
 ### I/O functions
