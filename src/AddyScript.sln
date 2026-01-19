@@ -189,7 +189,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagram", "diagram", "{409F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{22B34391-D678-49C7-9202-E48A9F43800D}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\assets\pdf.css = ..\docs\assets\pdf.css
+		..\docs\assets\manual.css = ..\docs\assets\manual.css
 	EndProjectSection
 EndProject
 Global

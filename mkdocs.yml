@@ -9,6 +9,9 @@ theme:
     - search.suggest
     - search.highlight
 
+extra_css:
+  - assets/manual.css
+
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -29,9 +32,6 @@ plugins:
       debug_html: false
       exclude_pages:
         - grammar.*
-
-extra_css:
-  - assets/pdf.css
 
 nav:
   - Home: README.md
