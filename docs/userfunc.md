@@ -267,7 +267,7 @@ And finally, _scripts_ being in the _ImportPaths_, we can import _core.add_ from
 
 The import directive can be used to import any symbol defined in a script. These include constants, variables, functions and classes.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](innerfunc.md) | [Next](classes.md)
 

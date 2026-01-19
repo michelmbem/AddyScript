@@ -61,7 +61,7 @@ Here is a quick summary of the most significant changes made to the the scriptin
 * Added support for using the **in** keyword as a reverse version of the **contains** operator: version 0.9.9.9.
 * Moved the _join_ method from the **list** class to the **string** class: version 0.9.9.9.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](aboutauth.md)
 

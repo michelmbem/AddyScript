@@ -13,7 +13,7 @@ When he's not coding, Michel loves urban music, architecture, and exploring new 
 
 ![Addy](addy.jpg)
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](license.md) | [Next](history.md)
 

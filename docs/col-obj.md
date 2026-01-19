@@ -454,7 +454,7 @@ println($'{firstName} {lastName} is a {age} years old {title} at {rest.company} 
 
 Well, there is no special manipulation on objects, other than storing values in their fields and retrieving them later. Advanced object manipulation is a concern of object-oriented programming.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](spec-types.md) | [Next](innerfunc.md)
 

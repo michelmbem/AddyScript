@@ -55,7 +55,7 @@ names.each(function (x)
 
 Well, now you can try your own.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](asgui-asis.md) | [Next](expressions.md)
 

@@ -155,7 +155,7 @@ foreach (item in new Range(5, 25, 5))
    println(item);
 ```
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](classes.md) | [Next](introspection.md)
 

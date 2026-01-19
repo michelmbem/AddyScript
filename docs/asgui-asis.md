@@ -110,7 +110,7 @@ Here are some useful examples of how to invoke asis:
 
 Well, that's it. More features will be added to both tools in the future. But for now, I hope they do the basics.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Previous](scriptengine.md) | [Next](anatomy.md)
 

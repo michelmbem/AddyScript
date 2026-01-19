@@ -21,7 +21,7 @@ Here's an overview of AddyScript's main features:
 * The entire scripting engine is exposed as a class library to the .NET platform.
 * Availability of a graphical script editor and an interactive console for testing scripts.
 
-<div class="web-only">
+<div class="web-only" markdown="1">
 
 [Home](README.md) | [Next](interpret.md)
 
