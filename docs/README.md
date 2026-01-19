@@ -12,7 +12,6 @@ with dynamic typing and consistent object-oriented programming features.
 You can familiarize yourself with this syntax by reviewing the example scripts provided with the source code.
 
 This manual aims to guide you through its syntax and features.
-
 <div class="web-only" markdown="1">
 
 ### In this manual
@@ -50,5 +49,4 @@ This manual aims to guide you through its syntax and features.
 * [Download this manual in PDF format](assets/manual.pdf)
 
 [Next ](features.md)
-
 </div>

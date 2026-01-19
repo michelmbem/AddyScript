@@ -21,6 +21,7 @@ plugins:
   - search
   - with-pdf:
       output_path: assets/manual.pdf
+      stylesheet: assets/pdf.css
       cover_title: AddyScript Manual
       cover_subtitle: Developer Documentation (version 0.9.9.9, January 2026)
       author: Michel Mbem
@@ -29,8 +30,6 @@ plugins:
       debug_html: false
       exclude_pages:
         - grammar.*
-      stylesheets:
-        - assets/pdf.css
 
 nav:
   - Home: README.md
