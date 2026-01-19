@@ -15,6 +15,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.snippets
+  - md_in_html
 
 plugins:
   - search
