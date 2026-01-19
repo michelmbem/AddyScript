@@ -49,6 +49,4 @@ This manual aims to guide you through its syntax and features.
 * [Changes history](history.md)
 * [Download this manual in PDF format](assets/manual.pdf)
 
-[Next ](features.md)
-
 </div>

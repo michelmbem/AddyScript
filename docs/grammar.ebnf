@@ -157,9 +157,7 @@ MatchCaseList ::= MatchCase (',' MatchCase)*
 
 MatchCase ::= Pattern ('when' Expression)? '=>' MatchCaseExpression
 
-Pattern ::= '_' | 'null' | RangePattern | (TYPE_NAME ObjectPattern?) | ObjectPattern | NegativePattern | CompositePattern | GroupingPattern
-
-RangePattern ::= (ValuePattern ('..' ValuePattern?)?) | ('..' ValuePattern)
+Pattern ::= '_' | 'null' | ('>' | '<' | ">=" | "<=")? ValuePattern | "matches" STRING | TYPE_NAME (('(' IDENTIFIER (',' IDENTIFIER)* ')') | ObjectPattern)? | ObjectPattern | NegativePattern | LogicalPattern | GroupingPattern
 
 ValuePattern ::= ([+-]? (INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL)) | BOOLEAN | DATE | STRING
 
@@ -167,7 +165,7 @@ ObjectPattern ::= '{' IDENTIFIER ':' Pattern (',' IDENTIFIER ':' Pattern)* '}'
 
 NegativePattern ::= 'not' Pattern
 
-CompositePattern ::= Pattern (('or' | 'and') Pattern)+
+LogicalPattern ::= Pattern (('or' | 'and') Pattern)+
 
 GroupingPattern ::= '(' Pattern ')'
 

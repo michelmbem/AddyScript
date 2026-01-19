@@ -662,20 +662,13 @@ MatchCase ::= Pattern ( 'when' Expression )? '=>' MatchCaseExpression
 ```
 Pattern  ::= '_'
            | 'null'
-           | RangePattern
-           | TYPE_NAME ObjectPattern?
+           | ( '>' | '<' | '>=' | '<=' )? ValuePattern
+           | 'matches' STRING
+           | TYPE_NAME ( '(' IDENTIFIER ( ',' IDENTIFIER )* ')' | ObjectPattern )?
            | ObjectPattern
            | NegativePattern
-           | CompositePattern
+           | LogicalPattern
            | GroupingPattern
-```
-
-**RangePattern:**
-
-![RangePattern](diagram/RangePattern.svg)
-
-```
-RangePattern ::= ValuePattern ( '..' ValuePattern? )? | '..' ValuePattern
 ```
 
 **ValuePattern:**
@@ -705,12 +698,12 @@ ObjectPattern ::= '{' IDENTIFIER ':' Pattern ( ',' IDENTIFIER ':' Pattern )* '}'
 NegativePattern ::= 'not' Pattern
 ```
 
-**CompositePattern:**
+**LogicalPattern:**
 
-![CompositePattern](diagram/CompositePattern.svg)
+![LogicalPattern](diagram/LogicalPattern.svg)
 
 ```
-CompositePattern ::= Pattern ( ( 'or' | 'and' ) Pattern )+
+LogicalPattern ::= Pattern ( ( 'or' | 'and' ) Pattern )+
 ```
 
 **GroupingPattern:**
