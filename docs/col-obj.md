@@ -1,6 +1,6 @@
 # Collections and objects
 
-### Collections
+## Collections
 
 Collections are ways to store multiple values ​​in a single variable. AddyScript offers 6 different types of collections: tuples, lists, sets, queues, stacks, and , maps. Each of these types has a unique set of features and is suited for a particular usage scenario.
 
@@ -364,11 +364,11 @@ concatOddItems = l.aggregate('', |acc, val, ind| => ind % 2 == 1 ? acc + val : a
 println('Items at odd ranks concatenated: ' + concatOddItems);
 ```
 
-### Objects
+## Objects
 
 Just like a collection, an object is another way to store multiple values in a single variable. These values are then called the fields of the object. The fields of the object are accessed by their name, using the dot syntax: _objectName.fieldName_.
 
-#### Creating an object
+### Creating an object
 
 There are 2 ways to create objects in AddyScript: by using an initializer or by invoking a constructor. We will talk about constructors in the chapter dedicated to object-oriented programming. For now, let's just talk about object initializers.
 
@@ -408,7 +408,7 @@ shape = (object) hash;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth);
 ```
 
-#### Object destructuring
+### Object destructuring
 
 In AddyScript one can initialize multiple variables at once by setting them values from the properties of an object. That mechanism is called object destructuring.
 Object destructuring is achieved by writing an assignment where the _lvalue_ is a list of variable names enclosed in curly braces and the _rvalue_ an expression that evaluates to an object.
@@ -450,7 +450,7 @@ let { firstName, lastName, age, { title, ..rest } = job } = person;
 println($'{firstName} {lastName} is a {age} years old {title} at {rest.company} since {rest.since:d}');
 ```
 
-#### Manipulating objects
+### Manipulating objects
 
 Well, there is no special manipulation on objects, other than storing values in their fields and retrieving them later. Advanced object manipulation is a concern of object-oriented programming.
 

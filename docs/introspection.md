@@ -3,7 +3,7 @@
 Introspection (also called reflection) allows you to discover the type of an object and its members at runtime.
 The following example shows how this functionality is handled in AddyScript.
 
-#### Example:
+### Example:
 
 Introspection showcase
 

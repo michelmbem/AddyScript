@@ -1,6 +1,6 @@
 # Variables, operators and expressions
 
-### Variables
+## Variables
 
 AddyScript is a dynamic language. This means that you don't have to declare variables. A variable starts existing as soon as you assign a value to it. This also means that variables are dynamically typed: they simply accept anything you put into them. As far as that aspect is concerned, a single variable can hold an integer at a certain time and hold a list of dates later.
 
@@ -16,11 +16,11 @@ v = ["joe", 45, 18.2, 'house']; // v is a list, items are not necessarily of the
 o = new {firstName = "James", lastName = "Bond", number = 007}; // o is an object, field names don't have to be known in advance
 ```
 
-#### Variable's scope
+### Variable's scope
 
 As stated before, a variable exists from where it is initialized first until the end of the block in which it appears. If a variable is created at the root level, it will be accessible to the remain of the script. AddyScript doesn't check variable access from functions; neither does it check that for functions themselves. This means that a function can refer to a variable before the variable is actually created. As long as the function is not called before the creation of the variable, this will not lead to any error. However, you should avoid doing so in functions that you want to reuse out of their original script because there is no guarantee that the referred variable will exist in the calling context.
 
-#### The **var** keyword
+### The **var** keyword
 
 Even if AddyScript is able to dynamically declare variables, there are still some situations where you may need to explicitly declare them. In particular, when you want to avoid confusion between some local variable and an eventually predefined global homonymous one. This is where the **var** keyword comes into action. Just as in other C-based scripting languages, it is used to explicitly declare variables. Such a variable will hide any homonymous constant or variable declared in the global scope.
 
@@ -62,7 +62,7 @@ in bar, toto = 20
 back to main, toto = 20
 ```
 
-### Constants
+## Constants
 
 A constant is a read-only variable. That is: it's assigned a value once and cannot be altered afterward. You will typically declare constants using the **const** keyword like in the following example.
 
@@ -76,7 +76,7 @@ const MAX_ITEMS = 10;
 MAX_ITEMS = 100;
 ```
 
-#### The following constants are predefined in AddyScript:
+### The following constants are predefined in AddyScript:
 
 |Constant|Value|Description|
 |:-:|-|-|
@@ -94,7 +94,7 @@ MAX_ITEMS = 100;
 |MAXDATE|9999-12-31 23:59:59|The maximum value for the **date** type.|
 |NEWLINE|"\r\n" on Windows, "\n" on Unix based systems|The sequence of characters used to mark the end of a line by the underlying platform.|
 
-### Data types
+## Data types
 
 Even if you don't have to explicitly define the type of your variables in AddyScript, they still have a type. In fact, AddyScript recognizes a set of 29 predefined data types. In addition to that, you can create your own classes and add them to the set of existing data types. Below are listed the AddyScript's built-in types and their meaning:
 
@@ -131,7 +131,7 @@ Even if you don't have to explicitly define the type of your variables in AddySc
 |   EventInfo   | A set of information describing an event. Used for introspection.                                                                                                                                                                                                                      | System.Reflection.EventInfo                                                                             |
 | ParameterInfo | A set of information describing a parameter. Used for introspection.                                                                                                                                                                                                                   | System.Reflection.ParameterInfo                                                                         |
 
-### Literal values
+## Literal values
 
 Depending on their type, literal values have the following forms:
 
@@ -178,7 +178,7 @@ Depending on their type, literal values have the following forms:
 
     3. Some literal string values embed expressions between curly braces into them. Those expressions are to be evaluated and replaced within the string by their value at runtime. The rendered string will be made of the static parts of its initial form concatenated with the results of the evaluation of embedded expressions. That kind of literal string value is called a **mutable string** and has to be prefixed with a dollar-sign (\$). Each embedded expression in a **mutable string** can be followed by a format or length specification within the same pair of curly braces. The overall protocol to follow is exactly the same than for a call to the builtin **format** function (in fact a mutable string is translated at runtime to a call to **format**). The process of rendering **mutable strings** is called **string interpolation**. **mutable strings** can also be verbatim; in that case they start with both dollar (\$) and at (@) signs  (**e.g.**: `$'item number {i}'`, `$"sine of PI is: {sin(PI)}"`, `$@'{emp.name} is a ''{emp.jobTitle}'' since {emp.hireDate:d}'`, `$@"movie ""D:\{movieDir}\{movieFile.Name}""" is {movieLen,3} minutes long`).
 
-### Initializers
+## Initializers
 
 Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps and sets. Depending on their type, initializers have the following forms:
 
@@ -194,7 +194,7 @@ Initializers are like literal values for composite types: they provide initial v
 
     **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
 
-### Type checking
+## Type checking
 
 You can check the type of an expression by using the **is** operator. Here is an illustration:
 
@@ -231,7 +231,7 @@ Exception
 * The **is** operator can optionally be followed by the **not** keyword to complement the result. This means that `x is not some_type` is the same as `!(x is some_type)`.
 * The **is** operator can also be used to check if an expression matches a particular pattern. For example `x is { color: 'Blue' }` checks if _x_ is an object with a property named _color_ that has _Blue_ as its value.
 
-### Conversion
+## Conversion
 
 For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
 
@@ -250,7 +250,7 @@ n = decimal('1234567890.987654321'); // n is a decimal
 Remember that this doesn't work for user-defined classes. But most of the time, it will not be required for them since AddyScript uses duck-typing.
 In the case where you need to convert an object of a user-defined class to another type, you should provide a conversion method in that class.
 
-### Operators
+## Operators
 
 Below are listed AddyScript's operators with their meaning:
 
@@ -296,7 +296,7 @@ Below are listed AddyScript's operators with their meaning:
 |   **switch**   | Pattern matching operator. We'll look closer at this in the next sections                                                                                                                                                                                    |
 |    **with**    | Copy with modified properties operator. We'll look closer at this in the next sections                                                                                                                                                                       |
 
-### Operator precedence
+## Operator precedence
 
 Operator precedence in AddyScript can be summarized in the following terms:
 
@@ -322,11 +322,11 @@ From the lowest to the highest priority, we have:
 
 10. Wrapping and special binary operators: (), [], **switch**, **with**
 
-### Expressions
+## Expressions
 
 An expression is any combination of operands and operators that can produce a value. An operand can be a literal value, a named constant, a reference to a variable, a reference to a list item, a reference to a field or property, a function or method call, the keyword **this**, an assignment, a unary expression, a binary expression, a ternary expression or any of these into parenthesis.
 
-### Assignments
+## Assignments
 
 An assignment is a particular kind of expression where a value is set to a location in memory. So it's made of two child expressions: the **lvalue** which represents the memory location about to be set, and the **rvalue** which represents the value that's being assigned to the lvalue. Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (=). So an assignment in AddyScript typically looks like this:
 
@@ -351,7 +351,7 @@ But AddyScript provides other assignment operators which are combinations of bin
 |`^=`|`a ^= b` is equivalent to `a = a ^ b`|
 |`??=`|`a ??= b` is equivalent to `a = a ?? b`|
 
-#### Group Assignment
+### Group Assignment
 
 Sometimes you need to assign values to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`. But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**. In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term). This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
 
@@ -385,7 +385,7 @@ Sometimes you need to assign values to multiple variables. You can do this in mu
     c = 2
     ```
 
-### The **let** keyword
+## The **let** keyword
 
 AddyScript has a dedicated keyword that can be used to introduce an assignment. That's the **let** keyword. It's especially useful when there is a risk of ambiguity in the way the code is parsed (like when [destructuring an object](col-obj.md)).
 
@@ -397,7 +397,7 @@ let lvalue = rvalue;
 
 With this syntax chaining assignments is not allowed. No other operator than the equal-sign (=) can be used.
 
-### Reading and printing values from/to the console
+## Reading and printing values from/to the console
 
 As you may have already guessed, you typically read a value from the console in AddyScript by using the **readln** function. It lets the user type a string and returns that string once the user presses on the [Return] key. The returned string can be converted to any type following your needs and expectations. **readln** accepts an optional parameter, a string that would be displayed as a prompt if given.
 

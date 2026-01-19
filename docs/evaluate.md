@@ -1,6 +1,6 @@
 # Evaluating expressions
 
-### The simpler approach
+## The simpler approach
 
 To evaluate an expression with AddyScript, do the following:
 
@@ -19,11 +19,11 @@ var result = ScriptEngine.EvaluateString(txExpr.Text, context);
 Console.WriteLine($"Given {context.Bindings["myString"]} and {context.Bindings["myFloat"]}, we obtain {result}");
 ```
 
-#### Notes:
+### Notes:
 
 Don't forget to embed this code in a try-catch block.
 
-### Parsing once, running later
+## Parsing once, running later
 
 Below is another example where the expression is parsed once and evaluated multiple times in a loop.
 Before testing it, you need to create the GUI and provide the logic for the _MoveTo_ and _LineTo_ methods yourself:

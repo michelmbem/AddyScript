@@ -1,6 +1,6 @@
 # Extending the API
 
-### Adding custom builtin functions
+## Adding custom builtin functions
 
 AddyScript's inner functions are all instances of the _AddyScript.Runtime.InnerFunction_ class. This class has a static property called _Globals_ that contains all of its predefined instances. To extend the list of the scripting engine's built-in functions, simply create new instances of _InnerFunction_ and add them to the _InnerFunction.Globals_ collection. The _InnerFunction_ constructor takes as arguments a string representing the name of the function, an array of _AddyScript.Runtime.Parameter_ objects representing the list of parameters that the function expects, and an instance of _AddyScript.Runtime.InnerFunctionLogic_ representing the body of the function. _InnerFunctionLogic_ is a delegate type that takes an array of _AddyScript.Runtime.DataItems.DataItem_ objects as a parameter and returns an object of the same _DataItem_ type as a result. Any method in a .NET class that has this prototype can be used as the body of an inner function. Here is a C# code example that demonstrates how to add a "clrscr" function to AddyScript to clear the screen:
 
@@ -31,11 +31,11 @@ public static class MyExtensions
 
 **Note**: Just make sure to call `MyExtensions.RegisterFunctions();` somewhere in your code before launching the interpreter.
 
-### Adding custom builtin classes
+## Adding custom builtin classes
 
 Defining a new built-in class in AddyScript can have two meanings: it can mean adding a primitive type to the scripting engine. It can also mean adding a new object type to the scripting engine. Defining a new primitive type requires much more effort than creating a new object class. In all cases, you will need to create an instance of the _AddyScript.Runtime.OOP.Class_ meta-class and add it to the AddyScript._Runtime.Class.OOP.Class.Predefined_ collection.
 
-#### Object classes
+### Object classes
 
 For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly as its base class. The meta-class has a constructor that allows you to specify the parent class. Afterwards, you will only need to provide member definitions to the new class. All members can be defined manually. For methods, this means creating their AST from scratch. But there is a shortcut which consists in creating an _InnerFunction_ which will not be added to the _InnerFunction.Globals_ collection but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_ using one of the _ToInstanceMethod_ or _ToStaticMethod_ methods of the _InnerFunction_ class.
 
@@ -144,7 +144,7 @@ public static class MyExtensions
 }
 ```
 
-#### Primitive types
+### Primitive types
 
 Creating a new primitive type goes through these same steps. But before that, you must add a new member to the _AddyScript.Runtime.OOP.ClassID_ enumeration to represent the new type. Afterwards, you will have to create a new instance of the meta-class as described above. This new class will not have a reference to a parent class but it will have the newly defined _ClassID_ (there is a suitable constructor in _Class_). After that you will need to create a new child class of _AddyScript.Runtime.DataItems.DataItem_ to represent data of the type being defined. The _Class_ property of this _DataItem_ type should return the reference to the previously created _Class_ instance. _DataItem_ provides a whole range of virtual methods that define the behavior of an object in arithmetic operations, conversions and property accesses. Overriding one of these methods allows you to customize the behavior of the new data type. You will probably also want to take a look at the _AddyScript.Runtime.DataItems.DataItemFactory_ and _AddyScript.Runtime.DataItems.DataItemBinder_ classes to add support for your data type in _Marshalling_ operations. _AddyScript.Runtime.DataItems.DataItemFactory_ has a _CreateDataItem_ method that converts a .NET _System.Object_ into a _DataItem_, you will certainly want to add support for your data type. _AddyScript.Runtime.DataItems.DataItemBinder_ on its side has a _Mismatch_ method that evaluates the degree of compatibility between .NET data types and AddyScript data types. You will also need to add support for your data type.
 

@@ -1,6 +1,6 @@
 # Interpreting a script
 
-### The simpler approach
+## The simpler approach
 
 To interpret a script with AddyScript, just proceed as follows:
 
@@ -22,11 +22,11 @@ Console.WriteLine("myString = " + context.Bindings["myString"]);
 Console.WriteLine("myFloat = " + context.Bindings["myFloat"]);
 ```
 
-#### Notes:
+### Notes:
 
 Don't forget to embed this code in a try-catch structure.
 
-### Parsing once, running later
+## Parsing once, running later
 
 Sometimes you need to parse the script once and run it multiple times later without needing to restart the parsing process.
 The _ScriptEngine_ class provides means to accomplish this in a straightforward manner.
@@ -49,7 +49,7 @@ foreach (var item in myArray)
 This will typically run the same script multiple times with different values of the "myValue" context variable
 without needing to parse the source code each time.
 
-### Sequentially parsing and running commands
+## Sequentially parsing and running commands
 
 Here is where the non-static version of the _ScriptEngine.Execute_ method comes to action.
 It is used to sequentially interpret commands on an instance of the _ScriptEngine_ class.
@@ -93,7 +93,7 @@ while (true)
 }
 ```
 
-### Interacting with the scripting engine
+## Interacting with the scripting engine
 
 The instance version of the _ScriptEngine.Execute_ method is itself a way of interacting with the scripting engine.
 But sometimes, you may need a closer interaction.
@@ -125,7 +125,7 @@ var sum = engine.GetDelegate<SumType>("sum");
 Console.WriteLine($"sum(7, -3) gives: {sum(7, -3)}");
 ```
 
-### The ScriptContext class
+## The ScriptContext class
 
 So far you have been reading this tutorial, you may have noticed that on each example, we create and use an instance of a class called _ScriptContext_.
 Well, this class is simply a mean for providing initial settings to the scripting engine.
@@ -140,7 +140,7 @@ It exposes three interesting properties that are listed and explained in the fol
 Notice that by default, the _ImportPaths_ property is empty while the _References_ property contains references to some essential .NET assemblies.
 You don't need to put a dot (symbolizing the current working directory) to the _ImportPaths_ property since imported scripts are always first searched in the same directory as the importing script.
 
-### The RuntimeServices class
+## The RuntimeServices class
 
 We have not demonstrated the utility of the _AddyScript.Runtime.RuntimeServices_ class here.
 However, it provides services that can be very helpful at runtime.

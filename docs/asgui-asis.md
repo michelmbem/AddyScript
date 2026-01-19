@@ -4,7 +4,7 @@ AddyScript comes with a graphical script editor and an interactive console.
 These two tools allow you to quickly write and test your own scripts.
 I will try to explain in the following lines how to use them.
 
-### Using the graphical script editor
+## Using the graphical script editor
 
 The AddyScript Graphical User Interface (**asgui**) is an [Avalonia UI](https://avaloniaui.net/) application built around the [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) control.
 It offers useful features such as syntax highlighting, automatic indentation, call tips, code completion and code snippets insertion.
@@ -14,7 +14,7 @@ The following image illustrates the GUI window:
 
 ![asgui](assets/asgui.jpg)
 
-#### Editor toolbar's buttons:
+### Editor toolbar's buttons:
 
 From left to right, the toolbar buttons play the following role:
 
@@ -37,7 +37,7 @@ From left to right, the toolbar buttons play the following role:
 17. Configure: displays a dialog box in which the user can set options such as the list of directories in which imported scripts should be searched or the list of assemblies referenced by the script.
 18. Help: displays this manual. Another entry in the drop-down menu displays the about box.
 
-#### General editor tips:
+### General editor tips:
 
 1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. Therefore, the executables of both programs must always be in the same directory.
 2. To have time to read the output printed by your script, always add a call to the _readln()_ function at the end of it. Of course this is not necessary for scripts that have a graphical interface.
@@ -53,7 +53,7 @@ It may seem natural for a scripting language to have an interactive console. Add
 
 Using the console is simple, just type a command and press [Enter]. Remember to add a semicolon at the end of each statement, except for blocks (this may seem strange if you are familiar with scripting languages, but currently AddyScript really expects a semicolon at the end of each statement. This behavior will probably change in the future).
 
-#### Troubleshooting with the if-else statement:
+### Troubleshooting with the if-else statement:
 
 Suppose you want to enter a sequence of statements like this:
 
@@ -77,7 +77,7 @@ if (a > 5) {
 ```
 Another option is to type the whole if-else statement in a single line of code, if it's short enough.
 
-#### Command line options for asis:
+### Command line options for asis:
 
 Actually, you don't have to run **asis** in interactive mode. Depending on the parameters you pass to it, it can behave differently. Here is a table summarizing the **asis** command line options and their meaning:
 

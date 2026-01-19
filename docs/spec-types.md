@@ -2,7 +2,7 @@
 
 AddyScript supports a number of special data types that can be used for various purposes. These are structured data types that behave like primitive types. They are described below:
 
-### Rational Numbers
+## Rational Numbers
 
 A rational number is a pair of integers resulting from their division. The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive.
 The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division. Thus, rational numbers are represented in AddyScript by the **rational** data type.
@@ -44,7 +44,7 @@ sign((3/4)) = 1
 abs((3/4)) = (3/4)
 ```
 
-#### Rational Number API
+### Rational Number API
 
 The following table summarizes the members of the **rational** type and their usage:
 
@@ -54,7 +54,7 @@ The following table summarizes the members of the **rational** type and their us
 |`int den { read; }`|property|Gets the denominator of the target rational number.|
 |`rational\|int inverse()`|method|Gets the inverse of the target rational number.<br>This can be another rational number or an integer.|
 
-### Complex Numbers
+## Complex Numbers
 
 AddyScript also supports complex numbers as a primitive data type. This type is represented by the **complex** class.
 Internally, a complex number is represented as a pair of real numbers, the first member of the pair is called the **real part** while the second is called the **imaginary part**.
@@ -95,7 +95,7 @@ the conjugate of (2 - i) is (2 + i)
 abs((2 - i)) = 2.23606797749979
 ```
 
-#### Complex Number API
+### Complex Number API
 
 The following table summarizes the members of the **complex** class and their usage:
 
@@ -105,7 +105,7 @@ The following table summarizes the members of the **complex** class and their us
 |`float imag { read; }`|property|Gets the imaginary part of a complex number.|
 |`complex conjugate()`|property|Gets the conjugate of a complex number.|
 
-### Dates
+## Dates
 
 Date/time values are instances of the **date** class. You will typically create **date** instances either by calling the global **now** function (which returns the current date and time) or by using a date literal. A date literal is anything enclosed in backticks (\`) that can be translated by the .NET runtime to a value of type _System.DateTime_. They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`). Here is an example of a script that manipulates dates:
 
@@ -121,7 +121,7 @@ d = d.add(1, "year");
 println("your first birthday was on {0:d}", d);
 ```
 
-#### Date API
+### Date API
 
 The **date** class supports the following operators:
 
@@ -151,7 +151,7 @@ In addition to those operators, the **date** class exposes the following members
 | `date addTicks(long ticks)`                                                                                | method        | Adds some ticks to the target date object and returns an altered copy of it. The target itself remains unchanged.                                                                                                            |
 | `int subtract(date d, string unit)`                                                                        | method        | Computes the difference in the given unit between the target date object and its first argument. Accepted units are: "year", "month", "day","hour", "minute", "second" and "millisecond".                                    |
 
-### Durations
+## Durations
 
 A duration is the amount of time elapsed between two dates. Durations are very important in AddyScript as some operations on dates involve and/or return durations.
 The language syntax doesn't provide neither literal values nor initializers for duration. A duration can only be obtained by computing the difference of two dates
@@ -174,7 +174,7 @@ d3 = now() + days(100) + hours(15) + minutes(45);
 println("in 100 days 15 hours and 45 minutes we will be on {0}", d3);
 ```
 
-#### Duration API
+### Duration API
 
 The functions bellow can be used to create **duration** instances:
 
@@ -210,7 +210,7 @@ In addition to those operators, the **date** class exposes the following members
 | `float totalMilliseconds`                                                      | property      | Extracts the otal number of milliseconds (eventually factional) stored in the target date object. |
 | `long ticks { read; }`                                                         | property      | Gets the number of ticks stored in the target duration instance.                                  |
 
-### Strings
+## Strings
 
 In AddyScript, sequences of characters more commonly called _strings_ are instances of the **string** class. You can obtain a string in various ways such as using a literal string value, invoking the global **format** or **readln** functions, invoking the "toString" method of any object and so on. In fact, the **string** class is one of the more commonly used data type in AddyScript (and I think, in any scripting language). This is why it exposes a wide range of methods. Here is an example of a script that uses strings:
 
@@ -243,7 +243,7 @@ for (i = 0; i < s.length - 1; ++i)
        println(s.substring(i, j));
 ```
 
-#### String API
+### String API
 
 The **string** class supports the following operators:
 
@@ -283,7 +283,7 @@ In addition to those operators, the **string** class exposes the following membe
 
 **Note**: none of the above methods alters the target string. They simply create a modified copy of it return that copy. The original string remains unchanged.
 
-### Blobs
+## Blobs
 
 A **blob** is AddyScript's abstraction of a byte array. Blobs are especially useful when it comes to using methods in .NET classes that take a byte array as an argument (such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
 
@@ -324,7 +324,7 @@ println($'b1 in base-64 = {b1.toBase64String()}, b1.length = {b1.length}, b1 == 
 println();
 ```
 
-#### Blob API
+### Blob API
 
 The **blob** class supports the following operators:
 

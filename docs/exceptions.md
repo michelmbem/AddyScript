@@ -1,10 +1,10 @@
 # Exceptions handling
 
-### Handling errors at runtime
+## Handling errors at runtime
 
 AddyScript's **try-catch-finally** statement provides an elegant way to handle errors that occur during script execution. You'll typically use this statement when you want to execute a sequence of statements that are likely to generate errors and you don't want your script to be interrupted because of those errors. Here's how to use it:
 
-#### Example:
+### Example:
 
 Let the user enter an expression that we will evaluate. The expression entered by the user may be wrong.
 
@@ -44,7 +44,7 @@ finally
 3. A **return** statement cannot appear in a **finally** block.
 4. The contents of the **finally** block are always executed, whether or not an error occurs.
 
-### Raising errors
+## Raising errors
 
 To raise an error, simply use the following syntax:
 
@@ -60,7 +60,7 @@ or more simply
 
 Of course, you don't have to throw an instance of the **Exception** class. But if you throw something else, it will be used as the exception message.
 
-#### Throw expressions
+### Throw expressions
 
 There are two cases where a throw statement can be used as an expression (called a **throw expression**):
 
@@ -82,11 +82,11 @@ There are two cases where a throw statement can be used as an expression (called
     };
     ```
 
-### Try-with-resource
+## Try-with-resource
 
 There is a special variant of the **try-catch-finally** statement that has an argument associated with it. This argument is called a _resource_. The _resource_ is intended to be immediately released (meaning that its "dispose" method is automatically invoked) once the **try-catch-finally** statement completes. When a **try-catch-finally** statement owns a resource, it is called a **try-with-resource** statement. In a **try-with-resource** statement, the **catch** and **finally** blocks can be omitted.
 
-#### Example
+### Example
 
 Let's copy a file from one place to another with a Stream that should be close at the end.
 

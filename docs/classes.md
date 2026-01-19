@@ -1,6 +1,6 @@
 # Classes
 
-### Declaring a class
+## Declaring a class
 
 Declaring a class in AddyScript is straightforward. Simply use this syntax:
 
@@ -20,7 +20,7 @@ Where
 
 **Note**: The parts in brackets are optional, so you can omit them.
 
-### Defining class members
+## Defining class members
 
 Generally speaking the definition of a class member follows this syntax:
 
@@ -32,17 +32,17 @@ Where
 * _modifier_ has the same meaning as for a class. It must therefore be **final**, **static** or **abstract**. However, the **abstract** modifier is reserved for properties and methods, it cannot be applied to fields or events. A field can be both **static** and **final**, such a field is a class constant whose default value must be specified.
 * The _specification_ varies depending on the type of member defined.
 
-#### Specifying a field:
+### Specifying a field:
 
 A field specification is simply the name of the field, optionally followed by an equal sign, and its initial value.
 
 **Note**: You do not have to explicitly declare the fields of a class. Objects are dynamic in AddyScript, so you can add fields to an object as you wish. However, declaring fields allows you to control how they are shared between instances of the class. It also allows you to control their visibility: whether they are accessible outside the class or not. It also ensures that these fields are discovered by any code that introspects the class.
 
-#### Specifying a method:
+### Specifying a method:
 
 The specification of a method is just a function declaration embedded into the class body.
 
-#### Specifying a property:
+### Specifying a property:
 
 A property is a pair of methods used to read and/or write the value of a field.
 AddyScript provides a dedicated syntax for defining properties of a class.
@@ -73,7 +73,7 @@ Where
 * Since both reader and writer are functions, they can also be reduced to an arrow followed by an expression when they consist of just an expression or a parameterized **return** statement.
 * When the property is read-only (i.e. it has no writer), and that its reader does nothing more than return a value, the entire property can be declared with the following syntax: `property property_name => returned_value;`. That syntax is equivalent to  `property property_name { read => returned_value; }`.
 
-#### Automatic properties:
+### Automatic properties:
 
 Since defining a property consists of declaring a backing field, then defining the property's read and write accessors,
 AddyScript can help the programmer save time by doing most of the work automatically.
@@ -90,7 +90,7 @@ resulting in something as short as: `property property_name;` which is equivalen
 
 **Remark**: The specification of an automatic property is identical to that of an abstract property except that the scripting engine doesn't generate any logic for an abstract property. It expects concrete subclasses to do so.
 
-#### Indexers:
+### Indexers:
 
 Indexers are a special type of property that allows instances of user-defined classes to behave like collections.
 A class can have only one indexer, and it cannot be static.
@@ -100,7 +100,7 @@ An indexer's accessors take an implicit parameter called **__key** that contains
 the expression enclosed in the square brackets (i.e., the index or key) at the time the indexer is invoked.
 An indexer's writer also takes the implicit parameter **__value** like any other writer.
 
-#### Specifying an event:
+### Specifying an event:
 
 An event specification consists of the **event** keyword followed by the prototype of the event.
 The prototype is a name (an identifier) followed by a comma-separated list of parameters in parentheses.
@@ -112,7 +112,7 @@ Once an _foo_ event is defined in a class, this automatically adds three methods
 
     _trigger_foo_ is always private and always has the same parameters as the event itself.
 
-#### Specifying an operator overload:
+### Specifying an operator overload:
 
 An operator overload specification consists of the **operator** keyword followed by the operator itself and its parameters. Depending on the operator being overloaded, the list may be empty or contain a single parameter. The complete list of operators that can be overloaded is as follows:
 
@@ -125,7 +125,7 @@ An operator overload specification consists of the **operator** keyword followed
 2. In the case of increment (++) or decrement (--) operators, the difference between overloading the prefix form and overloading the postfix form is that the postfix form expects an unused parameter while the prefix form expects no parameter.
 3. Operators are not really a special type of class member in AddyScript. Each operator is actually a method with a special name. This can be verified by introspecting a class in which an operator is overloaded. AddyScript looks for such a method whenever it encounters a unary or binary operation involving an instance of a user-defined class and an overloadable operator.
 
-### Example of a class
+## Example of a class
 
 In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method and an event.
 
@@ -190,12 +190,12 @@ john.sex = 'Female';
 println(john.summary());
 ```
 
-### The **this** keyword
+## The **this** keyword
 
 In the body of a method, the **this** keyword can be used to refer to the current instance of the class (the one on which the method is invoked).
 Most of the time, you will use this feature to access other members of a class from the body of one of its methods.
 
-### Constructors
+## Constructors
 
 A **constructor** is a special method that is automatically invoked by the scripting engine when an instance of a class is created to initialize that instance.
 In AddyScript, a class has only one constructor since the language does not support method overloading.
@@ -289,7 +289,7 @@ jane.sex = "Male";
 println(jane.summary());
 ```
 
-#### Constructors and property initializers
+### Constructors and property initializers
 
 A constructor call can be followed by a set of property initializers.
 This allows you to quickly initialize fields or properties that are not initialized by the constructor.
@@ -316,7 +316,7 @@ pt = new Point {x = 10, y = -5};
 println(pt.toString());
 ```
 
-### Modifiers
+## Modifiers
 
 When working with classes in AddyScript, you will always come across keywords like **private**, **protected**, **public**, **static**, **abstract**, and **final**. These are modifiers (in the broad sense of the word). The first three (**private**, **protected**, and **public**) are used to control the scope of a class member. The other three are used to manage the behavior of a class or one of its members. The table below details the meaning of each modifier depending on where it is used.
 
@@ -329,7 +329,7 @@ When working with classes in AddyScript, you will always come across keywords li
 |**final**|Forbids that another class inherits from this one|Indicates that the property or method cannot be overridden in a subclass.<br>Can be combined with **static** on fields.<br>Not applicable to constructors and events.|
 |**abstract**|Allows the declaration of abstract properties and methods within the class.<br>Disallow the creation of instances of the class|Indicates that the property or method is purely virtual, thus having no default implementation.<br>Not applicable to constructors, fields and events.|
 
-### Common members
+## Common members
 
 There is a set of members that any class in AddyScript (including the void type) exposes. The table below presents those members and describes them.
 

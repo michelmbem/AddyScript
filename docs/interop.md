@@ -1,6 +1,6 @@
 # Interacting with .NET and the host platform
 
-### Creating instances of .NET types
+## Creating instances of .NET types
 
 AddyScript provides tight integration with the .NET platform.
 A script can create instances of virtually any .NET type, initialize its properties, and invoke its methods.
@@ -43,7 +43,7 @@ println($"{t[0]} is {t[1]} years old, he works for us since {t[2]:d}.");
 The integration of AddyScript into the .NET platform is well demonstrated in some of the provided example scripts
 like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its dependencies).
 
-### Accessing to .NET types static members
+## Accessing to .NET types static members
 
 Well, you do this the same way you access static members of AddyScript types. Here's an example:
 
@@ -55,7 +55,7 @@ if (System::IO::File::Exists(path))
     System::IO::File::Delete(path);
 ```
 
-### Avoiding to type fully qualified names
+## Avoiding to type fully qualified names
 
 The **import** directive can be used to import .NET types and/or namespaces.
 Here is what the previous example would look like with an import directive:
@@ -82,7 +82,7 @@ path = IO::Path::Combine(Env::GetFolderPath('DesktopDirectory'), 'Products.xls')
 if (IO::File::Exists(path)) IO::File::Delete(path);
 ```
 
-### COM-Interop
+## COM-Interop
 
 The scripting engine supports COM interoperability over .NET.
 This allows you to create and manage instances of COM objects just like you do with regular .NET classes.

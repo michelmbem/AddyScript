@@ -2,11 +2,11 @@
 
 Like any other language, AddyScript provides means to control the program flow. The following sections describe these means.
 
-### The If-Else statement
+## The If-Else statement
 
 The if-else statement is used to perform an action only if a certain condition is met. An alternative action can be defined to be executed in case the condition is not met. An if-else therefore has the following 2 possible forms:
 
-#### Form 1:
+### Form 1:
 
 `if (condition) action`
 
@@ -19,7 +19,7 @@ if (n > 10)
     println('n is greater than 10');
 ```
 
-#### Form 2:
+### Form 2:
 
 `if (condition) action else alternative_action`
 
@@ -36,11 +36,11 @@ else
 
 **Note**: In all cases, actions can be statement blocks or other if-else statements. A block is a series of statements enclosed in curly braces. It is treated by the interpreter as a single composite statement. Use a block if you want your **if** or **else** section to perform multiple actions.
 
-### The Switch statement
+## The Switch statement
 
 Like the if-else statement, the switch statement is used to choose the action to perform based on the value of an expression. The main difference is that unlike the if-else statement, the switch statement is not limited to 2 alternatives. Its syntax is as follows:
 
-```
+```JS
 switch (expression)
 {
     case value1:
@@ -100,11 +100,11 @@ switch (result)
 }
 ```
 
-### Pattern matching
+## Pattern matching
 
 So far, we've seen the **switch** statement and the possibilities it offers. But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times. We also have to use **break** to prevent the flow of execution from continuing to the next **case** section. This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression with the value of each **case** label. This is the kind of problem that pattern matching solves. It combines a better matching syntax with the **switch** keyword, which this time is used as an operator, helping us create expressions that not only choose what action to perform based on the value of an expression, but also return a value. A pattern matching expression typically looks like this:
 
-```
+```JS
 expression switch {
     pattern1 => result1,
     pattern2 => result2,
@@ -163,7 +163,7 @@ println($'the result with o is {res}');
 
 **Output**:
 
-```
+```JS
 o is { name = 'my object', size = 18, color = 'blue' }
 the result with o is my object of size 18
 ```
@@ -185,12 +185,12 @@ The above examples showcase the different kinds of patterns. They are explained 
 | grouping pattern      | another pattern between parentheses; **e.g.**:`(>= 12 and <= 18) or ((>= 22 and <= 30) and not 25)` _(in the range 12 to 18 or in the range 22 to 30 except 25)_                                            | Changes the priority in which chained logical patterns are evaluated. By default they are evaluated left to right. Any pattern between parentheses in a chain is evaluated first.                                                                                                                          |
 | positional pattern    | a coma seperated list of elementary patterns between parentheses.                                                                                                                                           | Matches expressions whose value is an iterable data item (one that can be used in a **foreach** loop) of the same length than the given list of patterns with items that match the elementary patterns at corresponding positions                                                                          |
 
-### Loops
+## Loops
 
 Loops are used to repeat an action until a condition is met.
 In AddyScript, we have 4 different kinds of loops. These are:
 
-#### The While loop:
+### The While loop:
 
 It performs an action as long as a condition is satisfied. If the condition is initially unsatisfied, the action will never be performed.
 
@@ -211,7 +211,7 @@ while (i <= 12)
 
 **Output**:
 
-```
+```Shell
 2 x 1 = 2
 2 x 2 = 4
 2 x 3 = 6
@@ -226,7 +226,7 @@ while (i <= 12)
 2 x 12 = 24
 ```
 
-#### The Do-While loop:
+### The Do-While loop:
 
 Just like the While loop, it performs an action as long as a condition is satisfied. The action is performed before the condition is checked thus leading to the action always being performed at least once.
 
@@ -246,7 +246,7 @@ do
 } while (i <= 12);
 ```
 
-#### The For loop:
+### The For loop:
 
 It's mainly used to perform an action for each value of a counter.
 
@@ -267,7 +267,7 @@ for (i = 1; i <= 12; ++i)
 
 2. The example given is equivalent to the while loop example.
 
-#### The For-Each loop:
+### The For-Each loop:
 
 It's used to iterate over a collection of items, performing an action on each of them.
 
@@ -309,7 +309,7 @@ foreach (name => job in jobs)
 
 **Output**:
 
-```
+```Shell
 paul is a general manager
 roland is a accountant
 david is a driver
@@ -321,7 +321,7 @@ david is a driver
 
 * It is possible to use the foreach loop to iterate over instances of user-defined classes if their class implements the _interator protocol_. We'll come back on this in the section dedicated to [inheritance and polymorphism](inheritance.md).
 
-### Jumps
+## Jumps
 
 Jumps allow execution to resume from a location other than the next instruction. They are generally very useful for prematurely exiting from functions or loops. The table below describes them:
 

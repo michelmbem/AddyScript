@@ -6,7 +6,7 @@
 
 # Welcome to AddyScript
 
-### Overview
+## Overview
 
 AddyScript is a lightweight scripting engine for the .NET platform.
 It can be used to add scripting functionality to applications targeting this platform or simply as a learning tool for young people.
@@ -19,7 +19,7 @@ This manual aims to guide you through its syntax and features.
 
 <div class="web-only" markdown="1">
 
-### In this manual
+## In this manual
 
 * Introduction
     * [Features](features.md)

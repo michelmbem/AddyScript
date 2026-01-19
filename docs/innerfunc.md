@@ -2,19 +2,19 @@
 
 At the time of writing this manual page, AddyScript has a set of 42 predefined functions. We have already discovered some of them in the previous sections. Here is a more general overview of AddyScript's built-in functions:
 
-### Utility functions
+## Utility functions
 
 * `any eval(string expression)` : evaluates the expression contained in the given string and returns its value.
 * `int hash(any first, ..more)` : combines the provided values to calculate their hash code. It accepts a maximum of 9 arguments. Only the first argument is required; the others are optional.
 
-### Conversion functions
+## Conversion functions
 
 * `string chr(int ascii)` : gets the Unicode character corresponding to the given code. The returned value is of type string.
 * `int ord(string chr)` : gets the Unicode order of the first character of the given string. In fact, the string must be one character long.
 * `blob pack(string format, ..values)` : packs several values in a binary string (a **blob**): a way to create structured data items in preparation for a call to a .NET method or a native function that expects a structured argument.
 * `blob unpack(string format, blob bytes)` : unpacks the combined values into a binary string following the given format.
 
-### Math functions
+## Math functions
 
 * `float rand()` : generates a random float between 0.0 and 1.0.
 * `int randint(int min, int max = 0)` : generates a random integer between _min_ (included) and _max_ (excluded). If _max_ is omitted, the random value will be generated between 0 and _min_. In all cases, the limits are always sorted so that _max_ is greater than or equal to _min_.
@@ -44,7 +44,7 @@ At the time of writing this manual page, AddyScript has a set of 42 predefined f
 * `float|decimal ceil(float|decimal x)` : determines the ceiling of x (i.e.: the smallest integer that is greater than or equal to x). Returns a value of the same type than the argument.
 * `float|decimal round(float|decimal value, int precision = 0)` : gets _value_ rounded to _precision_ decimal digits. The result is of the same type than the first argument.
 
-### Factory functions
+## Factory functions
 
 * `date now()` : gets the current date and time.
 * `duration days(float value)` : creates a duration with the given number of days.
@@ -54,7 +54,7 @@ At the time of writing this manual page, AddyScript has a set of 42 predefined f
 * `duration milliseconds(float value)` : creates a duration with the given number of milliseconds.
 * `string format(string pattern, ..substitutions)` : interpolates a string with the given pattern and values. using a mutable string is equivalent to invoking this function.
 
-### I/O functions
+## I/O functions
 
 * `void print(string pattern, ..substitutions)` : prints a formatted message to standard output and stays on the same line.
 * `void println(string pattern = '', ..substitutions)` : prints a formatted message to standard output and moves to the next line.

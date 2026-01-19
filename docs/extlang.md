@@ -1,6 +1,6 @@
 # Extending the language syntax
 
-### Creating custom statements
+## Creating custom statements
 
 Creating a custom statement can be summarized as follows:
 
@@ -55,7 +55,7 @@ Creating a custom statement can be summarized as follows:
 
 That's all!
 
-### Going further
+## Going further
 
 Well, to go further in AddyScript extension, just dive into the source code and discover how all the engine works. Don't forget to share your experience with us.
 

@@ -2,7 +2,7 @@
 
 In addition to the predefined functions, users have the ability to define their own functions in AddyScript and use them. The following sections describe how to do this.
 
-### Creating a function
+## Creating a function
 
 To create a function in AddyScript, simply use the following syntax:
 
@@ -57,7 +57,7 @@ res = addTwo(n, m);
 println($'the result is: {res}');
 ```
 
-### Invoking functions
+## Invoking functions
 
 As in most languages, a function invocation in AddyScript consists of its name followed by a comma-separated list of arguments in parentheses. In AddyScript, however, arguments can be either positional or named.
 
@@ -102,7 +102,7 @@ s5 = concat(suffix: '[', separator: ':', values: l, prefix: ']');
 println('s5 = ' + s5);
 ```
 
-#### Spreading arguments
+### Spreading arguments
 
 An important feature of the AddyScript syntax is that you can invoke a function with arguments of type **list** or **set** preceded by the **spread operator** (..). This tells AddyScript that the **list** or **set** should be substituted for its contents. This works similarly to the right operand of group assignment. The only requirement here is that none of the parameters provided by the spread collection should be passed to the function by reference.
 
@@ -130,7 +130,7 @@ println('add(..l[2..], ..s)' + res);
 // Output: 26
 ```
 
-### Manage how parameters are passed to a function
+## Manage how parameters are passed to a function
 
 A parameter can be passed to a function by value, by reference, or as a variable-length list of values. By default, parameters are passed by value. To indicate that a parameter is passed by reference, simply prefix it with the ampersand sign (&). Similarly, prefixing a parameter with the double-dot sign (..) keyword indicates that it represents a variable-length list of values. Note that a variable-length list of values ​​must always be the last in a parameter list. Thus, a function cannot have multiple variable-length lists of values ​​in its header.
 
@@ -138,7 +138,7 @@ When a parameter is passed by value to a function, it can be assigned a default 
 
 Another feature that AddyScript offers in handling function parameters is emptiness checking. When a parameter name is followed by an exclamation mark (!) in a function header, this tells AddyScript that the parameter in question should not receive empty values. Empty here means a null reference, a zero-length string, or an empty collection. Whenever the parameter receives such a value, an exception is thrown.
 
-### Closures
+## Closures
 
 A closure is a function used as a variable. Closures are typically used to pass functions as parameters to other functions (customizing their behavior) or to return a function as the result of another function. They appear in two forms in AddyScript: function references and inline function declarations. A function reference is like a reference to a variable (a simple identifier in the code) while an inline function declaration is an anonymous function definition that appears where an expression was expected. Both techniques are illustrated in the example below:
 
@@ -172,13 +172,13 @@ repeat(myList, function (x)
                });
 ```
 
-#### Remarks:
+### Remarks:
 
 1. When the body of an anonymous function is reduced to a return statement or a simple expression, the entire function can be formulated like this: `|parameters| => expression`. In this form, we call it a **lambda expression**. For example, we could invoke the "repeat" function from the previous example like this: `repeat(myList, |n| => println('{0} x 2 = {1}', n, 2*n));`. A lambda expression can also have a real function body delimited by curly braces and optionally ending with a **return** statement.
 
 2. If the parameter list of a lambda expression is empty, put a space between the vertical bars. This prevents parsers from confusing them with an or-else operator (\|\|).
 
-#### The closure's "bind" method
+### The closure's "bind" method
 
 The **closure** type has a single member: the "bind" method. Its prototype is: `closure closure::bind(string parameterName, any defaultValue)`. Its main purpose is to create a clone of a closure with a modified prototype. The "bind" method operates as follows:
 
@@ -210,7 +210,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
     }
     ```
 
-### External functions
+## External functions
 AddyScript allows a script to invoke a function declared in a native library (such as a DLL or a shared object). To do this, the target function must first be declared as an external function in the script using this syntax:
 
 `[LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
@@ -233,7 +233,7 @@ extern function msgbox(
 msgbox(null, "Hello funny people!", "AddyScript", 0);
 ```
 
-### Re-using code: the import directive
+## Re-using code: the import directive
 
 AddyScript obviously allows the user to define a function once and reuse it multiple times later. To do this, simply save the target functions in a script and import that script from another. You typically import a script using the **import** directive. Its syntax is as follows:
 
@@ -263,7 +263,7 @@ And finally, _scripts_ being in the _ImportPaths_, we can import _core.add_ from
 
 `import graph::core;`
 
-#### Remarks:
+### Remarks:
 
 The import directive can be used to import any symbol defined in a script. These include constants, variables, functions and classes.
 
