@@ -12,7 +12,7 @@ Its use of the [Avalonia UI](https://avaloniaui.net/) toolkit ensures compatibil
 Upon opening, it appears as a single window with a toolbar at the top, a text area (or code editor) in the middle, and a status bar at the bottom.
 The following image illustrates the GUI window:
 
-![asgui](asgui.jpg)
+![asgui](assets/asgui.jpg)
 
 #### Editor toolbar's buttons:
 
@@ -49,7 +49,7 @@ From left to right, the toolbar buttons play the following role:
 
 It may seem natural for a scripting language to have an interactive console. AddyScript adheres to this principle by providing a _REPL_ interface called **asis** (for AddyScript Interactive Shell). Now, it's not as sophisticated as those of more mature languages (indeed, AddyScript is under construction, right?) but it does the essentials: read your commands, parse them, and interpret them. Here's an illustration of what it looks like:
 
-![asis](asis.jpg)
+![asis](assets/asis.jpg)
 
 Using the console is simple, just type a command and press [Enter]. Remember to add a semicolon at the end of each statement, except for blocks (this may seem strange if you are familiar with scripting languages, but currently AddyScript really expects a semicolon at the end of each statement. This behavior will probably change in the future).
 

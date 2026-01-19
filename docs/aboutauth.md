@@ -11,7 +11,7 @@ contributing to developer communities. You can connect with him on [LinkedIn](ht
 
 When he's not coding, Michel loves urban music, architecture, and exploring new technologies.
 
-![Addy](addy.jpg)
+![Addy](assets/addy.jpg)
 
 <div class="web-only" markdown="1">
 

@@ -1,4 +1,8 @@
-![Banner](AddyScript.jpg)
+<div class="web-only" markdown="1">
+
+![Banner](assets/banner.jpg)
+
+</div>
 
 # Welcome to AddyScript
 

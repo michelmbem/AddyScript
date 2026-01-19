@@ -245,7 +245,7 @@ Example:
 
 Suppose that you have the following file structure:
 
-![tree](tree.jpg)
+![tree](assets/tree.jpg)
 
 To import _funcs.add_ from _main.add_, simply add the following line of code to _main.add_:
 
