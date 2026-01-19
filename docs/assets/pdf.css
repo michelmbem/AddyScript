@@ -1,3 +1,5 @@
-.web-only {
-    display: none !important;
+@media print {
+    .web-only {
+        display: none !important;
+    }
 }
