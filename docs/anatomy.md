@@ -55,4 +55,8 @@ names.each(function (x)
 
 Well, now you can try your own.
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](asgui-asis.md) | [Next](expressions.md)
+
+</div>

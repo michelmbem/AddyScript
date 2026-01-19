@@ -55,4 +55,8 @@ do
  } while (x < end);
 ```
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](interpret.md) | [Next](scriptengine.md)
+
+</div>

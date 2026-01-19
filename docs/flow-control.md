@@ -333,4 +333,8 @@ Jumps allow execution to resume from a location other than the next instruction.
 |return|`return;`<br>or<br>`return expression;`|Returns from a function with or without a value.|
 |throw|`throw exception;`<br>or<br>`throw "some error message";`|Raises an error and stops the execution of the script until the raised error is caught by a **try-catch-finally** statement.|
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](expressions.md) | [Next](spec-types.md)
+
+</div>

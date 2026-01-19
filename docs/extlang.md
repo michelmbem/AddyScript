@@ -59,4 +59,8 @@ That's all!
 
 Well, to go further in AddyScript extension, just dive into the source code and discover how all the engine works. Don't forget to share your experience with us.
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](extapi.md) | [Next](improve.md)
+
+</div>

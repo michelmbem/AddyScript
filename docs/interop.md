@@ -115,4 +115,8 @@ objWord.Quit();
 The interoperability of AddyScript and COM is well demonstrated in the _msxml.add_, _word.add_ (shown above), and _ado.add_ sample scripts.
 Note that the scripting engine still cannot attach handlers to a COM object's events.
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](introspection.md) | [Next](exceptions.md)
+
+</div>

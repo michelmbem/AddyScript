@@ -11,4 +11,8 @@ open-source or not, at no cost without being obliged to provide your source-code
 However I would be very pleased if you mention in your project (or one of its relative content)
 that part (or the whole) of your work derives from AddyScript.
 
+<div class="web-only">
+
 [Home](README.md) | [Previous](improve.md) | [Next](aboutauth.md)
+
+</div>

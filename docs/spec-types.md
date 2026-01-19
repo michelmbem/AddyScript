@@ -84,15 +84,15 @@ println('abs({0}) = {1}', a, abs(a));
 **Output**:
 
 ```
-the real part of (2 - 1i) is 2
-the imaginary part of (2 - 1i) is -1
-the conjugate of (2 - 1i) is (2 + 1i)
-(2 - 1i) + (1 + 2i) = (3 + 1i)
-(2 - 1i) - (1 + 2i) = (1 - 3i)
-(2 - 1i) * (1 + 2i) = (4 + 3i)
-(2 - 1i) / (1 + 2i) = (0.8 - 0.4i)
-(2 - 1i) ** 2 = (3 - 4i)
-abs((2 - 1i)) = 2.23606797749979
+the real part of (2 - i) is 2
+the imaginary part of (2 - i) is -1
+the conjugate of (2 - i) is (2 + i)
+(2 - i) + (1 + 2i) = (3 + i)
+(2 - i) - (1 + 2i) = (1 - 3i)
+(2 - i) * (1 + 2i) = (4 + 3i)
+(2 - i) / (1 + 2i) = (0.8 - 0.4i)
+(2 - i) ** 2 = (3 - 4i)
+abs((2 - i)) = 2.23606797749979
 ```
 
 #### Complex Number API
@@ -352,5 +352,8 @@ In addition to those operators, the **blob** class exposes the following members
 |`void copyTo(blob other, int srcIndex = 0, int destIndex = 0, int length = 0)`|method|Copies one blob to another. The portion of the source blob to be copied is between the indices "srcIndex" and "srcIndex" + "length". The portion of the destination blob that will be affected is between the indices "destIndex" and "destIndex" + "length". Both blobs must be sufficiently long, otherwise an exception will be thrown.|
 |`void resize(int newLength)`|method|Resizes a blob preserving its current content (as much as possible).|
 
+<div class="web-only">
 
 [Home](README.md) | [Previous](flow-control.md) | [Next](col-obj.md)
+
+</div>
