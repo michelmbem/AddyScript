@@ -509,7 +509,7 @@ public class Class : IFrameItem
                                                                "__value",
                                                                new SelfReference(),
                                                                new Block(VariableDecl.Single("groupId", new FunctionCall("groupFunc", new VariableRef("__value"), new VariableRef("__index"))),
-                                                                         new IfElse(new MethodCall(new VariableRef("groups"), "containsKey", new VariableRef("groupId")),
+                                                                         new IfElse(new BinaryExpression(BinaryOperator.Contains, new VariableRef("groups"), new VariableRef("groupId")),
                                                                                     new MethodCall(new ItemRef(new VariableRef("groups"), new VariableRef("groupId")),
                                                                                                    "add",
                                                                                                    new VariableRef("__value")),

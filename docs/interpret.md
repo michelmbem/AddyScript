@@ -35,7 +35,7 @@ Look at this example:
 
 ```CSharp
 var context = new ScriptContext();
-var program ScriptEngine.ParseString(txtScript.Text);
+var program = ScriptEngine.ParseString(txtScript.Text);
 // Alternatively: var program = ScriptEngine.ParseFile(@"path/to/my/script");
 
 foreach (var item in myArray)
