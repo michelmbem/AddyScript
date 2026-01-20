@@ -3,7 +3,8 @@
         display: none !important;
     }
 
-    .logo {
+    .wrapper.upper,
+    .wrapper.upper > .logo  {
         margin: 0 !important;
         padding: 0 !important;
     }
