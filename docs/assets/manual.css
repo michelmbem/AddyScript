@@ -2,14 +2,14 @@
     .web-only {
         display: none !important;
     }
-    
-    .md-header__button.md-logo {
+
+    .logo,
+    .logo img {
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-    }
-
-    .md-header__button.md-logo img {
-        width: 100% !important;
+        display: block;
         height: auto !important;
     }
 }
