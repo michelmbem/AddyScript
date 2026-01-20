@@ -2,8 +2,4 @@
     .web-only {
         display: none !important;
     }
-
-    #doc-cover > .wrapper.upper > .logo  {
-        background-size: cover !important;
-    }
 }
