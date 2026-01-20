@@ -55,7 +55,7 @@ do
  } while (x < end);
 ```
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](interpret.md) | [Next](scriptengine.md)
 

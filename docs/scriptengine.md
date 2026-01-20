@@ -28,7 +28,7 @@ var program = ScriptEngine.ParseString(txtScript.Text);
 txtScript.Text = ScriptEngine.GenerateCode(program);
 ```
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](evaluate.md) | [Next](asgui-asis.md)
 

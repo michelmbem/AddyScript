@@ -152,7 +152,7 @@ The last step in the process of creating a primitive type is to decide how you w
 
 Have a look at how existing primitive types are defined to better understand the whole process.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](grammar.md) | [Next](extlang.md)
 

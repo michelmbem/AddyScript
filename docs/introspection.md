@@ -213,7 +213,7 @@ readln();
 The above code will output detailed information about the **Exception**, **int**, **tuple**, and **map** types, including their fields, properties, methods, and events.
 It will also demonstrate how to create instances and invoke methods using reflection.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](inheritance.md) | [Next](interop.md)
 

@@ -118,7 +118,7 @@ catch (e)
 }
 ```
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](interop.md) | [Next](grammar.md)
 

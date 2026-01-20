@@ -60,7 +60,7 @@ At the time of writing this manual page, AddyScript has a set of 42 predefined f
 * `void println(string pattern = '', ..substitutions)` : prints a formatted message to standard output and moves to the next line.
 * `string readln(string prompt = '')` : reads a string from the standard input device and returns it to the script. An optional prompt can be displayed.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](col-obj.md) | [Next](userfunc.md)
 

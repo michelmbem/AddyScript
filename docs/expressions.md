@@ -405,7 +405,7 @@ Similarly, you print values to the console in AddyScript by using the **print** 
 
 If you are integrating AddyScript in your own system, you could change the meaning of those statements and make **print** and **println** display a popup window for example.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](anatomy.md) | [Next](flow-control.md)
 

@@ -147,7 +147,7 @@ However, it provides services that can be very helpful at runtime.
 For example, its **In** and **Out** static properties are used by the scripting engine as standard input and (respectively) standard output devices for the currently running script.
 So if you want to redirect the script's input or output, just assign anything you want to those properties before invoking any _Execute_ method on the _ScriptEngine_ class.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](features.md) | [Next](evaluate.md)
 

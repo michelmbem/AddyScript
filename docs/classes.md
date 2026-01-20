@@ -345,7 +345,7 @@ There is a set of members that any class in AddyScript (including the void type)
 
 Apart from the _type_ property, any of these members can be overridden in your custom classes. AddyScript internally uses them to compare data items and to identify them in collections.
 
-<div class="web-only" markdown="1">
+<div markdown class="web-only">
 
 [Home](README.md) | [Previous](userfunc.md) | [Next](inheritance.md)
 
