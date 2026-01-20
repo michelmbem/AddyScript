@@ -3,7 +3,11 @@
         display: none !important;
     }
 
-    .wrapper.upper > .logo  {
+    #doc-cover > .wrapper  {
+        padding: 0 !important;
+    }
+
+    #doc-cover > .wrapper.upper > .logo  {
         background-size: cover !important;
     }
 }
