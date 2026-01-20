@@ -2,4 +2,14 @@
     .web-only {
         display: none !important;
     }
+    
+    .md-header__button.md-logo {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .md-header__button.md-logo img {
+        width: 100% !important;
+        height: auto !important;
+    }
 }
