@@ -3,7 +3,7 @@
         display: none !important;
     }
 
-    #doc-cover > .wrapper  {
+    #doc-cover > .wrapper.upper  {
         padding: 0 !important;
     }
 
