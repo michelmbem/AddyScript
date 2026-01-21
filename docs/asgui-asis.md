@@ -42,21 +42,19 @@ From left to right, the toolbar buttons play the following role:
 1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. Therefore, the executables of both programs must always be in the same directory.
 2. To have time to read the output printed by your script, always add a call to the _readln()_ function at the end of it. Of course this is not necessary for scripts that have a graphical interface.
 3. The shortcut to execute a script is **[F5]**. In fact, many commands use the same shortcut as in VS:
-
-    a. **[Ctrl+N]** to create a new script
-    b. **[Ctrl+O]** to open an existing script
-    c. **[Ctrl+S]** to save the current script (**[Ctrl+Shift+S]** for saving to a different name)
-    d. **[Ctrl+P]** to print it (**[Ctrl+Shift+P]** to save as PDF)
-    e. **[Ctrl+F]** to open the search window in find mode
-    f. **[Ctrl+H]** to open the search window in replace mode
-    g. **[F1]** to display help
-    h. The **[Tab]** key increases the indentation of selected lines
-    i. Combined with the **[Shift]** key it decreases the indentation level instead
-    j. **[Ctrl+K]** comments out selected lines
-    k. **[Ctrl+Shift+K]** uncomments selected lines
-    l. **[Ctrl+I]** inserts a code snippet
-    m. **[Ctrl+Shift+I]** surrounds the selection with a code snippet
-
+    1. **[Ctrl+N]** to create a new script
+    2. **[Ctrl+O]** to open an existing script
+    3. **[Ctrl+S]** to save the current script (**[Ctrl+Shift+S]** for saving to a different name)
+    4. **[Ctrl+P]** to print it (**[Ctrl+Shift+P]** to save as PDF)
+    5. **[Ctrl+F]** to open the search window in find mode
+    6. **[Ctrl+H]** to open the search window in replace mode
+    7. **[F1]** to display help
+    8. The **[Tab]** key increases the indentation of selected lines
+    9. Combined with the **[Shift]** key it decreases the indentation level instead
+    10. **[Ctrl+K]** comments out selected lines
+    11. **[Ctrl+Shift+K]** uncomments selected lines
+    12. **[Ctrl+I]** inserts a code snippet
+    13. **[Ctrl+Shift+I]** surrounds the selection with a code snippet
 4. On macOS all the above commands use the **[Command]** key in place of **[Ctrl]**.
 5. Additional commands are available in the editor's context menu.
 
