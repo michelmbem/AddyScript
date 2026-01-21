@@ -42,6 +42,7 @@ From left to right, the toolbar buttons play the following role:
 1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. Therefore, the executables of both programs must always be in the same directory.
 2. To have time to read the output printed by your script, always add a call to the _readln()_ function at the end of it. Of course this is not necessary for scripts that have a graphical interface.
 3. The shortcut to execute a script is **[F5]**. In fact, many commands use the same shortcut as in VS:
+
     a. **[Ctrl+N]** to create a new script
     b. **[Ctrl+O]** to open an existing script
     c. **[Ctrl+S]** to save the current script (**[Ctrl+Shift+S]** for saving to a different name)
@@ -55,6 +56,7 @@ From left to right, the toolbar buttons play the following role:
     k. **[Ctrl+Shift+K]** uncomments selected lines
     l. **[Ctrl+I]** inserts a code snippet
     m. **[Ctrl+Shift+I]** surrounds the selection with a code snippet
+
 4. On macOS all the above commands use the **[Command]** key in place of **[Ctrl]**.
 5. Additional commands are available in the editor's context menu.
 
