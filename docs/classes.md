@@ -73,7 +73,7 @@ Where
 * Since both reader and writer are functions, they can also be reduced to an arrow followed by an expression when they consist of just an expression or a parameterized **return** statement.
 * When the property is read-only (i.e. it has no writer), and that its reader does nothing more than return a value, the entire property can be declared with the following syntax: `property property_name => returned_value;`. That syntax is equivalent to  `property property_name { read => returned_value; }`.
 
-### Automatic properties:
+#### Automatic properties:
 
 Since defining a property consists of declaring a backing field, then defining the property's read and write accessors,
 AddyScript can help the programmer save time by doing most of the work automatically.
@@ -90,7 +90,7 @@ resulting in something as short as: `property property_name;` which is equivalen
 
 **Remark**: The specification of an automatic property is identical to that of an abstract property except that the scripting engine doesn't generate any logic for an abstract property. It expects concrete subclasses to do so.
 
-### Indexers:
+#### Indexers:
 
 Indexers are a special type of property that allows instances of user-defined classes to behave like collections.
 A class can have only one indexer, and it cannot be static.
@@ -126,6 +126,8 @@ An operator overload specification consists of the **operator** keyword followed
 3. Operators are not really a special type of class member in AddyScript. Each operator is actually a method with a special name. This can be verified by introspecting a class in which an operator is overloaded. AddyScript looks for such a method whenever it encounters a unary or binary operation involving an instance of a user-defined class and an overloadable operator.
 
 ## Example of a class
+
+### A simple class
 
 In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method and an event.
 
@@ -188,6 +190,59 @@ john.add_sex_changed(|old, _new| => println($'Sex changed from {old} to {_new}')
 john.add_sex_changed(|o, n| => println('Maybe the name should change too'));
 john.sex = 'Female';
 println(john.summary());
+```
+
+Output:
+
+```
+Mr. John, Male person aged 42
+Sex changed from Male to Female
+Maybe the name should change too
+Mrs. John, Female person aged 42
+```
+
+### A class with an indexer
+
+Exampple of a class that has an indexer:
+
+```JS
+class PhoneBook
+{
+    // Backing field for the indexer
+    private _entries = {=>};
+    
+    // Indexer definition
+    public property []
+    {
+        read => this._entries[__key];
+        write => this._entries[__key] = __value;
+    }
+    
+    // A method to display the content of the phone book
+    public function toString(format = 'g')
+    {
+        var result = 'Phone Book:';
+        foreach (name in this._entries.keys)
+        {
+            result += $'\n\t{name}: {this._entries[name]}';
+        }
+        return result;
+    }
+}
+
+// Usage:
+pb = new PhoneBook();
+pb['John Doe'] = '555-1234';
+pb['Jane Smith'] = '555-5678';
+println(pb);
+```
+
+Output:
+
+```
+Phone Book:
+    John Doe: 555-1234
+    Jane Smith: 555-5678
 ```
 
 ## The **this** keyword
@@ -289,6 +344,15 @@ jane.sex = "Male";
 println(jane.summary());
 ```
 
+Output:
+
+```
+Mrs. Jane, Female person aged 30
+Sex changed from Female to Male
+Why not call him John?
+Mr. Jane, Male person aged 30
+```
+
 ### Constructors and property initializers
 
 A constructor call can be followed by a set of property initializers.
@@ -314,6 +378,12 @@ class Point
 
 pt = new Point {x = 10, y = -5};
 println(pt.toString());
+```
+
+Output:
+
+```
+(10, -5)
 ```
 
 ## Modifiers

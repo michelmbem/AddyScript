@@ -45,12 +45,11 @@ foreach (name in names)
 names.each(hello);
 
 // Or without declaring the 'hello' function at all:
-names.each(function (x)
-           {
-              println($'Hello {x}');
-              if (x !== 'bill') return;
-              println('Have you been a CEO somewhere?');
-           });
+names.each(function (x) {
+    println($'Hello {x}');
+    if (x !== 'bill') return;
+    println('Have you been a CEO somewhere?');
+});
 ```
 
 Well, now you can try your own.

@@ -40,6 +40,27 @@ t = new Tuple{3}('Jason Donovan', 32, `2010-03-15`);
 println($"{t[0]} is {t[1]} years old, he works for us since {t[2]:d}.");
 ```
 
+Output:
+
+```
+LinkedList{1}:
+--------------
+[1]->[2]->[4]->[8]->[16]->[32]->[64]->[128]->[256]->[512]
+
+SortedDictionary{2}:
+--------------------
+  audrey : 28
+    hans : 24
+    john : 35
+    kyle : 22
+    phil : 30
+   steve : 27
+
+System::Tuple{3}:
+-----------------
+Jason Donovan is 32 years old, he works for us since 2010-03-15.
+```
+
 The integration of AddyScript into the .NET platform is well demonstrated in some of the provided example scripts
 like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its dependencies).
 

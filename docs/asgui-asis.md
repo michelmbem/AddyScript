@@ -18,32 +18,45 @@ The following image illustrates the GUI window:
 
 From left to right, the toolbar buttons play the following role:
 
-1. New: Creates a new window with an empty text box to allow you to edit a brand-new script.
-2. Open: Displays a file selection dialog and allows you to open an existing script in the active window if it was still empty or in a new window if it was not.
-3. Save: Saves the currently edited script to a file. The associated drop-down menu allows you to save the script under a new name or keep the existing name (if the currently edited script was already saved).
-4. Print: Prints the currently edited script. This actually exports the script as a PDF document that is then sent to the printer using a system command. There is an option in the associated dropdown menu to save the generated PDF document in a local file for later printing.
-5. Undo: Undoes the last action.
-6. Redo: Reapplies the last undone action.
-7. Cut: Cuts the selected text to the clipboard.
-8. Copy: Copies the selected text to the clipboard.
-9. Paste: Pastes the clipboard contents into the editor.
-10. Find: Displays the Find/Replace dialog with the "Find" tab enabled.
-11. Replace: Displays the Find/Replace dialog with the "Replace" tab enabled.
-12. Indent: Increases the indentation level of the selected lines of code.
-13. Outdent: Decreases the indentation level of the selected lines of code.
-14. Comment Lines: Comments out the selected lines of code.
-15. Uncomment Lines: Uncomment the selected lines of code.
-16. Run: Launches a console window and interprets the script being edited.
-17. Configure: displays a dialog box in which the user can set options such as the list of directories in which imported scripts should be searched or the list of assemblies referenced by the script.
-18. Help: displays this manual. Another entry in the drop-down menu displays the about box.
+1. **New**: Creates a new window with an empty text box to allow you to edit a brand-new script.
+2. **Open**: Displays a file selection dialog and allows you to open an existing script in the active window if it was still empty or in a new window if it was not.
+3. **Save**: Saves the currently edited script to a file. The associated drop-down menu allows you to save the script under a new name or keep the existing name (if the currently edited script was already saved).
+4. **Print**: Prints the currently edited script. This actually exports the script as a PDF document that is then sent to the printer using a system command. There is an option in the associated dropdown menu to save the generated PDF document in a local file for later printing.
+5. **Undo**: Undoes the last action.
+6. **Redo**: Reapplies the last undone action.
+7. **Cut**: Cuts the selected text to the clipboard.
+8. **Copy**: Copies the selected text to the clipboard.
+9. **Paste**: Pastes the clipboard contents into the editor.
+10. **Find**: Displays the Find/Replace dialog with the "Find" tab enabled.
+11. **Replace**: Displays the Find/Replace dialog with the "Replace" tab enabled.
+12. **Indent**: Increases the indentation level of the selected lines of code.
+13. **Outdent**: Decreases the indentation level of the selected lines of code.
+14. **Comment Lines**: Comments out the selected lines of code.
+15. **Uncomment Lines**: Uncomment the selected lines of code.
+16. **Run**: Launches a console window and interprets the script being edited.
+17. **Configure**: displays a dialog box in which the user can set options such as the list of directories in which imported scripts should be searched or the list of assemblies referenced by the script.
+18. **Help**: displays this manual. Another entry in the drop-down menu displays the about box.
 
 ### General editor tips:
 
 1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. Therefore, the executables of both programs must always be in the same directory.
 2. To have time to read the output printed by your script, always add a call to the _readln()_ function at the end of it. Of course this is not necessary for scripts that have a graphical interface.
-3. The shortcut to execute a script is **F5**. In fact, many commands use the same shortcut as in VS: **Ctrl+N** to create a new script, **Ctrl+O** to open an existing script, **Ctrl+S** to save the current script, **Ctrl+P** to print it, **Ctrl+F** to open the search window, **Ctrl+H** to open the search window in replace mode, **F1** to display help. The **[Tab]** key increases the indentation of selected lines; combined with the **[Shift]** key it decreases the indentation instead. **Ctrl+K** comments out selected lines, **Ctrl+Shift+K** uncomments selected lines. **Ctrl+I** inserts a code snippet.
-4. On macOS all the above commands use the _Command_ key in place of _Control_.
-5. Additional commands such as "Insert Snippet", "Surround With" and "Reformat Code" are available in the editor's context menu.
+3. The shortcut to execute a script is **[F5]**. In fact, many commands use the same shortcut as in VS:
+    a. **[Ctrl+N]** to create a new script
+    b. **[Ctrl+O]** to open an existing script
+    c. **[Ctrl+S]** to save the current script (**[Ctrl+Shift+S]** for saving to a different name)
+    d. **[Ctrl+P]** to print it (**[Ctrl+Shift+P]** to save as PDF)
+    e. **[Ctrl+F]** to open the search window in find mode
+    f. **[Ctrl+H]** to open the search window in replace mode
+    g. **[F1]** to display help
+    h. The **[Tab]** key increases the indentation of selected lines
+    i. Combined with the **[Shift]** key it decreases the indentation level instead
+    j. **[Ctrl+K]** comments out selected lines
+    k. **[Ctrl+Shift+K]** uncomments selected lines
+    l. **[Ctrl+I]** inserts a code snippet
+    m. **[Ctrl+Shift+I]** surrounds the selection with a code snippet
+4. On macOS all the above commands use the **[Command]** key in place of **[Ctrl]**.
+5. Additional commands are available in the editor's context menu.
 
 ## Using the Interactive Console
 
@@ -98,15 +111,17 @@ Here are some useful examples of how to invoke asis:
 * Run _test5.add_ using the _es_ (Spanish) culture and writing logs in _test5.log_: `asis -f test5.add -l test5.log -c es`
 * Evaluate an expression: `asis -e "x = 10; y = 5; 2*x - 5*y + 3"`.
 
-    Result: `-2`
+    Output:
+
+    ```
+    -2
+    ```
 
 * Interactive mode with reference to some common .NET assemblies; imported scripts should be looked for in the provided _samples/library_ directory: `asis -r System.Data.OleDb -r System.Windows.Forms -d ../../../samples/library`.
 
-    **Note:** In this case, the host .NET application must be a Windows Forms application referencing the _System.Data.OleDb_ package, otherwise AddyScript will not be able to dynamically load the corresponding assemblies.
-
 * Run the _test5.add_ file with references to some common .NET assemblies; imported scripts should be looked for in the provided _samples/library_ directory: `asis -f test5.add -r System.Data.OleDb -r System.Windows.Forms -d ../../../samples/library`
 
-    **Note:** Same observation as in the previous case.
+## Conclusion
 
 Well, that's it. More features will be added to both tools in the future. But for now, I hope they do the basics.
 

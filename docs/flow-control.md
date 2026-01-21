@@ -211,7 +211,7 @@ while (i <= 12)
 
 **Output**:
 
-```Shell
+```
 2 x 1 = 2
 2 x 2 = 4
 2 x 3 = 6
@@ -309,7 +309,7 @@ foreach (name => job in jobs)
 
 **Output**:
 
-```Shell
+```
 paul is a general manager
 roland is a accountant
 david is a driver
