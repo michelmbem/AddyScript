@@ -185,14 +185,14 @@ The set class supports the following operators:
 |\+|2 sets|Computes and returns the union of both sets. Identical to operator \|.|
 |\-|2 sets|Computes and returns the difference of both sets.|
 |\||2 sets|Computes and returns the union of both sets. Identical to operator \+.|
-|&|2 sets|Computes and returns the intersection of both sets.|
+|&amp;|2 sets|Computes and returns the intersection of both sets.|
 |^|2 sets|Computes and returns the symmetric difference of both sets (i.e.: a and b being sets, a ^ b is equal to (a - b) + (b - a)).|
 |==|2 sets|Verifies that both sets contains exactly the same elements, that is their symmetric difference is empty.|
 |!=|2 sets|Verifies that there is at least one element in one set that does not belong to the other.|
-|\<|2 sets|Verifies that left operand is a proper subset of the right operand.|
-|\<=|2 sets|Verifies that left operand is a subset of the right operand.|
-|\>|2 sets|Verifies that left operand is a proper superset of the right operand.|
-|\>=|2 sets|Verifies that left operand is a superset of the right operand.|
+|&lt;|2 sets|Verifies that left operand is a proper subset of the right operand.|
+|&lt;=|2 sets|Verifies that left operand is a subset of the right operand.|
+|&gt;|2 sets|Verifies that left operand is a proper superset of the right operand.|
+|&gt;=|2 sets|Verifies that left operand is a superset of the right operand.|
 |**contains**|a set to the left and anything to the right|Checks if the set contains the given value.|
 
 In addition to the above operators, the **set** class exposes the following members:
