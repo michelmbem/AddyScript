@@ -105,6 +105,11 @@ var res2 = dummy(4);
 Console.WriteLine(res2);
 ```
 
+## Learn more
+
+You can find more examples in the _samples_ folder of the distribution package.<br>
+You can also check the [Wiki](https://michelmbem.github.io/AddyScript/) for more documentation and code samples.
+
 ## Recently added features
 
 * Migration to .NET 8.0 (ver. 0.9.9).
