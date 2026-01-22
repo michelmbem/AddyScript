@@ -87,7 +87,7 @@ import System::Environment;
 // import the entire System.IO namespace
 import System::IO;
 
-path = Path::Combine(GetFolderPath('DesktopDirectory'), 'Products.xls');
+path = Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'Products.xls');
 
 if (File::Exists(path)) File::Delete(path);
 ```
