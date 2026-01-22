@@ -2,7 +2,7 @@
 
 ## Exporting the AST to XML
 
-You can easily export an Abstract Syntax Tree to Xml format by invoking the _ExportXml_ static method of the _ScriptEngine_ class.
+You can easily export an Abstract Syntax Tree to XML format by invoking the _ExportXml_ static method of the _ScriptEngine_ class.
 
 Simply do as follows:
 

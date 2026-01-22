@@ -158,18 +158,17 @@ myList = [2, 5, 7, 8, 3, 0, 1, 6, 9, 4];
 repeat(myList, println);
 
 // Declare a function inline and store it in a variable called myFunc
-myFunc = function (n)
-         {
-             println('{0} x 2 = {1}', n, 2 * n);
-         };
+myFunc = function (n) {
+    println('{0} x 2 = {1}', n, 2 * n);
+};
 
 // Invoke repeat with myFunc
 repeat(myList, myFunc);
+
 // Something more compact
-repeat(myList, function (x)
-               {
-                   println(x % 2 == 0 ? 'even' : 'odd');
-               });
+repeat(myList, function (x) {
+    println(x % 2 == 0 ? 'even' : 'odd');
+});
 ```
 
 ### Remarks:
@@ -194,6 +193,13 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
     println(add10(5));
     println(add10(-7));
     ```
+   
+   Output:
+
+   ```
+   15
+   3
+   ```
 
 2. If _parameterName_ doesn't match the name of an existing parameter in the original function's header, "bind" simply adds an optional parameter with the given name and default value to the resulting function. This is very helpful when you are creating a function that expects a closure as an argument and that you want the closure to match variable prototypes. As an example, the "each" method of the **list** type is defined as follows:
 
@@ -213,14 +219,28 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 ## External functions
 AddyScript allows a script to invoke a function declared in a native library (such as a DLL or a shared object). To do this, the target function must first be declared as an external function in the script using this syntax:
 
-`[LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
-extern function functionName(list_of_parameters_with_type_attribute);`
+```
+[LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
+extern function functionName(list_of_parameters_with_type_attribute);
+```
 
-Where "nativeLibraryName" is the name of the native library that contains the definition of the function we want to import, "importedFunctionName" is the name of the function we want to import, and "someDotNetType" is the name of the return type of the function. functionName is the name we want to give to the function in our code. If functionName is equal to "importedFunctionName", then the procName field of the LibImport attribute can be omitted. If the function does not return anything, then returnType can also be omitted.
+Where :
 
-Each parameter in the formal parameter list must be decorated with a Type attribute indicating what type the parameter is. If the Type attribute is omitted, the System.Object type will be used by default. In fact, when it comes to P/Invoke, AddyScript is less dynamically typed than usual. Unqualified type names will be prefixed with "System.", and will therefore be searched in the _System.Private.CorLib_ assembly.
+* _nativeLibraryName_ is the name of the native library that contains the definition of the function we want to import,
+* _importedFunctionName_ is the name of the function we want to import, and
+* _someDotNetType_ is the name of the return type of the function.
+* _functionName_ is the name we want to give to the function in our code.
 
-The following example shows how to invoke the Win32 MessageBox function from a script:
+**Notes:**
+
+1. If _functionName_ is equal to _importedFunctionName_, then the **procName** field of the **LibImport** attribute can be omitted.
+2. If the function does not return anything, then **returnType** can also be omitted. 
+3. Each parameter in the formal parameter list must be decorated with a **Type** attribute indicating what type the parameter is.
+4. If the **Type** attribute is omitted, the _System.Object_ type will be used by default.
+5. In fact, when it comes to P/Invoke, AddyScript is less dynamically typed than usual.
+6. Unqualified type names will be prefixed with "System.", and will therefore be searched in the _System.Private.CorLib_ assembly.
+
+The following example shows how to invoke the Win32 _MessageBox_ function from a script:
 
 ```JS
 [LibImport("user32", procName = "MessageBox", returnType = "Int32")]
@@ -230,16 +250,25 @@ extern function msgbox(
         [Type("String")] title,
         [Type("Int32")] flags);
 
-msgbox(null, "Hello funny people!", "AddyScript", 0);
+// Now we can call the imported function like this:
+res = msgbox(null, "Hello funny people!", "AddyScript", 0);
+println("MessageBox returned: " + res);
 ```
 
 ## Re-using code: the import directive
 
-AddyScript obviously allows the user to define a function once and reuse it multiple times later. To do this, simply save the target functions in a script and import that script from another. You typically import a script using the **import** directive. Its syntax is as follows:
+AddyScript obviously allows the user to define a function once and reuse it multiple times later.
+To do this, simply save the target functions in a script and import that script from another.
+You typically import a script using the **import** directive. Its syntax is as follows:
 
 `import script_name_without_extension;`
 
-AddyScript assumes that imported scripts have the extension _.add_. The imported script will first be searched in the same directory as the script from which it is imported. If it is not found in that directory, AddyScript will continue searching in each of the directories that are listed in the _ImportPaths_ property of the _ScriptContext_ instance with which the current _ScriptEngine_ object was initialized. An error occurs if the search is unsuccessful. To indicate that the script to be imported would be in a subdirectory, use the double-colon operator (::) as a path separator in the script name.
+AddyScript assumes that imported scripts have the extension _.add_.
+The imported script will first be searched in the same directory as the script from which it is imported.
+If it is not found in that directory, AddyScript will continue searching in each of the directories that are listed in
+the _ImportPaths_ property of the _ScriptContext_ instance with which the current _ScriptEngine_ object was initialized.
+An error occurs if the search is unsuccessful. To indicate that the script to be imported would be in a subdirectory,
+use the double-colon operator (::) as a path separator in the script name.
 
 Example:
 
@@ -255,7 +284,8 @@ To import _moreFuncs.add_ from _main.add_, simply add the following line of code
 
 `import lib::moreFuncs;`
 
-Supposing that the full path to _scripts_ figures in the _ImportPaths_ property of the current _ScriptContext_, we can import _math.add_ from _main.add_ by simply adding the following line of code to _main.add_:
+Supposing that the full path to _scripts_ figures in the _ImportPaths_ property of the current _ScriptContext_,
+we can import _math.add_ from _main.add_ by simply adding the following line of code to _main.add_:
 
 `import math;`
 

@@ -75,9 +75,9 @@ There are two cases where a throw statement can be used as an expression (called
     ```JS
     score = getScore();
     mention = score switch {
-        0..3 => 'low',
-        4..6 => 'average',
-        7..10 => 'high',
+        >= 0 and <= 3 => 'low',
+        >= 4 and <= 6 => 'average',
+        >= 7 and <= 10 => 'high',
         _ => throw new Exception('OutOfRange', 'The score should be between 0 and 10')
     };
     ```
