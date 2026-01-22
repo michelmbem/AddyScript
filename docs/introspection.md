@@ -25,10 +25,10 @@ They are listed in the table below:
 | `bool isAssignableFrom(TypeInfo otherType)` | Method   | Determines whether instances of the specified type can be assigned to variables of the current type. |
 | `MethodInfo $constructor { read; }`         | Property | Gets the constructor method of the type.                                                             |
 | `PropertyInfo indexer { read; }`            | Property | Gets the indexer property of the type, if any.                                                       |
-| `list fields { read; }`                     | Property | Gets a list of fields defined in the type.                                                           |
-| `list properties { read; }`                 | Property | Gets a list of properties defined in the type.                                                       |
-| `list methods { read; }`                    | Property | Gets a list of methods defined in the type.                                                          |
-| `list events { read; }`                     | Property | Gets a list of events defined in the type.                                                           |
+| `map fields { read; }`                      | Property | Gets a map of fields defined in the type identified by their names.                                  |
+| `map properties { read; }`                  | Property | Gets a map of properties defined in the type identified by their names.                             |
+| `map methods { read; }`                     | Property | Gets a map of methods defined in the type identified by their names.                                |
+| `map events { read; }`                      | Property | Gets a map of events defined in the type identified by their names.                                 |
 | `list attributes { read; }`                 | Property | Gets a list of attributes applied to the type.                                                       |
 | `any newInstance(..args)`                   | Method   | Creates a new instance of the type by invoking its constructor.                                      |
 
