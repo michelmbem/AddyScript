@@ -1,0 +1,68 @@
+import std::util; // for 'randlst'
+import System::Diagnostics::Stopwatch;
+
+function mergesort(t, n) =>
+	merge_sort_rec(t, [0] * n, 0, n - 1);
+
+function merge_sort_rec(t, tmp, l, r)
+{
+	if (l >= r) return;
+	
+	var mid = int((l + r) / 2);
+	merge_sort_rec(t, tmp, l, mid);
+	merge_sort_rec(t, tmp, mid + 1, r);
+	merge(t, tmp, l, mid, r);
+}
+
+function merge(t, tmp, l, mid, r)
+{
+	var i = l, j = mid + 1;
+	
+	for (var k = l; k <= r; k++)
+	{
+		if (j > r || (i <= mid && t[i] < t[j]))
+		{
+			tmp[k] = t[i];
+			i++;
+		}
+		else
+		{
+			tmp[k] = t[j];
+			j++;
+		}
+	}
+	
+	for (var k = l; k <= r; k++)
+		t[k] = tmp[k];
+}
+
+if (__name == 'main')
+{
+	n = (int)readln('how many items? ');
+	low = (int)readln('lower bound = ');
+	up = (int)readln('upper bound = ');
+	prec = (int)readln('precision = ');
+    println();
+	
+	println("generating values...");
+    println();
+    
+    // generates a list of n floating-point values comprised between low and up with prec decimal digits
+	t = randlst(n, low, up, prec);
+	println("generated list : " + t);
+    println();
+	
+	println("sorting...");
+	stopwatch = new Stopwatch();
+	stopwatch.Start();
+	mergesort(t, n);
+	stopwatch.Stop();
+	elapsedTime = stopwatch.Elapsed;
+    println();
+	
+	println("sorted list : " + t);
+    println();
+    
+	println($"total runtime : {elapsedTime.totalMilliseconds} ms");
+	readln();
+}

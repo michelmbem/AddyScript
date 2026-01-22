@@ -1,0 +1,10 @@
+function fibo(n) => n switch {
+	< 0 => throw "Fibonacci sequence doesn't accept negative values",
+	0 or 1 => n,
+	_ => fibo(n - 1) + fibo(n - 2)
+};
+
+for (i = 0; i < 20; ++i)
+	println($"fibo({i}) = {fibo(i)}");
+
+readln();
