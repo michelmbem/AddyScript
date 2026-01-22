@@ -32,7 +32,11 @@ public class Lexer
     public Lexer(TextReader input)
     {
         this.input = input;
-        FileName = input is StreamReader { BaseStream: FileStream fs } ? fs.Name : ":memory:";
+        FileName = input switch
+        {
+            StreamReader { BaseStream: FileStream fs } => fs.Name,
+            _ => ":memory:"
+        };
     }
 
     /// <summary>
