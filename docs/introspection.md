@@ -68,10 +68,10 @@ The **PropertyInfo** class represents a property in a type and provides the foll
 
 | Member                                           | Nature   | Description                                                                        |
 |--------------------------------------------------|----------|------------------------------------------------------------------------------------|
-| `bool canRead { read; }`                         | Property | Indicates whether the property has a getter.                                       |
-| `bool canWrite { read; }`                        | Property | Indicates whether the property has a setter.                                       |
-| `MethodInfo reader { read; }`                    | Property | Gets the getter method of the property.                                            |
-| `MethodInfo writer { read; }`                    | Property | Gets the setter method of the property.                                            |
+| `bool canRead { read; }`                         | Property | Indicates whether the property has a reader.                                       |
+| `bool canWrite { read; }`                        | Property | Indicates whether the property has a writer.                                       |
+| `MethodInfo reader { read; }`                    | Property | Gets the reader method of the property.                                            |
+| `MethodInfo writer { read; }`                    | Property | Gets the writer method of the property.                                            |
 | `any getValue(any target)`                       | Method   | Gets the value of the property for the specified target object.                    |
 | `void setValue(any target, any value)`           | Method   | Sets the value of the property for the specified target object.                    |
 | `any getItem(any target, any index)`             | Method   | Gets the value of the property at the given index for the specified target object. |
@@ -96,7 +96,7 @@ The **EventInfo** class represents an event in a type and provides the following
 
 ### ParameterInfo
 
-The **ParameterInfo** class represents a parameter of a method and provides the following members:
+The **ParameterInfo** class represents a parameter of a method or event and provides the following members:
 
 | Member                       | Nature   | Description                                                                               |
 |------------------------------|----------|-------------------------------------------------------------------------------------------|

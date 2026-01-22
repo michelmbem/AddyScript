@@ -203,7 +203,7 @@ Mrs. John, Female person aged 42
 
 ### A class with an indexer
 
-Exampple of a class that has an indexer:
+Example of a class that has an indexer:
 
 ```JS
 class PhoneBook
@@ -224,7 +224,7 @@ class PhoneBook
         var result = 'Phone Book:';
         foreach (name in this._entries.keys)
         {
-            result += $'\n\t{name}: {this._entries[name]}';
+            result += $'\n - {name}: {this._entries[name]}';
         }
         return result;
     }
@@ -241,8 +241,8 @@ Output:
 
 ```
 Phone Book:
-    John Doe: 555-1234
-    Jane Smith: 555-5678
+ - John Doe: 555-1234
+ - Jane Smith: 555-5678
 ```
 
 ## The **this** keyword
