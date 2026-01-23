@@ -1,27 +1,17 @@
-function sum(vector)
+function stats(vector)
 {
-	total = 0;
+	var total = 0,
+		minimum = MAXFLOAT,
+		maximum = MINFLOAT;
+	
 	foreach (item in vector)
+	{
 		total += item;
-	return total;
-}
-
-function minimum(vector)
-{
-	mini = MAXFLOAT;
-	foreach (item in vector)
-		if (item < mini)
-			mini = item;
-	return mini;
-}
-
-function maximum(vector)
-{
-	maxi = MINFLOAT;
-	foreach (item in vector)
-		if (item > maxi)
-			maxi = item;
-	return maxi;
+		if (item < minimum) minimum = item;
+		if (item > maximum) maximum = item;
+	}
+	
+	return (total, minimum, maximum);
 }
 
 t = [];
@@ -37,12 +27,12 @@ else
 		t.add(item);
 	}
 	
-	s = sum(t);
+	(sum, minimum, maximum) = stats(t);
 	println("you entered: " + t);
-	println("the sum of items is: " + s);
-	println("the minimum is: " + minimum(t));
-	println("the maximum is: " + maximum(t));
-	println("the averrage is: " + (s / n));
+	println("the sum of items is: " + sum);
+	println("the minimum is: " + minimum);
+	println("the maximum is: " + maximum);
+	println("the averrage is: " + (sum / n));
 }
 
 readln();
