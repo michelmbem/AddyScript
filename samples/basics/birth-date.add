@@ -7,4 +7,6 @@ d = d.add(1, "year");
 println("your first birthday was on {0:d}", d);
 elapsed = today - d;
 println("it was celebrated {0} days ago", elapsed.totalDays);
+d = now() + days(100) + hours(11) + minutes(30);
+println($"In 100 days 11 hours and 30 minutes we'll be on {d}");
 readln();

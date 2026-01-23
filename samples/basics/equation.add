@@ -53,21 +53,20 @@ function dialog()
 	return (a, b, c);
 }
 
-function readopt(message, options, defopt)
+function getOption(message, options, defaultOption)
 {
-	var opt;
-	var printopts = '/'.join(..options
-		.select(|x| => x == defopt ? x.toUpper() : x));
+	var selectedOption;
+	var printedOptions = '/'.join(..options.select(|opt| => opt == defaultOption ? opt.toUpper() : opt));
 	
 	do
-		opt = readln($'{message} ({printopts}) ').toLower().trim() ?? defopt;
-	while (opt not in options);
+		selectedOption = readln($'{message} ({printedOptions}) ').toLower().trim() ?? defaultOption;
+	while (selectedOption not in options);
 	
 	println();
 	
-	return opt;
+	return selectedOption;
 }
 
 do
 	equation(..dialog());
-while ('y' == readopt('continue ?', ['y', 'n'], 'y'));
+while ('y' == getOption('continue ?', ['y', 'n'], 'y'));
