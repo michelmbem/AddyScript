@@ -49,8 +49,8 @@ public static class RuntimeServices
     /// <returns>The value returned by the method</returns>
     public static DataItem Invoke(string methodName, Class methodHolder, params object[] args)
     {
-        var name = new QualifiedName(methodHolder.Name, methodName);
-        var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
+        QualifiedName name = new (methodHolder.Name, methodName);
+        Expression[] literals = [.. args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg)))];
         new StaticMethodCall(name, literals).AcceptTranslator(Interpreter);
 
         return Interpreter.ReturnedValue;
@@ -66,7 +66,7 @@ public static class RuntimeServices
     public static DataItem Invoke(string methodName, DataItem methodTarget, params object[] args)
     {
         Expression targetExpr = new Literal(methodTarget);
-        var literals = args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg))).ToArray();
+        Expression[] literals = [.. args.Select(arg => new Literal(DataItemFactory.CreateDataItem(arg)))];
         new MethodCall(targetExpr, methodName, literals).AcceptTranslator(Interpreter);
 
         return Interpreter.ReturnedValue;
@@ -78,20 +78,14 @@ public static class RuntimeServices
     /// <param name="a">The object on which to invoke <i>equals</i></param>
     /// <param name="b">The given argument</param>
     /// <returns>a <see cref="bool"/></returns>
-    public static bool Equals(DataItem a, DataItem b)
-    {
-        return Invoke("equals", a, b).AsBoolean;
-    }
+    public static bool Equals(DataItem a, DataItem b) => Invoke("equals", a, b).AsBoolean;
 
     /// <summary>
     /// Invokes <i>hashCode</i> on the given object.
     /// </summary>
     /// <param name="value">The object on which to invoke <i>hashCode</i></param>
     /// <returns>An <see cref="int"/></returns>
-    public static int HashCode(DataItem value)
-    {
-        return Invoke("hashCode", value).AsInt32;
-    }
+    public static int HashCode(DataItem value) => Invoke("hashCode", value).AsInt32;
 
     /// <summary>
     /// Invokes <i>compareTo</i> on the given object with the given argument.
@@ -99,10 +93,7 @@ public static class RuntimeServices
     /// <param name="a">The object on which to invoke <i>compareTo</i></param>
     /// <param name="b">The given argument</param>
     /// <returns>An <see cref="int"/></returns>
-    public static int CompareTo(DataItem a, DataItem b)
-    {
-        return Invoke("compareTo", a, b).AsInt32;
-    }
+    public static int CompareTo(DataItem a, DataItem b) => Invoke("compareTo", a, b).AsInt32;
 
     /// <summary>
     /// Invokes <i>toString</i> on the given object with the given format.
@@ -110,37 +101,26 @@ public static class RuntimeServices
     /// <param name="value">The object on which to invoke <i>toString</i></param>
     /// <param name="format">The given format</param>
     /// <returns>A <see cref="string"/></returns>
-    public static string ToString(DataItem value, string format)
-    {
-        return Invoke("toString", value, format).ToString();
-    }
+    public static string ToString(DataItem value, string format) =>
+        Invoke("toString", value, format).ToString();
 
     /// <summary>
     /// Invokes <i>toString</i> on the given object.
     /// </summary>
     /// <param name="value">The object on which to invoke <i>toString</i></param>
     /// <returns>A <see cref="string"/></returns>
-    public static string ToString(DataItem value)
-    {
-        return Invoke("toString", value).ToString();
-    }
+    public static string ToString(DataItem value) => Invoke("toString", value).ToString();
 
     /// <summary>
     /// Invokes <i>clone</i> on the given object.
     /// </summary>
     /// <param name="value">The object on which to invoke <i>clone</i></param>
     /// <returns>A <see cref="DataItem"/></returns>
-    public static DataItem Clone(DataItem value)
-    {
-        return Invoke("clone", value);
-    }
+    public static DataItem Clone(DataItem value) => Invoke("clone", value);
 
     /// <summary>
     /// Invokes <i>dispose</i> on the given object.
     /// </summary>
     /// <param name="value">The object on which to invoke <i>dispose</i></param>
-    public static void Dispose(DataItem value)
-    {
-        Invoke("dispose", value);
-    }
+    public static void Dispose(DataItem value) => Invoke("dispose", value);
 }

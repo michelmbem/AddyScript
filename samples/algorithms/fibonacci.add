@@ -4,7 +4,9 @@ function fibo(n) => n switch {
 	_ => fibo(n - 1) + fibo(n - 2)
 };
 
-for (i = 0; i < 20; ++i)
+n = (int) readln('How many terms? ');
+
+for (i = 0; i < n; ++i)
 	println($"fibo({i}) = {fibo(i)}");
 
 readln();
