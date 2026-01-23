@@ -1,0 +1,48 @@
+import std::util; // for 'swap' and 'randlst'
+import System::Diagnostics::Stopwatch;
+
+function selectionSort(t, n)
+{
+	for (var i = 0; i < n - 1; i++)
+	{
+		var minimum = i;
+		
+		for (var j = i + 1; j < n; j++)
+			if (t[j] < t[minimum])
+				minimum = j;
+		
+		if (minimum != i)
+			swap(t[i], t[minimum]);
+	}
+}
+
+if (__name == 'main')
+{
+	n = (int)readln('how many items? ');
+	low = (int)readln('lower bound = ');
+	up = (int)readln('upper bound = ');
+	prec = (int)readln('precision = ');
+    println();
+	
+	println("generating values...");
+    println();
+    
+    // generates a list of n floating-point values comprised between low and up with prec decimal digits
+	t = randlst(n, low, up, prec);
+	println("generated list : " + t);
+    println();
+	
+	println("sorting...");
+	stopwatch = new Stopwatch();
+	stopwatch.Start();
+	selectionSort(t, n);
+	stopwatch.Stop();
+	elapsedTime = stopwatch.Elapsed;
+    println();
+	
+	println("sorted list : " + t);
+    println();
+    
+	println($"total runtime : {elapsedTime.totalMilliseconds} ms");
+	readln();
+}
