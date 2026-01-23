@@ -2,15 +2,15 @@ import std::util; // for 'randlst'
 import System::Diagnostics::Stopwatch;
 
 function mergeSort(t, n) =>
-	splitSort(t, [0] * n, 0, n - 1);
+	mergeSortR(t, [0] * n, 0, n - 1);
 
-function splitSort(t, tmp, l, r)
+function mergeSortR(t, tmp, l, r)
 {
 	if (l >= r) return;
 	
 	var mid = int((l + r) / 2);
-	splitSort(t, tmp, l, mid);
-	splitSort(t, tmp, mid + 1, r);
+	mergeSortR(t, tmp, l, mid);
+	mergeSortR(t, tmp, mid + 1, r);
 	merge(t, tmp, l, mid, r);
 }
 
