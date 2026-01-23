@@ -105,11 +105,6 @@ var res2 = dummy(4);
 Console.WriteLine(res2);
 ```
 
-## Learn more
-
-You can find more examples in the _samples_ folder of the distribution package.<br>
-You can also check the [Wiki](https://michelmbem.github.io/AddyScript/) for more documentation and code samples.
-
 ## Recently added features
 
 * Migration to .NET 8.0 (ver. 0.9.9).
@@ -131,5 +126,10 @@ The following features may appear in future versions of the scripting engine:
 * The ability to compile a script to a .NET assembly via Reflection.Emit. This would improve runtime performance and bring other features like the ability to subclass .NET types from a script.
 * An alternative syntax for the **import** directive to make it look like a function call with a string argument.
 * A variable number of strongly typed catch clauses in the **try-catch-finally** statement.
+
+## Learn more
+
+You can find more examples in the _samples_ folder of the distribution package.<br>
+You can also check the [Wiki](https://michelmbem.github.io/AddyScript/) for more documentation and code samples.
 
 Well, that's all for the moment. Hope you'll enjoy. Waiting for your feedback.
