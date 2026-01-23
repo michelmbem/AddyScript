@@ -59,7 +59,7 @@ public sealed class Set : DataItem
         return sb.Append('}').ToString();
     }
 
-    protected override bool UnsafeEquals(DataItem other) => hashSet.Equals(other.AsHashSet);
+    protected override bool UnsafeEquals(DataItem other) => hashSet.SetEquals(other.AsHashSet);
 
     public override int GetHashCode() => hashSet.GetHashCode();
 
