@@ -26,10 +26,7 @@ class Rectangle : Geometry
 
 class Square : Rectangle
 {
-	public constructor(side)
-		 : super(side, side)
-	{
-	}
+	public constructor(side) : super(side, side) {}
 	
 	public function toString(fmt = '') => $'Square {{ side: {this.length} }}';
 }
@@ -55,23 +52,20 @@ class Ellipse : Geometry
 
 class Circle : Ellipse
 {
-	public constructor(radius)
-		 : super(radius, radius)
-	{
-	}
+	public constructor(radius) : super(radius, radius) {}
 	
 	public function toString(fmt = '') => $'Circle {{ radius: {this.a} }}';
 }
 
-geoms = [null] * 5;
-geoms[0] = new Rectangle(6, 4);
-geoms[1] = new Square(5);
-geoms[2] = new Ellipse(5, 4);
-geoms[3] = new Circle(3);
+geometries = [null] * 5;
+geometries[0] = new Rectangle(6, 4);
+geometries[1] = new Square(5);
+geometries[2] = new Ellipse(5, 4);
+geometries[3] = new Circle(3);
 
 try
 {
-	geoms.add(new Geometry());
+	geometries.add(new Geometry());
 	println('if you see this message, then something went wrong');
 }
 catch (e)
@@ -80,12 +74,12 @@ catch (e)
 	println();
 }
 
-foreach (geom in geoms)
+foreach (geometry in geometries)
 {
-	println(title = (geom ?? 'null') + ':');
+	println(title = (geometry ?? 'null') + ':');
 	println('-' * title.length);
-	println(' - perimeter = {0:0.##}', geom?.perimeter());
-	println(' - surface = {0:0.##}', geom?.surface());
+	println(' - perimeter = {0:0.##}', geometry?.perimeter());
+	println(' - surface = {0:0.##}', geometry?.surface());
 	println();
 }
 

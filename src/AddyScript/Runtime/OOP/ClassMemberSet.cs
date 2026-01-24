@@ -9,8 +9,7 @@ namespace AddyScript.Runtime.OOP;
 /// Represents a collection of <see cref="ClassMember"/>s that can be accessed either by index or by name.
 /// </summary>
 /// <typeparam name="T">Any subclass of <see cref="ClassMember"/></typeparam>
-public class ClassMemberSet<T> : List<T>
-    where T : ClassMember
+public class ClassMemberSet<T> : List<T> where T : ClassMember
 {
     private readonly Dictionary<string, T> dictionary = [];
 
@@ -28,6 +27,8 @@ public class ClassMemberSet<T> : List<T>
     }
 
     public T this[string name] => dictionary[name];
+    
+    public bool TryGetValue(string name, out T item) => dictionary.TryGetValue(name, out item);
 
     public new void Add(T item)
     {
@@ -54,4 +55,17 @@ public class ClassMemberSet<T> : List<T>
     public new bool Remove(T item) => base.Remove(item) && dictionary.Remove(item.Name);
 
     public bool Remove(string name) => Remove(dictionary[name]);
+    
+    public new void RemoveRange(int index, int count)
+    {
+        for (var i = index; i < index + count; i++)
+            dictionary.Remove(this[i].Name);
+        base.RemoveRange(index, count);
+    }
+    
+    public new void Clear()
+    {
+        base.Clear();
+        dictionary.Clear();
+    }
 }
