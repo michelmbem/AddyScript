@@ -29,17 +29,12 @@ public static class Reflector
             result = type.InvokeMember(memberName, flags, null, target, null);
         }
         else
-            switch (GetDataMember(type, memberName))
+            result = GetDataMember(type, memberName) switch
             {
-                case FieldInfo field:
-                    result = field.GetValue(target);
-                    break;
-                case PropertyInfo { CanRead: true } property:
-                    result = property.GetValue(target, null);
-                    break;
-                default:
-                    throw new InvalidOperationException(Resources.CannotReadProperty);
-            }
+                FieldInfo field => field.GetValue(target),
+                PropertyInfo { CanRead: true } property => property.GetValue(target, null),
+                _ => throw new InvalidOperationException(Resources.CannotReadProperty)
+            };
 
         return DataItemFactory.CreateDataItem(result);
     }

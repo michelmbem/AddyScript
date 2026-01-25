@@ -110,7 +110,7 @@ public class NameTree
             found = nodes[m].Name == name;
             if (found) return m;
 
-            if (nodes[m].Name.CompareTo(name) < 0)
+            if (string.CompareOrdinal(nodes[m].Name, name) < 0)
                 l = m + 1;
             else
                 r = m - 1;

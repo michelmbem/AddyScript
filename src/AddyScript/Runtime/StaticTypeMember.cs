@@ -32,17 +32,11 @@ public class StaticTypeMember(Type type, string memberName)
     /// Gets the value of a field or property.
     /// </summary>
     /// <returns>A <see cref="DataItem"/></returns>
-    public DataItem GetValue()
-    {
-        return Reflector.GetValue(Type, MemberName, null);
-    }
+    public DataItem GetValue() => Reflector.GetValue(Type, MemberName, null);
 
     /// <summary>
     /// Sets the value of a field or property.
     /// </summary>
     /// <param name="value">The value to set</param>
-    public void SetValue(DataItem value)
-    {
-        Reflector.SetValue(Type, MemberName, null, value);
-    }
+    public void SetValue(DataItem value) => Reflector.SetValue(Type, MemberName, null, value);
 }
