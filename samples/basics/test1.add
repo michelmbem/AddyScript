@@ -8,7 +8,7 @@ function stats(vector)
 	foreach (item in vector)
 	{
 		total += item;
-		total2 += item **2;
+		total2 += item ** 2;
 		if (item < minimum) minimum = item;
 		if (item > maximum) maximum = item;
 	}
