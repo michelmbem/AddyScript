@@ -50,16 +50,19 @@ public class ClassMemberSet<T> : List<T> where T : ClassMember
 
     public bool Contains(string name) => dictionary.ContainsKey(name);
 
-    public int IndexOf(string name) => IndexOf(dictionary[name]);
+    public int IndexOf(string name) =>
+        dictionary.TryGetValue(name, out var item) ? base.IndexOf(item) : -1;
 
     public new bool Remove(T item) => base.Remove(item) && dictionary.Remove(item.Name);
 
-    public bool Remove(string name) => Remove(dictionary[name]);
+    public bool Remove(string name) =>
+        dictionary.TryGetValue(name, out var item) && Remove(item) && dictionary.Remove(name);
     
     public new void RemoveRange(int index, int count)
     {
         for (var i = index; i < index + count; i++)
             dictionary.Remove(this[i].Name);
+        
         base.RemoveRange(index, count);
     }
     

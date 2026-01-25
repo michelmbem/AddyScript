@@ -18,7 +18,7 @@ public class ClassMethod(string name, Scope scope, Modifier modifier, Function f
     : ClassMember(name, scope, modifier)
 {
     /// <summary>
-    /// Stores the internal unary-operator <-> method-name mappings.
+    /// Stores the internal unary-operator &lt;-&gt; method-name mappings.
     /// </summary>
     private static readonly (UnaryOperator, string)[] UnaryOperatorNames =
     [
@@ -32,7 +32,7 @@ public class ClassMethod(string name, Scope scope, Modifier modifier, Function f
     ];
 
     /// <summary>
-    /// Stores the internal binary-operator <-> method-name mappings.
+    /// Stores the internal binary-operator &lt;-&gt; method-name mappings.
     /// </summary>
     private static readonly (BinaryOperator, string)[] BinaryOperatorNames =
     [
