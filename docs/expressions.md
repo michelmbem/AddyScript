@@ -2,7 +2,10 @@
 
 ## Variables
 
-AddyScript is a dynamic language. This means that you don't have to declare variables. A variable starts existing as soon as you assign a value to it. This also means that variables are dynamically typed: they simply accept anything you put into them. As far as that aspect is concerned, a single variable can hold an integer at a certain time and hold a list of dates later.
+AddyScript is a dynamic language. This means that you don't have to declare variables.
+A variable starts existing as soon as you assign a value to it.
+This also means that variables are dynamically typed: they simply accept anything you put into them.
+As far as that aspect is concerned, a single variable can hold an integer at a certain time and hold a list of dates later.
 
 Examples:
 
@@ -18,11 +21,22 @@ o = new {firstName = "James", lastName = "Bond", number = 007}; // o is an objec
 
 ### Variable's scope
 
-As stated before, a variable exists from where it is initialized first until the end of the block in which it appears. If a variable is created at the root level, it will be accessible to the remain of the script. AddyScript doesn't check variable access from functions; neither does it check that for functions themselves. This means that a function can refer to a variable before the variable is actually created. As long as the function is not called before the creation of the variable, this will not lead to any error. However, you should avoid doing so in functions that you want to reuse out of their original script because there is no guarantee that the referred variable will exist in the calling context.
+As stated before, a variable exists from where it is initialized first until the end of the block in which it appears.
+If a variable is created at the root level, it will be accessible to the remain of the script.
+AddyScript doesn't check variable access from functions; neither does it check that for functions themselves.
+This means that a function can refer to a variable before the variable is actually created.
+As long as the function is not called before the creation of the variable, this will not lead to any error.
+However, you should avoid doing so in functions that you want to reuse out of their original script
+because there is no guarantee that the referred variable will exist in the calling context.
 
 ### The **var** keyword
 
-Even if AddyScript is able to dynamically declare variables, there are still some situations where you may need to explicitly declare them. In particular, when you want to avoid confusion between some local variable and an eventually predefined global homonymous one. This is where the **var** keyword comes into action. Just as in other C-based scripting languages, it is used to explicitly declare variables. Such a variable will hide any homonymous constant or variable declared in the global scope.
+Even if AddyScript is able to dynamically declare variables,
+there are still some situations where you may need to explicitly declare them.
+In particular, when you want to avoid confusion between some local variable and an eventually predefined global homonymous one.
+This is where the **var** keyword comes into action.
+Just as in other C-based scripting languages, it is used to explicitly declare variables.
+Such a variable will hide any homonymous constant or variable declared in the global scope.
 
 Example:
 
@@ -64,7 +78,8 @@ back to main, toto = 20
 
 ## Constants
 
-A constant is a read-only variable. That is: it's assigned a value once and cannot be altered afterward. You will typically declare constants using the **const** keyword like in the following example.
+A constant is a read-only variable. That is: it's assigned a value once and cannot be altered afterward.
+You will typically declare constants using the **const** keyword like in the following example.
 
 Example:
 
@@ -136,21 +151,13 @@ Even if you don't have to explicitly define the type of your variables in AddySc
 Depending on their type, literal values have the following forms:
 
 * **Null pointer**: the **null** keyword.
-
 * **Boolean**: the **true** or **false** keyword.
-
 * **Integer**: a sequence of decimal digits (i.e. 0 to 9) or a sequence of hexadecimal digits (i.e. 0 to 9, 'A' to 'F' or 'a' to 'f') prefixed with "0X" or "0x" (**e.g.**: `154`, `0XF5D4`).
-
 * **Long integer**: a literal integer with the 'l' or 'L' suffix or simply a very large literal integer.
-
 * **Floating-point number**: a sequence of decimal digits optionally followed by a dot and another sequence of decimal digits, optionally followed again by 'e' or 'E' plus a '+' or '-' sign plus another sequence of decimal digits and optionally terminated by a 'f' or 'F' suffix. (**e.g.**: `0.5`, `1F`, `14.5e33`, `735e-3`, `88.33f`, `1.5e+6F`).
-
 * **Decimal number**: just like floating-point numbers with a mandatory 'd' or 'D' suffix.
-
-* **Complex number**: Any literal numeric value that has the suffix "i" or "I" is considered the imaginary part of a complex number. This makes AddyScript have a very natural syntax for representing complex numbers, as in "2 - 5i" or "1 + 2i". When the imaginary part is 1, it should be represented as "1i" or "1I". Simply typing "i" or "I" will cause the AddyScript interpreter to look for a variable with that name. 
-
+* **Complex number**: Any literal numeric value that has the suffix "i" or "I" is considered the imaginary part of a complex number. This makes AddyScript have a very natural syntax for representing complex numbers, as in "2 - 5i" or "1 + 2i". When the imaginary part is 1, it should be represented as "1i" or "1I". Simply typing "i" or "I" will cause the AddyScript interpreter to look for a variable with that name.
 * **Date**: any valid date between backticks (**e.g.**: \``2008-04-11`\`, \``2:30 PM`\`, \``05/18/2009 13:04`\`).
-
 * **String**: a sequence of unicode characters between single or double quotes. When a backslash (\\) appears in a string, it alters the meaning of the following characters. Combinations of backslash and its followers are called **escape sequences** and have the following meaning:
 
     * **\\\\**: a literal backslash
@@ -173,9 +180,7 @@ Depending on their type, literal values have the following forms:
     **Notes**:
 
     1. In literal numeric values represented with decimal digits, underscores (_) can be inserted between the digits to group them (in thousands for example) and make the number more human readable. There is no particular rule on how to group them but it will typically be 3-by-3 (**e.g.**: `21_345_986`, `9_876_544_785`, `6_438.59e+33`).
-
     2. Basically in AddyScript literal string values are not allowed to span over multiple lines of code. However it can be necessary in certain circumstances to define a literal string constants that wraps all its content in the source code, including line-breaks and tabulations. That kind of literal string value is called a **verbatim string** and is declared in AddyScript using the '@' prefix. In a **verbatim string**, **escape sequences** are not needed at all (even if they are still recognized). The only character that needs to be escaped is the string wrapper itself. This is done by doubling it (**e.g.**: `@'Say ''Hello'' to my friend Jonathan'`, `@"C:\MyMovies\""My Bad Movie.mp4"""`).
-
     3. Some literal string values embed expressions between curly braces into them. Those expressions are to be evaluated and replaced within the string by their value at runtime. The rendered string will be made of the static parts of its initial form concatenated with the results of the evaluation of embedded expressions. That kind of literal string value is called a **mutable string** and has to be prefixed with a dollar-sign (&#36;). Each embedded expression in a **mutable string** can be followed by a format or length specification within the same pair of curly braces. The overall protocol to follow is exactly the same than for a call to the builtin **format** function (in fact a mutable string is translated at runtime to a call to **format**). The process of rendering **mutable strings** is called **string interpolation**. **mutable strings** can also be verbatim; in that case they start with both dollar (&#36;) and at (@) signs  (**e.g.**: `$'item number {i}'`, `$"sine of PI is: {sin(PI)}"`, `$@'{emp.name} is a ''{emp.jobTitle}'' since {emp.hireDate:d}'`, `$@"movie ""D:\{movieDir}\{movieFile.Name}""" is {movieLen,3} minutes long`).
 
 ## Initializers
@@ -187,9 +192,7 @@ Initializers are like literal values for composite types: they provide initial v
     **Note**: Tuples are a new data type in AddyScript. The syntax used to represent tuple initializers was formerly used for complex initializers (with two items between the parentheses only respectively representing the real and the imaginary parts). AddyScript doesn't need complex initializers anymore as it has a built-in support for complex literals.
 
 * **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. Just like with tuples, if a list item is a sequential collection (i.e. a **tuple**, another **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
-
 * **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with tuple and list initializers the spread operator can be used to include the contents of another sequential collection.
-
 * **Map**: a sequence of key-value pairs between curly braces separated by commas. Each pair has the form: `key => value` where key and value are both expressions. **e.g.**: `{'name' => 'joe', 'age' => 18, 'job' => 'student'}`.
 
     **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
@@ -303,38 +306,38 @@ Operator precedence in AddyScript can be summarized in the following terms:
 From the lowest to the highest priority, we have:
 
 1. Assignment: =, +=, -=, \*=, /=, %=, \*\*=, &=, \|=, ^=, &lt;&lt;=, &gt;&gt;=, ??=
-
 2. The conditional ternary operator: ?:
-
 3. Conditional binary operators: &amp;, \|, ^, &amp;&amp;, \|\|, ??
-
 4. Relational operators: ==, !=, ===, !===, &lt;, &lt;=, &gt;, &gt;=, **startswith**, **endswith**, **contains**, **matches**, **in**, **is**
-
 5. Addition and subtraction: +, -
-
 6. Multiplication, division and bitwise shift operators: \*, /, %, &lt;&lt;, &gt;&gt;
-
 7. Exponentiation: \*\*
-
 8. Postfix unary operators: ++, --, !
-
 9. Prefix unary operators: +, -, !, ~, ++, --
-
 10. Wrapping and special binary operators: (), [], **switch**, **with**
 
 ## Expressions
 
-An expression is any combination of operands and operators that can produce a value. An operand can be a literal value, a named constant, a reference to a variable, a reference to a list item, a reference to a field or property, a function or method call, the keyword **this**, an assignment, a unary expression, a binary expression, a ternary expression or any of these into parenthesis.
+An expression is any combination of operands and operators that can produce a value.
+An operand can be a literal value, a named constant, a reference to a variable, a reference to a list item,
+a reference to a field or property, a function or method call, the keyword **this**, an assignment, a unary expression,
+a binary expression, a ternary expression or any of these wrapped into parentheses.
 
 ## Assignments
 
-An assignment is a particular kind of expression where a value is set to a location in memory. So it's made of two child expressions: the **lvalue** which represents the memory location about to be set, and the **rvalue** which represents the value that's being assigned to the lvalue. Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (=). So an assignment in AddyScript typically looks like this:
+An assignment is a particular kind of expression where a value is set to a location in memory.
+So it's made of two child expressions: the **lvalue** which represents the memory location about to be set,
+and the **rvalue** which represents the value that's being assigned to the lvalue.
+Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (=).
+So an assignment in AddyScript typically looks like this:
 
 ```
 lvalue = rvalue;
 ```
 
-But AddyScript provides other assignment operators which are combinations of binary arithmetic or logical operators with the equal sign. When such an operator is used, the initial value of lvalue is combined with rvalue using the given binary operator and then the result is reassigned to lvalue. The complete list of these combined operators is given in the table below:
+But AddyScript provides other assignment operators which are combinations of binary arithmetic or logical operators with the equal sign.
+When such an operator is used, the initial value of lvalue is combined with rvalue using the given binary operator and then the result is reassigned to lvalue.
+The complete list of these combined operators is given in the table below:
 
 |Operator|Equivalence|
 |:-:|-|
@@ -353,7 +356,10 @@ But AddyScript provides other assignment operators which are combinations of bin
 
 ### Group Assignment
 
-Sometimes you need to assign values to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`. But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**. In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term). This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
+Sometimes you need to assign values to multiple variables. You can do this in multiple steps, like in `a = 5; b = 2; c = -7`.
+But AddyScript has a type of statement in its syntax that allows you to do this in a more elegant way: **group assignment**.
+In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term).
+This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
 
 ```
 (var1, var2, ..., varN) = (val1, val2, ..., valN);
@@ -387,7 +393,8 @@ Sometimes you need to assign values to multiple variables. You can do this in mu
 
 ## The **let** keyword
 
-AddyScript has a dedicated keyword that can be used to introduce an assignment. That's the **let** keyword. It's especially useful when there is a risk of ambiguity in the way the code is parsed (like when [destructuring an object](col-obj.md)).
+AddyScript has a dedicated keyword that can be used to introduce an assignment. That's the **let** keyword.
+It's especially useful when there is a risk of ambiguity in the way the code is parsed (like when [destructuring an object](col-obj.md)).
 
 An assignment with the **let** keyword looks like this:
 
