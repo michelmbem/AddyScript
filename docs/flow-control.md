@@ -1,10 +1,13 @@
 # Controlling the program flow
 
-Like any other language, AddyScript provides means to control the program flow. The following sections describe these means.
+Like any other language, AddyScript provides means to control the program flow.
+The following sections describe these means.
 
 ## The If-Else statement
 
-The if-else statement is used to perform an action only if a certain condition is met. An alternative action can be defined to be executed in case the condition is not met. An if-else therefore has the following 2 possible forms:
+The if-else statement is used to perform an action only if a certain condition is met.
+An alternative action can be defined to be executed in case the condition is not met.
+An if-else therefore has the following 2 possible forms:
 
 ### Form 1:
 
@@ -34,11 +37,16 @@ else
     println('odd');
 ```
 
-**Note**: In all cases, actions can be statement blocks or other if-else statements. A block is a series of statements enclosed in curly braces. It is treated by the interpreter as a single composite statement. Use a block if you want your **if** or **else** section to perform multiple actions.
+**Note**: In all cases, actions can be statement blocks or other if-else statements.
+A block is a series of statements enclosed in curly braces.
+It is treated by the interpreter as a single composite statement.
+Use a block if you want your **if** or **else** section to perform multiple actions.
 
 ## The Switch statement
 
-Like the if-else statement, the switch statement is used to choose the action to perform based on the value of an expression. The main difference is that unlike the if-else statement, the switch statement is not limited to 2 alternatives. Its syntax is as follows:
+Like the if-else statement, the switch statement is used to choose the action to perform based on the value of an expression.
+The main difference is that unlike the if-else statement, the switch statement is not limited to 2 alternatives.
+Its syntax is as follows:
 
 ```
 switch (expression)
@@ -61,7 +69,8 @@ switch (expression)
 }
 ```
 
-Breaks are not required but if a **break** is missing, execution will continue at the next **case** section. The **default** section is also optional but at least one **case** section (or *default* section) must be present in the switch block.
+Breaks are not required but if a **break** is missing, execution will continue at the next **case** section.
+The **default** section is also optional but at least one **case** section (or *default* section) must be present in the switch block.
 
 Example:
 
@@ -102,7 +111,14 @@ switch (result)
 
 ## Pattern matching
 
-So far, we've seen the **switch** statement and the possibilities it offers. But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times. We also have to use **break** to prevent the flow of execution from continuing to the next **case** section. This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression with the value of each **case** label. This is the kind of problem that pattern matching solves. It combines a better matching syntax with the **switch** keyword, which this time is used as an operator, helping us create expressions that not only choose what action to perform based on the value of an expression, but also return a value. A pattern matching expression typically looks like this:
+So far, we've seen the **switch** statement and the possibilities it offers.
+But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times.
+We also have to use **break** to prevent the flow of execution from continuing to the next **case** section.
+This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression
+with the value of each **case** label.  This is the kind of problem that pattern matching solves.
+It combines a better matching syntax with the **switch** keyword, which this time is used as an operator,
+helping us create expressions that not only choose what action to perform based on the value of an expression,
+but also return a value. A pattern matching expression typically looks like this:
 
 ```
 expression switch {
@@ -228,7 +244,8 @@ while (i <= 12)
 
 ### The Do-While loop:
 
-Just like the While loop, it performs an action as long as a condition is satisfied. The action is performed before the condition is checked thus leading to the action always being performed at least once.
+Just like the While loop, it performs an action as long as a condition is satisfied.
+The action is performed before the condition is checked thus leading to the action always being performed at least once.
 
 Syntax:
 
@@ -264,7 +281,6 @@ for (i = 1; i <= 12; ++i)
 **Notes**:
 
 1. In the above example, _counter_initialization_ and _counter_increment_ are single statements, but they could also be comma-separated lists of statements; _counter_limit_test_ on the other hand is always a single logical expression.
-
 2. The example given is equivalent to the while loop example.
 
 ### The For-Each loop:
@@ -318,7 +334,6 @@ david is a driver
 **Notes**:
 
 * Even in the first form, there is an implicit key named **__key**. In both forms, the _collection_ must be a **string**, a **blob**, a **tuple**, a **list**, a **map**, a **set**, a native object implementing the **IEnumerable** interface or an AddyScript object implementing the **iterator protocol**.
-
 * It is possible to use the foreach loop to iterate over instances of user-defined classes if their class implements the _interator protocol_. We'll come back on this in the section dedicated to [inheritance and polymorphism](inheritance.md).
 
 ## Jumps

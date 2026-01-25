@@ -1,13 +1,19 @@
 # Special types
 
-AddyScript supports a number of special data types that can be used for various purposes. These are structured data types that behave like primitive types. They are described below:
+AddyScript supports a number of special data types that can be used for various purposes.
+These are structured data types that behave like primitive types. They are described below:
 
 ## Rational Numbers
 
-A rational number is a pair of integers resulting from their division. The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive.
-The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division. Thus, rational numbers are represented in AddyScript by the **rational** data type.
-Variables of this type can be used in arithmetic operations like other numeric data. However, there is no literal or initializer for the **rational** type. The only way to get a rational number is to divide two integers.
-Also note that some operations on rational numbers can return an integer. Here is an example of a script using rational numbers:
+A rational number is a pair of integers resulting from their division.
+The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive.
+The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division.
+Thus, rational numbers are represented in AddyScript by the **rational** data type.
+Variables of this type can be used in arithmetic operations like other numeric data.
+However, there is no literal or initializer for the **rational** type.
+The only way to get a rational number is to divide two integers.
+Also note that some operations on rational numbers can return an integer.
+Here is an example of a script using rational numbers:
 
 Example:
 
@@ -56,12 +62,17 @@ The following table summarizes the members of the **rational** type and their us
 
 ## Complex Numbers
 
-AddyScript also supports complex numbers as a primitive data type. This type is represented by the **complex** class.
-Internally, a complex number is represented as a pair of real numbers, the first member of the pair is called the **real part** while the second is called the **imaginary part**.
-The language supports literal values for purely imaginary complex numbers. Those are numeric literal values with the **i** or **I** suffix (**e.g.:** `2i` or `-5I`).
-Complex numbers can be involved in arithmetic operations like other numeric data types. Any arithmetic operation involving a real number and a purely imaginary complex number will produce a complex number as a result.
+AddyScript also supports complex numbers as a primitive data type.
+This type is represented by the **complex** class.
+Internally, a complex number is represented as a pair of real numbers,
+the first member of the pair is called the **real part** while the second is called the **imaginary part**.
+The language supports literal values for purely imaginary complex numbers.
+Those are numeric literal values with the **i** or **I** suffix (**e.g.:** `2i` or `-5I`).
+Complex numbers can be involved in arithmetic operations like other numeric data types.
+Any arithmetic operation involving a real number and a purely imaginary complex number will produce a complex number as a result.
 So in an expression like `3 + 2i`, `3` is a real number, `2i` is a purely imaginary complex number and the result is a complex number.
-The purely _imaginary one_ **i** is always represented as `1i`, so instead of `2 + i` use `2 + 1i`. The _sqrt_ (square root) function always returns a complex number when its argument is negative (**e.g.:** `sqrt(-1)` returns `1i`).
+The purely _imaginary one_ **i** is always represented as `1i`, so instead of `2 + i` use `2 + 1i`.
+The _sqrt_ (square root) function always returns a complex number when its argument is negative (**e.g.:** `sqrt(-1)` returns `1i`).
 Here is an example script using complex numbers:
 
 Example:
@@ -107,7 +118,12 @@ The following table summarizes the members of the **complex** class and their us
 
 ## Dates
 
-Date/time values are instances of the **date** class. You will typically create **date** instances either by calling the global **now** function (which returns the current date and time) or by using a date literal. A date literal is anything enclosed in backticks (\`) that can be translated by the .NET runtime to a value of type _System.DateTime_. They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`). Here is an example of a script that manipulates dates:
+Date/time values are instances of the **date** class.
+You will typically create **date** instances either by calling the global **now** function
+(which returns the current date and time) or by using a date literal.
+A date literal is anything enclosed in backticks (\`) that can be translated by the .NET runtime to a value of type _System.DateTime_.
+They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`).
+Here is an example of a script that manipulates dates:
 
 Example:
 
@@ -153,9 +169,11 @@ In addition to those operators, the **date** class exposes the following members
 
 ## Durations
 
-A duration is the amount of time elapsed between two dates. Durations are very important in AddyScript as some operations on dates involve and/or return durations.
-The language syntax doesn't provide neither literal values nor initializers for duration. A duration can only be obtained by computing the difference of two dates
-or by invoking a factory function. AddyScript has five (5) functions that all take a numeric value as argument and return a properly initialized duration.
+A duration is the amount of time elapsed between two dates.
+Durations are very important in AddyScript as some operations on dates involve and/or return durations.
+The language syntax doesn't provide neither literal values nor initializers for duration.
+A duration can only be obtained by computing the difference of two dates or by invoking a factory function.
+AddyScript has five (5) functions that all take a numeric value as argument and return a properly initialized duration.
 Those are described in one of the tables bellow.
 
 Example:
@@ -285,11 +303,21 @@ In addition to those operators, the **string** class exposes the following membe
 
 ## Blobs
 
-A **blob** is AddyScript's abstraction of a byte array. Blobs are especially useful when it comes to using methods in .NET classes that take a byte array as an argument (such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class). Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
+A **blob** is AddyScript's abstraction of a byte array.
+Blobs are especially useful when it comes to using methods in .NET classes that take a byte array as an argument
+(such as the _Read_ and _Write_ methods of the _System.IO.Stream_ class).
+Blobs have a lot in common with strings, but unlike strings, they are not immutable: their contents are meant to be changed.
 
-There are several ways to get blobs, such as using a blob literal value (a string literal preceded by a "b" or "B"), or invoking the static method _blob::of_ (which expects the desired length in bytes as an argument), or invoking one of the other static methods "fromHexString" and "fromBase64String" of the blob class which as their name suggests, convert strings to blobs using base-16 or base-64 encoding. You can also convert a string to a blob, which will convert each of its characters to a byte.
+There are several ways to get blobs, such as using a blob literal value (a string literal preceded by a "b" or "B"),
+or invoking the static method _blob::of_ (which expects the desired length in bytes as an argument),
+or invoking one of the other static methods "fromHexString" and "fromBase64String" of the blob class which as their name suggests,
+convert strings to blobs using base-16 or base-64 encoding.
+You can also convert a string to a blob, which will convert each of its characters to a byte.
 
-Once a blob is created, you can access each of its bytes individually for reading or writing, you can get its length by reading the "length" property, you can fill it partially or completely with a byte of your choice, you can resize it or copy it to another blob at a particular position. You can also create slices of blobs like you do with strings.
+Once a blob is created, you can access each of its bytes individually for reading or writing,
+you can get its length by reading the "length" property, you can fill it partially or completely with a byte of your choice,
+you can resize it or copy it to another blob at a particular position.
+You can also create slices of blobs like you do with strings.
 
 Here is an example script that manipulates blobs:
 

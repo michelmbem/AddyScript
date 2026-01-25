@@ -1,6 +1,7 @@
 # User-defined functions
 
-In addition to the predefined functions, users have the ability to define their own functions in AddyScript and use them. The following sections describe how to do this.
+In addition to the predefined functions, users have the ability to define their own functions in AddyScript and use them.
+The following sections describe how to do this.
 
 ## Creating a function
 
@@ -40,7 +41,8 @@ if (ans != "fine")
     println("What's the matter?");
 ```
 
-When the body of a function is reduced to a **return** statement or a simple expression, the entire function can be formulated with this shorter syntax:
+When the body of a function is reduced to a **return** statement or a simple expression,
+the entire function can be formulated with this shorter syntax:
 
 ```
 function functionName (comma_separated_list_of_parameters) => expression;
@@ -59,13 +61,19 @@ println($'the result is: {res}');
 
 ## Invoking functions
 
-As in most languages, a function invocation in AddyScript consists of its name followed by a comma-separated list of arguments in parentheses. In AddyScript, however, arguments can be either positional or named.
+As in most languages, a function invocation in AddyScript consists of its name followed by a comma-separated list of arguments in parentheses.
+In AddyScript, however, arguments can be either positional or named.
 
-A positional argument is any expression that appears at a particular position in an argument list. It is automatically mapped at runtime to the parameter that appears at the same position in the function header.
+A positional argument is any expression that appears at a particular position in an argument list.
+It is automatically mapped at runtime to the parameter that appears at the same position in the function header.
 
-A named argument is one that consists of a name (i.e., an identifier) followed by a colon (:) and then an expression. It is mapped to the parameter that has the same name in the function header. Named arguments are particularly useful when you are calling a function that has optional parameters and you do not want to provide values ​​for some of the ones that come first in the function header.
+A named argument is one that consists of a name (i.e., an identifier) followed by a colon (:) and then an expression.
+It is mapped to the parameter that has the same name in the function header.
+Named arguments are particularly useful when you are calling a function that has optional parameters
+and you do not want to provide values for some of the ones that come first in the function header.
 
-Positional arguments must always come first in an argument list. Once a named argument is encountered by the parser, it expects all subsequent arguments to be named as well.
+Positional arguments must always come first in an argument list.
+Once a named argument is encountered by the parser, it expects all subsequent arguments to be named as well.
 
 Example:
 
@@ -104,7 +112,11 @@ println('s5 = ' + s5);
 
 ### Spreading arguments
 
-An important feature of the AddyScript syntax is that you can invoke a function with arguments of type **list** or **set** preceded by the **spread operator** (..). This tells AddyScript that the **list** or **set** should be substituted for its contents. This works similarly to the right operand of group assignment. The only requirement here is that none of the parameters provided by the spread collection should be passed to the function by reference.
+An important feature of the AddyScript syntax is that you can invoke a function with arguments of type **list**
+or **set** preceded by the **spread operator** (..).
+This tells AddyScript that the **list** or **set** should be substituted for its contents.
+This works similarly to the right operand of group assignment.
+The only requirement here is that none of the parameters provided by the spread collection should be passed to the function by reference.
 
 Example:
 
@@ -132,15 +144,33 @@ println('add(..l[2..], ..s)' + res);
 
 ## Manage how parameters are passed to a function
 
-A parameter can be passed to a function by value, by reference, or as a variable-length list of values. By default, parameters are passed by value. To indicate that a parameter is passed by reference, simply prefix it with the ampersand sign (&). Similarly, prefixing a parameter with the double-dot sign (..) keyword indicates that it represents a variable-length list of values. Note that a variable-length list of values ​​must always be the last in a parameter list. Thus, a function cannot have multiple variable-length lists of values ​​in its header.
+A parameter can be passed to a function by value, by reference, or as a variable-length list of values.
+By default, parameters are passed by value.
+To indicate that a parameter is passed by reference, simply prefix it with the ampersand sign (&).
+Similarly, prefixing a parameter with the double-dot sign (..) keyword indicates that it represents a variable-length list of values.
+Note that a variable-length list of values must always be the last in a parameter list.
+Thus, a function cannot have multiple variable-length lists of values in its header.
 
-When a parameter is passed by value to a function, it can be assigned a default value. This makes the parameter optional (i.e., it does not need to be provided with a value when calling the function). Once you add an optional parameter to a parameter list, the only types of parameters that can follow are other optional parameters and a variable-length list of values.
+When a parameter is passed by value to a function, it can be assigned a default value.
+This makes the parameter optional (i.e., it does not need to be provided with a value when calling the function).
+Once you add an optional parameter to a parameter list,
+the only types of parameters that can follow are other optional parameters and a variable-length list of values.
 
-Another feature that AddyScript offers in handling function parameters is emptiness checking. When a parameter name is followed by an exclamation mark (!) in a function header, this tells AddyScript that the parameter in question should not receive empty values. Empty here means a null reference, a zero-length string, or an empty collection. Whenever the parameter receives such a value, an exception is thrown.
+Another feature that AddyScript offers in handling function parameters is emptiness checking.
+When a parameter name is followed by an exclamation mark (!) in a function header,
+this tells AddyScript that the parameter in question should not receive empty values.
+Empty here means a null reference, a zero-length string, or an empty collection.
+Whenever the parameter receives such a value, an exception is thrown.
 
 ## Closures
 
-A closure is a function used as a variable. Closures are typically used to pass functions as parameters to other functions (customizing their behavior) or to return a function as the result of another function. They appear in two forms in AddyScript: function references and inline function declarations. A function reference is like a reference to a variable (a simple identifier in the code) while an inline function declaration is an anonymous function definition that appears where an expression was expected. Both techniques are illustrated in the example below:
+A closure is a function used as a variable.
+Closures are typically used to pass functions as parameters to other functions (customizing their behavior)
+or to return a function as the result of another function.
+They appear in two forms in AddyScript: function references and inline function declarations.
+A function reference is like a reference to a variable (a simple identifier in the code)
+while an inline function declaration is an anonymous function definition that appears where an expression was expected.
+Both techniques are illustrated in the example below:
 
 Example:
 
@@ -174,7 +204,6 @@ repeat(myList, function (x) {
 ### Remarks:
 
 1. When the body of an anonymous function is reduced to a return statement or a simple expression, the entire function can be formulated like this: `|parameters| => expression`. In this form, we call it a **lambda expression**. For example, we could invoke the "repeat" function from the previous example like this: `repeat(myList, |n| => println('{0} x 2 = {1}', n, 2*n));`. A lambda expression can also have a real function body delimited by curly braces and optionally ending with a **return** statement.
-
 2. If the parameter list of a lambda expression is empty, put a space between the vertical bars. This prevents parsers from confusing them with an or-else operator (\|\|).
 
 ### The closure's "bind" method
