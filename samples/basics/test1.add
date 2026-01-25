@@ -25,7 +25,7 @@ else
 {
 	for (i = 1; i <= n; i++)
 	{
-		item = (float)readln("item no. " + i + ": ");
+		item = (float)readln($"item #{i}: ");
 		t.add(item);
 	}
 	
@@ -33,12 +33,12 @@ else
 	averrage = sum / n;
 	stdDev = sqrt(squares / n - averrage ** 2);
 	
-	println("you entered: " + t);
-	println("the sum of items is: " + sum);
-	println("the minimum is: " + minimum);
-	println("the maximum is: " + maximum);
-	println("the averrage is: " + averrage);
-	println("the standard deviation is: " + stdDev);
+	println($"you entered: {t}");
+	println($"the sum of items is: {sum}");
+	println($"the minimum is: {minimum}");
+	println($"the maximum is: {maximum}");
+	println($"the averrage is: {averrage}");
+	println($"the standard deviation is: {stdDev}");
 }
 
 readln();
