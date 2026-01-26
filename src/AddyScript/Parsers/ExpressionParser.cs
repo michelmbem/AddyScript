@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -12,6 +13,7 @@ using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
+using AddyScript.Runtime.Utilities;
 
 using Blob = AddyScript.Runtime.DataItems.Blob;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
@@ -1450,7 +1452,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         object[] groups = [.. substitutions.Cast<VariableRef>()
                                            .Select(varRef => varRef.Name)
                                            .Select(name => names.Add(name) ? $@"(?<{name}>.+)" : $@"\k<{name}>")];
-        Regex regex = new (string.Format($"^{pattern}$", groups), RegexOptions.Compiled);
+        Regex regex = StringUtil.GetRegex(string.Format($"^{pattern}$", groups));
 
         var strDestPattern = new StringDestructuringPattern(regex, [..names]);
         strDestPattern.CopyLocation(stringToken);

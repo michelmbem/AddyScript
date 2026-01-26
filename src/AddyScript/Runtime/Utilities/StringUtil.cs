@@ -36,7 +36,7 @@ public static class StringUtil
 
     public static Regex GetRegex(string pattern)
     {
-        RegexOptions options = RegexOptions.None;
+        RegexOptions options = RegexOptions.Compiled;
 
         if (pattern.Length > 0 && pattern[0] == '/')
         {
