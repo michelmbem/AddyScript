@@ -1229,6 +1229,14 @@ public class XmlGenerator : ITranslator
                     ProcessPattern(itemsElement, item);
                 break;
             }
+            case StringDestructuringPattern stringDest:
+            {
+                XmlElement tmpElement = document.CreateElement("StringDestructuringPattern");
+                tmpElement.SetAttribute("Regex", stringDest.Regex.ToString());
+                tmpElement.SetAttribute("VariableNames", string.Join(", ", stringDest.VariableNames));
+                parent.AppendChild(tmpElement);
+                break;
+            }
         }
     }
 

@@ -1360,7 +1360,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 pattern = MatchCaseGroupingOrPositionalPattern(ref last);
                 break;
             case TokenID.MutableString:
-                pattern = MatchCaseRegexDestructuringPattern();
+                pattern = MatchCaseStringDestructuringPattern();
                 break;
         }
 
@@ -1435,7 +1435,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         return pattern;
     }
 
-    private Pattern MatchCaseRegexDestructuringPattern()
+    private Pattern MatchCaseStringDestructuringPattern()
     {
         Token stringToken = Match(TokenID.MutableString);
         var (pattern, substitutions) = ParseMutableString(stringToken);
@@ -1443,16 +1443,18 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         foreach (var substitution in substitutions)
         {
             if (substitution is VariableRef) continue;
-            throw new ScriptError(FileName, substitution, Resources.InvalidRegexDestructuringSubstitution);
+            throw new ScriptError(FileName, substitution, Resources.InvalidStringDestructuringSubstitution);
         }
         
-        string[] varNames = [.. substitutions.Cast<VariableRef>().Select(vr => vr.Name)];
-        object[] groups = [.. varNames.Select(varName => $"(?<{varName}>.+)")];
+        HashSet<string> names = [];
+        object[] groups = [.. substitutions.Cast<VariableRef>()
+                                           .Select(varRef => varRef.Name)
+                                           .Select(name => !names.Add(name) ? $@"\k<{name}>" : $@"(?<{name}>.+)")];
         Regex regex = new (string.Format($"^{pattern}$", groups), RegexOptions.Compiled);
 
-        var regexDestPattern = new RegexDestructuringPattern(regex, varNames);
-        regexDestPattern.CopyLocation(stringToken);
-        return regexDestPattern;
+        var strDestPattern = new StringDestructuringPattern(regex, [..names]);
+        strDestPattern.CopyLocation(stringToken);
+        return strDestPattern;
     }
 
     /// <summary>

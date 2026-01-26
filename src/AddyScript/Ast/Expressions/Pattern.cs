@@ -12,6 +12,7 @@ using AddyScript.Runtime.OOP;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Object = AddyScript.Runtime.DataItems.Object;
 using String = AddyScript.Runtime.DataItems.String;
+using Void = AddyScript.Runtime.DataItems.Void;
 
 
 namespace AddyScript.Ast.Expressions;
@@ -321,12 +322,12 @@ public class PositionalPattern(params Pattern[] items) : Pattern
 /// </summary>
 /// <param name="regex">The regex pattern to match against</param>
 /// <param name="variableNames">The names of the variables to extract from the matched groups</param>
-public class RegexDestructuringPattern(Regex regex, string[] variableNames) : Pattern
+public class StringDestructuringPattern(Regex regex, string[] variableNames) : Pattern
 {
     /// <summary>
     /// An inner function that checks if its argument matches a regex and extracts variables from it.
     /// </summary>
-    private static readonly InnerFunction IsMatchAndExtract = new ("isMatchAndExtract", [new ("arg"), new ("regex"), new ("variableNames")], IsMatchAndExtractLogic);
+    private static readonly InnerFunction IsMatch = new ("isMatch", [new ("arg"), new ("regex"), new ("varNames")], IsMatchLogic);
     
     /// <summary>
     /// The regex pattern to match against.
@@ -339,14 +340,14 @@ public class RegexDestructuringPattern(Regex regex, string[] variableNames) : Pa
     public string[] VariableNames => variableNames;
 
     /// <summary>
-    /// The <see cref="Object"/> extracted by the last call to <see cref="IsMatchAndExtract"/>.
+    /// The <see cref="Object"/> extracted by the last call to <see cref="IsMatch"/>.
     /// </summary>
-    private static Object LastExtraction { get; set; }
+    private static Object LastExtracted { get; set; }
     
     public override Expression GetMatchTest(Expression arg) =>
         new BinaryExpression(BinaryOperator.AndAlso,
                              new TypeVerification(arg, Class.String.Name),
-                             new InnerFunctionCall(IsMatchAndExtract,
+                             new InnerFunctionCall(IsMatch,
                                                    arg,
                                                    new Literal(new Resource(regex)),
                                                    new Literal(new Resource(variableNames))));
@@ -354,12 +355,12 @@ public class RegexDestructuringPattern(Regex regex, string[] variableNames) : Pa
     public override Statement GetExtractionAction(Expression arg) =>
         new Assignment(
             new SetInitializer([.. variableNames.Select(name => new Argument(new VariableRef(name)))]),
-            new Literal(LastExtraction));
+            new Literal(LastExtracted));
 
-    private static DataItem IsMatchAndExtractLogic(DataItem[] arguments)
+    private static DataItem IsMatchLogic(DataItem[] arguments)
     {
         var arg = arguments[0];
-        if (arg.Class != Class.String) return Boolean.False;
+        if (!arg.InstanceOf(Class.String)) return Boolean.False;
 
         var regex = (Regex)arguments[1].AsNativeObject;
         var match = regex.Match(arg.ToString());
@@ -367,10 +368,13 @@ public class RegexDestructuringPattern(Regex regex, string[] variableNames) : Pa
 
         var variableNames = (string[])arguments[2].AsNativeObject;
         var extractedFields = new Dictionary<string, DataItem>();
-        for (var i = 1; i <= variableNames.Length && i <= match.Groups.Count; ++i)
-            extractedFields.Add(variableNames[i - 1], new String(match.Groups[i].Value));
-        
-        LastExtraction = new Object(extractedFields);
+        foreach (var variableName in variableNames)
+        {
+            var group = match.Groups[variableName];
+            extractedFields.Add(variableName, group.Success ? new String(group.Value) : Void.Value);
+        }
+
+        LastExtracted = new Object(extractedFields);
         return Boolean.True;
     }
 }

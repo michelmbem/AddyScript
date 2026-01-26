@@ -1212,6 +1212,18 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write(')');
                 break;
             }
+            case StringDestructuringPattern stringDest:
+            {
+                var regex = stringDest.Regex
+                                      .ToString()[1..^1]
+                                      .Replace(@"(?<", @"{")
+                                      .Replace(@">.+)", @"}")
+                                      .Replace(@"\k<", @"{")
+                                      .Replace(@">", @"}");
+                
+                textWriter.Write($"$'{regex}'");
+                break;
+            }
         }
     }
 

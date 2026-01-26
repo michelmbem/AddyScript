@@ -903,9 +903,9 @@ namespace AddyScript.Properties {
             }
         }
         
-        internal static string InvalidRegexDestructuringSubstitution {
+        internal static string InvalidStringDestructuringSubstitution {
             get {
-                return ResourceManager.GetString("InvalidRegexDestructuringSubstitution", resourceCulture);
+                return ResourceManager.GetString("InvalidStringDestructuringSubstitution", resourceCulture);
             }
         }
     }

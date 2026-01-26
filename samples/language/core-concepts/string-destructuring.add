@@ -9,4 +9,24 @@ if ("leon macias garcia, executive at leonora corp." is
 	println($'company: {company}');
 }
 
+var l = [
+	'apple orange apple mango',
+	'winter spring summer automn',
+	'yellow green yellow blue',
+	'one two three four',
+	'morning afternoon morning evening',
+	'macbook air hp omnibook macbook air lenovo yoga'
+];
+
+foreach (item in l)
+{
+	res = item switch {
+		$'{first} {second} {first} {third}' => ', '.join(first, second, third),
+		_ => 'unmatched!'
+	};
+	
+	println($'\n{item}:');
+	println($'> {res}');
+}
+
 readln();

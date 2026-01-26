@@ -547,7 +547,7 @@ Il a besoin d'une initialisation pour supporter l'opération sollicitée.</value
   <data name="EmptyPatternGroup" xml:space="preserve">
     <value>Un motif de correspondance était attendu entre les parenthèses</value>
   </data>
-  <data name="InvalidRegexDestructuringSubstitution" xml:space="preserve">
-    <value>Substitution par déstructuration d'expression régulière invalide : seuls les noms de variables sont autorisés.</value>
+  <data name="InvalidStringDestructuringSubstitution" xml:space="preserve">
+    <value>Substitution de déstructuration de chaîne invalide : seuls les noms de variables sont autorisés.</value>
   </data>
 </root>
