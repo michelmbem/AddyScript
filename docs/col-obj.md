@@ -212,13 +212,13 @@ The set class supports the following operators:
 
 In addition to the above operators, the **set** class exposes the following members:
 
-|Member|Nature|Description|
-|-|-|-|
-|`int size { read; }`|property|Gets the number of elements currently stored in the set.|
-|`bool empty { read; }`|property|Returns **true** if the set has no item, returns **false** otherwise.|
-|`void add(any value)`|method|Adds a value to the set. If the same value if already contained in the set, an exception will be thrown.|
-|`bool remove(any value)`|method|Tries to remove a value from a set. Returns **true** on success, **false** otherwise.|
-|`void clear()`|method|Empties a set.|
+| Member                   |Nature| Description                                                                                                                                           |
+|--------------------------|-|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `int size { read; }`     |property| Gets the number of elements currently stored in the set.                                                                                              |
+| `bool empty { read; }`   |property| Returns **true** if the set has no item, returns **false** otherwise.                                                                                 |
+| `bool add(any value)`    |method| Adds a value to the set. Returns **true** if the value was effectively added to set; returns **false** if the value was initially present in the set. |
+| `bool remove(any value)` |method| Tries to remove a value from a set. Returns **true** on success, **false** otherwise.                                                                 |
+| `void clear()`           |method| Empties a set.                                                                                                                                        |
 
 ### Queues
 

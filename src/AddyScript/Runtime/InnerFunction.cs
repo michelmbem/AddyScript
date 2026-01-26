@@ -1331,17 +1331,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     #region Set specific methods
 
-    private static DataItem SetAddLogic(DataItem[] arguments)
-    {
-        arguments[0].AsHashSet.Add(arguments[1]);
-        return Void.Value;
-    }
+    private static DataItem SetAddLogic(DataItem[] arguments) =>
+        Boolean.FromBool(arguments[0].AsHashSet.Add(arguments[1]));
 
-    private static DataItem SetRemoveLogic(DataItem[] arguments)
-    {
-        bool b = arguments[0].AsHashSet.Remove(arguments[1]);
-        return Boolean.FromBool(b);
-    }
+    private static DataItem SetRemoveLogic(DataItem[] arguments) =>
+        Boolean.FromBool(arguments[0].AsHashSet.Remove(arguments[1]));
 
     private static DataItem SetClearLogic(DataItem[] arguments)
     {
