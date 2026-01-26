@@ -293,13 +293,13 @@ Example 1:
 n = (int)readln('Please type a number: ');
 
 res = n switch {
-    < 0 => {
+    not >= 0 => {
         println('this is a block');
         yield 'negative';
     },
     >= 0 and <= 9 => 'from 0 to 9',
     10 or 11 or 12 => '10, 11, or 12',
-    13 or (>= 14 and <= 17) or 18 => '13 or between 14 and 17 or 18',
+    (>= 14 and <= 17) or 13 or 18 => '13 to 18',
     int when 20 <= __value && __value < 30 => '20 to 29',
     >= 30 => '30 and above',
     _ => throw 'an exception for 19'
@@ -329,7 +329,7 @@ foreach (o in l) {
 	    object { name : 'cube', color : 'blue' } => 'a blue cube',
 	    $'hello {quality} {target}, how {quality} are you?' => $'very {quality} {target} indeed!',
 	    (8, _, 6) => 'a triplet that starts with 8 and ends with 6',
-	    _ => $'"{__value}" did not match any pattern'
+	    _ => 'did not match any pattern'
 	};
 	
 	println($'o is: {o}');
@@ -360,7 +360,7 @@ o is: (8, 4, 6)
 result with o: "a triplet that starts with 8 and ends with 6"
 
 o is: 2026-01-26 15:11:01
-result with o: ""2026-01-26 15:11:01" did not match any pattern"
+result with o: "did not match any pattern"
 
 ```
 
