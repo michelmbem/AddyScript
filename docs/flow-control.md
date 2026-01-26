@@ -109,132 +109,6 @@ switch (result)
 }
 ```
 
-## Pattern matching
-
-So far, we've seen the **switch** statement and the possibilities it offers.
-But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times.
-We also have to use **break** to prevent the flow of execution from continuing to the next **case** section.
-This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression
-with the value of each **case** label.  This is the kind of problem that pattern matching solves.
-It combines a better matching syntax with the **switch** keyword, which this time is used as an operator,
-helping us create expressions that not only choose what action to perform based on the value of an expression,
-but also return a value. A pattern matching expression typically looks like this:
-
-```
-expression switch {
-    pattern1 => result1,
-    pattern2 => result2,
-    ...
-    patternN => resultN
-};
-```
-
-**Notes**:
-
-1. Each _result_ in this syntax is an expression.
-2. Patterns come in different types (see the table below).
-3. There is no default pattern at all, there is just a special type of pattern that matches everything, thus acting as a default (or fallback) pattern.
-4. A result can be produced in a block, in which case the block must end with a **yield** statement which acts as a **return** statement in a function body. Using a **return** statement here will either fail or interrupt the flow of execution without setting the value returned by the block.
-5. Throwing an exception is also a valid result.
-6. A pattern can be supplemented with a **guard** which is a logical expression linked to the pattern by a **when** keyword.
-7. The **guard** restricts the cases that should match by adding a condition to check.
-8. During pattern evaluation the value of the tested expression is represented by the **__value** automatic variable.
-
-Example 1:
-
-```JS
-n = (int)readln('Please type a number: ');
-
-res = n switch {
-    < 0 => {
-        println('this is a block');
-        yield 'negative';
-    },
-    >= 0 and <= 9 => 'from 0 to 9',
-    10 or 11 or 12 => '10, 11, or 12',
-    13 or (>= 14 and <= 17) or 18 => '13 or between 14 and 17 or 18',
-    int when 20 <= __value && __value < 30 => '20 to 29',
-    >= 30 => '30 and above',
-    _ => throw 'an exception for 19'
-};
-
-println(res);
-```
-
-Example 2:
-
-```JS
-l = [
-    new { name = 'cube', size = 18, color = 'blue' },
-    'hello funny people, how funny are you?',
-    new Exception('something went wrong'),
-    null,
-    PI,
-    (8, 4, 6),
-    now()
-];
-
-foreach (o in l) {
-	res = o switch {
-	    null => 'absolutely null',
-	    float => "i'm floating",
-	    Exception(message) => message,
-	    object { name : 'cube', color : 'blue' } => 'a blue cube',
-	    $'hello {quality} {target}, how {quality} are you?' => $'very {quality} {target} indeed!',
-	    (8, _, 6) => 'a triplet that starts with 8 and ends with 6',
-	    _ => $'"{__value}" did not match any pattern'
-	};
-	
-	println($'o is: {o}');
-	println($'result with o: "{res}"');
-	println();
-}
-```
-
-**Output**:
-
-```
-o is: <object {name = cube, size = 18, color = blue}>
-result with o: "a blue cube"
-
-o is: hello funny people, how funny are you?
-result with o: "very funny people indeed!"
-
-o is: Exception
-result with o: "something went wrong"
-
-o is:
-result with o: "absolutely null"
-
-o is: 3,141592653589793
-result with o: "i'm floating"
-
-o is: (8, 4, 6)
-result with o: "a triplet that starts with 8 and ends with 6"
-
-o is: 2026-01-26 15:11:01
-result with o: ""2026-01-26 15:11:01" did not match any pattern"
-
-```
-
-The above examples showcase the different kinds of patterns. They are explained in the table below:
-
-| Pattern                      | Syntax                                                                                                                                                                                                      | Description                                                                                                                                                                                                                                                                                                 |
-|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| always true pattern          | an underscore ( _ )                                                                                                                                                                                         | Matches everything; usually acts as the default. Should normally appear at the end of the list to avoid short-circuiting the flow of comparisons                                                                                                                                                            |
-| null checking pattern        | the keyword **null**                                                                                                                                                                                        | Matches only expressions that evaluate to the null reference                                                                                                                                                                                                                                                |
-| literal value pattern        | a literal **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string**                                                                                                                      | Matches only expressions whose value is equal to its own                                                                                                                                                                                                                                                    |
-| relational pattern           | a relational binary operator (one of: &lt;, &gt;, &lt;=, or &gt;=) followed by a literal **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string**                                       | Matches expressions whose value have the relation indicated by its operator with its own value                                                                                                                                                                                                              |
-| regex pattern                | the **matches** operator followed by a literal **string**                                                                                                                                                   | A particular kind of relational pattern that checks that the expression evaluates to a string that matches the given regular expression                                                                                                                                                                     |
-| type pattern                 | any type name, including user-defined classes                                                                                                                                                               | Matches objects of the given type; also matches instances of subclasses if the given type is a class                                                                                                                                                                                                        |
-| object pattern               | a curly-braced list of _property : pattern_ pairs optionally preceded by a type name; **e.g.**: `Exception { message : 'something went wrong'}` _(An Exception with "something went wrong" as its message)_ | Matches an object of the given type (if a type name is specified) with properties of the given names that match the corresponding patterns                                                                                                                                                                  |
-| destructuring pattern        | a type name followed by a list of property names between parentheses; **e.g.**: `Exception(name, message)}`                                                                                                 | Matches the expression to be evaluated to an object of the specified type with properties defined by the given names. Any matching object is automatically destructured, and a variable with the same name as each of the specified properties is initialized with the value of the corresponding property. |
-| negative pattern             | the keyword **not** followed by a child pattern; **e.g.**:`not int` _(anything but an integer)_                                                                                                             | Negates its child pattern.                                                                                                                                                                                                                                                                                  |
-| logical pattern              | two elementary patterns joined with the **and**/**or** keywords; **e.g.**:`10 or 11`, `int and >= 0`                                                                                                        | Whith the **or** operator, tries to match the expression against at least one of its components. Whith the **and** operator, tries to match the expression against both components.                                                                                                                         |
-| grouping pattern             | another pattern between parentheses; **e.g.**:`(>= 12 and <= 18) or ((>= 22 and <= 30) and not 25)` _(in the range 12 to 18 or in the range 22 to 30 except 25)_                                            | Changes the priority in which chained logical patterns are evaluated. By default they are evaluated left to right. Any pattern between parentheses in a chain is evaluated first.                                                                                                                           |
-| positional pattern           | a coma seperated list of elementary patterns between parentheses.                                                                                                                                           | Matches expressions whose value is an iterable data item (one that can be used in a **foreach** loop) of the same length than the given list of patterns with items that match the elementary patterns at corresponding positions.                                                                          |
-| string destructuring pattern | a mutable string in which all substitutions are variable references.                                                            | Matches expressions whose value is a string that matches the regular expression generated from the given mutable string. In this regular expression, a capture group is generated from each substitution. If the same variable appears multiple times among the substitutions, all its occurrences will reference the same capture group, thus requiring the same substring to appear in different places within the input string.                                                                             |
-
 ## Loops
 
 Loops are used to repeat an action until a condition is met.
@@ -381,6 +255,132 @@ Jumps allow execution to resume from a location other than the next instruction.
 |goto|`goto label;`<br>or _(in a switch block)_<br>`goto case X;`<br>`goto default;`|Unconditionally jumps to the specified location.<br>In a switch block can also jump to one of the case labels.<br><sub>**Note**: A label is any identifier that's appears at the beginning of an instruction and is followed by a colon. **e.g.**: in `printout: println('hello');` _printout_ is the label.</sub>|
 |return|`return;`<br>or<br>`return expression;`|Returns from a function with or without a value.|
 |throw|`throw exception;`<br>or<br>`throw "some error message";`|Raises an error and stops the execution of the script until the raised error is caught by a **try-catch-finally** statement.|
+
+## Pattern matching
+
+So far, we've seen the **switch** statement and the possibilities it offers.
+But its syntax is somewhat cumbersome: we have to repeat the **case** keyword a lot of times.
+We also have to use **break** to prevent the flow of execution from continuing to the next **case** section.
+This also leaves us with a very poor choice about what kind of operation to use to compare the value of our expression
+with the value of each **case** label.  This is the kind of problem that pattern matching solves.
+It combines a better matching syntax with the **switch** keyword, which this time is used as an operator,
+helping us create expressions that not only choose what action to perform based on the value of an expression,
+but also return a value. A pattern matching expression typically looks like this:
+
+```
+expression switch {
+    pattern1 => result1,
+    pattern2 => result2,
+    ...
+    patternN => resultN
+};
+```
+
+**Notes**:
+
+1. Each _result_ in this syntax is an expression.
+2. Patterns come in different types (see the table below).
+3. There is no default pattern at all, there is just a special type of pattern that matches everything, thus acting as a default (or fallback) pattern.
+4. A result can be produced in a block, in which case the block must end with a **yield** statement which acts as a **return** statement in a function body. Using a **return** statement here will either fail or interrupt the flow of execution without setting the value returned by the block.
+5. Throwing an exception is also a valid result.
+6. A pattern can be supplemented with a **guard** which is a logical expression linked to the pattern by a **when** keyword.
+7. The **guard** restricts the cases that should match by adding a condition to check.
+8. During pattern evaluation the value of the tested expression is represented by the **__value** automatic variable.
+
+Example 1:
+
+```JS
+n = (int)readln('Please type a number: ');
+
+res = n switch {
+    < 0 => {
+        println('this is a block');
+        yield 'negative';
+    },
+    >= 0 and <= 9 => 'from 0 to 9',
+    10 or 11 or 12 => '10, 11, or 12',
+    13 or (>= 14 and <= 17) or 18 => '13 or between 14 and 17 or 18',
+    int when 20 <= __value && __value < 30 => '20 to 29',
+    >= 30 => '30 and above',
+    _ => throw 'an exception for 19'
+};
+
+println(res);
+```
+
+Example 2:
+
+```JS
+l = [
+    new { name = 'cube', size = 18, color = 'blue' },
+    'hello funny people, how funny are you?',
+    new Exception('something went wrong'),
+    null,
+    PI,
+    (8, 4, 6),
+    now()
+];
+
+foreach (o in l) {
+	res = o switch {
+	    null => 'absolutely null',
+	    float => "i'm floating",
+	    Exception(message) => message,
+	    object { name : 'cube', color : 'blue' } => 'a blue cube',
+	    $'hello {quality} {target}, how {quality} are you?' => $'very {quality} {target} indeed!',
+	    (8, _, 6) => 'a triplet that starts with 8 and ends with 6',
+	    _ => $'"{__value}" did not match any pattern'
+	};
+	
+	println($'o is: {o}');
+	println($'result with o: "{res}"');
+	println();
+}
+```
+
+**Output**:
+
+```
+o is: <object {name = cube, size = 18, color = blue}>
+result with o: "a blue cube"
+
+o is: hello funny people, how funny are you?
+result with o: "very funny people indeed!"
+
+o is: Exception
+result with o: "something went wrong"
+
+o is:
+result with o: "absolutely null"
+
+o is: 3,141592653589793
+result with o: "i'm floating"
+
+o is: (8, 4, 6)
+result with o: "a triplet that starts with 8 and ends with 6"
+
+o is: 2026-01-26 15:11:01
+result with o: ""2026-01-26 15:11:01" did not match any pattern"
+
+```
+
+The above examples showcase the different kinds of patterns. They are explained in the table below:
+
+| Pattern                      | Syntax                                                                                                                                                                                                      | Description                                                                                                                                                                                                                                                                                                 |
+|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| always true pattern          | an underscore ( _ )                                                                                                                                                                                         | Matches everything; usually acts as the default. Should normally appear at the end of the list to avoid short-circuiting the flow of comparisons                                                                                                                                                            |
+| null checking pattern        | the keyword **null**                                                                                                                                                                                        | Matches only expressions that evaluate to the null reference                                                                                                                                                                                                                                                |
+| literal value pattern        | a literal **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string**                                                                                                                      | Matches only expressions whose value is equal to its own                                                                                                                                                                                                                                                    |
+| relational pattern           | a relational binary operator (one of: &lt;, &gt;, &lt;=, or &gt;=) followed by a literal **bool**, **int**, **long**, **float**, **decimal**, **date**, or **string**                                       | Matches expressions whose value have the relation indicated by its operator with its own value                                                                                                                                                                                                              |
+| regex pattern                | the **matches** operator followed by a literal **string**                                                                                                                                                   | A particular kind of relational pattern that checks that the expression evaluates to a string that matches the given regular expression                                                                                                                                                                     |
+| type pattern                 | any type name, including user-defined classes                                                                                                                                                               | Matches objects of the given type; also matches instances of subclasses if the given type is a class                                                                                                                                                                                                        |
+| object pattern               | a curly-braced list of _property : pattern_ pairs optionally preceded by a type name; **e.g.**: `Exception { message : 'something went wrong'}` _(An Exception with "something went wrong" as its message)_ | Matches an object of the given type (if a type name is specified) with properties of the given names that match the corresponding patterns                                                                                                                                                                  |
+| destructuring pattern        | a type name followed by a list of property names between parentheses; **e.g.**: `Exception(name, message)}`                                                                                                 | Matches the expression to be evaluated to an object of the specified type with properties defined by the given names. Any matching object is automatically destructured, and a variable with the same name as each of the specified properties is initialized with the value of the corresponding property. |
+| negative pattern             | the keyword **not** followed by a child pattern; **e.g.**:`not int` _(anything but an integer)_                                                                                                             | Negates its child pattern.                                                                                                                                                                                                                                                                                  |
+| logical pattern              | two elementary patterns joined with the **and**/**or** keywords; **e.g.**:`10 or 11`, `int and >= 0`                                                                                                        | Whith the **or** operator, tries to match the expression against at least one of its components. Whith the **and** operator, tries to match the expression against both components.                                                                                                                         |
+| grouping pattern             | another pattern between parentheses; **e.g.**:`(>= 12 and <= 18) or ((>= 22 and <= 30) and not 25)` _(in the range 12 to 18 or in the range 22 to 30 except 25)_                                            | Changes the priority in which chained logical patterns are evaluated. By default they are evaluated left to right. Any pattern between parentheses in a chain is evaluated first.                                                                                                                           |
+| positional pattern           | a coma seperated list of elementary patterns between parentheses.                                                                                                                                           | Matches expressions whose value is an iterable data item (one that can be used in a **foreach** loop) of the same length than the given list of patterns with items that match the elementary patterns at corresponding positions.                                                                          |
+| string destructuring pattern | a mutable string in which all substitutions are variable references.                                                            | Matches expressions whose value is a string that matches the regular expression generated from the given mutable string. In this regular expression, a capture group is generated from each substitution. If the same variable appears multiple times among the substitutions, all its occurrences will reference the same capture group, thus requiring the same substring to appear in different places within the input string.                                                                             |
 
 <div markdown class="web-only">
 
