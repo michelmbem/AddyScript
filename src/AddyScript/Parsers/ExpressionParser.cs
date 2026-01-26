@@ -1437,6 +1437,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         return pattern;
     }
 
+    /// <summary>
+    /// Parses a string destructuring pattern from the current token.
+    /// </summary>
+    /// <returns>A Pattern instance representing the parsed string destructuring pattern.</returns>
+    /// <exception cref="ScriptError">If the mutable string token is invalid or contains invalid substitutions.</exception>
     private Pattern MatchCaseStringDestructuringPattern()
     {
         Token stringToken = Match(TokenID.MutableString);
