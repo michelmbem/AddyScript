@@ -73,33 +73,16 @@ class Vector
 	public function toString(fmt = '') => 'Vector ' + this.__items.toString(fmt);
 }
 
-o = new {name = 'my object', size = 18, color = 'blue'};
-res = o switch {
-	null => 'null',
-	5 => 'five',
-	{height : 150, color : 'blue'} => 'a blue and 150 tall object',
-	{name : 'my object', size : 18} => 'my object of size 18'
-};
-println($'o is {o}');
-println($'result with o: {res}');
-println();
+/*********************************************************************************/
 
-res = PI switch {
-	3.14 => 'three-point-fourteen',
-	>= 3 and < 4 => 'between 3 (inclusive) and 4 (exclusive)',
-	decimal => 'a decimal number'
-};
-println($'result with PI: {res}');
-println();
-
-res = ((int)readln('type a number: ')) switch {
-	< 0 => 'negative',
-	0 or 1 or 2 or 3 or 4 => 'from 0 to 4',
-	not >= 10 => {
+res = int(readln('type a number: ')) switch {
+	not >= 0 => 'negative',
+	>= 5 and < 10 => {
 		print('yeah i know, ');
 		println('it\'s between 5 and 9!');
 		yield __value;
 	},
+	0 or 1 or 2 or 3 or 4 => 'from 0 to 4',
 	_ => '10 and above'
 };
 println($'result: {res}');
@@ -109,9 +92,7 @@ res = readln('type some text: ') switch {
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' when decimal(__value) > 0 =>
 		$'{__value} is a positive number',
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' => $'{__value} is just a number',
-	$'hello {name}' => $'a warm greating to {name}',
-	$'a {qualification} {season} day' => $'that day of {season} is surely {qualification}',
-	_ => $'{__value} is neither a number nor a greating nor an opinion on a day'
+	_ => $'{__value} is not a number'
 };
 println($'result: {res}');
 println();
@@ -121,9 +102,11 @@ l = [
 	new Employee('Jeanette Diabaté', 32, 3500, `2014-09-30`),
 	new Developper('Dereck Musa', 44, 4200, `2010-07-28`, ['C++', 'C#', 'Java']),
 	null,
+	'hello john',
 	new Box(15, 7, 9),
 	new Vector(4, 7, 18),
 	new Exception('this is an exception'),
+	'hello, salif',
 	[4, randint(10), now()],
 	new Box(12, 8, 4),
 	new Vector(4, 1.5, 'Hi!')
@@ -139,6 +122,7 @@ l.each(|item| => {
 			$'{item.name} is 44 years old employee hired in 2010 that earns ${item.salary}/month',
 		(4, int and <= 10, _) => 'a sequence of 3 that starts with 4',
 		Box(width, depth) => $'a box of width: {width} and depth: {depth}',
+		$'hello {name}' => $'a warm greating to a certain {name}',
 		_ => 'unmatched'
 	};
 	println($'item = {item}');
@@ -154,7 +138,7 @@ println();
 try {
 	randint(-5, 5) switch {
 		>= 0 => println($'{__value} is OK!'),
-		_ => throw 'I don\'t like negative values'
+		_ => throw $'{__value}, I don\'t like negative values'
 	};
 } catch (e) {
 	println($'{e.name} : {e.message}');
