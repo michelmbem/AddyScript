@@ -1,12 +1,17 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using AddyScript.Ast.Statements;
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
+using Object = AddyScript.Runtime.DataItems.Object;
+using String = AddyScript.Runtime.DataItems.String;
 
 
 namespace AddyScript.Ast.Expressions;
@@ -308,4 +313,64 @@ public class PositionalPattern(params Pattern[] items) : Pattern
     /// <returns>><b>true</b> if the method is a valid iterator method; otherwise, <b>false</b></returns>
     private static bool isIteratorMethod(ClassMethod method) =>
         method is { Scope: Scope.Public, Modifier: Modifier.Default or Modifier.Final, Function.Parameters.Length: 0 };
+}
+
+
+/// <summary>
+/// A subclass of <see cref="Pattern"/> that checks if the value to match satisfies a regex pattern and extracts variables from it.
+/// </summary>
+/// <param name="regex">The regex pattern to match against</param>
+/// <param name="variableNames">The names of the variables to extract from the matched groups</param>
+public class RegexDestructuringPattern(Regex regex, string[] variableNames) : Pattern
+{
+    /// <summary>
+    /// An inner function that checks if its argument matches a regex and extracts variables from it.
+    /// </summary>
+    private static readonly InnerFunction IsMatchAndExtract = new ("isMatchAndExtract", [new ("arg"), new ("regex"), new ("variableNames")], IsMatchAndExtractLogic);
+    
+    /// <summary>
+    /// The regex pattern to match against.
+    /// </summary>
+    public Regex Regex => regex;
+
+    /// <summary>
+    /// The names of the variables to extract from the matched groups.
+    /// </summary>
+    public string[] VariableNames => variableNames;
+
+    /// <summary>
+    /// The <see cref="Object"/> extracted by the last call to <see cref="IsMatchAndExtract"/>.
+    /// </summary>
+    private static Object LastExtraction { get; set; }
+    
+    public override Expression GetMatchTest(Expression arg) =>
+        new BinaryExpression(BinaryOperator.AndAlso,
+                             new TypeVerification(arg, Class.String.Name),
+                             new InnerFunctionCall(IsMatchAndExtract,
+                                                   arg,
+                                                   new Literal(new Resource(regex)),
+                                                   new Literal(new Resource(variableNames))));
+    
+    public override Statement GetExtractionAction(Expression arg) =>
+        new Assignment(
+            new SetInitializer([.. variableNames.Select(name => new Argument(new VariableRef(name)))]),
+            new Literal(LastExtraction));
+
+    private static DataItem IsMatchAndExtractLogic(DataItem[] arguments)
+    {
+        var arg = arguments[0];
+        if (arg.Class != Class.String) return Boolean.False;
+
+        var regex = (Regex)arguments[1].AsNativeObject;
+        var match = regex.Match(arg.ToString());
+        if (!match.Success) return Boolean.False;
+
+        var variableNames = (string[])arguments[2].AsNativeObject;
+        var extractedFields = new Dictionary<string, DataItem>();
+        for (var i = 1; i <= variableNames.Length && i <= match.Groups.Count; ++i)
+            extractedFields.Add(variableNames[i - 1], new String(match.Groups[i].Value));
+        
+        LastExtraction = new Object(extractedFields);
+        return Boolean.True;
+    }
 }

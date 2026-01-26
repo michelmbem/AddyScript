@@ -547,4 +547,7 @@ Requiere cierta inicialización para admitir la operación esperada.</value>
   <data name="EmptyPatternGroup" xml:space="preserve">
     <value>Se esperaba una coincidencia de patrones entre los paréntesis.</value>
   </data>
+  <data name="InvalidRegexDestructuringSubstitution" xml:space="preserve">
+    <value>Sustitución de desestructuración de expresiones regulares no válida: solo se permiten nombres de variables</value>
+  </data>
 </root>

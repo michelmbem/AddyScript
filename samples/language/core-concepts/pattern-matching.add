@@ -109,7 +109,9 @@ res = readln('type some text: ') switch {
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' when decimal(__value) > 0 =>
 		$'{__value} is a positive number',
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' => $'{__value} is just a number',
-	_ => $'{__value} is not a number'
+	$'hello {name}' => $'a warm greating to {name}',
+	$'a {qualification} {season} day' => $'that day of {season} is surely {qualification}',
+	_ => $'{__value} is neither a number nor a greating nor an opinion on a day'
 };
 println($'result: {res}');
 println();

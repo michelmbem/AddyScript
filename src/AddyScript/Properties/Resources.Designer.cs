@@ -902,5 +902,11 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("EmptyPatternGroup", resourceCulture);
             }
         }
+        
+        internal static string InvalidRegexDestructuringSubstitution {
+            get {
+                return ResourceManager.GetString("InvalidRegexDestructuringSubstitution", resourceCulture);
+            }
+        }
     }
 }

@@ -547,4 +547,7 @@ It requires some initialization to support the expected operation.</value>
   <data name="EmptyPatternGroup" xml:space="preserve">
     <value>A pattern was expected between parentheses</value>
   </data>
+  <data name="InvalidRegexDestructuringSubstitution" xml:space="preserve">
+    <value>Invalid regex destructuring substitution : only variable names are allowed</value>
+  </data>
 </root>

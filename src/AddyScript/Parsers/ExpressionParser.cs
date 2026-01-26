@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text;
-
+using System.Text.RegularExpressions;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -1072,67 +1073,11 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     /// <returns>A <see cref="Ast.Expressions.StringInterpolation"/></returns>
     private StringInterpolation StringInterpolation()
     {
-        List<Expression> substitutions = [];
-        StringBuilder patternBuffer = new ();
-        string mutableString = token.ToString();
-        int counter = 0, limit = mutableString.Length;
-        char ch;
-
-        while (counter < limit)
-        {
-            ch = mutableString[counter++];
-
-            if (ch == '{')
-            {
-                patternBuffer.Append(ch);
-
-                if (counter < limit && mutableString[counter] == ch)
-                {
-                    patternBuffer.Append(ch);
-                    ++counter;
-                }
-                else
-                {
-                    var auxParser = new ExpressionParser(new Lexer(new StringReader(mutableString[counter..])))
-                    {
-                        CurrentClass = CurrentClass,
-                        CurrentFunction = CurrentFunction,
-                    };
-
-                    Expression substitution = auxParser.RequiredExpression();
-                    substitution.MoveRel(token, counter + 2); // Note: the + 2 is a bit artificial but it's useful!
-                    patternBuffer.Append(substitutions.Count);
-                    substitutions.Add(substitution);
-                    counter += substitution.Length;
-
-                    if (counter >= limit)
-                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
-
-                    ch = mutableString[counter];
-
-                    if (ch == ',' || ch == ':')
-                    {
-                        int j = counter + 1;
-                        while (j < limit && mutableString[j] != '}') ++j;
-
-                        if (j >= limit)
-                            throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
-
-                        patternBuffer.Append(mutableString[counter..j]);
-                        counter = j;
-                    }
-                    else if (ch != '}')
-                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
-                }
-            }
-            else
-                patternBuffer.Append(ch);
-        }
-
-        var stringInt = new StringInterpolation(patternBuffer.ToString(), [.. substitutions]);
+        var (pattern, substitutions) = ParseMutableString(token);
+        var stringInt = new StringInterpolation(pattern, substitutions);
         stringInt.CopyLocation(token);
         Consume(1);
-
+        
         return stringInt;
     }
 
@@ -1191,6 +1136,74 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         }
 
         return new QualifiedName([.. parts]);
+    }
+
+    /// <summary>
+    /// Parses a mutable string token into a pattern and a list of substitution expressions.
+    /// </summary>
+    /// <param name="stringToken">The mutable string token to parse</param>
+    /// <returns>A (string, Expression[]) tuple</returns>
+    /// <exception cref="ScriptError">When a closing brace is missing</exception>
+    private (string pattern, Expression[] substitutions) ParseMutableString(Token stringToken)
+    {
+        List<Expression> substitutions = [];
+        StringBuilder patternBuffer = new ();
+        string mutableString = stringToken.ToString();
+        int counter = 0, limit = mutableString.Length;
+        char ch;
+
+        while (counter < limit)
+        {
+            ch = mutableString[counter++];
+
+            if (ch == '{')
+            {
+                patternBuffer.Append(ch);
+
+                if (counter < limit && mutableString[counter] == ch)
+                {
+                    patternBuffer.Append(ch);
+                    ++counter;
+                }
+                else
+                {
+                    var auxParser = new ExpressionParser(new Lexer(new StringReader(mutableString[counter..])))
+                    {
+                        CurrentClass = CurrentClass,
+                        CurrentFunction = CurrentFunction,
+                    };
+
+                    Expression substitution = auxParser.RequiredExpression();
+                    substitution.MoveRel(token, counter + 2); // Note: the + 2 is a bit artificial but it's useful!
+                    patternBuffer.Append(substitutions.Count);
+                    substitutions.Add(substitution);
+                    counter += substitution.Length;
+
+                    if (counter >= limit)
+                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
+
+                    ch = mutableString[counter];
+
+                    if (ch == ',' || ch == ':')
+                    {
+                        int j = counter + 1;
+                        while (j < limit && mutableString[j] != '}') ++j;
+
+                        if (j >= limit)
+                            throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
+
+                        patternBuffer.Append(mutableString[counter..j]);
+                        counter = j;
+                    }
+                    else if (ch != '}')
+                        throw new ScriptError(FileName, substitution, Resources.MissingClosingBrace);
+                }
+            }
+            else
+                patternBuffer.Append(ch);
+        }
+
+        return (patternBuffer.ToString(), [..substitutions]);
     }
 
     /// <summary>
@@ -1346,6 +1359,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.LeftParenthesis:
                 pattern = MatchCaseGroupingOrPositionalPattern(ref last);
                 break;
+            case TokenID.MutableString:
+                pattern = MatchCaseRegexDestructuringPattern();
+                break;
         }
 
         return pattern;
@@ -1417,6 +1433,26 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         pattern.SetLocation(first.Start, last.End);
         return pattern;
+    }
+
+    private Pattern MatchCaseRegexDestructuringPattern()
+    {
+        Token stringToken = Match(TokenID.MutableString);
+        var (pattern, substitutions) = ParseMutableString(stringToken);
+        
+        foreach (var substitution in substitutions)
+        {
+            if (substitution is VariableRef) continue;
+            throw new ScriptError(FileName, substitution, Resources.InvalidRegexDestructuringSubstitution);
+        }
+        
+        string[] varNames = [.. substitutions.Cast<VariableRef>().Select(vr => vr.Name)];
+        object[] groups = [.. varNames.Select(varName => $"(?<{varName}>.+)")];
+        Regex regex = new (string.Format($"^{pattern}$", groups), RegexOptions.Compiled);
+
+        var regexDestPattern = new RegexDestructuringPattern(regex, varNames);
+        regexDestPattern.CopyLocation(stringToken);
+        return regexDestPattern;
     }
 
     /// <summary>

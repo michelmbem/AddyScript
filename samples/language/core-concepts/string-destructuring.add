@@ -1,0 +1,12 @@
+var firstName, lastName, jobTitle, company;
+
+if ("leon macias garcia, executive at leonora corp." is
+    $'{firstName} {lastName}, {jobTitle} at {company}')
+{
+	println($'first name: {firstName}');
+	println($'last name: {lastName}');
+	println($'job: {jobTitle}');
+	println($'company: {company}');
+}
+
+readln();
