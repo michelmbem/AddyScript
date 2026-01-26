@@ -75,7 +75,7 @@ The **default** section is also optional but at least one **case** section (or *
 Example:
 
 ```JS
-result = (int)readln("What's your result? ");
+result = int(readln("What's your result? "));
 
 switch (result)
 {
@@ -134,7 +134,7 @@ expression switch {
 1. Each _result_ in this syntax is an expression.
 2. Patterns come in different types (see the table below).
 3. There is no default pattern at all, there is just a special type of pattern that matches everything, thus acting as a default (or fallback) pattern.
-4. A result can be produced in a block, in which case the block must end with a **yield** statement which acts as a **return** statement in a function body. Using a **return** statement here will either fail or interrupt the flow of execution without setting the value that should be returned by the block.
+4. A result can be produced in a block, in which case the block must end with a **yield** statement which acts as a **return** statement in a function body. Using a **return** statement here will either fail or interrupt the flow of execution without setting the value returned by the block.
 5. Throwing an exception is also a valid result.
 6. A pattern can be supplemented with a **guard** which is a logical expression linked to the pattern by a **when** keyword.
 7. The **guard** restricts the cases that should match by adding a condition to check.
@@ -164,24 +164,57 @@ println(res);
 Example 2:
 
 ```JS
-o = new { name = 'my object', size = 18, color = 'blue' };
+l = [
+    new { name = 'cube', size = 18, color = 'blue' },
+    'hello funny people, how funny are you?',
+    new Exception('something went wrong'),
+    null,
+    PI,
+    (8, 4, 6),
+    now()
+];
 
-res = o switch {
-    null => 'absolutely null',
-    float => "i'm floating",
-    Exception { message : 'something went wrong' } => __value.message,
-    { name : 'my object', size : 18 } => 'my object of size 18'
-};
-
-println($'o is {o}');
-println($'the result with o is {res}');
+foreach (o in l) {
+	res = o switch {
+	    null => 'absolutely null',
+	    float => "i'm floating",
+	    Exception(message) => message,
+	    object { name : 'cube', color : 'blue' } => 'a blue cube',
+	    $'hello {quality} {target}, how {quality} are you?' => $'very {quality} {target} indeed!',
+	    (8, _, 6) => 'a triplet that starts with 8 and ends with 6',
+	    _ => $'"{__value}" did not match any pattern'
+	};
+	
+	println($'o is: {o}');
+	println($'result with o: "{res}"');
+	println();
+}
 ```
 
 **Output**:
 
-```JS
-o is { name = 'my object', size = 18, color = 'blue' }
-the result with o is my object of size 18
+```
+o is: <object {name = cube, size = 18, color = blue}>
+result with o: "a blue cube"
+
+o is: hello funny people, how funny are you?
+result with o: "very funny people indeed!"
+
+o is: Exception
+result with o: "something went wrong"
+
+o is:
+result with o: "absolutely null"
+
+o is: 3,141592653589793
+result with o: "i'm floating"
+
+o is: (8, 4, 6)
+result with o: "a triplet that starts with 8 and ends with 6"
+
+o is: 2026-01-26 15:11:01
+result with o: ""2026-01-26 15:11:01" did not match any pattern"
+
 ```
 
 The above examples showcase the different kinds of patterns. They are explained in the table below:
@@ -200,7 +233,7 @@ The above examples showcase the different kinds of patterns. They are explained 
 | logical pattern              | two elementary patterns joined with the **and**/**or** keywords; **e.g.**:`10 or 11`, `int and >= 0`                                                                                                        | Whith the **or** operator, tries to match the expression against at least one of its components. Whith the **and** operator, tries to match the expression against both components.                                                                                                                         |
 | grouping pattern             | another pattern between parentheses; **e.g.**:`(>= 12 and <= 18) or ((>= 22 and <= 30) and not 25)` _(in the range 12 to 18 or in the range 22 to 30 except 25)_                                            | Changes the priority in which chained logical patterns are evaluated. By default they are evaluated left to right. Any pattern between parentheses in a chain is evaluated first.                                                                                                                           |
 | positional pattern           | a coma seperated list of elementary patterns between parentheses.                                                                                                                                           | Matches expressions whose value is an iterable data item (one that can be used in a **foreach** loop) of the same length than the given list of patterns with items that match the elementary patterns at corresponding positions.                                                                          |
-| string destructuring pattern | a mutable string. **e.g.**: `$'{firstName} {lastName}, {jobTitle} at {company}'` _(will match "leon macias garcia, executive at leonora corp.")_                                                            | Matches expressions whose value is a string that has the same form than the given mutable string. All substitutions in the mutable string should be variables that will be extracted from the string if the pattern is matched.                                                                             |
+| string destructuring pattern | a mutable string in which all substitutions are variable references.                                                            | Matches expressions whose value is a string that matches the regular expression generated from the given mutable string. In this regular expression, a capture group is generated from each substitution. If the same variable appears multiple times among the substitutions, all its occurrences will reference the same capture group, thus requiring the same substring to appear in different places within the input string.                                                                             |
 
 ## Loops
 

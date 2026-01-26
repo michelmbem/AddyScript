@@ -15,13 +15,13 @@ var l = [
 	'yellow green yellow blue',
 	'one two three four',
 	'morning afternoon morning evening',
-	'macbook air hp omnibook macbook air lenovo yoga'
+	'macbook air hp omnibook MacBook Air lenovo yoga'
 ];
 
 foreach (item in l)
 {
 	res = item switch {
-		$'{first} {second} {first} {third}' => ', '.join(first, second, third),
+		$'/{first} {second} {first} {third}/i' => ', '.join(first, second, third),
 		_ => 'unmatched!'
 	};
 	
