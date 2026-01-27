@@ -1215,7 +1215,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             case StringDestructuringPattern stringDest:
             {
                 var regex = stringDest.Regex
-                                      .ToString()[1..^1]
+                                      .ToString()
                                       .Replace(@"(?<", @"{")
                                       .Replace(@">.+)", @"}")
                                       .Replace(@"\k<", @"{")
