@@ -16,20 +16,13 @@ public sealed class Decimal(BigDecimal value) : DataItem
 
     public override Class Class => Class.Decimal;
 
-    public override bool AsBoolean => value != BigDecimal.Zero;
+    public override bool AsBoolean => value.ToBoolean(null);
 
     public override int AsInt32 => (int)value;
 
     public override BigInteger AsBigInteger => (BigInteger)value;
 
-    public override Rational32 AsRational32
-    {
-        get
-        {
-            var (num, den) = value.ToRational();
-            return new Rational32((int)num, (int)den).Simplify();
-        }
-    }
+    public override Rational32 AsRational32 => (Rational32)value;
 
     public override double AsDouble => (double)value;
 

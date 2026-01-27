@@ -17,9 +17,9 @@ public sealed class Tuple(DataItem[] items) : DataItem
 
     public override DataItem[] AsArray => items;
 
-    public override List<DataItem> AsList => [.. items];
+    public override List<DataItem> AsList => [..items];
 
-    public override HashSet<DataItem> AsHashSet => [.. items];
+    public override HashSet<DataItem> AsHashSet => [..items];
 
     public override Queue<DataItem> AsQueue => new (items);
 
@@ -36,7 +36,7 @@ public sealed class Tuple(DataItem[] items) : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder("(");
+        StringBuilder sb = new ("(");
         bool trimEnd = false;
 
         foreach (DataItem item in items)

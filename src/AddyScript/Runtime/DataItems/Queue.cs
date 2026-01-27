@@ -21,11 +21,11 @@ public sealed class Queue : DataItem
 
     public override Class Class => Class.Queue;
 
-    public override DataItem[] AsArray => [.. queue];
+    public override DataItem[] AsArray => [..queue];
 
-    public override List<DataItem> AsList => [.. queue];
+    public override List<DataItem> AsList => [..queue];
 
-    public override HashSet<DataItem> AsHashSet => [.. queue];
+    public override HashSet<DataItem> AsHashSet => [..queue];
 
     public override Queue<DataItem> AsQueue => queue;
 
@@ -45,7 +45,7 @@ public sealed class Queue : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
         sb.Append($"<{Class.Name} {{size = {queue.Count}");
 
         if (queue.Count > 0)

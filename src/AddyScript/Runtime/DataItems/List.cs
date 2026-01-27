@@ -18,7 +18,7 @@ public sealed class List : DataItem
 
     public List(int capacity) => list = new (capacity);
 
-    public List(IEnumerable<DataItem> initialContent) => list = new (initialContent);
+    public List(IEnumerable<DataItem> initialContent) => list = [..initialContent];
 
     public override Class Class => Class.List;
 
@@ -42,7 +42,7 @@ public sealed class List : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder("[");
+        StringBuilder sb = new ("[");
         bool trimEnd = false;
 
         foreach (DataItem item in list)

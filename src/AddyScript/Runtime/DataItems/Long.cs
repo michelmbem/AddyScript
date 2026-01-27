@@ -24,11 +24,11 @@ public sealed class Long(BigInteger value) : DataItem
 
     public override BigInteger AsBigInteger => value;
 
-    public override Rational32 AsRational32 => new ((int)value);
+    public override Rational32 AsRational32 => (Rational32)value;
 
     public override double AsDouble => (double)value;
 
-    public override BigDecimal AsBigDecimal => new (value);
+    public override BigDecimal AsBigDecimal => value;
 
     public override Complex64 AsComplex64 => new ((double)value, 0);
 

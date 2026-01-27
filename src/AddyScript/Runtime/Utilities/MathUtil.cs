@@ -8,7 +8,8 @@ namespace AddyScript.Runtime.Utilities;
 
 public static class MathUtil
 {
-    private const double DEFAULT_TOLERANCE = 1e-12;
+    public static bool Equal(double a, double b, double tolerance = double.Epsilon) =>
+        Math.Abs(a - b) <= tolerance;
 
     public static int Pow(int n, int exp)
     {
@@ -63,7 +64,7 @@ public static class MathUtil
         return (negative, exponent, mantissa);
     }
 
-    public static (long, long) ToRational(double value, double tolerance = DEFAULT_TOLERANCE)
+    public static (long, long) ToRational(double value)
     {
         if (double.IsNaN(value) || double.IsInfinity(value))
             throw new ArgumentException("Value must be finite.");
@@ -80,12 +81,11 @@ public static class MathUtil
             long k = a * k1 + k2;
 
             double approx = (double)h / k;
-            if (Math.Abs(approx - value) <= tolerance)
-                return (h, k);
+            if (Equal(approx, value)) return (h, k);
 
             h2 = h1; h1 = h;
             k2 = k1; k1 = k;
-
+            
             b = 1.0 / (b - a);
         } while (true);
     }

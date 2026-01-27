@@ -31,17 +31,17 @@ public sealed class Rational : DataItem
 
     public override Class Class => Class.Rational;
 
-    public override bool AsBoolean => value != Rational32.Zero;
+    public override bool AsBoolean => value.ToBoolean(null);
 
     public override int AsInt32 => (int)value;
 
-    public override BigInteger AsBigInteger => new ((int)value);
+    public override BigInteger AsBigInteger => (BigInteger)value;
 
     public override Rational32 AsRational32 => value;
 
     public override double AsDouble => (double)value;
 
-    public override BigDecimal AsBigDecimal => new ((decimal)value);
+    public override BigDecimal AsBigDecimal => (BigDecimal)value;
 
     public override Complex64 AsComplex64 => new ((double)value, 0);
 

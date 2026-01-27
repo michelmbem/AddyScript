@@ -116,6 +116,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             Minutes,
             Seconds,
             Milliseconds,
+            Exit,
         ];
 
         InnerFunction[] commonFunctions = [EqualsFunction, HashCodeFunction, CompareToFunction, ToStringFunction, CloneFunction, DisposeFunction];
@@ -757,6 +758,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem MillisecondsLogic(DataItem[] arguments) =>
         new Duration(TimeSpan.FromMilliseconds(arguments[0].AsDouble));
+
+    private static DataItem ExitLogic(DataItem[] arguments)
+    {
+        Environment.Exit(arguments[0].AsInt32);
+        return null; // Unreachable
+    }
 
     #endregion
 
@@ -1726,6 +1733,14 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Creates a <see cref="Duration"/> with the given number of milliseconds.
     /// </summary>
     public static readonly InnerFunction Milliseconds = new ("milliseconds", [new ("value")], MillisecondsLogic);
+
+    /// <summary>
+    /// Exits the program with the given status code.
+    /// </summary>
+    /// <remarks>
+    /// This will also terminate the host application.
+    /// </remarks>
+    public static readonly InnerFunction Exit = new ("exit", [new ("status", new Integer(0))], ExitLogic);
 
     #endregion
 

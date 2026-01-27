@@ -40,7 +40,7 @@ public sealed class Map : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder("{");
+        StringBuilder sb = new ("{");
 
         if (dict.Count > 0)
         {

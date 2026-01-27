@@ -16,7 +16,7 @@ public sealed class Set : DataItem
 
     public Set() => hashSet = [];
 
-    public Set(IEnumerable<DataItem> initialContent) => hashSet = new (initialContent);
+    public Set(IEnumerable<DataItem> initialContent) => hashSet = [..initialContent];
 
     public override Class Class => Class.Set;
 
@@ -44,7 +44,7 @@ public sealed class Set : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder("{");
+        StringBuilder sb = new ("{");
         bool trimEnd = false;
 
         foreach (DataItem element in hashSet)

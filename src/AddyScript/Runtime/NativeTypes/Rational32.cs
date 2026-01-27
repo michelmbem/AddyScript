@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
 
 using AddyScript.Runtime.Utilities;
 
@@ -479,8 +480,12 @@ public readonly struct Rational32 :
 
     public static explicit operator Rational32(decimal d)
     {
-        var (num, den) = new BigDecimal(d).ToRational();
-        return new Rational32((int)num, (int)den);
+        return (Rational32)new BigDecimal(d);
+    }
+
+    public static explicit operator Rational32(BigInteger n)
+    {
+        return new Rational32((int)n);
     }
 
     #endregion
@@ -540,6 +545,16 @@ public readonly struct Rational32 :
     public static explicit operator decimal(Rational32 self)
     {
         return self.ToDecimal(null);
+    }
+
+    public static explicit operator BigInteger(Rational32 self)
+    {
+        return new BigInteger(self.ToInt64(null));
+    }
+
+    public static explicit operator BigDecimal(Rational32 self)
+    {
+        return new BigDecimal(self.ToDecimal(null));
     }
 
     #endregion

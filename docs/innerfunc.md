@@ -1,11 +1,12 @@
 # Inner functions
 
-At the time of writing this manual page, AddyScript has a set of 42 predefined functions. We have already discovered some of them in the previous sections. Here is a more general overview of AddyScript's built-in functions:
+At the time of writing this manual page, AddyScript has a set of 43 predefined functions. We have already discovered some of them in the previous sections. Here is a more general overview of AddyScript's built-in functions:
 
 ## Utility functions
 
 * `any eval(string expression)` : evaluates the expression contained in the given string and returns its value.
-* `int hash(any first, ..more)` : combines the provided values to calculate their hash code. It accepts a maximum of 9 arguments. Only the first argument is required; the others are optional.
+* `int hash(any first, ..more)` : combines the provided values to calculate their hash code. It accepts a maximum of nine arguments. Only the first argument is required; the others are optional.
+* `void exit(int code = 0)` : Exits the program with the given status code. **Note**: This will also terminate the host application.
 
 ## Conversion functions
 
@@ -59,6 +60,10 @@ At the time of writing this manual page, AddyScript has a set of 42 predefined f
 * `void print(string pattern, ..substitutions)` : prints a formatted message to standard output and stays on the same line.
 * `void println(string pattern = '', ..substitutions)` : prints a formatted message to standard output and moves to the next line.
 * `string readln(string prompt = '')` : reads a string from the standard input device and returns it to the script. An optional prompt can be displayed.
+
+## Other functions
+
+While using the interactive console _(asis)_, you can also use the `void source(string path)` function to load a script from a file and execute it.
 
 <div markdown class="web-only">
 

@@ -3,6 +3,7 @@ using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
+using AddyScript.Runtime.Utilities;
 
 
 namespace AddyScript.Runtime.DataItems;
@@ -31,18 +32,12 @@ public sealed class Complex : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        string realString = value.Real != 0.0 ? value.Real.ToString(format) : null;
-        string imaginaryString = value.Imaginary switch
-        {
-            -1.0 => "-i",
-            0.0 => "0",
-            1.0 => "i",
-            _ => value.Imaginary.ToString(format) + "i",
-        };
+        var realString = MathUtil.Equal(value.Real, 0) ? null : value.Real.ToString(format);
+        var imaginaryString = MathUtil.Equal(value.Imaginary, 0) ? null : value.Imaginary.ToString(format) + 'i';
 
-        if (realString == null) return imaginaryString;
-        if (imaginaryString == "0") return realString;
-
+        if (realString == null) return imaginaryString ?? "0";
+        if (imaginaryString == null) return realString;
+        
         return value.Imaginary < 0.0
              ? $"({realString}{imaginaryString})"
              : $"({realString}+{imaginaryString})";

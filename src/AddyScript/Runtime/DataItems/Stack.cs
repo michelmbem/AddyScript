@@ -21,11 +21,11 @@ public sealed class Stack : DataItem
 
     public override Class Class => Class.Stack;
 
-    public override DataItem[] AsArray => [.. stack];
+    public override DataItem[] AsArray => [..stack];
 
-    public override List<DataItem> AsList => [.. stack];
+    public override List<DataItem> AsList => [..stack];
 
-    public override HashSet<DataItem> AsHashSet => [.. stack];
+    public override HashSet<DataItem> AsHashSet => [..stack];
 
     public override Queue<DataItem> AsQueue => new (stack);
 
@@ -45,7 +45,7 @@ public sealed class Stack : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
         sb.Append($"<{Class.Name} {{size = {stack.Count}");
 
         if (stack.Count > 0)

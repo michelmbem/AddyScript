@@ -17,7 +17,7 @@ public sealed class Float(double value) : DataItem
 
     public override Class Class => Class.Float;
 
-    public override bool AsBoolean => value != 0.0;
+    public override bool AsBoolean => MathUtil.Equal(value, 0.0);
 
     public override int AsInt32 => (int)value;
 
@@ -27,7 +27,7 @@ public sealed class Float(double value) : DataItem
 
     public override double AsDouble => value;
 
-    public override BigDecimal AsBigDecimal => new (value);
+    public override BigDecimal AsBigDecimal => (BigDecimal)value;
 
     public override Complex64 AsComplex64 => new (value, 0);
 
@@ -38,7 +38,7 @@ public sealed class Float(double value) : DataItem
 
     protected override bool UnsafeEquals(DataItem other)
     {
-        double x = other.AsDouble;
+        var x = other.AsDouble;
 
         if (double.IsNaN(x))
             return double.IsNaN(value);
@@ -47,7 +47,7 @@ public sealed class Float(double value) : DataItem
         if (double.IsNegativeInfinity(x))
             return double.IsNegativeInfinity(value);
 
-        return value == x;
+        return MathUtil.Equal(value, x);
     }
 
     public override int GetHashCode() => value.GetHashCode();

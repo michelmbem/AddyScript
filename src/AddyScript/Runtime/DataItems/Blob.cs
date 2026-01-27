@@ -18,14 +18,13 @@ public sealed class Blob(byte[] buffer) : DataItem
 
     public override byte[] AsByteArray => buffer;
 
-    private IEnumerable<DataItem> Items =>
-        buffer.Select(b => new String(b.ToString()));
+    private IEnumerable<DataItem> Items => buffer.Select(b => new Integer(b));
 
-    public override DataItem[] AsArray => [.. Items];
+    public override DataItem[] AsArray => [..Items];
 
-    public override List<DataItem> AsList => [.. Items];
+    public override List<DataItem> AsList => [..Items];
 
-    public override HashSet<DataItem> AsHashSet => [.. Items];
+    public override HashSet<DataItem> AsHashSet => [..Items];
 
     public override object AsNativeObject => buffer;
 
@@ -49,13 +48,9 @@ public sealed class Blob(byte[] buffer) : DataItem
     protected override bool UnsafeEquals(DataItem other)
     {
         var otherBuffer = other.AsByteArray;
-        if (buffer.Length != otherBuffer.Length) return false;
-
-        for (int i = 0; i < buffer.Length; ++i)
-            if (buffer[i] != otherBuffer[i])
-                return false;
-
-        return true;
+        return buffer.Length == otherBuffer.Length &&
+               !buffer.Where((item, index) => item != otherBuffer[index])
+                      .Any();
     }
 
     public override int GetHashCode() => buffer.GetHashCode();

@@ -525,8 +525,6 @@ public partial struct BigDecimal :
         return bytes;
     }
 
-    public readonly (long, long) ToRational() => ((long)unscaled, MathUtil.Pow(10, scale));
-
     #endregion
 
     #region Operators
@@ -584,6 +582,12 @@ public partial struct BigDecimal :
     public static explicit operator decimal(BigDecimal self) => self.ToDecimal(null);
 
     public static explicit operator BigInteger(BigDecimal self) => self.Round(0).unscaled;
+
+    public static explicit operator Rational32(BigDecimal self)
+    {
+        var (num, den) = self.ToRational();
+        return new Rational32((int)num, (int)den);
+    }
 
     #endregion
 
@@ -762,6 +766,8 @@ public partial struct BigDecimal :
         _ = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
         return new BigDecimal(r, a.scale).Deflate();
     }
+
+    private readonly (long, long) ToRational() => ((long)unscaled, MathUtil.Pow(10, scale));
 
     #endregion
 }
