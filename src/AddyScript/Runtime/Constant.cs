@@ -1,12 +1,13 @@
 using System;
 using System.Numerics;
+
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.NativeTypes;
-using AddyScript.Runtime.OOP;
+
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
