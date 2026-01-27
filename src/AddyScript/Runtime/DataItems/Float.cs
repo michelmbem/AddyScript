@@ -23,14 +23,7 @@ public sealed class Float(double value) : DataItem
 
     public override BigInteger AsBigInteger => new (value);
 
-    public override Rational32 AsRational32
-    {
-        get
-        {
-            var (num, den) = MathUtil.ToRational(value);
-            return new((int)num, (int)den);
-        }
-    }
+    public override Rational32 AsRational32 => (Rational32)value;
 
     public override double AsDouble => value;
 

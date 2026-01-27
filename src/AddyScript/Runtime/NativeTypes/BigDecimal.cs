@@ -91,7 +91,7 @@ public partial struct BigDecimal :
         Match match = DecimalRegex.Match(s);
         if (!match.Success) throw new FormatException();
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new ();
 
         Group signGroup = match.Groups["SIGN"];
         if (signGroup.Success) sb.Append(signGroup.Value);
@@ -170,7 +170,7 @@ public partial struct BigDecimal :
         if (scale > 0)
         {
             if (scale >= sb.Length) sb.Insert(0, "0", scale - sb.Length + 1);
-            var fmt = (NumberFormatInfo) formatProvider.GetFormat(typeof(NumberFormatInfo));
+            var fmt = (NumberFormatInfo)formatProvider.GetFormat(typeof(NumberFormatInfo));
             sb.Insert(sb.Length - scale, fmt.CurrencyDecimalSeparator);
         }
 
@@ -426,10 +426,9 @@ public partial struct BigDecimal :
     /// <filterpriority>2</filterpriority>
     public int CompareTo(object obj)
     {
-        if (obj is BigDecimal dec)
-            return CompareTo(dec);
-
-        throw new ArgumentException("obj should be a BigDecimal");
+        return obj is BigDecimal dec
+             ? CompareTo(dec)
+             : throw new ArgumentException("obj should be a BigDecimal");
     }
 
     #endregion
@@ -502,7 +501,8 @@ public partial struct BigDecimal :
 
     public readonly BigDecimal Round(int decs)
     {
-        if (decs < 0) throw new ArgumentOutOfRangeException();
+        ArgumentOutOfRangeException.ThrowIfNegative(decs);
+
         if (scale <= decs) return this;
 
         BigInteger p = BigInteger.Pow(BigIntegerTen, scale - decs);
@@ -531,7 +531,7 @@ public partial struct BigDecimal :
 
     #region Operators
 
-    #region Conversion
+    #region Conversion from other types
 
     public static implicit operator BigDecimal(sbyte n) => new (n);
 
@@ -556,6 +556,10 @@ public partial struct BigDecimal :
     public static explicit operator BigDecimal(double x) => new (x);
 
     public static implicit operator BigDecimal(decimal d) => new (d);
+
+    #endregion
+
+    #region Conversion to other types
 
     public static explicit operator sbyte(BigDecimal self) => self.ToSByte(null);
 

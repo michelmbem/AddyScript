@@ -89,7 +89,7 @@ public readonly struct Rational32 :
     /// <filterpriority>2</filterpriority>
     public bool ToBoolean(IFormatProvider provider)
     {
-        return (numerator != 0);
+        return numerator != 0;
     }
 
     /// <summary>
@@ -299,17 +299,18 @@ public readonly struct Rational32 :
     /// Compares the current instance with another object of the same type.
     /// </summary>
     /// <returns>
-    /// A 32-bit signed integer that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance is less than <paramref name="obj" />. Zero This instance is equal to <paramref name="obj" />. Greater than zero This instance is greater than <paramref name="obj" />. 
+    /// A 32-bit signed integer that indicates the relative order of the objects being compared.
+    /// The return value has these meanings: Value Meaning Less than zero This instance is less than <paramref name="obj" />.
+    /// Zero This instance is equal to <paramref name="obj" />. Greater than zero This instance is greater than <paramref name="obj" />. 
     /// </returns>
     /// <param name="obj">An object to compare with this instance.</param>
     /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
     public int CompareTo(object obj)
     {
-        if (obj is Rational32 rational)
-            return CompareTo(rational);
-
-        throw new ArgumentException("obj should be a Rational32");
+        return obj is Rational32 rational
+             ? CompareTo(rational)
+             : throw new ArgumentException("obj should be a Rational32");
     }
 
     #endregion
@@ -422,7 +423,7 @@ public readonly struct Rational32 :
 
     #region Operators
 
-    #region Conversion
+    #region Conversion from other types
 
     public static implicit operator Rational32(sbyte n)
     {
@@ -466,18 +467,25 @@ public readonly struct Rational32 :
 
     public static explicit operator Rational32(float x)
     {
-        return new Rational32((int)x);
+        var (num, den) = MathUtil.ToRational(x);
+        return new Rational32((int)num, (int)den);
     }
 
     public static explicit operator Rational32(double x)
     {
-        return new Rational32((int)x);
+        var (num, den) = MathUtil.ToRational(x);
+        return new Rational32((int)num, (int)den);
     }
 
     public static explicit operator Rational32(decimal d)
     {
-        return new Rational32((int)d);
+        var (num, den) = new BigDecimal(d).ToRational();
+        return new Rational32((int)num, (int)den);
     }
+
+    #endregion
+
+    #region Conversion to other types
 
     public static explicit operator sbyte(Rational32 self)
     {
