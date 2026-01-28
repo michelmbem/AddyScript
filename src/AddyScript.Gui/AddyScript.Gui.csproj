@@ -7,7 +7,11 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <UseAppHost>true</UseAppHost>
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishSingleFile>true</PublishSingleFile>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
@@ -19,21 +23,12 @@
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('osx-'))">
-        <UseAppHost>true</UseAppHost>
-        <PublishSingleFile>true</PublishSingleFile>
-        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-        <MacOSBundle>true</MacOSBundle>
-        <MacOSBundleInfoPlist>Properties\Info.plist</MacOSBundleInfoPlist>
-        <MacOSBundleIcon>Assets\Images\Icons\AddyScript.icns</MacOSBundleIcon>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.9"/>
         <PackageReference Include="Avalonia.Desktop" Version="11.3.9"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9"/>
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9"/>
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.9"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.9">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>

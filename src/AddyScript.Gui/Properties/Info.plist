@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+<plist>
     <dict>
         <key>CFBundleName</key>
         <string>asgui</string>
 
+        <key>CFBundleDisplayName</key>
+        <string>AddyScript GUI</string>
+
         <key>CFBundleIdentifier</key>
-        <string>org.addy.asgui</string>
+        <string>org.addy.script.gui</string>
 
         <key>CFBundleExecutable</key>
         <string>asgui</string>
@@ -15,7 +18,7 @@
         <string>0.9.9.9</string>
 
         <key>CFBundleShortVersionString</key>
-        <string>0.9.9</string>
+        <string>0.9</string>
 
         <key>LSMinimumSystemVersion</key>
         <string>12.0</string>
