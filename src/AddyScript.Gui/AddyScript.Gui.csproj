@@ -19,7 +19,7 @@
         <ApplicationIcon>Assets\Images\Icons\AddyScript.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <PropertyGroup Condition="'$(OS)' == 'Unix'">
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
