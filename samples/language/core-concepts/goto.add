@@ -5,7 +5,7 @@ for (;;)
 		case 'michel':
 			println('you\'re right!');
 			readln();
-			return;
+			exit();
 			one:
 			println('you\'re wrong!');
 			break;

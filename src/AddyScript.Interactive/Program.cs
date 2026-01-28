@@ -9,8 +9,8 @@ namespace AddyScript.Interactive;
 static class Program
 {
     const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\n" +
-                                          "GitHub page: https://github.com/michelmbem/AddyScript.\r\n" +
-                                          "Wiki page: https://michelmbem/github.io/AddyScript.\r\n" +
+                                          "GitHub: https://github.com/michelmbem/AddyScript.\r\n" +
+                                          "Wiki: https://michelmbem.github.io/AddyScript.\r\n" +
                                           "Use the exit() function to quit.";
     const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
     const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
