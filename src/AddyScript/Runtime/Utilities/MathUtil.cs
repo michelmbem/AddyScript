@@ -69,23 +69,22 @@ public static class MathUtil
         if (double.IsNaN(value) || double.IsInfinity(value))
             throw new ArgumentException("Value must be finite.");
 
-        long h1 = 1, h2 = 0;
-        long k1 = 0, k2 = 1;
-
-        double b = value;
+        // Depends on the number of significant decimal digits we want in the input (12, for instance)
+        const double tolerance = 1e-12;
+        
+        var (h1, h2, k1, k2) = (1L, 0L, 0L, 1L);
+        var b = value;
 
         do
         {
-            long a = (long)Math.Floor(b);
-            long h = a * h1 + h2;
-            long k = a * k1 + k2;
+            var a = (long)Math.Floor(b);
+            var h = a * h1 + h2;
+            var k = a * k1 + k2;
 
-            double approx = (double)h / k;
-            if (Equal(approx, value)) return (h, k);
+            var approx = (double)h / k;
+            if (Equal(approx, value, tolerance)) return (h, k);
 
-            h2 = h1; h1 = h;
-            k2 = k1; k1 = k;
-            
+            (h2, h1, k2, k1) = (h1, h, k1, k);
             b = 1.0 / (b - a);
         } while (true);
     }

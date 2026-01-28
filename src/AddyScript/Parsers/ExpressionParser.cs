@@ -1455,7 +1455,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         object[] groups = [.. substitutions.Cast<VariableRef>()
                                            .Select(varRef => varRef.Name)
                                            .Select(name => names.Add(name) ? $@"(?<{name}>.+)" : $@"\k<{name}>")];
-        Regex regex = StringUtil.GetRegex(string.Format(pattern, groups));
+        Regex regex = StringUtil.ToRegex(string.Format(pattern, groups));
 
         var strDestPattern = new StringDestructuringPattern(regex, [..names]);
         strDestPattern.CopyLocation(stringToken);

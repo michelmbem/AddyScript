@@ -978,7 +978,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         var arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "string::insert", 2);
 
-        var replaced = StringUtil.GetRegex(arg1.ToString()).Replace(self, arg2.ToString());
+        var replaced = StringUtil.ToRegex(arg1.ToString()).Replace(self, arg2.ToString());
         return new String(replaced);
     }
 
@@ -1044,7 +1044,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::split", 1);
 
-        var items = StringUtil.GetRegex(arg1.ToString())
+        var items = StringUtil.ToRegex(arg1.ToString())
                               .Split(self)
                               .Select(t => new String(t))
                               .ToList();

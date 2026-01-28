@@ -149,7 +149,7 @@ public sealed class String(string value) : DataItem
         BinaryOperator.StartsWith => Boolean.FromBool(value.StartsWith(operand.ToString())),
         BinaryOperator.EndsWith => Boolean.FromBool(value.EndsWith(operand.ToString())),
         BinaryOperator.Contains => Boolean.FromBool(value.Contains(operand.ToString())),
-        BinaryOperator.Matches => Boolean.FromBool(StringUtil.GetRegex(operand.ToString()).IsMatch(value)),
+        BinaryOperator.Matches => Boolean.FromBool(StringUtil.ToRegex(operand.ToString()).IsMatch(value)),
         _ => base.BinaryOperation(_operator, operand),
     };
 

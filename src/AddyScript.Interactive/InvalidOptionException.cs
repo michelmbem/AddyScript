@@ -2,9 +2,9 @@
 
 namespace AddyScript.Interactive;
 
-public class InvalidOptionException(string option, string message) : ApplicationException(message)
+public class InvalidOptionException(string option, string message) : Exception(message)
 {
-    public InvalidOptionException(string option) : this(option, "Invalid option: " + option)
+    public InvalidOptionException(string option) : this(option, $"Invalid option: {option}")
     {
     }
 

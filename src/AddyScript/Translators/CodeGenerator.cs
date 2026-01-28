@@ -11,8 +11,8 @@ using AddyScript.Ast.Statements;
 using AddyScript.Parsers;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+using AddyScript.Runtime.Utilities;
 using AddyScript.Translators.Utility;
-
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 
 
@@ -1214,8 +1214,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             }
             case StringDestructuringPattern stringDest:
             {
-                var regex = stringDest.Regex
-                                      .ToString()
+                var regex = StringUtil.ToString(stringDest.Regex)
                                       .Replace(@"(?<", @"{")
                                       .Replace(@">.+)", @"}")
                                       .Replace(@"\k<", @"{")

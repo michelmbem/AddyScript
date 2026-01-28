@@ -70,11 +70,9 @@ public class OptionSet
         Input = input;
         Log = log;
 
-        if (culture != null)
-        {
-            var currentThread = Thread.CurrentThread;
-            currentThread.CurrentUICulture = currentThread.CurrentCulture = new CultureInfo(culture);
-        }
+        if (culture == null) return;
+        var currentThread = Thread.CurrentThread;
+        currentThread.CurrentUICulture = currentThread.CurrentCulture = new CultureInfo(culture);
     }
 
     public ExecutionMode ExecutionMode { get; }
@@ -100,13 +98,13 @@ public class OptionSet
             _ => null
         };
 
-        if (message != null)
-            throw new InvalidOptionException(option, message);
+        if (message == null) return;
+        throw new InvalidOptionException(option, message);
     }
 
     private static void CheckMode(ExecutionMode mode, string option)
     {
-        if (mode != ExecutionMode.Default)
-            throw new InvalidOptionException(option, "Cannot specify execution mode twice");
+        if (mode == ExecutionMode.Default) return;
+        throw new InvalidOptionException(option, "Cannot specify execution mode twice");
     }
 }

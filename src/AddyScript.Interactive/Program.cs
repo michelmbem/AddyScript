@@ -2,26 +2,27 @@
 using System.IO;
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
-using AddyScript.Runtime.OOP;
+using String = AddyScript.Runtime.DataItems.String;
+using Void = AddyScript.Runtime.DataItems.Void;
 
 namespace AddyScript.Interactive;
 
-static class Program
+internal static class Program
 {
-    const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\n" +
-                                          "GitHub: https://github.com/michelmbem/AddyScript.\r\n" +
-                                          "Wiki: https://michelmbem.github.io/AddyScript.\r\n" +
-                                          "Use the exit() function to quit.";
-    const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
-    const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
-    const string MAIN_PROMPT = ">>> ";
-    const string CONTINUATION_PROMPT = "... ";
-    const string WAIT_KEY_PROMPT = "\r\nPress any key before exit";
+    private const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\n" +
+                                                  "GitHub: https://github.com/michelmbem/AddyScript.\r\n" +
+                                                  "Wiki: https://michelmbem.github.io/AddyScript.\r\n" +
+                                                  "Use the exit() function to quit.";
+    private const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
+    private const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
+    private const string MAIN_PROMPT = ">>> ";
+    private const string CONTINUATION_PROMPT = "... ";
+    private const string WAIT_KEY_PROMPT = "\r\nPress any key before exit";
 
-    static string prompt = MAIN_PROMPT;
+    private static string prompt = MAIN_PROMPT;
 
     [STAThread]
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         OptionSet options = null;
 
@@ -53,14 +54,14 @@ static class Program
     {
         try
         {
-            ScriptEngine.ExecuteString(command + ";", context);
+            ScriptEngine.ExecuteString($"{command};", context);
 
             var result = RuntimeServices.Interpreter.ReturnedValue;
             Console.WriteLine(RuntimeServices.ToString(result));
         }
-        catch (ScriptError sx)
+        catch (ScriptError se)
         {
-            ShowError(sx, log);
+            ShowError(se, log);
             Environment.Exit(2);
         }
         catch (Exception ex)
@@ -76,9 +77,9 @@ static class Program
         {
             ScriptEngine.ExecuteFile(path, context);
         }
-        catch (ScriptError sx)
+        catch (ScriptError se)
         {
-            ShowError(sx, log);
+            ShowError(se, log);
             WaitKey();
             Environment.Exit(2);
         }
@@ -110,9 +111,9 @@ static class Program
 
                 prompt = engine.Satisfied ? MAIN_PROMPT : CONTINUATION_PROMPT;
             }
-            catch (ScriptError sx)
+            catch (ScriptError se)
             {
-                ShowError(sx, null);
+                ShowError(se, null);
                 prompt = MAIN_PROMPT;
             }
             catch (Exception ex)
@@ -138,35 +139,33 @@ static class Program
 
     private static void ShowResult(DataItem result)
     {
-        string resultStr = result.Class.ClassID switch
-        {
-            ClassID.String or ClassID.Blob => RuntimeServices.ToString(result, "x"),
-            _ => RuntimeServices.ToString(result),
-        };
+        var resultStr = result is String or Blob
+            ? RuntimeServices.ToString(result, "x")
+            : RuntimeServices.ToString(result);
 
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(SUCCESS_MESSAGE_FORMAT, resultStr);
         Console.ResetColor();
     }
 
-    private static void ShowError(ScriptError sx, string log)
+    private static void ShowError(ScriptError se, string log)
     {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(ERROR_MESSAGE_FORMAT,
-                          sx.GetType().FullName,
-                          sx.Message,
-                          string.IsNullOrEmpty(sx.FileName) ? "(asis)" : sx.FileName,
-                          sx.Element.Start.LineNumber + 1,
-                          sx.Element.Start.Offset - sx.Element.Start.LineOffset + 1);
+                          se.GetType().FullName,
+                          se.Message,
+                          string.IsNullOrEmpty(se.FileName) ? "(stdin)" : se.FileName,
+                          se.Element.Start.LineNumber + 1,
+                          se.Element.Start.Offset - se.Element.Start.LineOffset + 1);
         Console.ResetColor();
 
         if (string.IsNullOrWhiteSpace(log)) return;
 
         using var logWriter = File.CreateText(log);
-        logWriter.WriteLine(sx.FileName);
-        logWriter.WriteLine($"{sx.Element.Start.Offset},{sx.Element.Start.LineOffset},{sx.Element.Start.LineNumber}");
-        logWriter.WriteLine($"{sx.Element.End.Offset},{sx.Element.End.LineOffset},{sx.Element.End.LineNumber}");
-        logWriter.WriteLine(sx.Message);
+        logWriter.WriteLine(se.FileName);
+        logWriter.WriteLine($"{se.Element.Start.Offset},{se.Element.Start.LineOffset},{se.Element.Start.LineNumber}");
+        logWriter.WriteLine($"{se.Element.End.Offset},{se.Element.End.LineOffset},{se.Element.End.LineNumber}");
+        logWriter.WriteLine(se.Message);
     }
 
     private static void ShowError(Exception ex)
@@ -187,7 +186,7 @@ static class Program
         var functionLogic = new InnerFunctionLogic(arguments =>
         {
             RunFile(arguments[0].ToString(), null, context);
-            return Runtime.DataItems.Void.Value;
+            return Void.Value;
         });
 
         return new InnerFunction("source", [new Parameter("path")], functionLogic);

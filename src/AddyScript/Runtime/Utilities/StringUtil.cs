@@ -34,7 +34,7 @@ public static class StringUtil
         return sb.ToString();
     }
 
-    public static Regex GetRegex(string pattern)
+    public static Regex ToRegex(string pattern)
     {
         RegexOptions options = RegexOptions.Compiled;
 
@@ -63,6 +63,22 @@ public static class StringUtil
         }
 
         return new Regex(pattern, options);
+    }
+    
+    public static string ToString(Regex regex)
+    {
+        StringBuilder sb = new ();
+        sb.Append('/').Append(regex).Append('/');
+        
+        var options = regex.Options;
+        if (options.HasFlag(RegexOptions.Singleline)) sb.Append('s');
+        if (options.HasFlag(RegexOptions.Multiline)) sb.Append('m');
+        if (options.HasFlag(RegexOptions.IgnoreCase)) sb.Append('i');
+        if (options.HasFlag(RegexOptions.IgnorePatternWhitespace)) sb.Append('x');
+        if (options.HasFlag(RegexOptions.CultureInvariant)) sb.Append('u');
+        if (options.HasFlag(RegexOptions.RightToLeft)) sb.Append('r');
+        
+        return sb.ToString();
     }
 
     public static byte[] String2ByteArray(string str) => Encoding.GetBytes(str);
