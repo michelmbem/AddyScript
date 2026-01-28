@@ -95,15 +95,15 @@ println('abs({0}) = {1}', a, abs(a));
 **Output**:
 
 ```
-the real part of (2 - i) is 2
-the imaginary part of (2 - i) is -1
-the conjugate of (2 - i) is (2 + i)
-(2 - i) + (1 + 2i) = (3 + i)
-(2 - i) - (1 + 2i) = (1 - 3i)
-(2 - i) * (1 + 2i) = (4 + 3i)
-(2 - i) / (1 + 2i) = (0.8 - 0.4i)
-(2 - i) ** 2 = (3 - 4i)
-abs((2 - i)) = 2.23606797749979
+the real part of (2-1i) is 2
+the imaginary part of (2-1i) is -1
+the conjugate of (2-1i) is (2+1i)
+(2-1i) + (1+2i) = (3+1i)
+(2-1i) - (1+2i) = (1-3i)
+(2-1i) * (1+2i) = (4+3i)
+(2-1i) / (1+2i) = -1i
+(2-1i) ** 2 = (3,0000000000000004-4i)
+abs((2-1i)) = 2,23606797749979
 ```
 
 ### Complex Number API
