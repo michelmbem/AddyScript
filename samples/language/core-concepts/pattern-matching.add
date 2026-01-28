@@ -86,16 +86,14 @@ res = int(readln('type a number: ')) switch {
 	_ => '10 and above'
 };
 println($'result: {res}');
-println();
 
-res = readln('type some text: ') switch {
+res = readln('\ntype some text: ') switch {
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' when decimal(__value) > 0 =>
 		$'{__value} is a positive number',
 	matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' => $'{__value} is just a number',
 	_ => $'{__value} is not a number'
 };
 println($'result: {res}');
-println();
 
 l = [
 	new Employee('Franklin Kenyata', 44, 5000, `2010-01-14`),
@@ -112,8 +110,10 @@ l = [
 	new Vector(4, 1.5, 'Hi!')
 ];
 
-l.add(l[0] with { name = 'Ahmadu Suleyman', salary = 7000 });
-l.add(l[2] with { name = 'Kim Ondo', age = 36, languages = ['Python', 'TypeScript'] });
+l += [
+	l[0] with { name = 'Ahmadu Suleyman', salary = 7000 },
+	l[2] with { name = 'Kim Ondo', age = 36, languages = ['Python', 'TypeScript'] }
+];
 
 l.each(|item| => {
 	res = item switch {
@@ -125,23 +125,26 @@ l.each(|item| => {
 		$'hello {name}' => $'a warm greating to a certain {name}',
 		_ => 'unmatched'
 	};
-	println($'item = {item}');
-	println($'result with item: {res}');
-	println('-' * 110);
+       	
+	println($'\nitem : {item}');
+	println($'> {res}');
 });
+
 println();
 
-l.where(|item| => item is Employee(languages))
-	.each(|item| => println($'{item.name} is a {" and ".join(..item.languages)} developper'));
-println();
+foreach (item in l) {
+	var name, languages;
+	if (item is Employee(name, languages))
+		println($'{name} is a {" and ".join(..languages)} developper');
+}
 
 try {
 	randint(-5, 5) switch {
-		>= 0 => println($'{__value} is OK!'),
+		>= 0 => println($'\n{__value} is OK!'),
 		_ => throw $'{__value}, I don\'t like negative values'
 	};
 } catch (e) {
-	println($'{e.name} : {e.message}');
+	println($'\n{e.name} : {e.message}');
 }
 
 readln();
