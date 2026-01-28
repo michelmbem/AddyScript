@@ -21,22 +21,40 @@ o = new {firstName = "James", lastName = "Bond", number = 007}; // o is an objec
 
 ### Variable's scope
 
-As stated before, a variable exists from where it is initialized first until the end of the block in which it appears.
-If a variable is created at the root level, it will be accessible to the remain of the script.
-AddyScript doesn't check variable access from functions; neither does it check that for functions themselves.
-This means that a function can refer to a variable before the variable is actually created.
-As long as the function is not called before the creation of the variable, this will not lead to any error.
-However, you should avoid doing so in functions that you want to reuse out of their original script
-because there is no guarantee that the referred variable will exist in the calling context.
+As mentioned earlier, a variable exists from its initialization until the end of the block in which it is defined.
+If a variable is created at the root of the script, it will be accessible to the rest of the script.
+AddyScript does not check the existence of variables accessed from a function, nor does it check the existence of the functions themselves.
+This means that a function can reference a variable even before the variable is created.
+As long as the function is not called before the variable is created, this will not generate any errors.
+However, it is not recommended to do this in functions that you intend to reuse outside their original script,
+as there is no guarantee that the referenced variable will be defined in the context of the call.
 
 ### The **var** keyword
 
-Even if AddyScript is able to dynamically declare variables,
-there are still some situations where you may need to explicitly declare them.
-In particular, when you want to avoid confusion between some local variable and an eventually predefined global homonymous one.
-This is where the **var** keyword comes into action.
-Just as in other C-based scripting languages, it is used to explicitly declare variables.
-Such a variable will hide any homonymous constant or variable declared in the global scope.
+Even though AddyScript allows you to declare variables dynamically,
+there are situations where it's necessary to declare them explicitly.
+In particular, to avoid confusion between a local variable and a pre-declared global variable with the same name.
+This is where the **var** keyword comes in.
+As in other C-based scripting languages, it's used to explicitly declare variables.
+Such a variable will hide any constant or variable with the same name declared in global scope.
+
+The syntax for explicitly declaring variables is the following:
+
+```
+var <variable_name1> = <initial_value1>, <variable_name2> = <initial_value2>, ... ,<variable_nameN> = <initial_valueN>
+```
+
+Setting the initial value of a variable is optional.
+However, an uninitialized variable remains unusable until it is assigned a value.
+Therefore, the above syntax is equivalent to the following:
+
+```
+var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
+<variable_name1> = <initial_value1>;
+<variable_name2> = <initial_value2>;
+...
+<variable_nameN> = <initial_valueN>;
+```
 
 Example:
 
@@ -80,6 +98,16 @@ back to main, toto = 20
 
 A constant is a read-only variable. That is: it's assigned a value once and cannot be altered afterward.
 You will typically declare constants using the **const** keyword like in the following example.
+
+The syntax for declaring constants is the following:
+
+```
+const <constant_name1> = <constant_value1>, <constant_name2> = <constant_value2>, ... ,<constant_nameN> = <constant_valueN>;
+```
+
+Unlike variables, constants cannot be declared without an initial value.
+Only values of the types **bool**, **int**, **long**, **rational**, **float**, **decimal**, **complex**, **date**,
+**duration**, and **string** can be used as initial values for constants.
 
 Example:
 
@@ -185,7 +213,7 @@ Depending on their type, literal values have the following forms:
 
 ## Initializers
 
-Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps and sets. Depending on their type, initializers have the following forms:
+Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps, and sets. Depending on their type, initializers have the following forms:
 
 * **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e. another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` **Output**: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
 
@@ -321,7 +349,7 @@ From the lowest to the highest priority, we have:
 An expression is any combination of operands and operators that can produce a value.
 An operand can be a literal value, a named constant, a reference to a variable, a reference to a list item,
 a reference to a field or property, a function or method call, the keyword **this**, an assignment, a unary expression,
-a binary expression, a ternary expression or any of these wrapped into parentheses.
+a binary expression, a ternary expression, or any of these wrapped into parentheses.
 
 ## Assignments
 
@@ -404,11 +432,21 @@ let lvalue = rvalue;
 
 With this syntax chaining assignments is not allowed. No other operator than the equal-sign (=) can be used.
 
+Example:
+
+```JS
+let a = 5;
+let b = 8;
+let c = a + b;
+```
+
+**Note**: **let** does not locally redeclare the variable. It's just a way to introduce an assignment.
+
 ## Reading and printing values from/to the console
 
 As you may have already guessed, you typically read a value from the console in AddyScript by using the **readln** function. It lets the user type a string and returns that string once the user presses on the [Return] key. The returned string can be converted to any type following your needs and expectations. **readln** accepts an optional parameter, a string that would be displayed as a prompt if given.
 
-Similarly, you print values to the console in AddyScript by using the **print** and **println** functions. Both functions are similar except that **print** remains on the same line after printing a value while **println** automatically skips to the next line. Both functions accept a variable number of arguments. The first argument, if present, represents a format string; any _{n}_ sequence (n being an integral number) in that string will be replaced with one of the corresponding following argument (0 for the second, 1 for the third and so on...). **print** requires at least on argument while **println** can be used without any argument. When used without an argument, **println** simply skips to the next line.
+Similarly, you print values to the console in AddyScript by using the **print** and **println** functions. Both functions are similar except that **print** remains on the same line after printing a value while **println** automatically skips to the next line. Both functions accept a variable number of arguments. The first argument, if present, represents a format string; any _{n}_ sequence (n being an integral number) in that string will be replaced with one of the corresponding following argument (0 for the second, 1 for the third, and so on...). **print** requires at least on argument while **println** can be used without any argument. When used without an argument, **println** simply skips to the next line.
 
 If you are integrating AddyScript in your own system, you could change the meaning of those statements and make **print** and **println** display a popup window for example.
 

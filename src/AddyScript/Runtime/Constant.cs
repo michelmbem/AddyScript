@@ -30,7 +30,7 @@ public class Constant : IFrameItem
     /// <param name="value">The value of the constant</param>
     public Constant(DataItem value)
     {
-        Value = value is Boolean or Integer or Long or Rational or Float or Decimal or Complex or Date or String
+        Value = value is Boolean or Integer or Long or Rational or Float or Decimal or Complex or Date or Duration or String
               ? value
               : throw new InvalidOperationException(string.Format(Resources.InvalidConstantType, value.Class.Name));
     }

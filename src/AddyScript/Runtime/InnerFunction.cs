@@ -6,7 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
-
+using System.Threading;
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -16,7 +16,6 @@ using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
-
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;
 using Decimal = AddyScript.Runtime.DataItems.Decimal;
@@ -116,6 +115,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             Minutes,
             Seconds,
             Milliseconds,
+            Sleep,
             Exit,
         ];
 
@@ -758,6 +758,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
     private static DataItem MillisecondsLogic(DataItem[] arguments) =>
         new Duration(TimeSpan.FromMilliseconds(arguments[0].AsDouble));
+
+    private static DataItem SleepLogic(DataItem[] arguments)
+    {
+        Thread.Sleep(arguments[0].AsInt32);
+        return Void.Value;
+    }
 
     private static DataItem ExitLogic(DataItem[] arguments)
     {
@@ -1733,6 +1739,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Creates a <see cref="Duration"/> with the given number of milliseconds.
     /// </summary>
     public static readonly InnerFunction Milliseconds = new ("milliseconds", [new ("value")], MillisecondsLogic);
+    
+    /// <summary>
+    /// Sleeps for the specified number of milliseconds.
+    /// </summary>
+    public static readonly InnerFunction Sleep = new ("sleep", [new ("milliseconds")], SleepLogic);
 
     /// <summary>
     /// Exits the program with the given status code.

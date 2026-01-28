@@ -1,5 +1,4 @@
 import System::Environment;
-import System::Threading::Thread;
 import System::Diagnostics::Process;
 import System::Diagnostics::ProcessStartInfo;
 import System::Runtime::InteropServices::OSPlatform;
@@ -33,11 +32,6 @@ function getFolderPath(specialFolder)
 function getTickCount()
 {
 	return Environment::TickCount;
-}
-
-function sleep(timeout)
-{
-	return Thread::Sleep(timeout);
 }
 
 function execl(fileName, arguments = '')

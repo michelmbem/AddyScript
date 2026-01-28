@@ -90,7 +90,7 @@ switch (result)
        println('Bad!');
        break;
     case 5:
-       println('Average!');
+       println('Averrage!');
        break;
     case 6:
        println('Good!');
@@ -112,7 +112,7 @@ switch (result)
 ## Loops
 
 Loops are used to repeat an action until a condition is met.
-In AddyScript, we have 4 different kinds of loops. These are:
+In AddyScript, we have four different kinds of loops. These are:
 
 ### The While loop:
 

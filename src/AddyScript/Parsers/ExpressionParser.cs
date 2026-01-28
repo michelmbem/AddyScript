@@ -5,7 +5,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
-
 using Complex64 = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
@@ -14,7 +13,6 @@ using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.Utilities;
-
 using Blob = AddyScript.Runtime.DataItems.Blob;
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;

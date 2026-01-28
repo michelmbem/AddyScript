@@ -17,7 +17,6 @@ using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
 using AddyScript.Translators.Utility;
-
 using Boolean = AddyScript.Runtime.DataItems.Boolean;
 using Complex = AddyScript.Runtime.DataItems.Complex;
 using Label = AddyScript.Ast.Statements.Label;
