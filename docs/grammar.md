@@ -3,6 +3,8 @@
 Here is the complete grammar for the AddyScript programming language,
 represented using railroad diagrams and Extended Backus-Naur Form (EBNF) notation.
 
+## Axiom
+
 #### Program:
 
 ![Program](diagram/Program.svg)
@@ -10,6 +12,8 @@ represented using railroad diagrams and Extended Backus-Naur Form (EBNF) notatio
 ```
 Program ::= StatementWithLabels*
 ```
+
+## Non-terminal symbols
 
 #### StatementWithLabels:
 
@@ -467,6 +471,8 @@ Reference ::= VariableRef
 Expression ::= Assignment
 ```
 
+**Note:** _Expression_ is an axiom to the expressions sublanguage (which is recognized by the _ExpressionParser_).
+
 #### Assignment:
 
 ![Assignment](diagram/Assignment.svg)
@@ -893,6 +899,8 @@ Lambda   ::= '|' ( Parameter ( ',' Parameter )* )? '|' '=>' ( Expression ';' | B
 ```
 InlineFunction ::= 'function' ParameterList Block
 ```
+
+## Terminal symbols
 
 #### LETTER:
 
