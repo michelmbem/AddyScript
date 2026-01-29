@@ -1,6 +1,6 @@
 using System;
 using System.Numerics;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.NativeTypes;
@@ -31,7 +31,7 @@ public sealed class Integer(int value) : DataItem
 
     public override BigDecimal AsBigDecimal => value;
 
-    public override Complex64 AsComplex64 => new (value, 0);
+    public override SysComplex AsComplex => new (value, 0);
 
     public override object AsNativeObject => value;
 

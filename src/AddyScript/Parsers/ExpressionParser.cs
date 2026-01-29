@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -407,7 +407,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             TokenID.LT_Long => Literal(new Long((BigInteger)token.Value)),
             TokenID.LT_Float => Literal(new Float((double)token.Value)),
             TokenID.LT_Decimal => Literal(new Decimal((BigDecimal)token.Value)),
-            TokenID.LT_Complex => Literal(new Complex((Complex64)token.Value)),
+            TokenID.LT_Complex => Literal(new Complex((SysComplex)token.Value)),
             TokenID.LT_Date => Literal(new Date((DateTime)token.Value)),
             TokenID.LT_String => Literal(new String((string)token.Value)),
             TokenID.LT_Blob => Literal(new Blob((byte[])token.Value)),

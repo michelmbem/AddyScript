@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Translators;
@@ -45,7 +45,7 @@ public abstract class DataItem :
     public virtual BigDecimal AsBigDecimal =>
         throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Decimal.Name));
 
-    public virtual Complex64 AsComplex64 =>
+    public virtual SysComplex AsComplex =>
         throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Complex.Name));
 
     public virtual DateTime AsDateTime =>
@@ -146,7 +146,7 @@ public abstract class DataItem :
             ClassID.Rational => new Rational(AsFraction),
             ClassID.Float => new Float(AsDouble),
             ClassID.Decimal => new Decimal(AsBigDecimal),
-            ClassID.Complex => new Complex(AsComplex64),
+            ClassID.Complex => new Complex(AsComplex),
             ClassID.Date => new Date(AsDateTime),
             ClassID.String => new String(ToString()),
             ClassID.Blob => new Blob(AsByteArray),

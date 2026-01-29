@@ -1,5 +1,5 @@
 using System;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;
@@ -11,22 +11,22 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Complex : DataItem
 {
-    private readonly Complex64 value;
+    private readonly SysComplex value;
 
-    public Complex(Complex64 value) => this.value = value;
+    public Complex(SysComplex value) => this.value = value;
 
     public Complex(double realPart, double imaginaryPart = 0) =>
         value = new (realPart, imaginaryPart);
 
     public Complex Opposite => new (-value);
 
-    public Complex Conjugate => new (Complex64.Conjugate(value));
+    public Complex Conjugate => new (SysComplex.Conjugate(value));
 
     public override Class Class => Class.Complex;
 
-    public override bool AsBoolean => value != Complex64.Zero;
+    public override bool AsBoolean => value != SysComplex.Zero;
 
-    public override Complex64 AsComplex64 => value;
+    public override SysComplex AsComplex => value;
 
     public override object AsNativeObject => value;
 
@@ -43,7 +43,7 @@ public sealed class Complex : DataItem
              : $"({realString}+{imaginaryString})";
     }
 
-    protected override bool UnsafeEquals(DataItem other) => value == other.AsComplex64;
+    protected override bool UnsafeEquals(DataItem other) => value == other.AsComplex;
 
     public override int GetHashCode() => value.GetHashCode();
 
@@ -56,11 +56,11 @@ public sealed class Complex : DataItem
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
-        BinaryOperator.Plus => new Complex(value + operand.AsComplex64),
-        BinaryOperator.Minus => new Complex(value - operand.AsComplex64),
-        BinaryOperator.Times => new Complex(value * operand.AsComplex64),
-        BinaryOperator.Divide => new Complex(value / operand.AsComplex64),
-        BinaryOperator.Power => new Complex(Complex64.Pow(value, operand.AsComplex64)),
+        BinaryOperator.Plus => new Complex(value + operand.AsComplex),
+        BinaryOperator.Minus => new Complex(value - operand.AsComplex),
+        BinaryOperator.Times => new Complex(value * operand.AsComplex),
+        BinaryOperator.Divide => new Complex(value / operand.AsComplex),
+        BinaryOperator.Power => new Complex(SysComplex.Pow(value, operand.AsComplex)),
         _ => base.BinaryOperation(_operator, operand),
     };
 

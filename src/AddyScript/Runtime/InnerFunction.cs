@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -233,7 +233,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Sin(arg.AsComplex64))
+             ? new Complex(SysComplex.Sin(arg.AsComplex))
              : new Float(Math.Sin(arg.AsDouble));
     }
 
@@ -241,7 +241,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Cos(arg.AsComplex64))
+             ? new Complex(SysComplex.Cos(arg.AsComplex))
              : new Float(Math.Cos(arg.AsDouble));
     }
 
@@ -249,7 +249,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Tan(arg.AsComplex64))
+             ? new Complex(SysComplex.Tan(arg.AsComplex))
              : new Float(Math.Tan(arg.AsDouble));
     }
 
@@ -257,7 +257,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Asin(arg.AsComplex64))
+             ? new Complex(SysComplex.Asin(arg.AsComplex))
              : new Float(Math.Asin(arg.AsDouble));
     }
 
@@ -265,7 +265,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Acos(arg.AsComplex64))
+             ? new Complex(SysComplex.Acos(arg.AsComplex))
              : new Float(Math.Acos(arg.AsDouble));
     }
 
@@ -273,7 +273,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Atan(arg.AsComplex64))
+             ? new Complex(SysComplex.Atan(arg.AsComplex))
              : new Float(Math.Atan(arg.AsDouble));
     }
 
@@ -284,7 +284,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Sinh(arg.AsComplex64))
+             ? new Complex(SysComplex.Sinh(arg.AsComplex))
              : new Float(Math.Sinh(arg.AsDouble));
     }
 
@@ -292,7 +292,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Cosh(arg.AsComplex64))
+             ? new Complex(SysComplex.Cosh(arg.AsComplex))
              : new Float(Math.Cosh(arg.AsDouble));
     }
 
@@ -300,7 +300,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Tanh(arg.AsComplex64))
+             ? new Complex(SysComplex.Tanh(arg.AsComplex))
              : new Float(Math.Tanh(arg.AsDouble));
     }
 
@@ -314,7 +314,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Log(arg.AsComplex64))
+             ? new Complex(SysComplex.Log(arg.AsComplex))
              : new Float(Math.Log(arg.AsDouble));
     }
 
@@ -322,7 +322,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Log10(arg.AsComplex64))
+             ? new Complex(SysComplex.Log10(arg.AsComplex))
              : new Float(Math.Log10(arg.AsDouble));
     }
 
@@ -331,7 +331,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         DataItem arg = arguments[0];
         double baseValue = arguments[1].AsDouble;
         return arg is Complex
-             ? new Complex(Complex64.Log(arg.AsComplex64, baseValue))
+             ? new Complex(SysComplex.Log(arg.AsComplex, baseValue))
              : new Float(Math.Log(arg.AsDouble, baseValue));
     }
 
@@ -339,7 +339,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg = arguments[0];
         return arg is Complex
-             ? new Complex(Complex64.Exp(arg.AsComplex64))
+             ? new Complex(SysComplex.Exp(arg.AsComplex))
              : new Float(Math.Exp(arg.AsDouble));
     }
 
@@ -348,11 +348,11 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         DataItem arg = arguments[0];
 
         if (arg is Complex)
-            return new Complex(Complex64.Sqrt(arg.AsComplex64));
+            return new Complex(SysComplex.Sqrt(arg.AsComplex));
 
         double x = arg.AsDouble;
         return x < 0
-             ? new Complex(Complex64.ImaginaryOne * Math.Sqrt(-x))
+             ? new Complex(SysComplex.ImaginaryOne * Math.Sqrt(-x))
              : new Float(Math.Sqrt(x));
     }
 
@@ -380,7 +380,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
             Rational => new Rational(arg.AsFraction.Abs()),
             Float => new Float(Math.Abs(arg.AsDouble)),
             Decimal => new Decimal(arg.AsBigDecimal.Abs()),
-            Complex => new Float(Complex64.Abs(arg.AsComplex64)),
+            Complex => new Float(SysComplex.Abs(arg.AsComplex)),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "abs,", arg.Class.Name)),
         };
     }
@@ -813,7 +813,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         new Complex(arguments[0].AsDouble, arguments[1].AsDouble);
 
     private static DataItem ComplexConjugateLogic(DataItem[] arguments) =>
-        new Complex(Complex64.Conjugate(arguments[0].AsComplex64));
+        new Complex(SysComplex.Conjugate(arguments[0].AsComplex));
 
     #endregion
 

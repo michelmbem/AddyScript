@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
@@ -93,7 +93,7 @@ public class Constant : IFrameItem
     /// Initializes a complex constant.
     /// </summary>
     /// <param name="value">The constant's value</param>
-    public Constant(Complex64 value)
+    public Constant(SysComplex value)
     {
         Value = new Complex(value);
     }

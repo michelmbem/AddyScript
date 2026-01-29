@@ -1,6 +1,6 @@
 using System;
 using System.Numerics;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.NativeTypes;
@@ -45,7 +45,7 @@ public sealed class Rational : DataItem
 
     public override BigDecimal AsBigDecimal => (BigDecimal)value;
 
-    public override Complex64 AsComplex64 => new ((double)value, 0);
+    public override SysComplex AsComplex => new ((double)value, 0);
 
     public override object AsNativeObject => value;
 

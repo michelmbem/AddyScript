@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Complex64 = System.Numerics.Complex;
+using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;
@@ -36,7 +36,7 @@ public static class DataItemFactory
                 BigInteger bigint => new Long(bigint),
                 BigDecimal bigdec => new Decimal(bigdec),
                 Fraction rational => new Rational(rational),
-                Complex64 complex => new Complex(complex),
+                SysComplex complex => new Complex(complex),
                 TimeSpan timespan => new Duration(timespan),
                 byte[] bytes => new Blob(bytes),
                 DataItem[] items => new Tuple(items),
