@@ -35,7 +35,7 @@ public static class DataItemFactory
                 DataItem dataItem => dataItem,
                 BigInteger bigint => new Long(bigint),
                 BigDecimal bigdec => new Decimal(bigdec),
-                Rational32 rational => new Rational(rational),
+                Fraction rational => new Rational(rational),
                 Complex64 complex => new Complex(complex),
                 TimeSpan timespan => new Duration(timespan),
                 byte[] bytes => new Blob(bytes),

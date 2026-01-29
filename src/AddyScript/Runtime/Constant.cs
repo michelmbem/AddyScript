@@ -66,7 +66,7 @@ public class Constant : IFrameItem
     /// Initializes a rational constant.
     /// </summary>
     /// <param name="value">The constant's value</param>
-    public Constant(Rational32 value)
+    public Constant(Fraction value)
     {
         Value = new Rational(value);
     }

@@ -9,25 +9,25 @@ namespace AddyScript.Runtime.NativeTypes;
 
 
 [Serializable]
-public readonly struct Rational32 :
-    IFormattable, IConvertible, IComparable, IComparable<Rational32>, IEquatable<Rational32>
+public readonly struct Fraction :
+    IFormattable, IConvertible, IComparable, IComparable<Fraction>, IEquatable<Fraction>
 {
     #region Fields
 
-    public static readonly Rational32 MinusOne = new (-1);
-    public static readonly Rational32 Zero = new (0);
-    public static readonly Rational32 One = new (1);
-    public static readonly Rational32 Half = new (1, 2);
-    public static readonly Rational32 Third = new (1, 3);
+    public static readonly Fraction MinusOne = new (-1L);
+    public static readonly Fraction Zero = new (0L);
+    public static readonly Fraction One = new (1L);
+    public static readonly Fraction Half = new (1L, 2L);
+    public static readonly Fraction Third = new (1L, 3L);
 
-    private readonly int numerator;
-    private readonly int denominator;
+    private readonly long numerator;
+    private readonly long denominator;
 
     #endregion
 
     #region Constructors
 
-    public Rational32(int num, int den = 1)
+    public Fraction(long num, long den = 1L)
     {
         if (den == 0) throw new DivideByZeroException();
 
@@ -39,8 +39,10 @@ public readonly struct Rational32 :
 
     #region Properties
 
-    public int Numerator => numerator;
-    public int Denominator => denominator;
+    public long Numerator => numerator;
+
+    public long Denominator => denominator;
+
     public int Sign => Math.Sign(numerator);
 
     #endregion
@@ -60,8 +62,8 @@ public readonly struct Rational32 :
     /// <filterpriority>2</filterpriority>
     public string ToString(string format, IFormatProvider formatProvider)
     {
-        if (denominator == 1) return numerator.ToString(format, formatProvider);
-        return string.Format(formatProvider, "({0:" + format + "}/{1:" + format + "})", numerator, denominator);
+        if (denominator == 1L) return numerator.ToString(format, formatProvider);
+        return string.Format(formatProvider, $"({{0:{format}}}/{{1:{format}}})", numerator, denominator);
     }
 
     #endregion
@@ -75,10 +77,7 @@ public readonly struct Rational32 :
     /// The enumerated constant that is the <see cref="TypeCode" /> of the class or value type that implements this interface.
     /// </returns>
     /// <filterpriority>2</filterpriority>
-    public TypeCode GetTypeCode()
-    {
-        return TypeCode.Object;
-    }
+    public TypeCode GetTypeCode() => TypeCode.Object;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Boolean value using the specified culture-specific formatting information.
@@ -88,10 +87,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public bool ToBoolean(IFormatProvider provider)
-    {
-        return numerator != 0;
-    }
+    public bool ToBoolean(IFormatProvider provider) => numerator != 0L;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.
@@ -101,10 +97,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public char ToChar(IFormatProvider provider)
-    {
-        return (char)(numerator / denominator);
-    }
+    public char ToChar(IFormatProvider provider) => (char)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific formatting information.
@@ -114,10 +107,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public sbyte ToSByte(IFormatProvider provider)
-    {
-        return (sbyte)(numerator / denominator);
-    }
+    public sbyte ToSByte(IFormatProvider provider) => (sbyte)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified culture-specific formatting information.
@@ -127,10 +117,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public byte ToByte(IFormatProvider provider)
-    {
-        return (byte)(numerator / denominator);
-    }
+    public byte ToByte(IFormatProvider provider) => (byte)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit signed integer using the specified culture-specific formatting information.
@@ -140,10 +127,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public short ToInt16(IFormatProvider provider)
-    {
-        return (short)(numerator / denominator);
-    }
+    public short ToInt16(IFormatProvider provider) => (short)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified culture-specific formatting information.
@@ -153,10 +137,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ushort ToUInt16(IFormatProvider provider)
-    {
-        return (ushort)(numerator / denominator);
-    }
+    public ushort ToUInt16(IFormatProvider provider) => (ushort)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
@@ -166,10 +147,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public int ToInt32(IFormatProvider provider)
-    {
-        return numerator / denominator;
-    }
+    public int ToInt32(IFormatProvider provider) => (int)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
@@ -179,10 +157,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public uint ToUInt32(IFormatProvider provider)
-    {
-        return (uint)(numerator / denominator);
-    }
+    public uint ToUInt32(IFormatProvider provider) => (uint)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit signed integer using the specified culture-specific formatting information.
@@ -192,10 +167,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public long ToInt64(IFormatProvider provider)
-    {
-        return numerator / denominator;
-    }
+    public long ToInt64(IFormatProvider provider) => numerator / denominator;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified culture-specific formatting information.
@@ -205,10 +177,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ulong ToUInt64(IFormatProvider provider)
-    {
-        return (ulong)(numerator / denominator);
-    }
+    public ulong ToUInt64(IFormatProvider provider) => (ulong)ToInt64(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent single-precision floating-point number using the specified culture-specific formatting information.
@@ -218,10 +187,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public float ToSingle(IFormatProvider provider)
-    {
-        return (float)numerator / denominator;
-    }
+    public float ToSingle(IFormatProvider provider) => (float)numerator / denominator;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.
@@ -231,10 +197,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public double ToDouble(IFormatProvider provider)
-    {
-        return (double)numerator / denominator;
-    }
+    public double ToDouble(IFormatProvider provider) => (double)numerator / denominator;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="T:System.Decimal" /> number using the specified culture-specific formatting information.
@@ -244,10 +207,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public decimal ToDecimal(IFormatProvider provider)
-    {
-        return (decimal)numerator / denominator;
-    }
+    public decimal ToDecimal(IFormatProvider provider) => (decimal)numerator / denominator;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="DateTime" /> using the specified culture-specific formatting information.
@@ -257,10 +217,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public DateTime ToDateTime(IFormatProvider provider)
-    {
-        throw new InvalidCastException();
-    }
+    public DateTime ToDateTime(IFormatProvider provider) => throw new InvalidCastException();
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="string" /> using the specified culture-specific formatting information.
@@ -270,10 +227,7 @@ public readonly struct Rational32 :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public string ToString(IFormatProvider provider)
-    {
-        return ToString("g", provider);
-    }
+    public string ToString(IFormatProvider provider) => ToString("g", provider);
 
     /// <summary>
     /// Converts the value of this instance to an <see cref="object" /> of the specified <see cref="Type" /> that has an equivalent value, using the specified culture-specific formatting information.
@@ -284,13 +238,8 @@ public readonly struct Rational32 :
     /// <param name="conversionType">The <see cref="Type" /> to which the value of this instance is converted.</param>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public object ToType(Type conversionType, IFormatProvider provider)
-    {
-        if (conversionType == typeof(Rational32))
-            return this;
-
-        throw new InvalidCastException();
-    }
+    public object ToType(Type conversionType, IFormatProvider provider) =>
+        conversionType == typeof(Fraction) ? this : throw new InvalidCastException();
 
     #endregion
 
@@ -307,12 +256,9 @@ public readonly struct Rational32 :
     /// <param name="obj">An object to compare with this instance.</param>
     /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
-    public int CompareTo(object obj)
-    {
-        return obj is Rational32 rational
+    public int CompareTo(object obj) => obj is Fraction rational
              ? CompareTo(rational)
              : throw new ArgumentException("obj should be a Rational32");
-    }
 
     #endregion
 
@@ -329,7 +275,7 @@ public readonly struct Rational32 :
     /// Greater than zero: this instance is greater than <paramref name="obj" />.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public int CompareTo(Rational32 other)
+    public int CompareTo(Fraction other)
     {
         if (this == other) return 0;
         return this < other ? -1 : 1;
@@ -346,53 +292,35 @@ public readonly struct Rational32 :
     /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public bool Equals(Rational32 other)
-    {
-        return this == other;
-    }
+    public bool Equals(Fraction other) => this == other;
 
     #endregion
 
-    public override bool Equals(object obj)
+    public override bool Equals(object obj) => obj is Fraction fraction && this == fraction;
+
+    public override int GetHashCode() => HashCode.Combine(numerator, denominator);
+
+    public override string ToString() => ToString("g", CultureInfo.CurrentUICulture);
+
+    public Fraction Abs() => new Fraction(Math.Abs(numerator), denominator);
+
+    public Fraction Inverse() => new Fraction(denominator, numerator);
+
+    public Fraction Simplify()
     {
-        return obj is Rational32 rational && this == rational;
+        if (numerator == 0L || denominator == 1L) return this;
+        long gcd = MathExt.Gcd(Math.Abs(numerator), denominator);
+        return gcd == 1L ? this : new Fraction(numerator / gcd, denominator / gcd);
     }
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(numerator, denominator);
-    }
-
-    public override string ToString()
-    {
-        return ToString("g", CultureInfo.CurrentUICulture);
-    }
-
-    public Rational32 Abs()
-    {
-        return new Rational32(Math.Abs(numerator), denominator);
-    }
-
-    public Rational32 Inverse()
-    {
-        return new Rational32(denominator, numerator);
-    }
-
-    public Rational32 Simplify()
-    {
-        if (numerator == 0 || denominator == 1) return this;
-        int gcd = MathUtil.Gcd(Math.Abs(numerator), denominator);
-        return gcd == 1 ? this : new Rational32(numerator / gcd, denominator / gcd);
-    }
-
-    public Rational32 Power(int exp)
+    public Fraction Power(int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
 
         if (exp == 0) return One;
 
-        Rational32 factor = this;
-        Rational32 result = One;
+        Fraction factor = this;
+        Fraction result = One;
 
         while (exp != 0)
         {
@@ -405,7 +333,7 @@ public readonly struct Rational32 :
         return result;
     }
 
-    public static void ToCommonDenominator(Rational32 a, Rational32 b, out Rational32 c, out Rational32 d)
+    public static void ToCommonDenominator(Fraction a, Fraction b, out Fraction c, out Fraction d)
     {
         if (a.denominator == b.denominator)
         {
@@ -414,9 +342,9 @@ public readonly struct Rational32 :
         }
         else
         {
-            int commonDeno = a.denominator * b.denominator;
-            c = new Rational32(a.numerator * b.denominator, commonDeno);
-            d = new Rational32(b.numerator * a.denominator, commonDeno);
+            long commonDeno = a.denominator * b.denominator;
+            c = new Fraction(a.numerator * b.denominator, commonDeno);
+            d = new Fraction(b.numerator * a.denominator, commonDeno);
         }
     }
 
@@ -426,174 +354,105 @@ public readonly struct Rational32 :
 
     #region Conversion from other types
 
-    public static implicit operator Rational32(sbyte n)
+    public static implicit operator Fraction(sbyte n) => new (n);
+
+    public static implicit operator Fraction(byte n) => new (n);
+
+    public static implicit operator Fraction(short n) => new (n);
+
+    public static implicit operator Fraction(ushort n) => new (n);
+
+    public static implicit operator Fraction(int n) => new (n);
+
+    public static explicit operator Fraction(uint n) => new (n);
+
+    public static explicit operator Fraction(long n) => new (n);
+
+    public static explicit operator Fraction(ulong n) => new ((long)n);
+
+    public static explicit operator Fraction(float x)
     {
-        return new Rational32(n);
+        var (num, den) = MathExt.ToRational(x);
+        return new Fraction(num, den);
     }
 
-    public static implicit operator Rational32(byte n)
+    public static explicit operator Fraction(double x)
     {
-        return new Rational32(n);
+        var (num, den) = MathExt.ToRational(x);
+        return new Fraction(num, den);
     }
 
-    public static implicit operator Rational32(short n)
-    {
-        return new Rational32(n);
-    }
+    public static explicit operator Fraction(decimal d) => (Fraction)new BigDecimal(d);
 
-    public static implicit operator Rational32(ushort n)
-    {
-        return new Rational32(n);
-    }
-
-    public static implicit operator Rational32(int n)
-    {
-        return new Rational32(n);
-    }
-
-    public static explicit operator Rational32(uint n)
-    {
-        return new Rational32((int)n);
-    }
-
-    public static explicit operator Rational32(long n)
-    {
-        return new Rational32((int)n);
-    }
-
-    public static explicit operator Rational32(ulong n)
-    {
-        return new Rational32((int)n);
-    }
-
-    public static explicit operator Rational32(float x)
-    {
-        var (num, den) = MathUtil.ToRational(x);
-        return new Rational32((int)num, (int)den);
-    }
-
-    public static explicit operator Rational32(double x)
-    {
-        var (num, den) = MathUtil.ToRational(x);
-        return new Rational32((int)num, (int)den);
-    }
-
-    public static explicit operator Rational32(decimal d)
-    {
-        return (Rational32)new BigDecimal(d);
-    }
-
-    public static explicit operator Rational32(BigInteger n)
-    {
-        return new Rational32((int)n);
-    }
+    public static explicit operator Fraction(BigInteger n) => new ((long)n);
 
     #endregion
 
     #region Conversion to other types
 
-    public static explicit operator sbyte(Rational32 self)
-    {
-        return self.ToSByte(null);
-    }
+    public static explicit operator sbyte(Fraction self) => self.ToSByte(null);
 
-    public static explicit operator byte(Rational32 self)
-    {
-        return self.ToByte(null);
-    }
+    public static explicit operator byte(Fraction self) => self.ToByte(null);
 
-    public static explicit operator short(Rational32 self)
-    {
-        return self.ToInt16(null);
-    }
+    public static explicit operator short(Fraction self) => self.ToInt16(null);
 
-    public static explicit operator ushort(Rational32 self)
-    {
-        return self.ToUInt16(null);
-    }
+    public static explicit operator ushort(Fraction self) => self.ToUInt16(null);
 
-    public static explicit operator int(Rational32 self)
-    {
-        return self.ToInt32(null);
-    }
+    public static explicit operator int(Fraction self) => self.ToInt32(null);
 
-    public static explicit operator uint(Rational32 self)
-    {
-        return self.ToUInt32(null);
-    }
+    public static explicit operator uint(Fraction self) => self.ToUInt32(null);
 
-    public static explicit operator long(Rational32 self)
-    {
-        return self.ToInt64(null);
-    }
+    public static explicit operator long(Fraction self) => self.ToInt64(null);
 
-    public static explicit operator ulong(Rational32 self)
-    {
-        return self.ToUInt64(null);
-    }
+    public static explicit operator ulong(Fraction self) => self.ToUInt64(null);
 
-    public static explicit operator float(Rational32 self)
-    {
-        return self.ToSingle(null);
-    }
+    public static explicit operator float(Fraction self) => self.ToSingle(null);
 
-    public static explicit operator double(Rational32 self)
-    {
-        return self.ToDouble(null);
-    }
+    public static explicit operator double(Fraction self) => self.ToDouble(null);
 
-    public static explicit operator decimal(Rational32 self)
-    {
-        return self.ToDecimal(null);
-    }
+    public static explicit operator decimal(Fraction self) => self.ToDecimal(null);
 
-    public static explicit operator BigInteger(Rational32 self)
-    {
-        return new BigInteger(self.ToInt64(null));
-    }
+    public static explicit operator BigInteger(Fraction self) => new (self.ToInt64(null));
 
-    public static explicit operator BigDecimal(Rational32 self)
-    {
-        return new BigDecimal(self.ToDecimal(null));
-    }
+    public static explicit operator BigDecimal(Fraction self) => new (self.ToDecimal(null));
 
     #endregion
 
     #region Relational
 
-    public static bool operator ==(Rational32 a, Rational32 b)
+    public static bool operator ==(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator == d.numerator;
     }
 
-    public static bool operator !=(Rational32 a, Rational32 b)
+    public static bool operator !=(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator != d.numerator;
     }
 
-    public static bool operator <(Rational32 a, Rational32 b)
+    public static bool operator <(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator < d.numerator;
     }
 
-    public static bool operator >(Rational32 a, Rational32 b)
+    public static bool operator >(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator > d.numerator;
     }
 
-    public static bool operator <=(Rational32 a, Rational32 b)
+    public static bool operator <=(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator <= d.numerator;
     }
 
-    public static bool operator >=(Rational32 a, Rational32 b)
+    public static bool operator >=(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
         return c.numerator >= d.numerator;
     }
 
@@ -601,32 +460,25 @@ public readonly struct Rational32 :
 
     #region Arithmetic
 
-    public static Rational32 operator -(Rational32 a)
+    public static Fraction operator -(Fraction a) => new (-a.numerator, a.denominator);
+
+    public static Fraction operator +(Fraction a, Fraction b)
     {
-        return new Rational32(-a.numerator, a.denominator);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
+        return new Fraction(c.numerator + d.numerator, c.denominator);
     }
 
-    public static Rational32 operator +(Rational32 a, Rational32 b)
+    public static Fraction operator -(Fraction a, Fraction b)
     {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
-        return new Rational32(c.numerator + d.numerator, c.denominator);
+        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
+        return new Fraction(c.numerator - d.numerator, c.denominator);
     }
 
-    public static Rational32 operator -(Rational32 a, Rational32 b)
-    {
-        ToCommonDenominator(a, b, out Rational32 c, out Rational32 d);
-        return new Rational32(c.numerator - d.numerator, c.denominator);
-    }
+    public static Fraction operator *(Fraction a, Fraction b) =>
+        new (a.numerator * b.numerator, a.denominator * b.denominator);
 
-    public static Rational32 operator *(Rational32 a, Rational32 b)
-    {
-        return new Rational32(a.numerator * b.numerator, a.denominator * b.denominator);
-    }
-
-    public static Rational32 operator /(Rational32 a, Rational32 b)
-    {
-        return new Rational32(a.numerator * b.denominator, a.denominator * b.numerator);
-    }
+    public static Fraction operator /(Fraction a, Fraction b) =>
+        new (a.numerator * b.denominator, a.denominator * b.numerator);
 
     #endregion
 

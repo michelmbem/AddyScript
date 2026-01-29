@@ -12,7 +12,7 @@ Thus, rational numbers are represented in AddyScript by the **rational** data ty
 Variables of this type can be used in arithmetic operations like other numeric data.
 However, there is no literal or initializer for the **rational** type.
 The only way to get a rational number is to divide two integers.
-Also note that some operations on rational numbers can return an integer.
+Also note that some operations on rational numbers can return an integer (actually a **long**).
 Here is an example of a script using rational numbers:
 
 Example:
@@ -56,9 +56,9 @@ The following table summarizes the members of the **rational** type and their us
 
 |Member|Nature|Description|
 |-|-|-|
-|`int num { read; }`|property|Gets the numerator of the target rational number.|
-|`int den { read; }`|property|Gets the denominator of the target rational number.|
-|`rational\|int inverse()`|method|Gets the inverse of the target rational number.<br>This can be another rational number or an integer.|
+|`long num { read; }`|property|Gets the numerator of the target rational number.|
+|`long den { read; }`|property|Gets the denominator of the target rational number.|
+|`rational|long inverse()`|method|Gets the inverse of the target rational number.<br>This can be another rational number or a big integer.|
 
 ## Complex Numbers
 

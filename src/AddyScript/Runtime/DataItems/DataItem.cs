@@ -36,7 +36,7 @@ public abstract class DataItem :
     public virtual BigInteger AsBigInteger =>
         throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Long.Name));
 
-    public virtual Rational32 AsRational32 =>
+    public virtual Fraction AsFraction =>
         throw new InvalidCastException(string.Format(Resources.CannotConvert, Class.Name, Class.Rational.Name));
 
     public virtual double AsDouble =>
@@ -143,7 +143,7 @@ public abstract class DataItem :
             ClassID.Boolean => Boolean.FromBool(AsBoolean),
             ClassID.Integer => new Integer(AsInt32),
             ClassID.Long => new Long(AsBigInteger),
-            ClassID.Rational => new Rational(AsRational32),
+            ClassID.Rational => new Rational(AsFraction),
             ClassID.Float => new Float(AsDouble),
             ClassID.Decimal => new Decimal(AsBigDecimal),
             ClassID.Complex => new Complex(AsComplex64),

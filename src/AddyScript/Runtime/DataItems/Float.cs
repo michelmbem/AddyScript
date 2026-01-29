@@ -17,13 +17,13 @@ public sealed class Float(double value) : DataItem
 
     public override Class Class => Class.Float;
 
-    public override bool AsBoolean => MathUtil.Equal(value, 0.0);
+    public override bool AsBoolean => MathExt.Equal(value, 0.0);
 
     public override int AsInt32 => (int)value;
 
     public override BigInteger AsBigInteger => new (value);
 
-    public override Rational32 AsRational32 => (Rational32)value;
+    public override Fraction AsFraction => (Fraction)value;
 
     public override double AsDouble => value;
 
@@ -47,7 +47,7 @@ public sealed class Float(double value) : DataItem
         if (double.IsNegativeInfinity(x))
             return double.IsNegativeInfinity(value);
 
-        return MathUtil.Equal(value, x);
+        return MathExt.Equal(value, x);
     }
 
     public override int GetHashCode() => value.GetHashCode();
@@ -67,7 +67,7 @@ public sealed class Float(double value) : DataItem
         BinaryOperator.Minus => new Float(value - operand.AsDouble),
         BinaryOperator.Times => new Float(value * operand.AsDouble),
         BinaryOperator.Divide => new Float(value / operand.AsDouble),
-        BinaryOperator.Modulo => new Float(MathUtil.Modulo(value, operand.AsDouble)),
+        BinaryOperator.Modulo => new Float(MathExt.Modulo(value, operand.AsDouble)),
         BinaryOperator.Power => new Float(Math.Pow(value, operand.AsDouble)),
         BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsDouble),
         BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsDouble),

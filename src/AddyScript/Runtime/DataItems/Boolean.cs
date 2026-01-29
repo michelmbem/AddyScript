@@ -32,7 +32,7 @@ public sealed class Boolean : DataItem
 
     public override BigInteger AsBigInteger => value ? BigInteger.One : BigInteger.Zero;
 
-    public override Rational32 AsRational32 => value ? Rational32.One : Rational32.Zero;
+    public override Fraction AsFraction => value ? Fraction.One : Fraction.Zero;
 
     public override double AsDouble => value ? 1.0 : 0.0;
 

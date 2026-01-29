@@ -24,7 +24,7 @@ public sealed class Long(BigInteger value) : DataItem
 
     public override BigInteger AsBigInteger => value;
 
-    public override Rational32 AsRational32 => (Rational32)value;
+    public override Fraction AsFraction => (Fraction)value;
 
     public override double AsDouble => (double)value;
 

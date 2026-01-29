@@ -22,7 +22,7 @@ public sealed class Void : DataItem
 
     public override BigInteger AsBigInteger => BigInteger.Zero;
 
-    public override Rational32 AsRational32 => Rational32.Zero;
+    public override Fraction AsFraction => Fraction.Zero;
 
     public override double AsDouble => 0.0;
 

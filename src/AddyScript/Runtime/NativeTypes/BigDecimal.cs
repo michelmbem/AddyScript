@@ -583,10 +583,10 @@ public partial struct BigDecimal :
 
     public static explicit operator BigInteger(BigDecimal self) => self.Round(0).unscaled;
 
-    public static explicit operator Rational32(BigDecimal self)
+    public static explicit operator Fraction(BigDecimal self)
     {
         var (num, den) = self.ToRational();
-        return new Rational32((int)num, (int)den);
+        return new Fraction(num, den);
     }
 
     #endregion
@@ -767,7 +767,7 @@ public partial struct BigDecimal :
         return new BigDecimal(r, a.scale).Deflate();
     }
 
-    private readonly (long, long) ToRational() => ((long)unscaled, MathUtil.Pow(10, scale));
+    private readonly (long, long) ToRational() => ((long)unscaled, MathExt.Pow(10L, scale));
 
     #endregion
 }

@@ -12,17 +12,19 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Rational : DataItem
 {
-    private readonly Rational32 value;
+    private readonly Fraction value;
 
-    public Rational(Rational32 value) => this.value = value;
+    public Rational(Fraction value) => this.value = value;
 
-    public Rational(int numerator, int denominator = 1) =>
-        value = new Rational32(numerator, denominator);
+    public Rational(long numerator, long denominator = 1L) =>
+        value = new Fraction(numerator, denominator);
 
-    public static DataItem Simplify(Rational32 rational)
+    public static DataItem Simplify(Fraction rational)
     {
         var simplified = rational.Simplify();
-        return simplified.Denominator == 1 ? new Integer(simplified.Numerator) : new Rational(simplified);
+        return simplified.Denominator == 1L
+             ? new Long(simplified.Numerator)
+             : new Rational(simplified);
     }
 
     public Rational Opposite => new (-value);
@@ -37,7 +39,7 @@ public sealed class Rational : DataItem
 
     public override BigInteger AsBigInteger => (BigInteger)value;
 
-    public override Rational32 AsRational32 => value;
+    public override Fraction AsFraction => value;
 
     public override double AsDouble => (double)value;
 
@@ -50,7 +52,7 @@ public sealed class Rational : DataItem
     public override string ToString(string format, IFormatProvider formatProvider) =>
         value.ToString(format, formatProvider);
 
-    protected override bool UnsafeEquals(DataItem other) => value == other.AsRational32;
+    protected override bool UnsafeEquals(DataItem other) => value == other.AsFraction;
 
     public override int GetHashCode() => value.GetHashCode();
 
@@ -63,22 +65,22 @@ public sealed class Rational : DataItem
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
-        BinaryOperator.Plus => Simplify(value + operand.AsRational32),
-        BinaryOperator.Minus => Simplify(value - operand.AsRational32),
-        BinaryOperator.Times => Simplify(value * operand.AsRational32),
-        BinaryOperator.Divide => Simplify(value / operand.AsRational32),
+        BinaryOperator.Plus => Simplify(value + operand.AsFraction),
+        BinaryOperator.Minus => Simplify(value - operand.AsFraction),
+        BinaryOperator.Times => Simplify(value * operand.AsFraction),
+        BinaryOperator.Divide => Simplify(value / operand.AsFraction),
         BinaryOperator.Power => new Rational(value.Power(operand.AsInt32)),
-        BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsRational32),
-        BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsRational32),
-        BinaryOperator.GreaterThan => Boolean.FromBool(value > operand.AsRational32),
-        BinaryOperator.GreaterThanOrEqual => Boolean.FromBool(value >= operand.AsRational32),
+        BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsFraction),
+        BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsFraction),
+        BinaryOperator.GreaterThan => Boolean.FromBool(value > operand.AsFraction),
+        BinaryOperator.GreaterThanOrEqual => Boolean.FromBool(value >= operand.AsFraction),
         _ => base.BinaryOperation(_operator, operand),
     };
 
     public override DataItem GetProperty(string propertyName) => propertyName switch
     {
-        "num" => new Integer(value.Numerator),
-        "den" => new Integer(value.Denominator),
+        "num" => new Long(value.Numerator),
+        "den" => new Long(value.Denominator),
         _ => base.GetProperty(propertyName),
     };
 }

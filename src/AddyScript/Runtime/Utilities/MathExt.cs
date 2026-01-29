@@ -6,19 +6,18 @@ using AddyScript.Properties;
 namespace AddyScript.Runtime.Utilities;
 
 
-public static class MathUtil
+public static class MathExt
 {
     public static bool Equal(double a, double b, double tolerance = double.Epsilon) =>
         Math.Abs(a - b) <= tolerance;
 
-    public static int Pow(int n, int exp)
+    public static long Pow(long n, int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
 
-        if (exp == 0) return 1;
+        if (exp == 0) return 1L;
 
-        int factor = n;
-        int result = 1;
+        var (factor, result) = (n, 1L);
 
         while (exp != 0)
         {
@@ -31,7 +30,7 @@ public static class MathUtil
         return result;
     }
 
-    public static int Gcd(int a, int b)
+    public static long Gcd(long a, long b)
     {
         if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), Resources.CannotComputeGcdForNegative);
         if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), Resources.CannotComputeGcdForNegative);
@@ -75,7 +74,7 @@ public static class MathUtil
         var (h1, h2, k1, k2) = (1L, 0L, 0L, 1L);
         var b = value;
 
-        do
+        while (true)
         {
             var a = (long)Math.Floor(b);
             var h = a * h1 + h2;
@@ -86,6 +85,6 @@ public static class MathUtil
 
             (h2, h1, k2, k1) = (h1, h, k1, k);
             b = 1.0 / (b - a);
-        } while (true);
+        }
     }
 }

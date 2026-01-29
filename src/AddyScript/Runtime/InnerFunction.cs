@@ -363,7 +363,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         {
             Integer => new Integer(Math.Sign(arg.AsInt32)),
             Long => new Integer(arg.AsBigInteger.Sign),
-            Rational => new Integer(arg.AsRational32.Sign),
+            Rational => new Integer(arg.AsFraction.Sign),
             Float => new Integer(Math.Sign(arg.AsDouble)),
             Decimal => new Integer(arg.AsBigDecimal.Sign),
             _ => throw new InvalidOperationException(string.Format(Resources.TypeDoesNotSupportFunction, "sign,", arg.Class.Name)),
@@ -377,7 +377,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         {
             Integer => new Integer(Math.Abs(arg.AsInt32)),
             Long => new Long(BigInteger.Abs(arg.AsBigInteger)),
-            Rational => new Rational(arg.AsRational32.Abs()),
+            Rational => new Rational(arg.AsFraction.Abs()),
             Float => new Float(Math.Abs(arg.AsDouble)),
             Decimal => new Decimal(arg.AsBigDecimal.Abs()),
             Complex => new Float(Complex64.Abs(arg.AsComplex64)),
@@ -803,7 +803,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     #region Rational specific methods
 
     private static DataItem RationalInverseLogic(DataItem[] arguments) =>
-        new Rational(arguments[0].AsRational32.Inverse());
+        new Rational(arguments[0].AsFraction.Inverse());
 
     #endregion
 

@@ -32,8 +32,8 @@ public sealed class Complex : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        var realString = MathUtil.Equal(value.Real, 0) ? null : value.Real.ToString(format);
-        var imaginaryString = MathUtil.Equal(value.Imaginary, 0) ? null : value.Imaginary.ToString(format) + 'i';
+        var realString = MathExt.Equal(value.Real, 0) ? null : value.Real.ToString(format);
+        var imaginaryString = MathExt.Equal(value.Imaginary, 0) ? null : value.Imaginary.ToString(format) + 'i';
 
         if (realString == null) return imaginaryString ?? "0";
         if (imaginaryString == null) return realString;
