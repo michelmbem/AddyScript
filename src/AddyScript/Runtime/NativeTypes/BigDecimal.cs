@@ -16,16 +16,17 @@ public partial struct BigDecimal :
 {
     #region Fields
 
-    private const int MAX_SCALE = 50; // Note: Well, this is an arbitrary value!
+    // We are fixing an arbitrary limit of 50 decimal digits for big decimals.
+    private const int MAX_SCALE = 50;
+
+    private static readonly Regex DecimalRegex = GetDecimalRegex();
+    private static readonly BigInteger BigIntegerTen = new (10);
 
     public static readonly BigDecimal MinusOne = new (BigInteger.MinusOne, 0);
     public static readonly BigDecimal Zero = new (BigInteger.Zero, 0);
     public static readonly BigDecimal One = new (BigInteger.One, 0);
     public static readonly BigDecimal Ten = new (BigIntegerTen, 0);
     public static readonly BigDecimal PointOne = new (BigInteger.One, 1);
-
-    private static readonly BigInteger BigIntegerTen = new (10);
-    private static readonly Regex DecimalRegex = GetDecimalRegex();
 
     private readonly BigInteger unscaled;
     private readonly int scale;
@@ -40,55 +41,34 @@ public partial struct BigDecimal :
         this.scale = scale;
     }
 
-    public BigDecimal(int n) : this(new BigInteger(n))
-    {
-    }
+    public BigDecimal(int n) : this(new BigInteger(n)) { }
 
-    public BigDecimal(uint n) : this(new BigInteger(n))
-    {
-    }
+    public BigDecimal(uint n) : this(new BigInteger(n)) { }
 
-    public BigDecimal(long n) : this(new BigInteger(n))
-    {
-    }
+    public BigDecimal(long n) : this(new BigInteger(n)) { }
 
-    public BigDecimal(ulong n) : this(new BigInteger(n))
-    {
-    }
+    public BigDecimal(ulong n) : this(new BigInteger(n)) { }
 
-    public BigDecimal(BigInteger i) : this(i, 0)
-    {
-    }
+    public BigDecimal(BigInteger i) : this(i, 0) { }
 
-    public BigDecimal(float x) : this(x.ToString(CultureInfo.InvariantCulture))
-    {
-    }
+    public BigDecimal(float x) : this(x.ToString(CultureInfo.InvariantCulture)) { }
 
-    public BigDecimal(double x) : this(x.ToString(CultureInfo.InvariantCulture))
-    {
-    }
+    public BigDecimal(double x) : this(x.ToString(CultureInfo.InvariantCulture)) { }
 
-    public BigDecimal(decimal d) : this(d.ToString(CultureInfo.InvariantCulture))
-    {
-    }
+    public BigDecimal(decimal d) : this(d.ToString(CultureInfo.InvariantCulture)) { }
 
     public BigDecimal(string s)
     {
         if (string.IsNullOrEmpty(s)) throw new FormatException();
 
-        switch (s[0])
+        var input = s[0] switch
         {
-            case '.':
-                s = "0" + s;
-                break;
-            case '+':
-            case '-':
-                if (s.Length > 1 && s[1] == '.')
-                    s = s.Insert(1, "0");
-                break;
-        }
+            '.' => "0" + s,
+            '+' or '-' when s.Length > 1 && s[1] == '.' => s.Insert(1, "0"),
+            _ => s
+        };
 
-        Match match = DecimalRegex.Match(s);
+        Match match = DecimalRegex.Match(input);
         if (!match.Success) throw new FormatException();
 
         StringBuilder sb = new ();
@@ -190,10 +170,7 @@ public partial struct BigDecimal :
     /// The enumerated constant that is the <see cref="TypeCode" /> of the class or value type that implements this interface.
     /// </returns>
     /// <filterpriority>2</filterpriority>
-    public readonly TypeCode GetTypeCode()
-    {
-        return TypeCode.Object;
-    }
+    public readonly TypeCode GetTypeCode() => TypeCode.Object;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Boolean value using the specified culture-specific formatting information.
@@ -203,10 +180,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly bool ToBoolean(IFormatProvider provider)
-    {
-        return unscaled != BigInteger.Zero;
-    }
+    public readonly bool ToBoolean(IFormatProvider provider) => unscaled != BigInteger.Zero;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.
@@ -216,10 +190,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public char ToChar(IFormatProvider provider)
-    {
-        return (char)Round(0).unscaled;
-    }
+    public char ToChar(IFormatProvider provider) => (char)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific formatting information.
@@ -229,10 +200,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public sbyte ToSByte(IFormatProvider provider)
-    {
-        return (sbyte)Round(0).unscaled;
-    }
+    public sbyte ToSByte(IFormatProvider provider) => (sbyte)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified culture-specific formatting information.
@@ -242,10 +210,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public byte ToByte(IFormatProvider provider)
-    {
-        return (byte)Round(0).unscaled;
-    }
+    public byte ToByte(IFormatProvider provider) => (byte)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit signed integer using the specified culture-specific formatting information.
@@ -255,10 +220,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public short ToInt16(IFormatProvider provider)
-    {
-        return (short)Round(0).unscaled;
-    }
+    public short ToInt16(IFormatProvider provider) => (short)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified culture-specific formatting information.
@@ -268,10 +230,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ushort ToUInt16(IFormatProvider provider)
-    {
-        return (ushort)Round(0).unscaled;
-    }
+    public ushort ToUInt16(IFormatProvider provider) => (ushort)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
@@ -281,10 +240,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public int ToInt32(IFormatProvider provider)
-    {
-        return (int)Round(0).unscaled;
-    }
+    public int ToInt32(IFormatProvider provider) => (int)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
@@ -294,10 +250,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public uint ToUInt32(IFormatProvider provider)
-    {
-        return (uint)Round(0).unscaled;
-    }
+    public uint ToUInt32(IFormatProvider provider) => (uint)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit signed integer using the specified culture-specific formatting information.
@@ -307,10 +260,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public long ToInt64(IFormatProvider provider)
-    {
-        return (long)Round(0).unscaled;
-    }
+    public long ToInt64(IFormatProvider provider) => (long)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified culture-specific formatting information.
@@ -320,10 +270,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ulong ToUInt64(IFormatProvider provider)
-    {
-        return (ulong)Round(0).unscaled;
-    }
+    public ulong ToUInt64(IFormatProvider provider) => (ulong)Round(0).unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent single-precision floating-point number using the specified culture-specific formatting information.
@@ -333,10 +280,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly float ToSingle(IFormatProvider provider)
-    {
-        return (float)unscaled / (float)Math.Pow(10.0, scale);
-    }
+    public readonly float ToSingle(IFormatProvider provider) => (float)unscaled / (float)Math.Pow(10.0, scale);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.
@@ -346,10 +290,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly double ToDouble(IFormatProvider provider)
-    {
-        return (double)unscaled / Math.Pow(10.0, scale);
-    }
+    public readonly double ToDouble(IFormatProvider provider) => (double)unscaled / Math.Pow(10.0, scale);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="T:System.Decimal" /> number using the specified culture-specific formatting information.
@@ -359,10 +300,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly decimal ToDecimal(IFormatProvider provider)
-    {
-        return (decimal)unscaled / (decimal)Math.Pow(10.0, scale);
-    }
+    public readonly decimal ToDecimal(IFormatProvider provider) => (decimal)unscaled / (decimal)Math.Pow(10.0, scale);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="DateTime" /> using the specified culture-specific formatting information.
@@ -372,10 +310,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public DateTime ToDateTime(IFormatProvider provider)
-    {
-        throw new InvalidCastException();
-    }
+    public DateTime ToDateTime(IFormatProvider provider) => throw new InvalidCastException();
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="string" /> using the specified culture-specific formatting information.
@@ -385,10 +320,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public string ToString(IFormatProvider provider)
-    {
-        return ToString();
-    }
+    public string ToString(IFormatProvider provider) => ToString();
 
     /// <summary>
     /// Converts the value of this instance to an <see cref="object" /> of the specified <see cref="Type" /> that has an equivalent value, using the specified culture-specific formatting information.
@@ -463,10 +395,7 @@ public partial struct BigDecimal :
     /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public readonly bool Equals(BigDecimal other)
-    {
-        return this == other;
-    }
+    public readonly bool Equals(BigDecimal other) => this == other;
 
     #endregion
 
@@ -714,10 +643,7 @@ public partial struct BigDecimal :
         return new (i, decs);
     }
 
-    private readonly BigDecimal Opposite()
-    {
-        return new (-unscaled, scale);
-    }
+    private readonly BigDecimal Opposite() => new (-unscaled, scale);
 
     private static int Compare(BigDecimal a, BigDecimal b)
     {

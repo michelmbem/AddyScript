@@ -414,7 +414,8 @@ public readonly struct Fraction :
 
     public static explicit operator BigInteger(Fraction self) => new (self.ToInt64(null));
 
-    public static explicit operator BigDecimal(Fraction self) => new (self.ToDecimal(null));
+    public static explicit operator BigDecimal(Fraction self) =>
+        new BigDecimal(self.numerator) / new BigDecimal(self.denominator);
 
     #endregion
 

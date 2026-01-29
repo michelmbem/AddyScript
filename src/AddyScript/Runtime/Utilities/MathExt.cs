@@ -32,8 +32,8 @@ public static class MathExt
 
     public static long Gcd(long a, long b)
     {
-        if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), Resources.CannotComputeGcdForNegative);
-        if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), Resources.CannotComputeGcdForNegative);
+        ArgumentOutOfRangeException.ThrowIfNegative(a);
+        ArgumentOutOfRangeException.ThrowIfNegative(b);
 
         while (b > 0)
         {
@@ -68,8 +68,8 @@ public static class MathExt
         if (double.IsNaN(value) || double.IsInfinity(value))
             throw new ArgumentException("Value must be finite.");
 
-        // Depends on the number of significant decimal digits we want in the input (12, for instance)
-        const double tolerance = 1e-12;
+        // Depends on the number of significant decimal digits we want in the input (16, for instance)
+        const double tolerance = 1e-16;
         
         var (h1, h2, k1, k2) = (1L, 0L, 0L, 1L);
         var b = value;
