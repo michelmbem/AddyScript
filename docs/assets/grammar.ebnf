@@ -157,7 +157,7 @@ MatchCaseList ::= MatchCase (',' MatchCase)*
 
 MatchCase ::= Pattern ('when' Expression)? '=>' MatchCaseExpression
 
-Pattern ::= '_' | 'null' | ('>' | '<' | ">=" | "<=")? ValuePattern | "matches" STRING | TYPE_NAME (('(' IDENTIFIER (',' IDENTIFIER)* ')') | ObjectPattern)? | ObjectPattern | NegativePattern | LogicalPattern | GroupingPattern
+Pattern ::= '_' | 'null' | ('>' | '<' | ">=" | "<=")? ValuePattern | "matches" STRING | TYPE_NAME (('(' IDENTIFIER (',' IDENTIFIER)* ')') | ObjectPattern)? | ObjectPattern | NegativePattern | LogicalPattern | GroupingPattern | MUTABLE_STRING
 
 ValuePattern ::= ([+-]? (INTEGER | BIG_INTEGER | FLOAT | BIG_DECIMAL)) | BOOLEAN | DATE | STRING
 
@@ -171,7 +171,7 @@ GroupingPattern ::= '(' Pattern ')'
 
 MatchCaseExpression ::= Block | 'throw'? Expression
 
-Atom ::= Literal | 'this' | AtomStartingWithSuper | AtomStartingWithTypeOf | AtomStartingWithTypeName | AtomStartingWithId | AtomStartingWithNew | AtomStartingWithLParen | AtomStartingWithLBrace | ListInitializer | Lambda | InlineFunction
+Atom ::= Literal | MUTABLE_STRING | 'this' | AtomStartingWithSuper | AtomStartingWithTypeOf | AtomStartingWithTypeName | AtomStartingWithId | AtomStartingWithNew | AtomStartingWithLParen | AtomStartingWithLBrace | ListInitializer | Lambda | InlineFunction
 
 AtomStartingWithSuper ::= 'super' (('::' IDENTIFIER ArgumentList?) | ('[' Expression ']'))
 
@@ -247,7 +247,9 @@ COMPLEX ::= REAL [iI]
 
 DATE ::= '`' [^`]* '`'
 
-STRING ::= ('$''@'?)? (SINGLE_QUOTED | DOUBLE_QUOTED)
+MUTABLE_STRING ::= '$' STRING
+
+STRING ::= '@'? (SINGLE_QUOTED | DOUBLE_QUOTED)
 
 BLOB ::= [bB](SINGLE_QUOTED | DOUBLE_QUOTED)
 
@@ -255,7 +257,7 @@ SINGLE_QUOTED ::= "'" ( [^'] | ESCAPE_SEQ)* "'"
 
 DOUBLE_QUOTED ::= '"' ([^"] | ESCAPE_SEQ)* '"'
 
-TYPE_NAME ::= 'void' | 'bool' | 'int' | 'long' | 'rational' | 'float' | 'decimal' | 'complex' | 'date' | 'string' | 'list' | 'map' | 'set' | 'queue' | 'stack' | 'object' | 'resource' | 'closure'
+TYPE_NAME ::= 'void' | 'bool' | 'int' | 'long' | 'rational' | 'float' | 'decimal' | 'complex' | 'date' | 'duration' | 'string' | 'list' | 'map' | 'set' | 'queue' | 'stack' | 'object' | 'resource' | 'closure'
 
 MODIFIER ::= 'final' | 'static' | 'abstract'
 
