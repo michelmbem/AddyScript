@@ -1064,8 +1064,7 @@ DATE ::= '`' [^`]* '`'
 ![MUTABLE_STRING](diagram/MUTABLE_STRING.svg)
 
 ```
-MUTABLE_STRING
-         ::= '$' STRING
+MUTABLE_STRING ::= '$' STRING
 ```
 
 #### STRING:

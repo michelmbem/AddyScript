@@ -178,6 +178,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagram", "diagram", "{409F
 		..\docs\diagram\VariableSetterList.svg = ..\docs\diagram\VariableSetterList.svg
 		..\docs\diagram\WhileLoop.svg = ..\docs\diagram\WhileLoop.svg
 		..\docs\diagram\Yield.svg = ..\docs\diagram\Yield.svg
+		..\docs\diagram\MUTABLE_STRING.svg = ..\docs\diagram\MUTABLE_STRING.svg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{22B34391-D678-49C7-9202-E48A9F43800D}"
