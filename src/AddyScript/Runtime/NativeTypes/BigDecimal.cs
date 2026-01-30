@@ -480,7 +480,7 @@ public partial struct BigDecimal :
         }
     }
 
-    public readonly override bool Equals(object obj) => obj is BigDecimal dec && this == dec;
+    public readonly override bool Equals(object obj) => obj is BigDecimal bd && Equals(bd);
 
     public readonly override int GetHashCode() => HashCode.Combine(unscaled, scale);
 

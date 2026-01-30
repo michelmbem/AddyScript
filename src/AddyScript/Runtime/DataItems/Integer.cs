@@ -68,7 +68,7 @@ public sealed class Integer(int value) : DataItem
                         ClassID.Blob or ClassID.Tuple or ClassID.List =>
                     operand.BinaryOperation(_operator, this),
                 BinaryOperator.Times => new Integer(checked(value * operand.AsInt32)),
-                BinaryOperator.Divide => Rational.Simplify(new Fraction(value, operand.AsInt32)),
+                BinaryOperator.Divide => new Rational(new Fraction(value, operand.AsInt32)),
                 BinaryOperator.Modulo => new Integer(value % operand.AsInt32),
                 BinaryOperator.Power => Power(value, operand.AsInt32),
                 BinaryOperator.And => new Integer(value & operand.AsInt32),

@@ -30,9 +30,10 @@ public readonly struct Fraction :
     public Fraction(long num, long den = 1L)
     {
         if (den == 0) throw new DivideByZeroException("Denominator cannot be zero");
-
-        numerator = num * Math.Sign(den);
-        denominator = Math.Abs(den);
+        
+        long gcd = MathExt.Gcd(Math.Abs(num), Math.Abs(den));
+        numerator = num / gcd * Math.Sign(den);
+        denominator = Math.Abs(den / gcd);
     }
 
     #endregion
@@ -98,7 +99,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public char ToChar(IFormatProvider provider) => (char)ToInt64(provider);
+    public char ToChar(IFormatProvider provider) => (char)ToUInt16(provider);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific formatting information.
@@ -108,7 +109,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public sbyte ToSByte(IFormatProvider provider) => (sbyte)ToInt64(provider);
+    public sbyte ToSByte(IFormatProvider provider) => decimal.ToSByte(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified culture-specific formatting information.
@@ -118,7 +119,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public byte ToByte(IFormatProvider provider) => (byte)ToInt64(provider);
+    public byte ToByte(IFormatProvider provider) => decimal.ToByte(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit signed integer using the specified culture-specific formatting information.
@@ -128,7 +129,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public short ToInt16(IFormatProvider provider) => (short)ToInt64(provider);
+    public short ToInt16(IFormatProvider provider) => decimal.ToInt16(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified culture-specific formatting information.
@@ -138,7 +139,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ushort ToUInt16(IFormatProvider provider) => (ushort)ToInt64(provider);
+    public ushort ToUInt16(IFormatProvider provider) => decimal.ToUInt16(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
@@ -148,7 +149,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public int ToInt32(IFormatProvider provider) => (int)ToInt64(provider);
+    public int ToInt32(IFormatProvider provider) => decimal.ToInt32(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
@@ -158,7 +159,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public uint ToUInt32(IFormatProvider provider) => (uint)ToInt64(provider);
+    public uint ToUInt32(IFormatProvider provider) => decimal.ToUInt32(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit signed integer using the specified culture-specific formatting information.
@@ -168,7 +169,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public long ToInt64(IFormatProvider provider) => numerator / denominator;
+    public long ToInt64(IFormatProvider provider) => decimal.ToInt64(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified culture-specific formatting information.
@@ -178,7 +179,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ulong ToUInt64(IFormatProvider provider) => (ulong)ToInt64(provider);
+    public ulong ToUInt64(IFormatProvider provider) => decimal.ToUInt64(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent single-precision floating-point number using the specified culture-specific formatting information.
@@ -188,7 +189,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public float ToSingle(IFormatProvider provider) => (float)numerator / denominator;
+    public float ToSingle(IFormatProvider provider) => decimal.ToSingle(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.
@@ -198,7 +199,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public double ToDouble(IFormatProvider provider) => (double)numerator / denominator;
+    public double ToDouble(IFormatProvider provider) => decimal.ToDouble(ToDecimal(provider));
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="T:System.Decimal" /> number using the specified culture-specific formatting information.
@@ -263,7 +264,7 @@ public readonly struct Fraction :
 
     #endregion
 
-    #region Implementation of IComparable<Rational>
+    #region Implementation of IComparable<Fraction>
 
     /// <summary>
     /// Compares the current object with another object of the same type.
@@ -271,20 +272,21 @@ public readonly struct Fraction :
     /// <returns>
     /// A 32-bit signed integer that indicates the relative order of the objects being compared.
     /// The return value has these meanings:
-    /// Less than zero: this instance is less than <paramref name="obj" />.
-    /// Zero: this instance is equal to <paramref name="obj" />.
-    /// Greater than zero: this instance is greater than <paramref name="obj" />.
+    /// Less than zero: this instance is less than <paramref name="other" />.
+    /// Zero: this instance is equal to <paramref name="other" />.
+    /// Greater than zero: this instance is greater than <paramref name="other" />.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public int CompareTo(Fraction other)
     {
-        if (this == other) return 0;
-        return this < other ? -1 : 1;
+        BigInteger left  = numerator * other.denominator;
+        BigInteger right = other.numerator * denominator;
+        return left.CompareTo(right);
     }
 
     #endregion
 
-    #region Implementation of IEquatable<Rational>
+    #region Implementation of IEquatable<Fraction>
 
     /// <summary>
     /// Indicates whether the current object is equal to another object of the same type.
@@ -297,7 +299,7 @@ public readonly struct Fraction :
 
     #endregion
 
-    public override bool Equals(object obj) => obj is Fraction fraction && this == fraction;
+    public override bool Equals(object obj) => obj is Fraction fraction && Equals(fraction);
 
     public override int GetHashCode() => HashCode.Combine(numerator, denominator);
 
@@ -309,22 +311,14 @@ public readonly struct Fraction :
         ? throw new DivideByZeroException("Cannot invert zero fraction")
         : new Fraction(denominator, numerator);
 
-    public Fraction Simplify()
-    {
-        if (numerator == 0L || denominator == 1L) return this;
-        long gcd = MathExt.Gcd(Math.Abs(numerator), denominator);
-        return gcd == 1L ? this : new Fraction(numerator / gcd, denominator / gcd);
-    }
-
     public Fraction Power(int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
 
         if (exp == 0) return One;
 
-        Fraction factor = this;
-        Fraction result = One;
-
+        var (factor, result) = (this, One);
+        
         while (exp != 0)
         {
             if ((exp & 1) != 0) result *= factor;
@@ -431,22 +425,18 @@ public readonly struct Fraction :
     #region Relational
 
     public static bool operator ==(Fraction a, Fraction b) =>
-        a.numerator * b.denominator == b.numerator * a.denominator;
+        a.numerator == b.numerator && a.denominator == b.denominator;
 
     public static bool operator !=(Fraction a, Fraction b) =>
-        a.numerator * b.denominator != b.numerator * a.denominator;
+        a.numerator != b.numerator || a.denominator != b.denominator;
 
-    public static bool operator <(Fraction a, Fraction b) =>
-        a.numerator * b.denominator < b.numerator * a.denominator;
+    public static bool operator <(Fraction a, Fraction b) => a.CompareTo(b) < 0;
 
-    public static bool operator >(Fraction a, Fraction b) =>
-        a.numerator * b.denominator > b.numerator * a.denominator;
+    public static bool operator >(Fraction a, Fraction b) => a.CompareTo(b) > 0;
 
-    public static bool operator <=(Fraction a, Fraction b) =>
-        a.numerator * b.denominator <= b.numerator * a.denominator;
+    public static bool operator <=(Fraction a, Fraction b) => a.CompareTo(b) <= 0;
 
-    public static bool operator >=(Fraction a, Fraction b) =>
-        a.numerator * b.denominator >= b.numerator * a.denominator;
+    public static bool operator >=(Fraction a, Fraction b) => a.CompareTo(b) >= 0;
 
     #endregion
 
@@ -454,23 +444,21 @@ public readonly struct Fraction :
 
     public static Fraction operator -(Fraction a) => new (-a.numerator, a.denominator);
 
-    public static Fraction operator +(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return new Fraction(c.numerator + d.numerator, c.denominator);
-    }
+    public static Fraction operator +(Fraction a, Fraction b) =>
+        new (a.numerator * b.denominator + b.numerator * a.denominator, a.denominator * b.denominator);
 
-    public static Fraction operator -(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return new Fraction(c.numerator - d.numerator, c.denominator);
-    }
+    public static Fraction operator -(Fraction a, Fraction b) =>
+        new (a.numerator * b.denominator - b.numerator * a.denominator,a.denominator * b.denominator);
 
     public static Fraction operator *(Fraction a, Fraction b) =>
         new (a.numerator * b.numerator, a.denominator * b.denominator);
 
-    public static Fraction operator /(Fraction a, Fraction b) =>
-        new (a.numerator * b.denominator, a.denominator * b.numerator);
+    public static Fraction operator /(Fraction a, Fraction b)
+    {
+        return b.numerator == 0L
+             ? throw new DivideByZeroException("Cannot divide by zero")
+             : new Fraction(a.numerator * b.denominator, a.denominator * b.numerator);
+    }
 
     #endregion
 

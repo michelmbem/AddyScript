@@ -19,17 +19,9 @@ public sealed class Rational : DataItem
     public Rational(long numerator, long denominator = 1L) =>
         value = new Fraction(numerator, denominator);
 
-    public static DataItem Simplify(Fraction rational)
-    {
-        var simplified = rational.Simplify();
-        return simplified.Denominator == 1L
-             ? new Long(simplified.Numerator)
-             : new Rational(simplified);
-    }
-
     public Rational Opposite => new (-value);
 
-    public DataItem Inverse => Simplify(value.Inverse());
+    public DataItem Inverse => new Rational(value.Inverse());
 
     public override Class Class => Class.Rational;
 
@@ -65,10 +57,10 @@ public sealed class Rational : DataItem
 
     public override DataItem BinaryOperation(BinaryOperator _operator, DataItem operand) => _operator switch
     {
-        BinaryOperator.Plus => Simplify(value + operand.AsFraction),
-        BinaryOperator.Minus => Simplify(value - operand.AsFraction),
-        BinaryOperator.Times => Simplify(value * operand.AsFraction),
-        BinaryOperator.Divide => Simplify(value / operand.AsFraction),
+        BinaryOperator.Plus => new Rational(value + operand.AsFraction),
+        BinaryOperator.Minus => new Rational(value - operand.AsFraction),
+        BinaryOperator.Times => new Rational(value * operand.AsFraction),
+        BinaryOperator.Divide => new Rational(value / operand.AsFraction),
         BinaryOperator.Power => new Rational(value.Power(operand.AsInt32)),
         BinaryOperator.LessThan => Boolean.FromBool(value < operand.AsFraction),
         BinaryOperator.LessThanOrEqual => Boolean.FromBool(value <= operand.AsFraction),
