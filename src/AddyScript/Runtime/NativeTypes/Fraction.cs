@@ -17,8 +17,8 @@ public readonly struct Fraction :
     public static readonly Fraction MinusOne = new (BigInteger.MinusOne);
     public static readonly Fraction Zero = new (BigInteger.Zero);
     public static readonly Fraction One = new (BigInteger.One);
-    public static readonly Fraction Half = new (BigInteger.One, new BigInteger(2L));
-    public static readonly Fraction Third = new (BigInteger.One, new BigInteger(3L));
+    public static readonly Fraction Half = new (BigInteger.One, 2);
+    public static readonly Fraction Third = new (BigInteger.One, 3);
     
     private readonly BigInteger numerator;
     private readonly BigInteger denominator;
@@ -94,7 +94,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public bool ToBoolean(IFormatProvider provider) => !numerator.IsZero;
+    public bool ToBoolean(IFormatProvider provider) => !IsZero;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.
@@ -245,8 +245,13 @@ public readonly struct Fraction :
     /// <param name="conversionType">The <see cref="Type" /> to which the value of this instance is converted.</param>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public object ToType(Type conversionType, IFormatProvider provider) =>
-        conversionType == typeof(Fraction) ? this : throw new InvalidCastException();
+    public object ToType(Type conversionType, IFormatProvider provider)
+    {
+        if (conversionType == typeof(Fraction)) return this;
+        if (conversionType == typeof(BigDecimal)) return (BigDecimal)this;
+        if (conversionType == typeof(BigInteger)) return (BigInteger)this;
+        throw new InvalidCastException($"Cannot convert {nameof(Fraction)} to {conversionType.Name}");
+    }
 
     #endregion
 
@@ -263,8 +268,8 @@ public readonly struct Fraction :
     /// <param name="obj">An object to compare with this instance.</param>
     /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
-    public int CompareTo(object obj) => obj is Fraction fraction
-             ? CompareTo(fraction)
+    public int CompareTo(object obj) => obj is Fraction other
+             ? CompareTo(other)
              : throw new ArgumentException($"{nameof(obj)} should be a {nameof(Fraction)}");
 
     #endregion
@@ -300,22 +305,61 @@ public readonly struct Fraction :
     /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public bool Equals(Fraction other) => this == other;
+    public bool Equals(Fraction other) =>
+        numerator == other.numerator && denominator == other.denominator;
 
     #endregion
 
+    #region Overrides
+
+    /// <summary>
+    /// Determines whether the specified object is equal to the current Fraction instance.
+    /// </summary>
+    /// <remarks>This method overrides Object.Equals and supports value equality comparison for Fraction
+    /// instances. Two Fraction objects are considered equal if they represent the same rational value.</remarks>
+    /// <param name="obj">The object to compare with the current Fraction instance.</param>
+    /// <returns>true if the specified object is a Fraction and is equal to the current instance; otherwise, false.</returns>
     public override bool Equals(object obj) => obj is Fraction frac && Equals(frac);
 
+    /// <summary>
+    /// Serves as the default hash function for the current object.
+    /// </summary>
+    /// <remarks>Use this method when inserting instances of this type into hash-based collections such as
+    /// <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> or <see
+    /// cref="System.Collections.Generic.HashSet{T}"/>. The hash code is based on the values of the numerator and
+    /// denominator fields.</remarks>
+    /// <returns>A 32-bit signed integer hash code that represents the current object.</returns>
     public override int GetHashCode() => HashCode.Combine(numerator, denominator);
 
+    /// <summary>
+    /// Returns a string that represents the current object using the general format and the current UI culture.
+    /// </summary>
+    /// <returns>A string representation of the current object, formatted using the general format specifier and the current UI
+    /// culture.</returns>
     public override string ToString() => ToString("g", CultureInfo.CurrentUICulture);
 
+    #endregion
+
+    /// <summary>
+    /// Returns a new Fraction that represents the absolute value of the current instance.
+    /// </summary>
+    /// <returns>A Fraction whose value is the absolute value of this instance.</returns>
     public Fraction Abs() => new (BigInteger.Abs(numerator), denominator);
 
+    /// <summary>
+    /// Returns a new Fraction that is the multiplicative inverse of the current fraction.
+    /// </summary>
+    /// <returns>A Fraction representing the reciprocal of the current fraction.</returns>
+    /// <exception cref="DivideByZeroException">Thrown if the current fraction is zero.</exception>
     public Fraction Inverse() => numerator.IsZero
         ? throw new DivideByZeroException("Cannot invert zero fraction")
         : new Fraction(denominator, numerator);
 
+    /// <summary>
+    /// Returns a new Fraction that is this instance raised to the specified non-negative integer power.
+    /// </summary>
+    /// <param name="exp">The non-negative integer exponent to which to raise this fraction.</param>
+    /// <returns>A Fraction representing this value raised to the power of exp. If exp is 0, returns a Fraction equal to one.</returns>
     public Fraction Power(int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
@@ -393,23 +437,21 @@ public readonly struct Fraction :
 
     public static explicit operator ulong(Fraction self) => self.ToUInt64(null);
 
+    public static explicit operator BigInteger(Fraction self) => self.numerator / self.denominator;
+
     public static explicit operator float(Fraction self) => self.ToSingle(null);
 
     public static explicit operator double(Fraction self) => self.ToDouble(null);
 
     public static explicit operator decimal(Fraction self) => self.ToDecimal(null);
 
-    public static explicit operator BigInteger(Fraction self) => new (self.ToInt64(null));
-
     #endregion
 
     #region Relational
 
-    public static bool operator ==(Fraction a, Fraction b) =>
-        a.numerator == b.numerator && a.denominator == b.denominator;
+    public static bool operator ==(Fraction a, Fraction b) => a.Equals(b);
 
-    public static bool operator !=(Fraction a, Fraction b) =>
-        a.numerator != b.numerator || a.denominator != b.denominator;
+    public static bool operator !=(Fraction a, Fraction b) => !a.Equals(b);
 
     public static bool operator <(Fraction a, Fraction b) => a.CompareTo(b) < 0;
 
@@ -423,20 +465,22 @@ public readonly struct Fraction :
 
     #region Arithmetic
 
+    public static Fraction operator +(Fraction a) => a;
+
     public static Fraction operator -(Fraction a) => new (-a.numerator, a.denominator);
 
     public static Fraction operator +(Fraction a, Fraction b) =>
         new (a.numerator * b.denominator + b.numerator * a.denominator, a.denominator * b.denominator);
 
     public static Fraction operator -(Fraction a, Fraction b) =>
-        new (a.numerator * b.denominator - b.numerator * a.denominator,a.denominator * b.denominator);
+        new (a.numerator * b.denominator - b.numerator * a.denominator, a.denominator * b.denominator);
 
     public static Fraction operator *(Fraction a, Fraction b) =>
         new (a.numerator * b.numerator, a.denominator * b.denominator);
 
     public static Fraction operator /(Fraction a, Fraction b)
     {
-        return b.numerator.IsZero
+        return b.IsZero
              ? throw new DivideByZeroException("Cannot divide by zero")
              : new Fraction(a.numerator * b.denominator, a.denominator * b.numerator);
     }
