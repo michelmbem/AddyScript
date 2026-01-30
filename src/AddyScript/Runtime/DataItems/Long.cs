@@ -18,7 +18,7 @@ public sealed class Long(BigInteger value) : DataItem
 
     public override Class Class => Class.Long;
 
-    public override bool AsBoolean => value != BigInteger.Zero;
+    public override bool AsBoolean => !value.IsZero;
 
     public override int AsInt32 => (int)value;
 
@@ -35,7 +35,7 @@ public sealed class Long(BigInteger value) : DataItem
     public override object AsNativeObject => value;
 
     public override string ToString(string format, IFormatProvider formatProvider) =>
-        value.ToString(format, formatProvider);
+        value.ToString(format, formatProvider) ?? string.Empty;
 
     protected override bool UnsafeEquals(DataItem other) => value == other.AsBigInteger;
 
@@ -60,7 +60,7 @@ public sealed class Long(BigInteger value) : DataItem
         BinaryOperator.Plus => new Long(value + operand.AsBigInteger),
         BinaryOperator.Minus => new Long(value - operand.AsBigInteger),
         BinaryOperator.Times => new Long(value * operand.AsBigInteger),
-        BinaryOperator.Divide => new Long(value / operand.AsBigInteger),
+        BinaryOperator.Divide => new Rational(new Fraction(value, operand.AsBigInteger)),
         BinaryOperator.Modulo => new Long(value % operand.AsBigInteger),
         BinaryOperator.Power => new Long(BigInteger.Pow(value, operand.AsInt32)),
         BinaryOperator.And => new Long(value & operand.AsBigInteger),

@@ -54,11 +54,11 @@ abs((3/4)) = (3/4)
 
 The following table summarizes the members of the **rational** type and their usage:
 
-|Member|Nature|Description|
-|-|-|-|
-|`long num { read; }`|property|Gets the numerator of the target rational number.|
-|`long den { read; }`|property|Gets the denominator of the target rational number.|
-|`rational|long inverse()`|method|Gets the inverse of the target rational number.<br>This can be another rational number or a big integer.|
+| Member               |Nature|Description|
+|----------------------|-|-|
+| `long num { read; }` |property|Gets the numerator of the target rational number.|
+| `long den { read; }` |property|Gets the denominator of the target rational number.|
+| `rational            |long inverse()`|method|Gets the inverse of the target rational number.<br>This can be another rational number or a long integer.|
 
 ## Complex Numbers
 
