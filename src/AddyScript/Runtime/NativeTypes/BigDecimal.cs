@@ -56,7 +56,7 @@ public partial struct BigDecimal :
     public BigDecimal(double x)
     {
         if (double.IsNaN(x) || double.IsInfinity(x))
-            throw new ArithmeticException();
+            throw new ArithmeticException("Invalid floating-point value");
 
         // "R" guarantees round-trip exactness
         var tmp = Parse(x.ToString("R", CultureInfo.InvariantCulture));
@@ -123,13 +123,13 @@ public partial struct BigDecimal :
     /// <filterpriority>2</filterpriority>
     public readonly string ToString(string format, IFormatProvider formatProvider)
     {
-        var sb = new StringBuilder(BigInteger.Abs(unscaled).ToString());
+        StringBuilder sb = new (BigInteger.Abs(unscaled).ToString());
         
         if (scale > 0)
         {
             if (scale >= sb.Length) sb.Insert(0, "0", scale - sb.Length + 1);
-            var fmt = (NumberFormatInfo)formatProvider.GetFormat(typeof(NumberFormatInfo));
-            sb.Insert(sb.Length - scale, fmt.CurrencyDecimalSeparator);
+            var fmt = (NumberFormatInfo)formatProvider?.GetFormat(typeof(NumberFormatInfo));
+            sb.Insert(sb.Length - scale, fmt?.CurrencyDecimalSeparator ?? ".");
         }
 
         if (Sign < 0) sb.Insert(0, '-');

@@ -29,7 +29,7 @@ public readonly struct Fraction :
 
     public Fraction(long num, long den = 1L)
     {
-        if (den == 0) throw new DivideByZeroException();
+        if (den == 0) throw new DivideByZeroException("Denominator cannot be zero");
 
         numerator = num * Math.Sign(den);
         denominator = Math.Abs(den);
@@ -62,8 +62,9 @@ public readonly struct Fraction :
     /// <filterpriority>2</filterpriority>
     public string ToString(string format, IFormatProvider formatProvider)
     {
-        if (denominator == 1L) return numerator.ToString(format, formatProvider);
-        return string.Format(formatProvider, $"({{0:{format}}}/{{1:{format}}})", numerator, denominator);
+        return denominator == 1L
+             ? numerator.ToString(format, formatProvider)
+             : string.Format(formatProvider, $"({{0:{format}}}/{{1:{format}}})", numerator, denominator);
     }
 
     #endregion
@@ -256,9 +257,9 @@ public readonly struct Fraction :
     /// <param name="obj">An object to compare with this instance.</param>
     /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
-    public int CompareTo(object obj) => obj is Fraction rational
-             ? CompareTo(rational)
-             : throw new ArgumentException("obj should be a Rational32");
+    public int CompareTo(object obj) => obj is Fraction fraction
+             ? CompareTo(fraction)
+             : throw new ArgumentException($"{nameof(obj)} should be a {nameof(Fraction)}");
 
     #endregion
 
@@ -302,9 +303,11 @@ public readonly struct Fraction :
 
     public override string ToString() => ToString("g", CultureInfo.CurrentUICulture);
 
-    public Fraction Abs() => new Fraction(Math.Abs(numerator), denominator);
+    public Fraction Abs() => new (Math.Abs(numerator), denominator);
 
-    public Fraction Inverse() => new Fraction(denominator, numerator);
+    public Fraction Inverse() => numerator == 0L
+        ? throw new DivideByZeroException("Cannot invert zero fraction")
+        : new Fraction(denominator, numerator);
 
     public Fraction Simplify()
     {
@@ -335,17 +338,23 @@ public readonly struct Fraction :
 
     public static void ToCommonDenominator(Fraction a, Fraction b, out Fraction c, out Fraction d)
     {
-        if (a.denominator == b.denominator)
+        long ad = a.denominator;
+        long bd = b.denominator;
+
+        if (ad == bd)
         {
             c = a;
             d = b;
+            return;
         }
-        else
-        {
-            long commonDeno = a.denominator * b.denominator;
-            c = new Fraction(a.numerator * b.denominator, commonDeno);
-            d = new Fraction(b.numerator * a.denominator, commonDeno);
-        }
+
+        long gcd = MathExt.Gcd(ad, bd);
+        long lcm = (ad / gcd) * bd; // safer than ad * bd
+        long factorA = lcm / ad;
+        long factorB = lcm / bd;
+
+        c = new Fraction(a.numerator * factorA, lcm);
+        d = new Fraction(b.numerator * factorB, lcm);
     }
 
     #endregion
@@ -421,41 +430,23 @@ public readonly struct Fraction :
 
     #region Relational
 
-    public static bool operator ==(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator == d.numerator;
-    }
+    public static bool operator ==(Fraction a, Fraction b) =>
+        a.numerator * b.denominator == b.numerator * a.denominator;
 
-    public static bool operator !=(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator != d.numerator;
-    }
+    public static bool operator !=(Fraction a, Fraction b) =>
+        a.numerator * b.denominator != b.numerator * a.denominator;
 
-    public static bool operator <(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator < d.numerator;
-    }
+    public static bool operator <(Fraction a, Fraction b) =>
+        a.numerator * b.denominator < b.numerator * a.denominator;
 
-    public static bool operator >(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator > d.numerator;
-    }
+    public static bool operator >(Fraction a, Fraction b) =>
+        a.numerator * b.denominator > b.numerator * a.denominator;
 
-    public static bool operator <=(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator <= d.numerator;
-    }
+    public static bool operator <=(Fraction a, Fraction b) =>
+        a.numerator * b.denominator <= b.numerator * a.denominator;
 
-    public static bool operator >=(Fraction a, Fraction b)
-    {
-        ToCommonDenominator(a, b, out Fraction c, out Fraction d);
-        return c.numerator >= d.numerator;
-    }
+    public static bool operator >=(Fraction a, Fraction b) =>
+        a.numerator * b.denominator >= b.numerator * a.denominator;
 
     #endregion
 
