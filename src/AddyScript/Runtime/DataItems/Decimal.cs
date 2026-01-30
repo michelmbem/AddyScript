@@ -22,7 +22,7 @@ public sealed class Decimal(BigDecimal value) : DataItem
 
     public override BigInteger AsBigInteger => (BigInteger)value;
 
-    public override Fraction AsFraction => (Fraction)value;
+    public override Fraction AsFraction => value;
 
     public override double AsDouble => (double)value;
 

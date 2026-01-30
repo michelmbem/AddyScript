@@ -351,11 +351,13 @@ public readonly struct Fraction :
 
     public static implicit operator Fraction(int n) => new (n);
 
-    public static explicit operator Fraction(uint n) => new (n);
+    public static implicit operator Fraction(uint n) => new (n);
 
-    public static explicit operator Fraction(long n) => new (n);
+    public static implicit operator Fraction(long n) => new (n);
 
-    public static explicit operator Fraction(ulong n) => new (n);
+    public static implicit operator Fraction(ulong n) => new (n);
+
+    public static implicit operator Fraction(BigInteger n) => new (n);
 
     public static explicit operator Fraction(float x)
     {
@@ -369,9 +371,7 @@ public readonly struct Fraction :
         return new Fraction(num, den);
     }
 
-    public static explicit operator Fraction(decimal d) => (Fraction)new BigDecimal(d);
-
-    public static explicit operator Fraction(BigInteger n) => new (n);
+    public static implicit operator Fraction(decimal d) => (Fraction)new BigDecimal(d);
 
     #endregion
 

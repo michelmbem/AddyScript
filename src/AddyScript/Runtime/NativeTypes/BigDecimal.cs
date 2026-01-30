@@ -583,7 +583,7 @@ public partial struct BigDecimal :
 
     public static explicit operator BigInteger(BigDecimal self) => self.Round().unscaled;
 
-    public static explicit operator Fraction(BigDecimal self)
+    public static implicit operator Fraction(BigDecimal self)
     {
         var (num, den) = self.ToRational();
         return new Fraction(num, den);
