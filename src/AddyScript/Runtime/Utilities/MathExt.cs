@@ -1,7 +1,5 @@
 ﻿using System;
 
-using AddyScript.Properties;
-
 
 namespace AddyScript.Runtime.Utilities;
 
@@ -30,37 +28,11 @@ public static class MathExt
         return result;
     }
 
-    public static long Gcd(long a, long b)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(a);
-        ArgumentOutOfRangeException.ThrowIfNegative(b);
-
-        while (b > 0)
-        {
-            var r = a % b;
-            a = b;
-            b = r;
-        }
-
-        return a;
-    }
-
     public static double Modulo(double a, double b)
     {
         var c = a / b;
         var d = c - Math.Truncate(c);
         return d * b;
-    }
-
-    public static (bool, ushort, ulong) Decompose(double value)
-    {
-        // binary format: sign[1]exponent[11]mantissa[52]
-        var bits = BitConverter.DoubleToUInt64Bits(value);
-        var negative = bits >> 63 != 0UL;
-        var exponent = (ushort)((bits >> 52) & 0x7FFUL);
-        var mantissa = bits & 0xFFFFFFFFFFFFFUL;
-        
-        return (negative, exponent, mantissa);
     }
 
     public static (long, long) ToRational(double value)

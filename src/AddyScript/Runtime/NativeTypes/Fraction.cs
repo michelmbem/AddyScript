@@ -14,37 +14,41 @@ public readonly struct Fraction :
 {
     #region Fields
 
-    public static readonly Fraction MinusOne = new (-1L);
-    public static readonly Fraction Zero = new (0L);
-    public static readonly Fraction One = new (1L);
-    public static readonly Fraction Half = new (1L, 2L);
-    public static readonly Fraction Third = new (1L, 3L);
-
-    private readonly long numerator;
-    private readonly long denominator;
-
+    public static readonly Fraction MinusOne = new (BigInteger.MinusOne);
+    public static readonly Fraction Zero = new (BigInteger.Zero);
+    public static readonly Fraction One = new (BigInteger.One);
+    public static readonly Fraction Half = new (BigInteger.One, new BigInteger(2L));
+    public static readonly Fraction Third = new (BigInteger.One, new BigInteger(3L));
+    
+    private readonly BigInteger numerator;
+    private readonly BigInteger denominator;
+    
     #endregion
 
     #region Constructors
 
-    public Fraction(long num, long den = 1L)
+    public Fraction(BigInteger num, BigInteger den)
     {
-        if (den == 0) throw new DivideByZeroException("Denominator cannot be zero");
+        if (den.IsZero) throw new DivideByZeroException("Denominator cannot be zero");
         
-        long gcd = MathExt.Gcd(Math.Abs(num), Math.Abs(den));
-        numerator = num / gcd * Math.Sign(den);
-        denominator = Math.Abs(den / gcd);
+        var gcd = BigInteger.GreatestCommonDivisor(num, den);
+        numerator = num / gcd * den.Sign;
+        denominator = BigInteger.Abs(den / gcd);
     }
+
+    public Fraction(BigInteger num) : this(num, BigInteger.One) { }
 
     #endregion
 
     #region Properties
 
-    public long Numerator => numerator;
+    public BigInteger Numerator => numerator;
 
-    public long Denominator => denominator;
+    public BigInteger Denominator => denominator;
 
-    public int Sign => Math.Sign(numerator);
+    public int Sign => numerator.Sign;
+
+    public bool IsZero => numerator.IsZero;
 
     #endregion
 
@@ -63,9 +67,10 @@ public readonly struct Fraction :
     /// <filterpriority>2</filterpriority>
     public string ToString(string format, IFormatProvider formatProvider)
     {
-        return denominator == 1L
-             ? numerator.ToString(format, formatProvider)
-             : string.Format(formatProvider, $"({{0:{format}}}/{{1:{format}}})", numerator, denominator);
+        string s = denominator.IsOne
+            ? numerator.ToString(format, formatProvider)
+            : string.Format(formatProvider, $"({{0:{format}}}/{{1:{format}}})", numerator, denominator);
+        return s ?? string.Empty;
     }
 
     #endregion
@@ -89,7 +94,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public bool ToBoolean(IFormatProvider provider) => numerator != 0L;
+    public bool ToBoolean(IFormatProvider provider) => !numerator.IsZero;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.
@@ -209,7 +214,7 @@ public readonly struct Fraction :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public decimal ToDecimal(IFormatProvider provider) => (decimal)numerator / denominator;
+    public decimal ToDecimal(IFormatProvider provider) => (decimal)numerator / (decimal)denominator;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="DateTime" /> using the specified culture-specific formatting information.
@@ -299,15 +304,15 @@ public readonly struct Fraction :
 
     #endregion
 
-    public override bool Equals(object obj) => obj is Fraction fraction && Equals(fraction);
+    public override bool Equals(object obj) => obj is Fraction frac && Equals(frac);
 
     public override int GetHashCode() => HashCode.Combine(numerator, denominator);
 
     public override string ToString() => ToString("g", CultureInfo.CurrentUICulture);
 
-    public Fraction Abs() => new (Math.Abs(numerator), denominator);
+    public Fraction Abs() => new (BigInteger.Abs(numerator), denominator);
 
-    public Fraction Inverse() => numerator == 0L
+    public Fraction Inverse() => numerator.IsZero
         ? throw new DivideByZeroException("Cannot invert zero fraction")
         : new Fraction(denominator, numerator);
 
@@ -330,27 +335,6 @@ public readonly struct Fraction :
         return result;
     }
 
-    public static void ToCommonDenominator(Fraction a, Fraction b, out Fraction c, out Fraction d)
-    {
-        long ad = a.denominator;
-        long bd = b.denominator;
-
-        if (ad == bd)
-        {
-            c = a;
-            d = b;
-            return;
-        }
-
-        long gcd = MathExt.Gcd(ad, bd);
-        long lcm = (ad / gcd) * bd; // safer than ad * bd
-        long factorA = lcm / ad;
-        long factorB = lcm / bd;
-
-        c = new Fraction(a.numerator * factorA, lcm);
-        d = new Fraction(b.numerator * factorB, lcm);
-    }
-
     #endregion
 
     #region Operators
@@ -371,7 +355,7 @@ public readonly struct Fraction :
 
     public static explicit operator Fraction(long n) => new (n);
 
-    public static explicit operator Fraction(ulong n) => new ((long)n);
+    public static explicit operator Fraction(ulong n) => new (n);
 
     public static explicit operator Fraction(float x)
     {
@@ -387,7 +371,7 @@ public readonly struct Fraction :
 
     public static explicit operator Fraction(decimal d) => (Fraction)new BigDecimal(d);
 
-    public static explicit operator Fraction(BigInteger n) => new ((long)n);
+    public static explicit operator Fraction(BigInteger n) => new (n);
 
     #endregion
 
@@ -416,9 +400,6 @@ public readonly struct Fraction :
     public static explicit operator decimal(Fraction self) => self.ToDecimal(null);
 
     public static explicit operator BigInteger(Fraction self) => new (self.ToInt64(null));
-
-    public static explicit operator BigDecimal(Fraction self) =>
-        new BigDecimal(self.numerator) / new BigDecimal(self.denominator);
 
     #endregion
 
@@ -455,7 +436,7 @@ public readonly struct Fraction :
 
     public static Fraction operator /(Fraction a, Fraction b)
     {
-        return b.numerator == 0L
+        return b.numerator.IsZero
              ? throw new DivideByZeroException("Cannot divide by zero")
              : new Fraction(a.numerator * b.denominator, a.denominator * b.numerator);
     }

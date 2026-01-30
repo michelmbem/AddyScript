@@ -39,11 +39,6 @@ public class Class : IFrameItem
     public static readonly Class Long = new (ClassID.Long, "long", Modifier.Final);
 
     /// <summary>
-    /// Maps the <b>rational</b> primitive type.
-    /// </summary>
-    public static readonly Class Rational = new (ClassID.Rational, "rational", Modifier.Final);
-
-    /// <summary>
     /// Maps the <b>float</b> primitive type.
     /// </summary>
     public static readonly Class Float = new (ClassID.Float, "float", Modifier.Final);
@@ -52,6 +47,11 @@ public class Class : IFrameItem
     /// Maps the <b>decimal</b> primitive type.
     /// </summary>
     public static readonly Class Decimal = new (ClassID.Decimal, "decimal", Modifier.Final);
+
+    /// <summary>
+    /// Maps the <b>rational</b> primitive type.
+    /// </summary>
+    public static readonly Class Rational = new (ClassID.Rational, "rational", Modifier.Final);
 
     /// <summary>
     /// Maps the <b>complex</b> primitive type.
@@ -219,9 +219,9 @@ public class Class : IFrameItem
             Boolean,
             Integer,
             Long,
-            Rational,
             Float,
             Decimal,
+            Rational,
             Complex,
             Date,
             Duration,

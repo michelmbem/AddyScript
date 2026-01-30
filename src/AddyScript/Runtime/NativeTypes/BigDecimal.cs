@@ -4,8 +4,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using AddyScript.Runtime.Utilities;
-
 
 namespace AddyScript.Runtime.NativeTypes;
 
@@ -99,12 +97,14 @@ public partial struct BigDecimal :
     #endregion
 
     #region Properties
-
-    public readonly int Sign => unscaled.Sign;
     
     public readonly BigInteger Unscaled => unscaled;
     
     public readonly int Scale => scale;
+
+    public readonly int Sign => unscaled.Sign;
+
+    public readonly bool IsZero => unscaled.IsZero;
 
     #endregion
 
@@ -158,7 +158,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly bool ToBoolean(IFormatProvider provider) => unscaled != BigInteger.Zero;
+    public readonly bool ToBoolean(IFormatProvider provider) => !unscaled.IsZero;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.
@@ -168,7 +168,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public char ToChar(IFormatProvider provider) => (char)Round(0).unscaled;
+    public char ToChar(IFormatProvider provider) => (char)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific formatting information.
@@ -178,7 +178,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public sbyte ToSByte(IFormatProvider provider) => (sbyte)Round(0).unscaled;
+    public sbyte ToSByte(IFormatProvider provider) => (sbyte)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified culture-specific formatting information.
@@ -188,7 +188,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public byte ToByte(IFormatProvider provider) => (byte)Round(0).unscaled;
+    public byte ToByte(IFormatProvider provider) => (byte)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit signed integer using the specified culture-specific formatting information.
@@ -198,7 +198,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public short ToInt16(IFormatProvider provider) => (short)Round(0).unscaled;
+    public short ToInt16(IFormatProvider provider) => (short)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified culture-specific formatting information.
@@ -208,7 +208,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ushort ToUInt16(IFormatProvider provider) => (ushort)Round(0).unscaled;
+    public ushort ToUInt16(IFormatProvider provider) => (ushort)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
@@ -218,7 +218,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public int ToInt32(IFormatProvider provider) => (int)Round(0).unscaled;
+    public int ToInt32(IFormatProvider provider) => (int)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
@@ -228,7 +228,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public uint ToUInt32(IFormatProvider provider) => (uint)Round(0).unscaled;
+    public uint ToUInt32(IFormatProvider provider) => (uint)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit signed integer using the specified culture-specific formatting information.
@@ -238,7 +238,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public long ToInt64(IFormatProvider provider) => (long)Round(0).unscaled;
+    public long ToInt64(IFormatProvider provider) => (long)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified culture-specific formatting information.
@@ -248,7 +248,7 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public ulong ToUInt64(IFormatProvider provider) => (ulong)Round(0).unscaled;
+    public ulong ToUInt64(IFormatProvider provider) => (ulong)Round().unscaled;
 
     /// <summary>
     /// Converts the value of this instance to an equivalent single-precision floating-point number using the specified culture-specific formatting information.
@@ -261,17 +261,11 @@ public partial struct BigDecimal :
     public readonly float ToSingle(IFormatProvider provider)
     {
         if (unscaled.IsZero)
-            return 0.0f * (unscaled.Sign < 0 ? -1.0f : 1.0f);
+            return 0f * (unscaled.Sign < 0 ? -1f : 1f);
 
-        // float range:
-        // max ≈ 3.4028235e+38
-        // min normal ≈ 1.17549435e−38
-        // min subnormal ≈ 1.401298e−45
         if (scale is < -45 or > 38)
             return unscaled.Sign < 0 ? float.NegativeInfinity : float.PositiveInfinity;
 
-        // Convert via canonical scientific decimal string
-        // Let the CLR perform IEEE-754 rounding
         return float.Parse(ToScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture);
     }
 
@@ -288,13 +282,9 @@ public partial struct BigDecimal :
         if (unscaled.IsZero)
             return 0.0 * (unscaled.Sign < 0 ? -1.0 : 1.0);
 
-        // Fast overflow check (decimal exponent too large for double)
-        // double max ≈ 1.7976931348623157E308
         if (scale is < -324 or > 308)
             return unscaled.Sign < 0 ? double.NegativeInfinity : double.PositiveInfinity;
 
-        // Convert via canonical decimal string
-        // This guarantees IEEE-754 round-to-nearest-even
         return double.Parse(ToScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture);
     }
 
@@ -308,21 +298,18 @@ public partial struct BigDecimal :
     /// <filterpriority>2</filterpriority>
     public readonly decimal ToDecimal(IFormatProvider provider)
     {
-        // decimal supports only scale 0–28
         if (scale is < 0 or > 28)
             throw new OverflowException("Scale out of range for decimal");
 
-        // decimal mantissa is 96 bits
         var abs = BigInteger.Abs(unscaled);
         if (abs.GetBitLength() > 96)
             throw new OverflowException("Magnitude too large for decimal");
 
-        // Extract 96-bit integer
         var lo = (uint)(abs & uint.MaxValue);
         var mid = (uint)((abs >> 32) & uint.MaxValue);
         var hi = (uint)((abs >> 64) & uint.MaxValue);
         var negate = unscaled.Sign < 0;
-
+        
         return new decimal((int)lo, (int)mid, (int)hi, negate, (byte)scale);
     }
 
@@ -334,7 +321,8 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public DateTime ToDateTime(IFormatProvider provider) => throw new InvalidCastException();
+    public DateTime ToDateTime(IFormatProvider provider) =>
+        throw new InvalidCastException("Cannot convert BigDecimal to DateTime");
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="string" /> using the specified culture-specific formatting information.
@@ -357,11 +345,10 @@ public partial struct BigDecimal :
     /// <filterpriority>2</filterpriority>
     public object ToType(Type conversionType, IFormatProvider provider)
     {
-        if (conversionType == typeof(BigDecimal))
-            return this;
-        if (conversionType == typeof(BigInteger))
-            return Round(0).unscaled;
-        throw new InvalidCastException();
+        if (conversionType == typeof(BigDecimal)) return this;
+        return conversionType == typeof(BigInteger)
+             ? Round().unscaled
+             : throw new InvalidCastException("Cannot convert BigDecimal to " + conversionType.Name);
     }
 
     #endregion
@@ -384,7 +371,7 @@ public partial struct BigDecimal :
     {
         return obj is BigDecimal dec
              ? CompareTo(dec)
-             : throw new ArgumentException("obj should be a BigDecimal");
+             : throw new ArgumentException($"{nameof(obj)} must be of type {nameof(BigDecimal)}");
     }
 
     #endregion
@@ -397,9 +384,9 @@ public partial struct BigDecimal :
     /// <returns>
     /// A 32-bit signed integer that indicates the relative order of the objects being compared.
     /// The return value has these meanings:
-    /// Less than zero: this instance is less than <paramref name="obj" />.
-    /// Zero: this instance is equal to <paramref name="obj" />.
-    /// Greater than zero: this instance is greater than <paramref name="obj" />.
+    /// Less than zero: this instance is less than <paramref name="other" />.
+    /// Zero: this instance is equal to <paramref name="other" />.
+    /// Greater than zero: this instance is greater than <paramref name="other" />.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public readonly int CompareTo(BigDecimal other)
@@ -509,17 +496,17 @@ public partial struct BigDecimal :
         return Sign > 0 ? trunc + One : trunc;
     }
 
-    public readonly BigDecimal Round(int decs)
+    public readonly BigDecimal Round(int precision = 0)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(decs);
+        ArgumentOutOfRangeException.ThrowIfNegative(precision);
 
-        if (scale <= decs) return this;
+        if (scale <= precision) return this;
 
-        BigInteger p = BigInteger.Pow(BigIntegerTen, scale - decs);
-        BigInteger q = BigInteger.DivRem(unscaled, p, out BigInteger r);
-        if (r >= p / 2) q += BigInteger.One;
+        var p = BigInteger.Pow(BigIntegerTen, scale - precision);
+        var q = BigInteger.DivRem(unscaled, p, out var r);
+        if (r >= p / 2L) q += BigInteger.One;
 
-        return new (q, decs);
+        return new BigDecimal(q, precision);
     }
     
     public readonly byte[] ToByteArray()
@@ -543,11 +530,11 @@ public partial struct BigDecimal :
 
     public static implicit operator BigDecimal(sbyte n) => new (n);
 
-    public static implicit operator BigDecimal(byte n) => new ((uint)n);
+    public static implicit operator BigDecimal(byte n) => new (n);
 
     public static implicit operator BigDecimal(short n) => new (n);
 
-    public static implicit operator BigDecimal(ushort n) => new ((uint)n);
+    public static implicit operator BigDecimal(ushort n) => new (n);
 
     public static implicit operator BigDecimal(int n) => new (n);
 
@@ -557,13 +544,16 @@ public partial struct BigDecimal :
 
     public static implicit operator BigDecimal(ulong n) => new (n);
 
-    public static implicit operator BigDecimal(BigInteger i) => new (i);
+    public static implicit operator BigDecimal(BigInteger n) => new (n);
 
     public static explicit operator BigDecimal(float x) => new (x);
 
     public static explicit operator BigDecimal(double x) => new (x);
 
     public static implicit operator BigDecimal(decimal d) => new (d);
+
+    public static explicit operator BigDecimal(Fraction d) =>
+        FromRational(d.Numerator, d.Denominator, MAX_SCALE, MidpointRounding.ToEven);
 
     #endregion
 
@@ -591,7 +581,7 @@ public partial struct BigDecimal :
 
     public static explicit operator decimal(BigDecimal self) => self.ToDecimal(null);
 
-    public static explicit operator BigInteger(BigDecimal self) => self.Round(0).unscaled;
+    public static explicit operator BigInteger(BigDecimal self) => self.Round().unscaled;
 
     public static explicit operator Fraction(BigDecimal self)
     {
@@ -697,31 +687,31 @@ public partial struct BigDecimal :
         RegexOptions.Compiled)]
     private static partial Regex GetDecimalRegex();
 
-    private readonly BigDecimal Inflate(int decs)
+    private readonly BigDecimal Inflate(int toScale)
     {
-        if (decs <= scale) return this;
+        if (toScale <= scale) return this;
 
-        BigInteger powers = BigInteger.Pow(BigIntegerTen, decs - scale);
-        return new (unscaled * powers, decs);
+        var pow10 = BigInteger.Pow(BigIntegerTen, toScale - scale);
+        return new BigDecimal(unscaled * pow10, toScale);
     }
 
     private readonly BigDecimal Deflate()
     {
         if (scale <= 0) return this;
 
-        BigInteger i = unscaled;
-        int decs = scale;
+        BigInteger n = unscaled;
+        int toScale = scale;
         
-        while (decs > 0)
+        while (toScale > 0)
         {
-            BigInteger q = BigInteger.DivRem(i, BigIntegerTen, out BigInteger r);
-            if (r != BigInteger.Zero) break;
+            var q = BigInteger.DivRem(n, BigIntegerTen, out var r);
+            if (r.IsZero) break;
 
-            i = q;
-            --decs;
+            n = q;
+            --toScale;
         }
 
-        return new (i, decs);
+        return new BigDecimal(n, toScale);
     }
 
     private readonly BigDecimal Opposite() => new (-unscaled, scale);
@@ -753,42 +743,68 @@ public partial struct BigDecimal :
     private static BigDecimal Divide(BigDecimal a, BigDecimal b)
     {
         // Assuming a.scale == b.scale
-        BigInteger q = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
-        int decs = 0;
+        var q = BigInteger.DivRem(a.unscaled, b.unscaled, out var r);
+        var toScale = 0;
         
-        while (decs < MAX_SCALE && !r.IsZero)
+        while (toScale < MAX_SCALE && !r.IsZero)
         {
-            BigInteger q1 = BigInteger.DivRem(r * BigIntegerTen, b.unscaled, out BigInteger r1);
+            var q1 = BigInteger.DivRem(r * BigIntegerTen, b.unscaled, out var r1);
             q = q * BigIntegerTen + q1;
             r = r1;
-            ++decs;
+            ++toScale;
         }
 
-        return new BigDecimal(q, decs).Deflate();
+        return new BigDecimal(q, toScale).Deflate();
     }
 
     private static BigDecimal Modulo(BigDecimal a, BigDecimal b)
     {
         // Assuming a.scale == b.scale
-        _ = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
+        _ = BigInteger.DivRem(a.unscaled, b.unscaled, out var r);
         return new BigDecimal(r, a.scale).Deflate();
     }
+    
+    private static BigDecimal FromRational(BigInteger numerator, BigInteger denominator,
+                                           int scale, MidpointRounding rounding)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(scale);
 
-    private readonly (long, long) ToRational() => ((long)unscaled, MathExt.Pow(10L, scale));
+        var factor = BigInteger.Pow(BigIntegerTen, scale);
+        var scaled = numerator * factor;
+        var q = BigInteger.DivRem(scaled, denominator, out var r);
+
+        if (!r.IsZero)
+        {
+            var roundUp = rounding switch
+            {
+                MidpointRounding.AwayFromZero =>
+                    BigInteger.Abs(r) * 2 >= BigInteger.Abs(denominator),
+                MidpointRounding.ToEven =>
+                    BigInteger.Abs(r) * 2 > BigInteger.Abs(denominator) ||
+                    (BigInteger.Abs(r) * 2 == BigInteger.Abs(denominator) && !q.IsEven),
+                _ => throw new NotSupportedException()
+            };
+
+            if (roundUp) q += numerator.Sign;
+        }
+
+        return new BigDecimal(q, scale);
+    }
+
+    private readonly (BigInteger, BigInteger) ToRational() => (unscaled, BigInteger.Pow(BigIntegerTen, scale));
     
     private readonly string ToScientificString()
     {
-        BigInteger abs = BigInteger.Abs(unscaled);
-        string digits = abs.ToString();
-        int exponent = digits.Length - scale - 1;
+        var abs = BigInteger.Abs(unscaled);
+        var digits = abs.ToString();
+        var exponent = digits.Length - scale - 1;
 
         if (digits.Length == 1)
-            return (unscaled.Sign < 0 ? "-" : "") +
-                   digits + "e" + exponent.ToString(CultureInfo.InvariantCulture);
+            return (unscaled.Sign < 0 ? "-" : "") + digits + "e" +
+                   exponent.ToString(CultureInfo.InvariantCulture);
 
-        return (unscaled.Sign < 0 ? "-" : "") +
-               digits[0] + "." + digits.Substring(1) +
-               "e" + exponent.ToString(CultureInfo.InvariantCulture);
+        return (unscaled.Sign < 0 ? "-" : "") + digits[0] + "." + digits[1..] + "e" +
+               exponent.ToString(CultureInfo.InvariantCulture);
     }
 
     #endregion

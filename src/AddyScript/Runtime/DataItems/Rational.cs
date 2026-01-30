@@ -16,8 +16,10 @@ public sealed class Rational : DataItem
 
     public Rational(Fraction value) => this.value = value;
 
-    public Rational(long numerator, long denominator = 1L) =>
+    public Rational(BigInteger numerator, BigInteger denominator) =>
         value = new Fraction(numerator, denominator);
+
+    public Rational(BigInteger numerator) => value = new Fraction(numerator);
 
     public Rational Opposite => new (-value);
 
