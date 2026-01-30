@@ -51,53 +51,31 @@ public partial struct BigDecimal :
 
     public BigDecimal(BigInteger i) : this(i, 0) { }
 
-    public BigDecimal(float x) : this(x.ToString(CultureInfo.InvariantCulture)) { }
+    public BigDecimal(float x) : this((double)x) { }
 
-    public BigDecimal(double x) : this(x.ToString(CultureInfo.InvariantCulture)) { }
-
-    public BigDecimal(decimal d) : this(d.ToString(CultureInfo.InvariantCulture)) { }
-
-    public BigDecimal(string s)
+    public BigDecimal(double x)
     {
-        if (string.IsNullOrEmpty(s)) throw new FormatException();
+        if (double.IsNaN(x) || double.IsInfinity(x))
+            throw new ArithmeticException();
 
-        var input = s[0] switch
-        {
-            '.' => "0" + s,
-            '+' or '-' when s.Length > 1 && s[1] == '.' => s.Insert(1, "0"),
-            _ => s
-        };
+        // "R" guarantees round-trip exactness
+        var tmp = Parse(x.ToString("R", CultureInfo.InvariantCulture));
+        unscaled = tmp.unscaled;
+        scale = tmp.scale;
+    }
+    
+    public BigDecimal(decimal d)
+    {
+        int[] bits = decimal.GetBits(d);
 
-        Match match = DecimalRegex.Match(input);
-        if (!match.Success) throw new FormatException();
+        var (lo, mid, hi, ext) = (bits[0], bits[1], bits[2], bits[3]);
+        bool negate = (ext & unchecked((int)0x80000000)) != 0;
+        int decs = (ext >> 16) & 0x7F;
 
-        StringBuilder sb = new ();
+        var value = ((BigInteger)(uint)hi << 64) | ((BigInteger)(uint)mid << 32) | (uint)lo;
+        if (negate) value = -value;
 
-        Group signGroup = match.Groups["SIGN"];
-        if (signGroup.Success) sb.Append(signGroup.Value);
-
-        Group integerGroup = match.Groups["INTEGER"];
-        if (integerGroup.Success) sb.Append(integerGroup.Value);
-
-        int decs = 0;
-
-        Group decimalsGroup = match.Groups["DECIMALS"];
-        if (decimalsGroup.Success)
-        {
-            decs = decimalsGroup.Length;
-            sb.Append(decimalsGroup.Value);
-        }
-
-        Group exponentGroup = match.Groups["EXPONENT"];
-        if (exponentGroup.Success) decs -= int.Parse(exponentGroup.Value[1..]);
-
-        if (decs < 0)
-        {
-            sb.Append('0', -decs);
-            decs = 0;
-        }
-
-        var tmp = new BigDecimal(BigInteger.Parse(sb.ToString()), decs).Deflate();
+        var tmp = new BigDecimal(value, decs).Deflate();
         unscaled = tmp.unscaled;
         scale = tmp.scale;
     }
@@ -280,7 +258,22 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly float ToSingle(IFormatProvider provider) => (float)unscaled / (float)Math.Pow(10.0, scale);
+    public readonly float ToSingle(IFormatProvider provider)
+    {
+        if (unscaled.IsZero)
+            return 0.0f * (unscaled.Sign < 0 ? -1.0f : 1.0f);
+
+        // float range:
+        // max ≈ 3.4028235e+38
+        // min normal ≈ 1.17549435e−38
+        // min subnormal ≈ 1.401298e−45
+        if (scale is < -45 or > 38)
+            return unscaled.Sign < 0 ? float.NegativeInfinity : float.PositiveInfinity;
+
+        // Convert via canonical scientific decimal string
+        // Let the CLR perform IEEE-754 rounding
+        return float.Parse(ToScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.
@@ -290,7 +283,20 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly double ToDouble(IFormatProvider provider) => (double)unscaled / Math.Pow(10.0, scale);
+    public readonly double ToDouble(IFormatProvider provider)
+    {
+        if (unscaled.IsZero)
+            return 0.0 * (unscaled.Sign < 0 ? -1.0 : 1.0);
+
+        // Fast overflow check (decimal exponent too large for double)
+        // double max ≈ 1.7976931348623157E308
+        if (scale is < -324 or > 308)
+            return unscaled.Sign < 0 ? double.NegativeInfinity : double.PositiveInfinity;
+
+        // Convert via canonical decimal string
+        // This guarantees IEEE-754 round-to-nearest-even
+        return double.Parse(ToScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="T:System.Decimal" /> number using the specified culture-specific formatting information.
@@ -300,7 +306,25 @@ public partial struct BigDecimal :
     /// </returns>
     /// <param name="provider">An <see cref="IFormatProvider" /> interface implementation that supplies culture-specific formatting information.</param>
     /// <filterpriority>2</filterpriority>
-    public readonly decimal ToDecimal(IFormatProvider provider) => (decimal)unscaled / (decimal)Math.Pow(10.0, scale);
+    public readonly decimal ToDecimal(IFormatProvider provider)
+    {
+        // decimal supports only scale 0–28
+        if (scale is < 0 or > 28)
+            throw new OverflowException("Scale out of range for decimal");
+
+        // decimal mantissa is 96 bits
+        var abs = BigInteger.Abs(unscaled);
+        if (abs.GetBitLength() > 96)
+            throw new OverflowException("Magnitude too large for decimal");
+
+        // Extract 96-bit integer
+        var lo = (uint)(abs & uint.MaxValue);
+        var mid = (uint)((abs >> 32) & uint.MaxValue);
+        var hi = (uint)((abs >> 64) & uint.MaxValue);
+        var negate = unscaled.Sign < 0;
+
+        return new decimal((int)lo, (int)mid, (int)hi, negate, (byte)scale);
+    }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent <see cref="DateTime" /> using the specified culture-specific formatting information.
@@ -399,6 +423,63 @@ public partial struct BigDecimal :
 
     #endregion
 
+    public static BigDecimal Parse(string s)
+    {
+        if (string.IsNullOrEmpty(s)) throw new FormatException();
+
+        var input = s[0] switch
+        {
+            '.' => "0" + s,
+            '+' or '-' when s.Length > 1 && s[1] == '.' => s.Insert(1, "0"),
+            _ => s
+        };
+
+        Match match = DecimalRegex.Match(input);
+        if (!match.Success) throw new FormatException();
+
+        StringBuilder sb = new ();
+
+        Group signGroup = match.Groups["SIGN"];
+        if (signGroup.Success) sb.Append(signGroup.Value);
+
+        Group integerGroup = match.Groups["INTEGER"];
+        if (integerGroup.Success) sb.Append(integerGroup.Value);
+
+        int decs = 0;
+
+        Group decimalsGroup = match.Groups["DECIMALS"];
+        if (decimalsGroup.Success)
+        {
+            decs = decimalsGroup.Length;
+            sb.Append(decimalsGroup.Value);
+        }
+
+        Group exponentGroup = match.Groups["EXPONENT"];
+        if (exponentGroup.Success) decs -= int.Parse(exponentGroup.Value[1..]);
+
+        if (decs < 0)
+        {
+            sb.Append('0', -decs);
+            decs = 0;
+        }
+
+        return new BigDecimal(BigInteger.Parse(sb.ToString()), decs).Deflate();
+    }
+
+    public static bool TryParse(string s, out BigDecimal value)
+    {
+        try
+        {
+            value = Parse(s);
+            return true;
+        }
+        catch
+        {
+            value = default;
+            return false;
+        }
+    }
+
     public readonly override bool Equals(object obj) => obj is BigDecimal dec && this == dec;
 
     public readonly override int GetHashCode() => HashCode.Combine(unscaled, scale);
@@ -462,11 +543,11 @@ public partial struct BigDecimal :
 
     public static implicit operator BigDecimal(sbyte n) => new (n);
 
-    public static implicit operator BigDecimal(byte n) => new ((uint) n);
+    public static implicit operator BigDecimal(byte n) => new ((uint)n);
 
     public static implicit operator BigDecimal(short n) => new (n);
 
-    public static implicit operator BigDecimal(ushort n) => new ((uint) n);
+    public static implicit operator BigDecimal(ushort n) => new ((uint)n);
 
     public static implicit operator BigDecimal(int n) => new (n);
 
@@ -675,7 +756,7 @@ public partial struct BigDecimal :
         BigInteger q = BigInteger.DivRem(a.unscaled, b.unscaled, out BigInteger r);
         int decs = 0;
         
-        while (decs < MAX_SCALE && r != BigInteger.Zero)
+        while (decs < MAX_SCALE && !r.IsZero)
         {
             BigInteger q1 = BigInteger.DivRem(r * BigIntegerTen, b.unscaled, out BigInteger r1);
             q = q * BigIntegerTen + q1;
@@ -694,6 +775,21 @@ public partial struct BigDecimal :
     }
 
     private readonly (long, long) ToRational() => ((long)unscaled, MathExt.Pow(10L, scale));
+    
+    private readonly string ToScientificString()
+    {
+        BigInteger abs = BigInteger.Abs(unscaled);
+        string digits = abs.ToString();
+        int exponent = digits.Length - scale - 1;
+
+        if (digits.Length == 1)
+            return (unscaled.Sign < 0 ? "-" : "") +
+                   digits + "e" + exponent.ToString(CultureInfo.InvariantCulture);
+
+        return (unscaled.Sign < 0 ? "-" : "") +
+               digits[0] + "." + digits.Substring(1) +
+               "e" + exponent.ToString(CultureInfo.InvariantCulture);
+    }
 
     #endregion
 }

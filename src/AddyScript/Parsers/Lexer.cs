@@ -194,7 +194,7 @@ public class Lexer
                 'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                             ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
                             : MakeToken(TokenID.Unknown, numberStr, true),
-                'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(numberStr), true),
+                'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
                 _ => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                    ? MakeToken(TokenID.LT_Float, aDouble, false)
                    : MakeToken(TokenID.Unknown, numberStr, false),
@@ -209,7 +209,7 @@ public class Lexer
             'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                         ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
                         : MakeToken(TokenID.Unknown, numberStr, true),
-            'd' or 'D' => MakeToken(TokenID.LT_Decimal, new BigDecimal(numberStr), true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
             _ => int.TryParse(numberStr, NumberStyles.Integer, ci, out int anInt)
                ? MakeToken(TokenID.LT_Integer, anInt, false)
                : MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr), false),
