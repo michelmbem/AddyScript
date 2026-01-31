@@ -24,6 +24,7 @@ Example:
 ```JS
 a = 3/4;
 b = 1/4;
+l = (14, 27l, 0.3333333333333333, .5d);
 
 println('the numerator of {0} is {1}', a, a.num);
 println('the denominator of {0} is {1}', a, a.den);
@@ -36,6 +37,12 @@ println('{0} / {1} = {2}', a, b, a / b);
 println('{0} ** 2 = {1}', a, a ** 2);
 println('sign({0}) = {1}', a, sign(a));
 println('abs({0}) = {1}', a, abs(a));
+
+println();
+
+foreach (n in l) {
+    println($'{n} ({n.type}) converted to rational is {rational(n)}');
+}
 ```
 
 **Output**:
@@ -52,6 +59,11 @@ the inverse of (1/4) is 4
 (3/4) ** 2 = (9/16)
 sign((3/4)) = 1
 abs((3/4)) = (3/4)
+
+14 (int) converted to rational is 14
+27 (long) converted to rational is 27
+0,3333333333333333 (float) converted to rational is (1/3)
+0,5 (decimal) converted to rational is (1/2)
 ```
 
 ### Rational Number API
