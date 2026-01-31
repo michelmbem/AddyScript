@@ -1205,10 +1205,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             Consume(1); // Skip ';'
             return null;
         }
-        else if (modifier == Modifier.Abstract)
-            throw new SyntaxError(FileName, token, Resources.AbstractMemberCantHaveBody);
 
-        return FunctionBody(name, false, true, modifier == Modifier.Static);
+        return modifier == Modifier.Abstract
+             ? throw new SyntaxError(FileName, token, Resources.AbstractMemberCantHaveBody)
+             : FunctionBody(name, false, true, modifier == Modifier.Static);
     }
 
     /// <summary>

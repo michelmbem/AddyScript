@@ -48,9 +48,7 @@ public class ClassProperty : ClassMember
     /// <param name="readerBody">The read accessor body</param>
     /// <param name="writerBody">The write accessor body</param>
     public ClassProperty(string name, Scope scope, Modifier modifier, Block readerBody, Block writerBody = null) :
-        this(name, scope, modifier, PropertyAccess.None, scope, readerBody, scope, writerBody)
-    {
-    }
+        this(name, scope, modifier, PropertyAccess.None, scope, readerBody, scope, writerBody) { }
 
     /// <summary>
     /// Initializes a new instance of ClassProperty.
@@ -60,9 +58,7 @@ public class ClassProperty : ClassMember
     /// <param name="modifier">property's modifier; it may be <b>static</b>, <b>final</b>, <b>abstract</b> or nothing</param>
     /// <param name="access">The desired property access mode. Used for automatic accessors generation</param>
     public ClassProperty(string name, Scope scope, Modifier modifier, PropertyAccess access = PropertyAccess.ReadWrite) :
-        this(name, scope, modifier, access, scope, null, scope, null)
-    {
-    }
+        this(name, scope, modifier, access, scope, null, scope, null) { }
 
     /// <summary>
     /// The property's read accessor.
