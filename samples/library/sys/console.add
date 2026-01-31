@@ -7,7 +7,8 @@ function read()
 
 function readKey(echo = true)
 {
-	return Console::ReadKey(echo);
+	var info = Console::ReadKey(echo);
+	return (info.KeyChar, info.Key, info.Modifiers);
 }
 
 function keyAvail()
