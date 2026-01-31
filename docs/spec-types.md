@@ -6,14 +6,18 @@ These are structured data types that behave like primitive types. They are descr
 ## Rational Numbers
 
 A rational number is a pair of integers resulting from their division.
-The first member of the pair called **numerator** can be of any sign while the second member called **denominator** is always positive.
-The main purpose of defining a rational number type in AddyScript is to provide better handling of integer division.
-Thus, rational numbers are represented in AddyScript by the **rational** data type.
-Variables of this type can be used in arithmetic operations like other numeric data.
-However, there is no literal or initializer for the **rational** type.
-The only way to get a rational number is to divide two integers.
-Also note that some operations on rational numbers can return an integer (actually a **long**).
-Here is an example of a script using rational numbers:
+The first element of the pair, called the **numerator**, can have any sign,
+while the second, called the **denominator**, is always strictly positive.
+The main purpose of defining a rational number type in AddyScript is to improve the handling of integer division:
+dividing two integers always produces a rational number as the result.
+If you divide two integers and want the result to also be an integer, simply convert the result to the desired type.
+In AddyScript, rational numbers are represented by the **rational** data type.
+Variables of this type can be used in arithmetic operations like any other numeric data and
+are convertible to and from all other numeric data types.
+AddyScript even offers a smart conversion mechanism for **double** and **decimal** to **rational** numbers:
+it attempts to guess which fraction might have generated the floating-point or decimal number being converted.
+However, there is no literal value or initializer for the **rational** type; the only way to get a rational number
+is by dividing two integers (**int** or **long**). Here is an example script that uses rational numbers:
 
 Example:
 
@@ -64,7 +68,7 @@ The following table summarizes the members of the **rational** type and their us
 
 AddyScript also supports complex numbers as a primitive data type.
 This type is represented by the **complex** class.
-Internally, a complex number is represented as a pair of real numbers,
+Internally, a complex number is represented as a pair of real numbers;
 the first member of the pair is called the **real part** while the second is called the **imaginary part**.
 The language supports literal values for purely imaginary complex numbers.
 Those are numeric literal values with the **i** or **I** suffix (**e.g.:** `2i` or `-5I`).
