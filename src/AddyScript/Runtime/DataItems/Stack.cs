@@ -45,8 +45,7 @@ public sealed class Stack : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        StringBuilder sb = new ();
-        sb.Append($"<{Class.Name} {{size = {stack.Count}");
+        StringBuilder sb = new ($"<{Class.Name} {{size = {stack.Count}");
 
         if (stack.Count > 0)
         {

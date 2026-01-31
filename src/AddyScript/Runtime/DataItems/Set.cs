@@ -45,18 +45,18 @@ public sealed class Set : DataItem
     public override string ToString(string format, IFormatProvider formatProvider)
     {
         StringBuilder sb = new ("{");
-        bool trimEnd = false;
+        bool stripEnd = false;
 
         foreach (DataItem element in hashSet)
         {
             sb.Append(element).Append(", ");
-            trimEnd = true;
+            stripEnd = true;
         }
 
-        if (trimEnd)
-            sb.Remove(sb.Length - 2, 2);
+        if (stripEnd) sb.Length -= 2;
+        sb.Append('}');
 
-        return sb.Append('}').ToString();
+        return sb.ToString();
     }
 
     protected override bool UnsafeEquals(DataItem other) => hashSet.SetEquals(other.AsHashSet);

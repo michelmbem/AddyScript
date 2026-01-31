@@ -73,9 +73,8 @@ public partial struct BigDecimal :
         var value = ((BigInteger)(uint)hi << 64) | ((BigInteger)(uint)mid << 32) | (uint)lo;
         if (negate) value = -value;
 
-        var tmp = new BigDecimal(value, decs).Deflate();
-        unscaled = tmp.unscaled;
-        scale = tmp.scale;
+        unscaled = value;
+        scale = decs;
     }
 
     public BigDecimal(byte[] bytes)

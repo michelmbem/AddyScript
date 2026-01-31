@@ -21,7 +21,7 @@ public sealed class Float(double value) : DataItem
 
     public override int AsInt32 => (int)value;
 
-    public override BigInteger AsBigInteger => new (value);
+    public override BigInteger AsBigInteger => (BigInteger)value;
 
     public override Fraction AsFraction => (Fraction)value;
 

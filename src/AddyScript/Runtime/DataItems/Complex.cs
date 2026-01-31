@@ -16,7 +16,7 @@ public sealed class Complex : DataItem
     public Complex(SysComplex value) => this.value = value;
 
     public Complex(double realPart, double imaginaryPart = 0) =>
-        value = new (realPart, imaginaryPart);
+        value = new SysComplex(realPart, imaginaryPart);
 
     public Complex Opposite => new (-value);
 

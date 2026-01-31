@@ -16,9 +16,10 @@ public sealed class Map : DataItem
 
     public Map() => dict = [];
 
-    public Map(int capacity) => dict = new (capacity);
+    public Map(int capacity) => dict = new Dictionary<DataItem, DataItem>(capacity);
 
-    public Map(Dictionary<DataItem, DataItem> initialContent) => dict = new (initialContent);
+    public Map(Dictionary<DataItem, DataItem> initialContent) =>
+        dict = new Dictionary<DataItem, DataItem>(initialContent);
 
     public override Class Class => Class.Map;
 
@@ -44,7 +45,7 @@ public sealed class Map : DataItem
 
         if (dict.Count > 0)
         {
-            bool trimEnd = false;
+            bool stripEnd = false;
 
             foreach (var pair in dict)
             {
@@ -53,10 +54,10 @@ public sealed class Map : DataItem
                   .Append(pair.Value.ToString(format, formatProvider))
                   .Append(", ");
 
-                trimEnd = true;
+                stripEnd = true;
             }
 
-            if (trimEnd) sb.Remove(sb.Length - 2, 2);
+            if (stripEnd) sb.Length -= 2;
         }
         else
             sb.Append("=>");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -11,17 +12,11 @@ namespace AddyScript.Runtime.DataItems;
 
 public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : DataItem
 {
-    public Object(Class klass) : this(klass, [])
-    {
-    }
+    public Object(Class klass) : this(klass, []) { }
 
-    public Object(Dictionary<string, DataItem> fields) : this(Class.Object, fields)
-    {
-    }
+    public Object(Dictionary<string, DataItem> fields) : this(Class.Object, fields) { }
 
-    public Object() : this(Class.Object, [])
-    {
-    }
+    public Object() : this(Class.Object, []) { }
 
     public override Class Class => klass;
 
@@ -60,23 +55,23 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         if (IsOverridden("toString"))
             return RuntimeServices.ToString(this, format);
 
-        var sb = new StringBuilder();
-        sb.Append($"<{Class.Name} {{");
-
-        bool trimEnd = false;
-
-        foreach (var pair in fields)
+        StringBuilder sb = new ($"<{Class.Name} {{");
+        bool stripEnd = false;
+        var publicFields = from pair in fields
+                           let field = klass.GetField(pair.Key)
+                           where field == null || field.Scope == Scope.Public
+                           select pair;
+        
+        foreach (var (name, value) in publicFields)
         {
-            ClassField field = klass.GetField(pair.Key);
-            if (field is { Scope: not Scope.Public }) continue;
-            
-            sb.Append($"{pair.Key} = {pair.Value.ToString(format, formatProvider)}, ");
-            trimEnd = true;
+            sb.Append($"{name} = {value.ToString(format, formatProvider)}, ");
+            stripEnd = true;
         }
 
-        if (trimEnd) sb.Remove(sb.Length - 2, 2);
-
-        return sb.Append("}>").ToString();
+        if (stripEnd) sb.Length -= 2;
+        sb.Append("}>");
+        
+        return sb.ToString();
     }
 
     protected override bool UnsafeEquals(DataItem other)
@@ -110,22 +105,21 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
 
     public override object ConvertTo(Type targetType)
     {
-        if (!(targetType == typeof(DataItem) || targetType == typeof(object)))
-        {
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Static |
-                                       BindingFlags.Instance | BindingFlags.SetField |
-                                       BindingFlags.SetProperty | BindingFlags.OptionalParamBinding;
+        if (targetType == typeof(DataItem) || targetType == typeof(object))
+            return base.ConvertTo(targetType);
+        
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.Static |
+                                   BindingFlags.Instance | BindingFlags.SetField |
+                                   BindingFlags.SetProperty | BindingFlags.OptionalParamBinding;
 
-            var binder = new DataItemBinder();
-            object instance = Activator.CreateInstance(targetType);
+        var binder = new DataItemBinder();
+        object instance = Activator.CreateInstance(targetType);
 
-            foreach (var pair in fields)
-                targetType.InvokeMember(pair.Key, flags, binder, instance, [pair.Value]);
+        foreach (var (name, value) in fields)
+            targetType.InvokeMember(name, flags, binder, instance, [value]);
 
-            return instance;
-        }
+        return instance;
 
-        return base.ConvertTo(targetType);
     }
 
     public override DataItem GetProperty(string propertyName)

@@ -45,8 +45,7 @@ public sealed class Queue : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        StringBuilder sb = new ();
-        sb.Append($"<{Class.Name} {{size = {queue.Count}");
+        StringBuilder sb = new ($"<{Class.Name} {{size = {queue.Count}");
 
         if (queue.Count > 0)
         {

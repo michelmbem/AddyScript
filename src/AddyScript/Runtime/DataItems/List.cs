@@ -43,19 +43,18 @@ public sealed class List : DataItem
     public override string ToString(string format, IFormatProvider formatProvider)
     {
         StringBuilder sb = new ("[");
-        bool trimEnd = false;
+        bool stripEnd = false;
 
         foreach (DataItem item in list)
         {
-            sb.Append(item.ToString(format, formatProvider))
-              .Append(", ");
-
-            trimEnd = true;
+            sb.Append(item.ToString(format, formatProvider)).Append(", ");
+            stripEnd = true;
         }
 
-        if (trimEnd) sb.Remove(sb.Length - 2, 2);
+        if (stripEnd) sb.Length -= 2;
+        sb.Append(']');
 
-        return sb.Append(']').ToString();
+        return sb.ToString();
     }
 
     protected override bool UnsafeEquals(DataItem other)

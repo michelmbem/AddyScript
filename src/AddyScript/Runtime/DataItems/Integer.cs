@@ -70,7 +70,7 @@ public sealed class Integer(int value) : DataItem
                 BinaryOperator.Times => new Integer(checked(value * operand.AsInt32)),
                 BinaryOperator.Divide => new Rational(new Fraction(value, operand.AsBigInteger)),
                 BinaryOperator.Modulo => new Integer(value % operand.AsInt32),
-                BinaryOperator.Power => Power(value, operand.AsInt32),
+                BinaryOperator.Power => new Integer(MathExt.Pow(value, operand.AsInt32)),
                 BinaryOperator.And => new Integer(value & operand.AsInt32),
                 BinaryOperator.Or => new Integer(value | operand.AsInt32),
                 BinaryOperator.ExclusiveOr => new Integer(value ^ operand.AsInt32),
@@ -87,11 +87,5 @@ public sealed class Integer(int value) : DataItem
         {
             return new Long(value).BinaryOperation(_operator, operand);
         }
-    }
-
-    private static DataItem Power(int m, int n)
-    {
-        long power = MathExt.Pow(m, n);
-        return power > int.MaxValue ? new Long(power) : new Integer((int)power);
     }
 }

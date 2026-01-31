@@ -28,9 +28,11 @@ public sealed class Resource(object handle) : DataItem
 
     public override string ToString(string format, IFormatProvider formatProvider)
     {
-        return handle is IFormattable formattable
-             ? formattable.ToString(format, formatProvider)
-             : handle.ToString();
+        var s = handle is IFormattable formattable
+            ? formattable.ToString(format, formatProvider)
+            : handle.ToString();
+        
+        return s ?? string.Empty;
     }
 
     protected override bool UnsafeEquals(DataItem other) => handle.Equals(other.AsNativeObject);

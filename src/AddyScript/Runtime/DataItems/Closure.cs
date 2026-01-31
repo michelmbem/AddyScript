@@ -21,7 +21,7 @@ public sealed class Closure(Function function) : DataItem
         var sb = new StringBuilder();
         sb.Append($"<{Class.Name} (");
 
-        bool trimEnd = false;
+        bool stripEnd = false;
 
         foreach (var param in function.Parameters)
         {
@@ -50,10 +50,10 @@ public sealed class Closure(Function function) : DataItem
                 }
 
             sb.Append(", ");
-            trimEnd = true;
+            stripEnd = true;
         }
 
-        if (trimEnd) sb.Remove(sb.Length - 2, 2);
+        if (stripEnd) sb.Length -= 2;
 
         return sb.Append(")>").ToString();
     }

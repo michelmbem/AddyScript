@@ -32,10 +32,10 @@ public static class DataItemFactory
             TypeCode.Char or TypeCode.String => new String(Convert.ToString(value)),
             _ => value switch
             {
-                DataItem dataItem => dataItem,
+                DataItem item => item,
                 BigInteger bigint => new Long(bigint),
                 BigDecimal bigdec => new Decimal(bigdec),
-                Fraction rational => new Rational(rational),
+                Fraction fraction => new Rational(fraction),
                 SysComplex complex => new Complex(complex),
                 TimeSpan timespan => new Duration(timespan),
                 byte[] bytes => new Blob(bytes),

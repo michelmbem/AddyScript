@@ -6,16 +6,13 @@ namespace AddyScript.Runtime.Utilities;
 
 public static class MathExt
 {
-    public static bool Equal(double a, double b, double tolerance = double.Epsilon) =>
-        Math.Abs(a - b) <= tolerance;
-
-    public static long Pow(long n, int exp)
+    public static int Pow(int n, int exp)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(exp);
 
-        if (exp == 0) return 1L;
+        if (exp == 0) return 1;
 
-        var (factor, result) = (n, 1L);
+        var (factor, result) = (n, 1);
 
         while (exp != 0)
         {
@@ -27,6 +24,9 @@ public static class MathExt
 
         return result;
     }
+
+    public static bool Equal(double a, double b, double tolerance = double.Epsilon) =>
+        Math.Abs(a - b) <= tolerance;
 
     public static double Modulo(double a, double b)
     {
