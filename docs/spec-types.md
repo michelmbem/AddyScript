@@ -24,6 +24,7 @@ Example:
 ```JS
 a = 3/4;
 b = 1/4;
+c = 11/7;
 l = (14, 27l, 0.3333333333333333, .5d);
 
 println('the numerator of {0} is {1}', a, a.num);
@@ -39,7 +40,13 @@ println('sign({0}) = {1}', a, sign(a));
 println('abs({0}) = {1}', a, abs(a));
 
 println();
+println('{0} as an int is {1}', c, int(c));
+println('{0} as a long is {1}', c, long(c));
+println('{0} as a float is {1}', c, float(c));
+println('{0} as a decimal is {1}', c, decimal(c));
+println('{0} as a complex is {1}', c, complex(c));
 
+println();
 foreach (n in l) {
     println($'{n} ({n.type}) converted to rational is {rational(n)}');
 }
@@ -59,6 +66,12 @@ the inverse of (1/4) is 4
 (3/4) ** 2 = (9/16)
 sign((3/4)) = 1
 abs((3/4)) = (3/4)
+
+(11/7) as an int is 1
+(11/7) as a long is 1
+(11/7) as a float is 1,5714285714285714
+(11/7) as a decimal is 1,57142857142857142857142857142857142857142857142857
+(11/7) as a complex is 1,5714285714285714
 
 14 (int) converted to rational is 14
 27 (long) converted to rational is 27
@@ -82,7 +95,7 @@ AddyScript also supports complex numbers as a primitive data type.
 This type is represented by the **complex** class.
 Internally, a complex number is represented as a pair of real numbers;
 the first member of the pair is called the **real part** while the second is called the **imaginary part**.
-The language supports literal values for purely imaginary complex numbers.
+The language supports literal values for purely imaginary complex numbers (i.e.: those that have a zero real part).
 Those are numeric literal values with the **i** or **I** suffix (**e.g.:** `2i` or `-5I`).
 Complex numbers can be involved in arithmetic operations like other numeric data types.
 Any arithmetic operation involving a real number and a purely imaginary complex number will produce a complex number as a result.
