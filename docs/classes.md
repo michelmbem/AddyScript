@@ -45,7 +45,7 @@ The specification of a method is just a function declaration embedded into the c
 ### Specifying a property:
 
 A property is a pair of methods used to read and/or write the value of a field.
-AddyScript provides a dedicated syntax for defining properties of a class.
+AddyScript provides a dedicated syntax for defining the properties of a class.
 The specification of a property follows this syntax:
 
 ```
@@ -68,10 +68,10 @@ Where
 * The block prefixed by **read** is called the **read accessor** (or simply **reader**). This is actually the body of the method that will be used to read the value of the backing field. It usually ends with a parameterized **return** statement.
 * The block prefixed by **write** is called the **write accessor** (or simply **writer**). This is the body of the method that will be used to write (update) the value of the backing field. In this block, the script can refer to a special variable called **__value**. This is the value assigned to the property.
 * Each of these accessors can be omitted, but not both at the same time.
-* One of the accessors can be defined on a different scope than the property itself: for example, a public property can have a private writer. Such a property can only be updated by the class itself.
+* One of the accessors can be defined in a different scope than the property itself: for example, a public property can have a private writer. Such a property can only be updated by the class itself.
 * Neither **read**, nor **write**, nor **__value** are AddyScript keywords. They are simply identifiers that have a special meaning in a particular context (let's say they are **contextual keywords**).
 * Since both reader and writer are functions, they can also be reduced to an arrow followed by an expression when they consist of just an expression or a parameterized **return** statement.
-* When the property is read-only (i.e. it has no writer), and that its reader does nothing more than return a value, the entire property can be declared with the following syntax: `property property_name => returned_value;`. That syntax is equivalent to  `property property_name { read => returned_value; }`.
+* When the property is read-only (i.e.: it has no writer), and that its reader does nothing more than return a value, the entire property can be declared with the following syntax: `property property_name => returned_value;`. That syntax is equivalent to  `property property_name { read => returned_value; }`.
 
 #### Automatic properties:
 
@@ -84,11 +84,43 @@ property property_name { [scope] read; [scope] write; }
 ```
 
 As you can see, with this syntax, accessors are reduced to the contextual keywords **read** and **write** optionally preceded by a scope.
-For such a property, the scripting engine automatically generates a backing field as well as the accessors logic.
+For such a property, the scripting engine automatically generates a backing field as well as the accessor's logic.
 The content between braces can even be omitted if no accessors have a different scope than the property itself,
 resulting in something as short as: `property property_name;` which is equivalent to `property property_name { read; write; }`.
 
 **Remark**: The specification of an automatic property is identical to that of an abstract property except that the scripting engine doesn't generate any logic for an abstract property. It expects concrete subclasses to do so.
+
+#### Semi-automatic properties:
+
+A property can have one of its accessors defined automatically, while the other one is defined manually.
+This can be useful when one of the accessors is trivial while the other one requires more complex logic.
+Such a property is called a **semi-automatic property**. The scripting engine will generate the backing field for it.
+An auto-generated backing field is always private and has the same name as the property itself prefixed by a double underscore (__).
+The syntax for defining a semi-automatic property is as follows.
+
+```
+property property_name
+{
+  [scope] read;
+  [scope] write
+  {
+    // statements
+  }
+}
+```
+
+Or
+
+```
+property property_name
+{
+  [scope] read
+  {
+    // statements
+  }
+  [scope] write;
+}
+```
 
 #### Indexers:
 
@@ -104,13 +136,13 @@ An indexer's writer also takes the implicit parameter **__value** like any other
 
 An event specification consists of the **event** keyword followed by the prototype of the event.
 The prototype is a name (an identifier) followed by a comma-separated list of parameters in parentheses.
-Once an _foo_ event is defined in a class, this automatically adds three methods to the class:
+Once a _foo_ event is defined in a class, this automatically adds three methods to the class:
 
 * A method to add handlers to the _foo_ event: `void add_foo(closure handler)`
 * A method to remove handlers from the _foo_ event: `void remove_foo(closure handler)`
-* A method to trigger the _foo_ event: `void trigger_foo(...)`.     
+* A method to trigger the _foo_ event: `void trigger_foo(...)`.
 
-    _trigger_foo_ is always private and always has the same parameters as the event itself.
+  _trigger_foo_ is always private and always has the same parameters as the event itself.
 
 ### Specifying an operator overload:
 
@@ -245,9 +277,9 @@ Phone Book:
  - Jane Smith: 555-5678
 ```
 
-## The **this** keyword
+## The keyword **this**
 
-In the body of a method, the **this** keyword can be used to refer to the current instance of the class (the one on which the method is invoked).
+In the body of a method, the keyword **this** can be used to refer to the current instance of the class (the one on which the method is invoked).
 Most of the time, you will use this feature to access other members of a class from the body of one of its methods.
 
 ## Constructors
@@ -267,11 +299,11 @@ Where
 
 * _scope_ is one of the **private**, **protected** and **public** keywords. If no scope is provided, **private** is assumed by default.
 
-    _scope_ has the following effects on instance creation:
+  _scope_ has the following effects on instance creation:
 
-    * **private**: Only the class will be able to create instances of itself.
-    * **protected**: Only the class and its derived classes will be able to create instances of itself.
-    * **public**: Instances of the class can be created anywhere in the code.
+  * **private**: Only the class will be able to create instances of itself.
+  * **protected**: Only the class and its derived classes will be able to create instances of itself.
+  * **public**: Instances of the class can be created anywhere in the code.
 
 * The optional 'colon-super' part is used to invoke the constructor of the parent class (if any) prior to any other statement.
 * A constructor is not allowed to return a value.
@@ -283,7 +315,6 @@ class Person
 {
     // Fields: we don't need default values anymore as the constructor is supplying them
     private _name;
-    private _sex;
     private _courtesy;
     
     // Here is the constructor, all parameters are made optional to allow the user to omit them
@@ -301,18 +332,18 @@ class Person
         write => this._name = __value;
     }
     
-    // A property with the typical syntax
+    // A semi-automatic property
     public property sex
     {
-        read { return this._sex; }
+        read;
         write
         {
             // Updating sex will also update courtesy and raise the sex_changed event
-            var oldSex = this._sex;
-            this._sex = __value;
-            this._courtesy = __value.toLower() switch {
-                'male' => 'Mr.',
-                'female' => 'Mrs.',
+            var oldSex = this.__sex;
+            this.__sex = __value;
+            this._courtesy = __value switch {
+                matches '/male/i' => 'Mr.',
+                matches '/female/i' => 'Mrs.',
                 _ => 'Dear'
             };
             this.trigger_sex_changed(oldSex, __value);

@@ -770,7 +770,7 @@ public class Interpreter
                             propValue = new Closure(function);
                             break;
                         }
-                        case ClassProperty property when property.CanRead:
+                        case ClassProperty { CanRead: true } property:
                             CheckAccess(property.Reader, propertyRef);
                             Invoke(property.Reader.Function, property.Name, property.Holder, owner);
                             return;
@@ -807,7 +807,7 @@ public class Interpreter
                 case ClassField field:
                     returnedValue = field.SharedValue;
                     break;
-                case ClassProperty property when property.CanRead:
+                case ClassProperty { CanRead: true } property:
                     CheckAccess(property.Reader, staticRef);
                     Invoke(property.Reader.Function, property.Name, property.Holder, null);
                     break;

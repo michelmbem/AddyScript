@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 
@@ -29,18 +31,12 @@ public class ClassProperty : ClassMember
         base(name, scope, modifier)
     {
         if (readerBody != null || access.HasFlag(PropertyAccess.Read))
-        {
-            Parameter[] readerParameters = IsIndexer ? [new(ForEachLoop.DEFAULT_KEY_NAME)] : [];
-            Reader = new ClassMethod(GetReaderName(name), readerScope, modifier, new (readerParameters, readerBody));
-        }
+            Reader = new ClassMethod(GetReaderName(name), readerScope, modifier,
+                                     new Function(GetAccessorParameters(false), readerBody));
 
-        if (writerBody == null && !access.HasFlag(PropertyAccess.Write)) return;
-        
-        Parameter[] writerParameters = IsIndexer
-            ? [new(ForEachLoop.DEFAULT_KEY_NAME), new(WRITER_PARAMETER_NAME)]
-            : [new(WRITER_PARAMETER_NAME)];
-
-        Writer = new ClassMethod(GetWriterName(name), writerScope, modifier, new(writerParameters, writerBody));
+        if (writerBody != null || access.HasFlag(PropertyAccess.Write))
+            Writer = new ClassMethod(GetWriterName(name), writerScope, modifier,
+                                     new Function(GetAccessorParameters(true), writerBody));
     }
 
     /// <summary>
@@ -174,5 +170,18 @@ public class ClassProperty : ClassMember
                                                 new VariableRef(WRITER_PARAMETER_NAME)),
                                  new Return());
         }
+    }
+    
+    /// <summary>
+    /// Gets the parameters of an accessor.
+    /// </summary>
+    /// <param name="isWriter">Whether the accessor is a writer</param>
+    /// <returns>An array of <see cref="Parameter"/></returns>
+    private Parameter[] GetAccessorParameters(bool isWriter)
+    {
+        List<Parameter> parameters = [];
+        if (IsIndexer) parameters.Add(new Parameter(ForEachLoop.DEFAULT_KEY_NAME));
+        if (isWriter) parameters.Add(new Parameter(WRITER_PARAMETER_NAME));
+        return [..parameters];
     }
 }

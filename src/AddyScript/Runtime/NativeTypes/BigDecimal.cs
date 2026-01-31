@@ -565,8 +565,8 @@ public partial struct BigDecimal :
     public readonly BigDecimal Truncate()
     {
         if (scale <= 0) return this;
-        BigInteger powers = BigInteger.Pow(BigIntegerTen, scale);
-        return new (unscaled / powers);
+        var powers = BigInteger.Pow(BigIntegerTen, scale);
+        return new BigDecimal(unscaled / powers);
     }
 
     /// <summary>
@@ -885,7 +885,7 @@ public partial struct BigDecimal :
             if (roundUp) q += numerator.Sign;
         }
 
-        return new BigDecimal(q, scale);
+        return new BigDecimal(q, scale).Deflate();
     }
 
     private readonly (BigInteger, BigInteger) ToRational() => (unscaled, BigInteger.Pow(BigIntegerTen, scale));
