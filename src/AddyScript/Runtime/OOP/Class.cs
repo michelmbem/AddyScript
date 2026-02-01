@@ -14,6 +14,11 @@ namespace AddyScript.Runtime.OOP;
 /// </summary>
 public class Class : IFrameItem
 {
+    /// <summary>
+    /// The name of the property that holds a tuple of all record the class members.
+    /// </summary>
+    public const string RECORD_MEMBERS_PROPERTY_NAME = "__members";
+    
     #region Predefined classes
 
     #region Primitive types
@@ -136,6 +141,17 @@ public class Class : IFrameItem
 
     #endregion
 
+    #region Record
+
+    /// <summary>
+    /// Exception type.
+    /// </summary>
+    public static readonly Class Record =
+        new (Object, "Record", Modifier.Abstract, CreateDefaultConstructor("Record", Scope.Protected),
+             null, [], GetRecordProperties(), GetRecordMethods(), null);
+
+    #endregion
+
     #region Attribute
 
     /// <summary>
@@ -237,6 +253,7 @@ public class Class : IFrameItem
             Resource,
             Closure,
             Exception,
+            Record,
             Attribute,
             TypeInfo,
             MemberInfo,
@@ -569,9 +586,7 @@ public class Class : IFrameItem
     /// <param name="modifier">Determines the way this class supports inheritance</param>
     private Class(ClassID classID, string name, Modifier modifier) :
         this(classID, name, modifier, null, CreateDefaultConstructor(name, Scope.Private),
-        null, null, null, null, null)
-    {
-    }
+         null, null, null, null, null) { }
 
     /// <summary>
     /// Initializes a new instance of Class.
@@ -591,9 +606,8 @@ public class Class : IFrameItem
                  IEnumerable<ClassProperty> properties,
                  IEnumerable<ClassMethod> methods,
                  IEnumerable<ClassEvent> events) :
-        this(superClass.ClassID, name, modifier, superClass, constructor, indexer, fields, properties, methods, events)
-    {
-    }
+        this(superClass.ClassID, name, modifier, superClass, constructor,
+             indexer, fields, properties, methods, events) { }
 
     #endregion
 
@@ -754,6 +768,56 @@ public class Class : IFrameItem
                                         Block.WithReturn(PropertyRef.OfSelf("name")));
 
         return [new ("toString", Scope.Public, Modifier.Default, toStringFunc)];
+    }
+
+    /// <summary>
+    /// Gets the properties of the <i>Record</i> class.
+    /// </summary>
+    /// <returns>An array of <see cref="ClassProperty"/>s</returns>
+    private static IEnumerable<ClassProperty> GetRecordProperties() =>
+        [new (RECORD_MEMBERS_PROPERTY_NAME, Scope.Protected, Modifier.Abstract, PropertyAccess.Read)];
+
+    /// <summary>
+    /// Gets the methods of the <i>Record</i> class.
+    /// </summary>
+    /// <returns>An array of <see cref="ClassMethod"/>s</returns>
+    private static IEnumerable<ClassMethod> GetRecordMethods()
+    {
+        var equalsFunc = new Function([new Parameter("other")],
+                                      Block.WithReturn(new BinaryExpression(BinaryOperator.AndAlso,
+                                                                            new BinaryExpression(BinaryOperator.Equal,
+                                                                                PropertyRef.OfSelf("type"),
+                                                                                new PropertyRef(new VariableRef("other"), "type")),
+                                                                            new BinaryExpression(BinaryOperator.Equal,
+                                                                                PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME),
+                                                                                new PropertyRef(new VariableRef("other"), RECORD_MEMBERS_PROPERTY_NAME)))));
+
+        var hashCodeFunc = new Function([],
+                                        Block.WithReturn(new FunctionCall("hash",
+                                                                          [new Argument(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME), true)],
+                                                                          null)));
+
+        var toStringFunc = new Function([new Parameter("format", new String(""))],
+                                        Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
+                                                                              new PropertyRef(PropertyRef.OfSelf("type"), "name"),
+                                                                              PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME))));
+
+        var eqOpFunc = new Function([new Parameter("other")],
+                                        Block.WithReturn(MethodCall.OfSelf("equals",
+                                                                           new VariableRef("other"))));
+
+        var neqOpFunc = new Function([new Parameter("other")],
+                                    Block.WithReturn(new UnaryExpression(UnaryOperator.Not,
+                                                                         MethodCall.OfSelf("equals",
+                                                                             new VariableRef("other")))));
+
+        return [
+            new ("equals", Scope.Public, Modifier.Default, equalsFunc),
+            new ("hashCode", Scope.Public, Modifier.Default, hashCodeFunc),
+            new ("toString", Scope.Public, Modifier.Default, toStringFunc),
+            new (ClassMethod.GetMethodName(BinaryOperator.Equal), Scope.Public, Modifier.Default, eqOpFunc),
+            new (ClassMethod.GetMethodName(BinaryOperator.NotEqual), Scope.Public, Modifier.Default, neqOpFunc)
+        ];
     }
 
     /// <summary>

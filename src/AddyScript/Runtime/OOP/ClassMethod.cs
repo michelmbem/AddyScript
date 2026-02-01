@@ -65,6 +65,11 @@ public class ClassMethod(string name, Scope scope, Modifier modifier, Function f
     public Function Function => function;
 
     /// <summary>
+    /// Gets if this member is redefined in a subclass.
+    /// </summary>
+    public override bool IsOverriden => Holder?.SuperClass?.GetMethod(Name) != null;
+
+    /// <summary>
     /// Gets the name of the method that's mapped to an overloaded unary operator.
     /// </summary>
     /// <param name="_operator">The given unary operator</param>

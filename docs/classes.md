@@ -161,7 +161,7 @@ An operator overload specification consists of the **operator** keyword followed
 
 ### A simple class
 
-In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method and an event.
+In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method, and an event.
 
 ```JS
 class Person
@@ -445,6 +445,90 @@ There is a set of members that any class in AddyScript (including the void type)
 |`void dispose()`|method|Tries to release the unmanaged resources held by the target object. Does nothing for most types. For a collection or an object, recursively calls itself on each item or field. For a native object, tests if the object's type implements the _IDisposable_ interface and if so, invokes its _Dispose_ method.|
 
 Apart from the _type_ property, any of these members can be overridden in your custom classes. AddyScript internally uses them to compare data items and to identify them in collections.
+
+## Records
+
+A record is a special type of class that can be used to represent a simple data structure.
+Records are immutable and final by default. The script engine automatically generates a constructor for them,
+as well as an override of the _equals_, _hashCode_ and _toString_ methods.
+It also automatically generates a property for each field of the record.
+The equality (==) and the inequality (!=) operators are overloaded to compare records.
+The syntax for defining a record is as follows:
+
+Form 1:
+
+```
+record recordName(field1, field2, ..., fieldN);
+```
+
+Form 2:
+
+```
+record recordName(field1, field2, ..., fieldN)
+{
+    additionalMembers
+}
+```
+
+**Note**:
+
+* _recordName_ is the name you want to give your record type.
+* _additionalMembers_ is a series of field, property, method, operator, and/or event definitions.
+* None of the additional members should match any of the record's fields in name.
+* No constructor can be explicitly defined in a record.
+* Records with additional members are not guaranteed to be immutable as one of their additional members might mutate the record.
+* Manually defined fields and/or properties are not taken into account in the automatically generated methods, if necessary, it is up to the user to override them.
+
+Example:
+
+```JS
+record Point(x, y);
+p1 = new Point(10, 20);
+p2 = new Point(30, 40);
+p3 = new Point(10, 20);
+println($'p1 = {p1}');
+println($'p2 = {p2}');
+println($'p3 = {p3}');
+println($'p1 == p2: {p1 == p2}');
+println($'p1 != p2: {p1 != p2}');
+println($'p1 == p3: {p1 == p3}');
+println($'p1 != p3: {p1 != p3}');
+
+println();
+
+record Vector(x, y) {
+  public property length => sqrt(this.x * this.x + this.y * this.y);
+  public function toPoint() => new Point(this.x,  this.y);
+}
+v1 = new Vector(10, 20);
+println($'v1 = {v1}');
+println($'v1.length = {v1.length}');
+println($'v1.toPoint() = {v1.toPoint()}');
+println($'p1 == v1: {p1 == v1}');
+println($'p1 != v1: {p1 != v1}');
+println($'p1 == v1.toPoint(): {p1 == v1.toPoint()}');
+println($'p1 != v1.toPoint(): {p1 != v1.toPoint()}');
+```
+
+Output:
+
+```
+p1 = Point(10, 20)
+p2 = Point(30, 40)
+p3 = Point(10, 20)
+p1 == p2: false
+p1 != p2: true
+p1 == p3: true
+p1 != p3: false
+
+v1 = Vector(10, 20)
+v1.length = 22,360679774997898
+v1.toPoint() = Point(10, 20)
+p1 == v1: false
+p1 != v1: true
+p1 == v1.toPoint(): true
+p1 != v1.toPoint(): false
+```
 
 <div markdown class="web-only">
 

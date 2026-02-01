@@ -51,6 +51,11 @@ public abstract class ClassMember(string name, Scope scope, Modifier modifier)
     public bool IsFinal => Modifier is Modifier.Final or Modifier.StaticFinal;
 
     /// <summary>
+    /// Gets if this member is redefined in a subclass.
+    /// </summary>
+    public virtual bool IsOverriden => false;
+
+    /// <summary>
     /// The member's attributes.
     /// </summary>
     public DataItem[] Attributes { get; set; }

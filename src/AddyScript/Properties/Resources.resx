@@ -550,4 +550,7 @@ It requires some initialization to support the expected operation.</value>
   <data name="InvalidStringDestructuringSubstitution" xml:space="preserve">
     <value>Invalid string destructuring substitution : only variable names are allowed</value>
   </data>
+  <data name="RecordCannotDefineConstructor" xml:space="preserve">
+    <value>A record class cannot explicitly define a constructor.</value>
+  </data>
 </root>

@@ -42,9 +42,9 @@ internal partial class KeywordCompletionData(string keyword, KeywordType type) :
             is:4 let:0 list:1 log:3 log10:3 log2:3 long:1 map:1 matches:4 max:3 MAXDATE:2 MAXFLOAT:2 MAXINT:2 milliseconds:3
             min:3 MINDATE:2 MINFLOAT:2 MININT:2 minutes:3 NAN:2 new:4 NEWLINE:2 NINFINITY:2 not:4 now:3 null:2 object:1
             operator:0 or:4 ord:3 pack:3 PI:2 PINFINITY:2 print:3 println:3 private:0 property:0 protected:0 public:0 queue:1
-            rad2deg:3 rand:3 randint:3 rational:1 read:5 readln:3 resource:1 return:0 round:3 seconds:3 set:1 sign:3 sin:3
-            sinh:3 sleep:3 sqrt:3 stack:1 startswith:4 static:0 string:1 super:5 switch:0 tan:3 tanh:3 this:5 throw:0 true:2
-            trunc:3 try:0 tuple:1 typeof:4 unpack:3 var:0 void:1 when:0 while:0 with:4 write:5 yield:0
+            rad2deg:3 rand:3 randint:3 rational:1 read:5 readln:3 record:1 resource:1 return:0 round:3 seconds:3 set:1
+            sign:3 sin:3 sinh:3 sleep:3 sqrt:3 stack:1 startswith:4 static:0 string:1 super:5 switch:0 tan:3 tanh:3 this:5
+            throw:0 true:2 trunc:3 try:0 tuple:1 typeof:4 unpack:3 var:0 void:1 when:0 while:0 with:4 write:5 yield:0
             """;
 
         All = [.. from keyword in KeywordSplitRegex().Split(keywords)

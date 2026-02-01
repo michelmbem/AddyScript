@@ -550,4 +550,7 @@ Requiere cierta inicialización para admitir la operación esperada.</value>
   <data name="InvalidStringDestructuringSubstitution" xml:space="preserve">
     <value>Sustitución de desestructuración de cadena no válida: solo se permiten nombres de variables</value>
   </data>
+  <data name="RecordCannotDefineConstructor" xml:space="preserve">
+    <value>Una clase de registro no puede definir explícitamente un constructor.</value>
+  </data>
 </root>

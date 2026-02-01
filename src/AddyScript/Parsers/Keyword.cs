@@ -50,6 +50,7 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("return", TokenID.KW_Return);
         Register("yield", TokenID.KW_Yield);
         Register("class", TokenID.KW_Class);
+        Register("record", TokenID.KW_Record);
         Register("constructor", TokenID.KW_Constructor);
         Register("property", TokenID.KW_Property);
         Register("operator", TokenID.KW_Operator);
@@ -93,11 +94,12 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("bool", TokenID.TypeName, "bool");
         Register("int", TokenID.TypeName, "int");
         Register("long", TokenID.TypeName, "long");
-        Register("rational", TokenID.TypeName, "rational");
         Register("float", TokenID.TypeName, "float");
         Register("decimal", TokenID.TypeName, "decimal");
+        Register("rational", TokenID.TypeName, "rational");
         Register("complex", TokenID.TypeName, "complex");
         Register("date", TokenID.TypeName, "date");
+        Register("duration", TokenID.TypeName, "duration");
         Register("string", TokenID.TypeName, "string");
         Register("blob", TokenID.TypeName, "blob");
         Register("tuple", TokenID.TypeName, "tuple");

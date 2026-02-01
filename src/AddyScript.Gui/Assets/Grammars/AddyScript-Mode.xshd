@@ -195,6 +195,7 @@
             <Word>case</Word>
             <Word>catch</Word>
             <Word>class</Word>
+            <Word>record</Word>
             <Word>const</Word>
             <Word>constructor</Word>
             <Word>continue</Word>

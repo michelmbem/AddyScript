@@ -86,6 +86,11 @@ public class ClassProperty : ClassMember
     public bool IsIndexer => Name == INDEXER_NAME;
 
     /// <summary>
+    /// Gets if this member is redefined in a subclass.
+    /// </summary>
+    public override bool IsOverriden => Holder?.SuperClass?.GetProperty(Name) != null;
+
+    /// <summary>
     /// Creates a suitable name for a read-accessor, given the property's name.
     /// </summary>
     /// <param name="name">The property's name</param>

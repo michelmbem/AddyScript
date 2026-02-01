@@ -133,6 +133,9 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
         fields[propertyName] = value;
     }
 
-    private bool IsOverridden(string methodName) =>
-        klass != Class.Object && klass.GetDeclaredMember(methodName, MemberKind.Method) != null;
+    private bool IsOverridden(string methodName)
+    {
+        var method = klass.GetMember(methodName, MemberKind.Method);
+        return method != null && method.Holder != Class.Object;
+    }
 }

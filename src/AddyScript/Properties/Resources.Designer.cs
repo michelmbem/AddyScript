@@ -908,5 +908,11 @@ namespace AddyScript.Properties {
                 return ResourceManager.GetString("InvalidStringDestructuringSubstitution", resourceCulture);
             }
         }
+        
+        internal static string RecordCannotDefineConstructor {
+            get {
+                return ResourceManager.GetString("RecordCannotDefineConstructor", resourceCulture);
+            }
+        }
     }
 }

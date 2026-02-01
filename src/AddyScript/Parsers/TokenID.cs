@@ -98,6 +98,7 @@ public enum TokenID
     KW_Function,
     KW_Extern,
     KW_Class,
+    KW_Record,
     KW_Constructor,
     KW_Property,
     KW_Operator,

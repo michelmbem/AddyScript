@@ -82,6 +82,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             TokenID.LeftBracket => StatementWithAttributes(),
             TokenID.KW_Import => Import(),
             TokenID.Modifier or TokenID.KW_Class => Class(),
+            TokenID.KW_Record => Record(),
             TokenID.KW_Function => Function(),
             TokenID.KW_Extern => ExternalFunction(),
             TokenID.KW_Const => ConstantDecl(),
@@ -124,6 +125,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         StatementWithAttributes stmtWA = token.TokenID switch
         {
             TokenID.Modifier or TokenID.KW_Class => Class(),
+            TokenID.KW_Record => Record(),
             TokenID.KW_Function => Function(),
             TokenID.KW_Extern => ExternalFunction(),
             _ => throw new SyntaxError(FileName, token, Resources.AttributesNotSupported),
@@ -213,7 +215,46 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         last = Match(TokenID.RightBrace);
 
         var classDef = new ClassDefinition(className, superClassName, modifier, constructor, indexer,
-                                           [.. fields], [.. properties], [.. methods], [.. events]);
+                                           [..fields], [..properties], [..methods], [..events]);
+        classDef.SetLocation(first.Start, last.End);
+        return classDef;
+    }
+
+    /// <summary>
+    /// Recognizes a record class definition.
+    /// </summary>
+    /// <returns>A <see cref="ClassDefinition"/></returns>
+    private ClassDefinition Record()
+    {
+        const Modifier modifier = Modifier.Final;
+        
+        Token first = Match(TokenID.KW_Record), last;
+        string className = Match(TokenID.Identifier).ToString();
+        ParameterDecl[] parameters = ParameterList();
+        ClassMemberDecl[] additionalMembers = [];
+
+        if (TryMatch(TokenID.LeftBrace))
+        {
+            Consume(1); // To skip the left brace
+            PushClass(modifier, className, null);
+            additionalMembers = Asterisk(ClassMember);
+            PopClass();
+            last = Match(TokenID.RightBrace);
+        }
+        else
+            last = Match(TokenID.SemiColon);
+        
+        PushClass(modifier, className, null);
+        var (otherCtor, indexer, fields, additionalProps, methods, events) =
+            IdentifiyClassMembers(modifier, additionalMembers);
+        PopClass();
+        
+        if (otherCtor != null)
+            throw new ScriptError(FileName, otherCtor, Resources.RecordCannotDefineConstructor);
+        
+        var (constructor, properties) = BuildRecordClassMembers(className, parameters);
+        var classDef = new ClassDefinition(className, Runtime.OOP.Class.Record.Name, modifier, constructor, indexer,
+                                           [..fields], [..properties, ..additionalProps], [..methods], [..events]);
         classDef.SetLocation(first.Start, last.End);
         return classDef;
     }
@@ -1370,6 +1411,40 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         }
 
         return (constructor, indexer, fields, properties, methods, events);
+    }
+
+    /// <summary>
+    /// Builds the class members for a record type.
+    /// </summary>
+    /// <param name="className">The name of the class being built</param>
+    /// <param name="parameters">The parameters for the record constructor</param>
+    /// <returns>A tuple containing the constructor and property declarations for the record class</returns>
+    private static (ClassMethodDecl, ClassPropertyDecl[])
+        BuildRecordClassMembers(string className, ParameterDecl[] parameters)
+    {
+        var ctorBody = new Block([
+            ..parameters.Select(p => new Assignment(PropertyRef.OfSelf(p.Name), new VariableRef(p.Name))),
+            new Return()
+        ]);
+        
+        var constructor = new ClassMethodDecl(className, Scope.Public, Modifier.Default, parameters, ctorBody);
+        
+        var memberReaderBody = Ast.Statements.Block.WithReturn(
+            new TupleInitializer([..parameters.Select(p => new Argument(PropertyRef.OfSelf(p.Name)))]));
+        
+        var memberProp = new ClassPropertyDecl(Runtime.OOP.Class.RECORD_MEMBERS_PROPERTY_NAME,
+                                               Scope.Protected, Modifier.Default, PropertyAccess.None,
+                                               Scope.Protected, memberReaderBody,
+                                               Scope.Protected, null);
+        ClassPropertyDecl[] properties = [
+            memberProp,
+            ..parameters.Select(p => new ClassPropertyDecl(p.Name, Scope.Public,
+                                                           Modifier.Default, PropertyAccess.ReadWrite,
+                                                           Scope.Public, null,
+                                                           Scope.Private, null))
+        ];
+        
+        return (constructor, properties);
     }
 
     /// <summary>

@@ -1,0 +1,42 @@
+record Person(name, sex, age);
+
+record Pet(name, sex, age);
+
+record Student(name, sex, age, section)
+{
+	public property sexString => this.sex switch {
+		matches '/^m(ale)?$/i' => 'male',
+		matches '/^f(emale)?$/i' => 'female',
+		_ => 'genderless'
+	};
+	
+	public function toString(format = '') =>
+		$'{this.name} is a {this.age}-year-old {this.sexString} {this.section} student';
+}
+
+john = new Person('John Doe', 'M', 18);
+jane = new Person('Jane Dave', 'F', 25);
+doe = new Person(age: 18, name: 'John Doe', sex: 'M');
+kitty = new Pet('Jane Dave', 'F', 25);
+laura = new Student('Laura Edwards', 'F', 19, 'Computer Science');
+mario = new Student('Mario Constelo', 'M', 21, 'Arts');
+ed = new Student(sex: 'F', age: 19, name: 'Laura Edwards', section: 'Computer Science');
+
+println($'john = {john}');
+println($'jane = {jane}');
+println($'doe = {doe}');
+println($'kitty = {kitty}');
+println($'laura = {laura}');
+println($'mario = {mario}');
+println($'ed = {ed}');
+
+println();
+
+println($'john == jane: {john == jane}');
+println($'john == doe: {john == doe}');
+println($'john == laura: {john == laura}');
+println($'jane == kitty: {jane == kitty}');
+println($'laura == mario: {laura == mario}');
+println($'laura == ed: {laura == ed}');
+
+readln();

@@ -2400,7 +2400,7 @@ public class Interpreter
 
                 foreach (var member in superClass.GetMembers(kind))
                 {
-                    if (member.Modifier != Modifier.Abstract) continue;
+                    if (member.Modifier != Modifier.Abstract || IsPropertyAccessor(member)) continue;
 
                     var _override = classDef.GetMembers(kind).FirstOrDefault(m => m.Name == member.Name) ??
                         throw new RuntimeError(fileName, classDef, string.Format(Resources.MustOverride, classDef.ClassName, member.FullName));
@@ -2468,6 +2468,17 @@ public class Interpreter
     }
 
     /// <summary>
+    /// Checks if the specified member is a property accessor (reader or writer).
+    /// </summary>
+    /// <param name="member">The member to check</param>
+    /// <returns><b>true</b> if the member is a property accessor, <b>false</b> otherwise</returns>
+    private static bool IsPropertyAccessor(ClassMember member)
+    {
+        var accessorNamePattern = StringUtil.ToRegex(@"^__(read|write)_(\w+)$");
+        return member is ClassMethod && accessorNamePattern.IsMatch(member.Name);
+    }
+
+    /// <summary>
     /// Initializes the static fields of a class.
     /// </summary>
     /// <param name="klass">A class</param>
@@ -2516,7 +2527,7 @@ public class Interpreter
         {
             Scope.Private => ctx.MethodHolder == null || ctx.MethodHolder != member.Holder,
             Scope.Protected => ctx.MethodHolder == null || (ctx.MethodHolder != member.Holder &&
-                                                            !ctx.MethodHolder.Inherits(member.Holder)),
+                                                            !(ctx.MethodHolder.Inherits(member.Holder) || member.IsOverriden)),
             _ => false
         };
 

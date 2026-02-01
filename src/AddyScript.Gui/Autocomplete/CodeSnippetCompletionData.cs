@@ -34,6 +34,7 @@ internal class CodeSnippetCompletionData(string title, string snippet, string de
             ["function", "function myFunc(arg1, arg2) {\n\t^\n}"],
             ["extern-function", "[LibImport(\"mylib\", returnType=\"Int32\")]\nextern function myFunc(\n\t^\n);"],
             ["class", "class MyClass {\n\t^\n}"],
+            ["record", "record MyRecord(^);"],
             ["import", "import ^;"],
             ["import-as", "import ^ as alias;"],
         ];
