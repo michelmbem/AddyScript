@@ -183,13 +183,13 @@ Depending on their type, literal values have the following forms:
 
 * **Null pointer**: the **null** keyword.
 * **Boolean**: the **true** or **false** keyword.
-* **Integer**: a sequence of decimal digits (i.e. 0 to 9) or a sequence of hexadecimal digits (i.e. 0 to 9, 'A' to 'F' or 'a' to 'f') prefixed with "0X" or "0x" (**e.g.**: `154`, `0XF5D4`).
-* **Long integer**: a literal integer with the 'l' or 'L' suffix or simply a very large literal integer.
-* **Floating-point number**: a sequence of decimal digits optionally followed by a dot and another sequence of decimal digits, optionally followed again by 'e' or 'E' plus a '+' or '-' sign plus another sequence of decimal digits and optionally terminated by a 'f' or 'F' suffix. (**e.g.**: `0.5`, `1F`, `14.5e33`, `735e-3`, `88.33f`, `1.5e+6F`).
-* **Decimal number**: just like floating-point numbers with a mandatory 'd' or 'D' suffix.
-* **Complex number**: Any literal numeric value that has the suffix "i" or "I" is considered the imaginary part of a complex number. This makes AddyScript have a very natural syntax for representing complex numbers, as in "2 - 5i" or "1 + 2i". When the imaginary part is 1, it should be represented as "1i" or "1I". Simply typing "i" or "I" will cause the AddyScript interpreter to look for a variable with that name.
+* **Integer**: a sequence of decimal digits (i.e.: `0` to `9`) or a sequence of hexadecimal digits (i.e.: `0` to `9`, `A` to, or `a` to `f`) prefixed with `0X` or `0x` (**e.g.**: `154`, `0XF5D4`).
+* **Long integer**: a literal integer with the `l` or `L` suffix or simply a huge literal integer (one that doesn't fit in a 32-bits signed integer).
+* **Floating-point number**: a sequence of decimal digits optionally followed by a dot and another sequence of decimal digits, optionally followed again by `e` or `E` plus a `+` or `-` sign plus another sequence of decimal digits and optionally terminated by a `f` or `F` suffix. (**e.g.**: `0.5`, `1F`, `14.5e33`, `735e-3`, `88.33f`, `1.5e+6F`).
+* **Decimal number**: just like floating-point numbers with a mandatory `d` or `D` suffix.
+* **Complex number**: Any literal numeric value that has the suffix `i` or `I` is considered the imaginary part of a complex number. This makes AddyScript have a very natural syntax for representing complex numbers, as in `2 - 5i` or `1 + 2i`. When the imaginary part is 1, it should be represented as `1i` or `1I`. Simply typing `i` or `I` will cause the AddyScript interpreter to look for a variable with that name.
 * **Date**: any valid date between backticks (**e.g.**: \``2008-04-11`\`, \``2:30 PM`\`, \``05/18/2009 13:04`\`).
-* **String**: a sequence of unicode characters between single or double quotes. When a backslash (\\) appears in a string, it alters the meaning of the following characters. Combinations of backslash and its followers are called **escape sequences** and have the following meaning:
+* **String**: a sequence of Unicode characters between single (`'`) or double (`"`) quotes. When a backslash (`\`) appears in a string, it alters the meaning of the following characters. Combinations of backslash and its followers are called **escape sequences** and have the following meaning:
 
     * **\\\\**: a literal backslash
     * **\\'**: a single quote (not needed in strings wrapped in double quotes)
@@ -206,24 +206,24 @@ Depending on their type, literal values have the following forms:
 
     **e.g.**: `'Hello World!'`, `"Joe's dog's bell"`, `"C:\\Documents and Settings\\Addy"`, `'Living\r\nLa vida\tloca'`.
 
-* **Blob**: A literal string value prefixed with the letter 'b' or 'B'. Each character in the string represents a single byte (**e.g.**: `b"Initial content of my buffer"`, `B'Another large binary object\xff\x7c'`).
+* **Blob**: A literal string value prefixed with the letter `b` or `B`. Each character in the string represents a single byte (**e.g.**: `b"Initial content of my buffer"`, `B'Another large binary object\xff\x7c'`).
 
     **Notes**:
 
-    1. In literal numeric values represented with decimal digits, underscores (_) can be inserted between the digits to group them (in thousands for example) and make the number more human readable. There is no particular rule on how to group them but it will typically be 3-by-3 (**e.g.**: `21_345_986`, `9_876_544_785`, `6_438.59e+33`).
-    2. Basically in AddyScript literal string values are not allowed to span over multiple lines of code. However it can be necessary in certain circumstances to define a literal string constants that wraps all its content in the source code, including line-breaks and tabulations. That kind of literal string value is called a **verbatim string** and is declared in AddyScript using the '@' prefix. In a **verbatim string**, **escape sequences** are not needed at all (even if they are still recognized). The only character that needs to be escaped is the string wrapper itself. This is done by doubling it (**e.g.**: `@'Say ''Hello'' to my friend Jonathan'`, `@"C:\MyMovies\""My Bad Movie.mp4"""`).
-    3. Some literal string values embed expressions between curly braces into them. Those expressions are to be evaluated and replaced within the string by their value at runtime. The rendered string will be made of the static parts of its initial form concatenated with the results of the evaluation of embedded expressions. That kind of literal string value is called a **mutable string** and has to be prefixed with a dollar-sign (&#36;). Each embedded expression in a **mutable string** can be followed by a format or length specification within the same pair of curly braces. The overall protocol to follow is exactly the same than for a call to the builtin **format** function (in fact a mutable string is translated at runtime to a call to **format**). The process of rendering **mutable strings** is called **string interpolation**. **mutable strings** can also be verbatim; in that case they start with both dollar (&#36;) and at (@) signs  (**e.g.**: `$'item number {i}'`, `$"sine of PI is: {sin(PI)}"`, `$@'{emp.name} is a ''{emp.jobTitle}'' since {emp.hireDate:d}'`, `$@"movie ""D:\{movieDir}\{movieFile.Name}""" is {movieLen,3} minutes long`).
+    1. In literal numeric values represented with decimal digits, underscores (`_`) can be inserted between the digits to group them (in thousands, for example) and make the number more human-readable. There is no particular rule on how to group them, but it will typically be 3-by-3 (**e.g.**: `21_345_986`, `9_876_544_785`, `6_438.59e+33`).
+    2. Basically, in AddyScript literal string values are not allowed to span over multiple lines of code. However, it can be necessary in certain circumstances to define a literal string constant that wraps all its content in the source code, including line-breaks and tabulations. That kind of literal string value is called a **verbatim string** and is declared in AddyScript using the `@` prefix. In a **verbatim string**, **escape sequences** are not needed at all (even if they are still recognized). The only character that needs to be escaped is the string wrapper itself. This is done by doubling it (**e.g.**: `@'Say ''Hello'' to my friend Jonathan'`, `@"C:\MyMovies\""My Bad Movie.mp4"""`).
+    3. Some literal string values embed expressions between curly braces into them. Those expressions are to be evaluated and replaced within the string by their value at runtime. The rendered string will be made of the static parts of its initial form concatenated with the results of the evaluation of embedded expressions. That kind of literal string value is called a **mutable string** and has to be prefixed with a dollar-sign (`$`). Each embedded expression in a **mutable string** can be followed by a format or length specification within the same pair of curly braces. The overall protocol to follow is exactly the same than for a call to the builtin **format** function (in fact, a mutable string is translated at runtime to a call to **format**). The process of rendering **mutable strings** is called **string interpolation**. **mutable strings** can also be verbatim; in that case they start with both dollar (`$`) and at (`@`) signs (**e.g.**: `$'item number {i}'`, `$"sine of PI is: {sin(PI)}"`, `$@'{emp.name} is a ''{emp.jobTitle}'' since {emp.hireDate:d}'`, `$@"movie ""D:\{movieDir}\{movieFile.Name}""" is {movieLen,3} minutes long`).
 
 ## Initializers
 
-Initializers are like literal values for composite types: they provide initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps, and sets. Depending on their type, initializers have the following forms:
+Initializers are like literal values for composite types: they provide an initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps, and sets. Depending on their type, initializers have the following forms:
 
-* **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e. another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` **Output**: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
+* **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e.: another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (`..`) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` **Output**: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
 
     **Note**: Tuples are a new data type in AddyScript. The syntax used to represent tuple initializers was formerly used for complex initializers (with two items between the parentheses only respectively representing the real and the imaginary parts). AddyScript doesn't need complex initializers anymore as it has a built-in support for complex literals.
 
-* **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. Just like with tuples, if a list item is a sequential collection (i.e. a **tuple**, another **list** or a **set**), it can be preceded by the **spread operator** (..) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
-* **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with tuple and list initializers the spread operator can be used to include the contents of another sequential collection.
+* **List**: a sequence of expressions (literal or not) in square brackets separated by commas (**e.g.**: `[4, 5, 'joe', 'adam', true, 0.5]`). The expressions that appear between the square brackets are called list items. Just like with tuples, if a list item is a sequential collection (i.e.: a **tuple**, another **list** or a **set**), it can be preceded by the **spread operator** (`..`) to indicate that it is not the item itself that is to be added to the list being initialized, but its contents (**e.g.**: `[17, 23, ..prime_numbers, 19]`, where _prime_numbers_ is another list or a set).
+* **Set**: a sequence of expressions enclosed in curly braces separated by commas. **e.g.**: `{'one', 'two', 'three'}`. As with tuple and list initializers, the spread operator can be used to include the contents of another sequential collection.
 * **Map**: a sequence of key-value pairs between curly braces separated by commas. Each pair has the form: `key => value` where key and value are both expressions. **e.g.**: `{'name' => 'joe', 'age' => 18, 'job' => 'student'}`.
 
     **Note**: An empty map initializer must have this form: `{=>}`. This helps to make a difference between an empty map initializer and an empty set initializer.
@@ -325,7 +325,7 @@ Below are listed AddyScript's operators with their meaning:
 |       =        | Simple assignment; can be combined with a binary operator like in `x += y` (a shortcut for `x = x + y`) or in `x \|= y` (a shortcut for `x = x \| y`)                                                                                                         |
 |       ?:       | A C-like conditional ternary operator: `x ? y : z` is a shortcut for `if (x) y else z`                                                                                                                                                                        |
 |       ??       | returns the first operand if it's not empty (**i.e.** **null**, an empty collection or an empty string); returns the second otherwise                                                                                                                         |
-|       ()       | Parenthesis are used to break precedence rules and force an expression to be evaluated in a certain way                                                                                                                                                       |
+|       ()       | Parentheses are used to break precedence rules and force an expression to be evaluated in a certain way                                                                                                                                                       |
 |       []       | Square braces are used to access lists and maps items. They can also be used to extract a single character from a string. If a native type exposes an indexer, objects of this type will support the [] operator too                                          |
 |   **switch**   | Pattern matching operator. We'll look closer at this in the next sections                                                                                                                                                                                     |
 |    **with**    | Mutable copy operator. We'll look closer at this in the next sections                                                                                                                                                                                         |
@@ -359,7 +359,7 @@ a binary expression, a ternary expression, or any of these wrapped into parenthe
 An assignment is a particular kind of expression where a value is set to a location in memory.
 So it's made of two child expressions: the **lvalue** which represents the memory location about to be set,
 and the **rvalue** which represents the value that's being assigned to the lvalue.
-Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (=).
+Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (`=`).
 So an assignment in AddyScript typically looks like this:
 
 ```
@@ -401,8 +401,8 @@ This allows you to set the value of multiple variables at once. So a typical gro
 * Both tuples must have exactly the same number of elements.
 * Neither tuple must be empty.
 * Each element of the left tuple must be a valid reference (such as a variable, a list item, an object property, or another tuple).
-* The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (..). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
-* Any underscore (_) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
+* The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (`..`). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
+* Any underscore (`_`) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
     
     Example:
 
@@ -433,7 +433,7 @@ An assignment with the **let** keyword looks like this:
 let lvalue = rvalue;
 ```
 
-With this syntax chaining assignments is not allowed. No other operator than the equal-sign (=) can be used.
+With this syntax chaining assignments is not allowed. No other operator than the equal-sign (`=`) can be used.
 
 Example:
 
@@ -449,7 +449,7 @@ let c = a + b;
 
 As you may have already guessed, you typically read a value from the console in AddyScript by using the **readln** function. It lets the user type a string and returns that string once the user presses on the [Return] key. The returned string can be converted to any type following your needs and expectations. **readln** accepts an optional parameter, a string that would be displayed as a prompt if given.
 
-Similarly, you print values to the console in AddyScript by using the **print** and **println** functions. Both functions are similar except that **print** remains on the same line after printing a value while **println** automatically skips to the next line. Both functions accept a variable number of arguments. The first argument, if present, represents a format string; any _{n}_ sequence (n being an integral number) in that string will be replaced with one of the corresponding following argument (0 for the second, 1 for the third, and so on...). **print** requires at least on argument while **println** can be used without any argument. When used without an argument, **println** simply skips to the next line.
+Similarly, you print values to the console in AddyScript by using the **print** and **println** functions. Both functions are similar except that **print** remains on the same line after printing a value while **println** automatically skips to the next line. Both functions accept a variable number of arguments. The first argument, if present, represents a format string; any `{n}` sequence (n being an integral number) in that string will be replaced with one of the corresponding following argument (`0` for the second, `1` for the third, and so on...). **print** requires at least on argument while **println** can be used without any argument. When used without an argument, **println** simply skips to the next line.
 
 If you are integrating AddyScript in your own system, you could change the meaning of those statements and make **print** and **println** display a popup window for example.
 

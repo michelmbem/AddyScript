@@ -3,7 +3,7 @@
 ## Collections
 
 Collections are ways to store multiple values in a single variable.
-AddyScript offers 6 different types of collections: tuples, lists, sets, queues, stacks, and maps.
+AddyScript offers six different types of collections: tuples, lists, sets, queues, stacks, and maps.
 Each of these types has a unique set of features and is suited for a particular usage scenario.
 
 ### Tuples
@@ -34,7 +34,7 @@ println($'Does t contain "Tokyo"? {t contains "Tokyo"}');
 
 #### Tuple API
 
-The following tables summarize all the operators, properties and methods provided by the AddyScript tuple API.
+The following tables summarize all the operators, properties, and methods provided by the AddyScript tuple API.
 
 The **tuple** class supports the following operators:
 
@@ -114,7 +114,7 @@ println('After clearing the list: ' + names);
 
 #### List API
 
-The following tables summarize all the operators, properties and methods provided by the AddyScript list API.
+The following tables summarize all the operators, properties, and methods provided by the AddyScript list API.
 
 The list class supports the following operators:
 
@@ -191,7 +191,7 @@ println('t > v : ' + (t > v));
 
 #### Set API
 
-The following tables summarize all the operators, properties and methods provided by the AddyScript set API.
+The following tables summarize all the operators, properties, and methods provided by the AddyScript set API.
 
 The set class supports the following operators:
 
@@ -334,7 +334,7 @@ else
 
 #### Map API
 
-The following tables summarize all the operators, properties and methods provided by the AddyScript map API.
+The following tables summarize all the operators, properties, and methods provided by the AddyScript map API.
 
 The map class supports the following operators:
 

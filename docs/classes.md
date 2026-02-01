@@ -126,7 +126,7 @@ property property_name
 
 Indexers are a special type of property that allows instances of user-defined classes to behave like collections.
 A class can have only one indexer, and it cannot be static.
-An indexer is always declared as a property with an empty pair of square brackets ([ ]) as its name.
+An indexer is always declared as a property with an empty pair of square brackets (`[]`) as its name.
 It cannot be automatic: you must provide logic for its accessors.
 An indexer's accessors take an implicit parameter called **__key** that contains the value of
 the expression enclosed in the square brackets (i.e., the index or key) at the time the indexer is invoked.
@@ -154,14 +154,14 @@ An operator overload specification consists of the **operator** keyword followed
 **Remarks**:
 
 1. No modifiers should be specified when overloading an operator. This means that an operator cannot be **abstract**, **static**, or **final**.
-2. In the case of increment (++) or decrement (--) operators, the difference between overloading the prefix form and overloading the postfix form is that the postfix form expects an unused parameter while the prefix form expects no parameter.
+2. In the case of increment (`++`) or decrement (`--`) operators, the difference between overloading the prefix form and overloading the postfix form is that the postfix form expects an unused parameter while the prefix form expects no parameter.
 3. Operators are not really a special type of class member in AddyScript. Each operator is actually a method with a special name. This can be verified by introspecting a class in which an operator is overloaded. AddyScript looks for such a method whenever it encounters a unary or binary operation involving an instance of a user-defined class and an overloadable operator.
 
 ## Example of a class
 
 ### A simple class
 
-In this example, we will define a Person class with 3 fields, 4 properties (3 of them mapping the 3 fields plus an automatic one), a method, and an event.
+In this example, we will define a Person class with three fields, four properties (three of them mapping the three fields plus an automatic one), a method, and an event.
 
 ```JS
 class Person
@@ -284,7 +284,7 @@ Most of the time, you will use this feature to access other members of a class f
 
 ## Constructors
 
-A **constructor** is a special method that is automatically invoked by the scripting engine when an instance of a class is created to initialize that instance.
+A **constructor** is a special method automatically invoked by the scripting engine when an instance of a class is created to initialize that instance.
 In AddyScript, a class has only one constructor since the language does not support method overloading.
 The definition of a constructor follows this special syntax:
 
