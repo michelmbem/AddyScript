@@ -340,7 +340,7 @@ public class Interpreter
             {
                 case null:
                 case DataItem or Constant when frame != currentFrame:
-                    if (setter.Value == null)
+                    if (setter.Value is VariableRef vr && Equals(vr.Name, setter.Name))
                         returnedValue = Undefined.Value;
                     else
                         setter.Value.AcceptTranslator(this);

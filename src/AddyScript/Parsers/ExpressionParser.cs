@@ -372,7 +372,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 {
                     Consume(1); // To skip the 'with'
                     Match(TokenID.LeftBrace);
-                    var mutators = List(VariableSetter, true, Resources.DuplicatedProperty);
+                    var mutators = List(ConstantSetter, true, Resources.DuplicatedProperty);
                     Token last = Match(TokenID.RightBrace);
 
                     Expression original = expr;
@@ -565,17 +565,14 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         while (section == 1)
         {
-            Token argName = Match(TokenID.Identifier);
+            Token argNameToken = Match(TokenID.Identifier);
+            string argName = argNameToken.ToString();
+            
+            if (namedArgs.ContainsKey(argName))
+                throw new SyntaxError(FileName, argNameToken, Resources.DuplicatedParameter);
+            
             Match(TokenID.Colon);
-
-            try
-            {
-                namedArgs.Add(argName.ToString(), RequiredExpression());
-            }
-            catch (ArgumentException ex)
-            {
-                throw new SyntaxError(FileName, argName, ex); // named argument duplicated
-            }
+            namedArgs.Add(argName, RequiredExpression());
 
             if (TryMatch(TokenID.Comma))
                 Consume(1);
@@ -583,7 +580,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 section = -1;
         }
 
-        return ([.. positionalArgs], namedArgs);
+        return ([..positionalArgs], namedArgs);
     }
 
     /// <summary>
@@ -634,7 +631,25 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a constant or property setter.
+    /// Recognizes a constant assignment (like <i>x = 42</i>).
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
+    protected VariableSetter ConstantSetter()
+    {
+        if (!TryMatch(TokenID.Identifier)) return null;
+
+        Token name = token;
+        Consume(1);
+        Match(TokenID.Equal);
+        Expression value = RequiredExpression();
+
+        var setter = new VariableSetter(name.ToString(), value);
+        setter.SetLocation(name.Start, value.End);
+        return setter;
+    }
+
+    /// <summary>
+    /// Recognizes a variable or field assignment.
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
     protected VariableSetter VariableSetter()
@@ -842,8 +857,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     fields = List(VariableSetter, true, Resources.DuplicatedProperty);
                     last = Match(TokenID.RightBrace);
                 }
-                else if (last.TokenID != TokenID.RightParenthesis) // Require an empty pair of parenthesis when no initializer is given
+                else if (last.TokenID != TokenID.RightParenthesis)
                 {
+                    // Require an empty pair of parentheses when no initializer is given
                     Match(TokenID.LeftParenthesis);
                     last = Match(TokenID.RightParenthesis);
                 }

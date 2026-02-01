@@ -353,10 +353,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private ConstantDecl ConstantDecl()
     {
         Token first = Match(TokenID.KW_Const);
-        var initializers = List(VariableSetter, true, Resources.DuplicatedConstant);
+        var setters = List(ConstantSetter, true, Resources.DuplicatedConstant);
         Token last = Match(TokenID.SemiColon);
 
-        var constDecl = new ConstantDecl(initializers);
+        var constDecl = new ConstantDecl(setters);
         constDecl.SetLocation(first.Start, last.Start);
         return constDecl;
     }
@@ -367,32 +367,11 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <returns>A <see cref="Ast.Statements.VariableDecl"/></returns>
     private VariableDecl VariableDecl()
     {
-        List<VariableSetter> initializers = [];
         Token first = Match(TokenID.KW_Var);
-
-        while (TryMatch(TokenID.Identifier))
-        {
-            Token bookmark = token;
-            string varName = bookmark.ToString();
-            Consume(1);
-
-            Expression varValue = null;
-            if (TryMatch(TokenID.Equal))
-            {
-                Consume(1);
-                varValue = RequiredExpression();
-            }
-
-            var initializer = new VariableSetter(varName, varValue);
-            initializer.SetLocation(bookmark.Start, varValue?.End ?? bookmark.End);
-            initializers.Add(initializer);
-
-            if (TryMatch(TokenID.Comma)) Consume(1);
-        }
-
+        var setters = List(VariableSetter, true, Resources.DuplicatedVariable);
         Token last = Match(TokenID.SemiColon);
 
-        var varDecl = new VariableDecl([.. initializers]);
+        var varDecl = new VariableDecl([..setters]);
         varDecl.SetLocation(first.Start, last.Start);
         return varDecl;
     }
@@ -1606,7 +1585,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                 }
             }
 
-            var moreFields = List(VariableSetter, true, Resources.DuplicatedAttributeField);
+            var moreFields = List(ConstantSetter, true, Resources.DuplicatedAttributeField);
             if (fields.Count > 0 && moreFields.Any(p => p.Name == AttributeDecl.DEFAULT_FIELD_NAME))
                 throw new ScriptError(FileName, fields[0], Resources.DuplicatedAttributeValue);
             
