@@ -60,6 +60,7 @@ Here is a quick summary of the most significant changes made to the the scriptin
 * Added an alternative syntax for converting values to a given type using the type name as a function: version 0.9.9.9.
 * Added support for using the **in** keyword as a reverse version of the **contains** operator: version 0.9.9.9.
 * Moved the _join_ method from the **list** class to the **string** class: version 0.9.9.9.
+* Introduction of record types: version 0.9.9.9.
 
 <div markdown class="web-only">
 
