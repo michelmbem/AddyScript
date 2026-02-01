@@ -448,11 +448,12 @@ Apart from the _type_ property, any of these members can be overridden in your c
 
 ## Records
 
-A record is a special type of class that can be used to represent a simple data structure.
-Records are immutable and final by default. The script engine automatically generates a constructor for them,
-as well as an override of the _equals_, _hashCode_ and _toString_ methods.
-It also automatically generates a property for each field of the record.
-The equality (==) and the inequality (!=) operators are overloaded to compare records.
+A record is a special type of class that allows you to represent a simple data structure.
+Records are immutable and final by default. The scripting engine automatically generates a constructor for them,
+as well as overriding the `equals`, `hashCode`, and `toString` methods.
+It also automatically generates a property for each of the record's fields.
+The equality (`==`) and inequality (`!=`) operators are also overloaded to make comparing records easier.
+
 The syntax for defining a record is as follows:
 
 Form 1:
@@ -499,7 +500,7 @@ record recordName(field1, field2, ..., fieldN)
       public property fieldN { read; private write; }
       
       // Generated methods:
-      public function equals(any other) => other is recordName &&
+      public function equals(other) => other is recordName &&
           this.field1 == other.field1 && this.field2 == other.field2 && ... && this.fieldN == other.fieldN;
       public function hashCode() => hash(this.field1, this.field2, ..., this.fieldN);
       public function toString(format = 'g') => $'recordName({this.field1}, {this.field2}, ..., {this.fieldN})';
