@@ -47,17 +47,18 @@ Defining a new built-in class in AddyScript can have two meanings:
 it can mean adding a primitive type to the scripting engine.
 It can also mean adding a new object type to the scripting engine.
 Defining a new primitive type requires much more effort than creating a new object class.
-In all cases, you will need to create an instance of the _AddyScript.Runtime.OOP.Class_ meta-class
+In all cases, you will need to create an instance of the _AddyScript.Runtime.OOP.Class_ metaclass
 and add it to the AddyScript._Runtime.Class.OOP.Class.Predefined_ collection.
 
 ### Object classes
 
-For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly as its base class.
-The metaclass has a constructor that allows you to specify the parent class.
+For a new object class, you will make it reference _AddyScript.Runtime.OOP.Class.Object_ directly or indirectly
+as its base class. The metaclass has a constructor that allows you to specify the parent class.
 Afterward, you will only need to provide member definitions to the new class.
 All members can be defined manually. For methods, this means creating their AST from scratch.
-But there is a shortcut which consists in creating an _InnerFunction_ which will not be added to the _InnerFunction.Globals_ collection
-but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_ using one of the _ToInstanceMethod_ or _ToStaticMethod_ methods of the _InnerFunction_ class.
+But there is a shortcut that consists in creating an _InnerFunction_ which will not be added to
+the _InnerFunction.Globals_ collection but will instead be converted to _AddyScript.Runtime.OOP.ClassMethod_
+using one of the _ToInstanceMethod_ or _ToStaticMethod_ methods of the _InnerFunction_ class.
 
 Example:
 
@@ -88,25 +89,25 @@ public static class MyExtensions
 
     /**
     * The constructor is defined as:
-    * public constructor (name, msg = null)
+    * public constructor (name, message = null)
     * {
-    *     if (msg === null)
-    *         this._message = name;
+    *     if (message === null)
+    *         this.message = name;
     *     else
     *     {
-    *         this._name = name!;
-    *         this._message = msg;
+    *         this.name = name!;
+    *         this.message = message;
     *     }
     * }
     */
     private static ClassMethod GetExceptionConstructor()
     {
-        var ctorFunc = new Function([new Parameter("name"), new Parameter("msg", DataItems.Void.Value)],
-                                    new Block(new IfElse(new BinaryExpression(BinaryOperator.Identical, new VariableRef("msg"), new Literal()),
-                                                         new Assignment(PropertyRef.OfSelf("_message"), new VariableRef("name")),
-                                                         new Block(new Assignment(PropertyRef.OfSelf("_name"),
+        var ctorFunc = new Function([new Parameter("name"), new Parameter("message", DataItems.Void.Value)],
+                                    new Block(new IfElse(new BinaryExpression(BinaryOperator.Identical, new VariableRef("message"), new Literal()),
+                                                         new Assignment(PropertyRef.OfSelf("message"), new VariableRef("name")),
+                                                         new Block(new Assignment(PropertyRef.OfSelf("name"),
                                                                                   new UnaryExpression(UnaryOperator.NotEmpty, new VariableRef("name"))),
-                                                                   new Assignment(PropertyRef.OfSelf("_message"), new VariableRef("msg")))),
+                                                                   new Assignment(PropertyRef.OfSelf("message"), new VariableRef("message")))),
                                               new Return()));
 
         return new ClassMethod("Exception", Scope.Public, Modifier.Default, ctorFunc);
@@ -119,33 +120,28 @@ public static class MyExtensions
     }
 
     /**
-    * Two fields:
-    * private _name = "Exception";
-    * private _message;
+    * No explicitly declared fields
     */
     private static IEnumerable<ClassField> GetExceptionFields()
     {
-        return [
-            new ClassField("_name", Scope.Private, Modifier.Default, new Literal(new String("Exception"))),
-            new ClassField("_message", Scope.Private, Modifier.Default, new Literal(new String("")))
-        ];
+        return null;
     }
 
     /**
-    * Two properties:
-    * public property name => this._name;
-    * public property message => this._message;
+    * Two auto properties:
+    * public property name { read; private write; }
+    * public property message { read; private write; }
     */
     private static IEnumerable<ClassProperty> GetExceptionProperties()
     {
         return [
-            new ClassProperty("name", Scope.Public, Modifier.Default, "_name", PropertyAccess.Read),
-            new ClassProperty("message", Scope.Public, Modifier.Default, "_message", PropertyAccess.Read)
+            new ClassProperty("name", Scope.Public, Modifier.Default, PropertyAccess.ReadWrite, Scope.Public, null, Scope.Private, null),
+            new ClassProperty("message", Scope.Public, Modifier.Default, PropertyAccess.ReadWrite, Scope.Public, null, Scope.Private, null)
         ];
     }
 
     /**
-    * A single toString method that overrides the inherited method from object:
+    * A single "toString" method that overrides the inherited method from object:
     * public function toString(format = "") => this.name;
     */
     private static IEnumerable<ClassMethod> GetExceptionMethods()
@@ -168,24 +164,26 @@ public static class MyExtensions
 
 Creating a new primitive type goes through these same steps. But before that,
 you must add a new member to the _AddyScript.Runtime.OOP.ClassID_ enumeration to represent the new type.
-Afterward, you will have to create a new instance of the meta-class as described above.
-This new class will not have a reference to a parent class but it will have the newly defined _ClassID_ (there is a suitable constructor in _Class_).
-After that you will need to create a new child class of _AddyScript.Runtime.DataItems.DataItem_ to represent data of the type being defined.
+Afterward, you will have to create a new instance of the metaclass as described above.
+This new class will not have a reference to a parent class, but it will have the newly defined _ClassID_
+(there is a suitable constructor in _Class_). After that you will need to create a new child class of
+_AddyScript.Runtime.DataItems.DataItem_ to represent data of the type being defined.
 The _Class_ property of this _DataItem_ type should return the reference to the previously created _Class_ instance.
-_DataItem_ provides a whole range of virtual methods that define the behavior of an object in arithmetic operations, conversions and property accesses.
-Overriding one of these methods allows you to customize the behavior of the new data type.
+_DataItem_ provides a whole range of virtual methods that define the behavior of an object in arithmetic operations,
+conversions, and property accesses. Overriding one of these methods allows you to customize the behavior of the new data type.
 You will probably also want to take a look at the _AddyScript.Runtime.DataItems.DataItemFactory_
-and _AddyScript.Runtime.DataItems.DataItemBinder_ classes to add support for your data type in _Marshalling_ operations.
-_AddyScript.Runtime.DataItems.DataItemFactory_ has a _CreateDataItem_ method that converts a .NET _System.Object_ into a _DataItem_,
-you will certainly want to add support for your data type.
-_AddyScript.Runtime.DataItems.DataItemBinder_ on its side has a _Mismatch_ method that evaluates the degree of compatibility between .NET data types and AddyScript data types.
-You will also need to add support for your data type.
+and _AddyScript.Runtime.DataItems.DataItemBinder_ classes to add support for your data type in _Marshaling_ operations.
+_AddyScript.Runtime.DataItems.DataItemFactory_ has a _CreateDataItem_ method that converts a .NET _System.Object_
+into a _DataItem_, you will certainly want to add support for your data type.
+_AddyScript.Runtime.DataItems.DataItemBinder_ on its side has a _Mismatch_ method that evaluates the degree
+of compatibility between .NET data types and AddyScript data types. You will also need to add support for your data type.
 
 The last step in the process of creating a primitive type is to decide how you want to create data of this type.
-You may want it to have literal values or initializers or simply a static factory method.
-If the choice of the factory method is made then the work is done: the factory method is probably already part of the class definition.
-On the other hand, for a literal value or an initializer, it will be necessary to update the analyzers so that they recognize a new category of symbols.
-It will also be necessary to modify the translators so that they know how to translate this new type of symbol.
+You may want it to have literal values or initializers or simply a static factory method. If the choice of
+the factory method is made, then the work is done: the factory method is probably already part of the class definition.
+On the other hand, for a literal value or an initializer, it will be necessary to update the analyzers so that
+they recognize a new category of symbols. It will also be necessary to modify the translators so that
+they know how to translate this new type of symbol.
 
 Have a look at how existing primitive types are defined to better understand the whole process.
 
