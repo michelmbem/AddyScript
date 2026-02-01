@@ -47,7 +47,7 @@ The so defined _Employee_ class inherits all the members of the _Person_ class i
 ## Polymorphism
 
 Polymorphism is nothing more than the ability to override inherited members in derived classes.
-Since AddyScript uses duck typing (i.e. objects are generally taken for what they appear to be without further checking),
+Since AddyScript uses duck typing (i.e.: objects are generally taken for what they appear to be without further checking),
 it handles polymorphism without any additional semantics.
 Any class method is overridable unless it is marked as **private**, **final**, or **static** in the parent class.
 Also, when the parent class is **abstract**, any subclass that is not abstract must override its abstract properties and methods.

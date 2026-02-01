@@ -95,7 +95,7 @@ resulting in something as short as: `property property_name;` which is equivalen
 A property can have one of its accessors defined automatically, while the other one is defined manually.
 This can be useful when one of the accessors is trivial while the other one requires more complex logic.
 Such a property is called a **semi-automatic property**. The scripting engine will generate the backing field for it.
-An auto-generated backing field is always private and has the same name as the property itself prefixed by a double underscore (__).
+An auto-generated backing field is always private and has the same name as the property itself prefixed by a double underscore (`__`).
 The syntax for defining a semi-automatic property is as follows.
 
 ```
