@@ -313,7 +313,7 @@
     <value>Recuento de operandos no válidos para el operador {0}</value>
   </data>
   <data name="InvalidOperandForWith" xml:space="preserve">
-    <value>El operando izquierdo de 'con' debería ser un objeto</value>
+    <value>El operando izquierdo de 'with' debe ser un registro</value>
   </data>
   <data name="InvalidOperatorModifier" xml:space="preserve">
     <value>No se permite ningún modificador por sobrecarga del operador.</value>

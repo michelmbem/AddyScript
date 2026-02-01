@@ -313,7 +313,7 @@
     <value>Invalid operands count for operator {0}</value>
   </data>
   <data name="InvalidOperandForWith" xml:space="preserve">
-    <value>The left operand of 'with' should be an object</value>
+    <value>The left operand of 'with' must be a record</value>
   </data>
   <data name="InvalidOperatorModifier" xml:space="preserve">
     <value>No modifier is allowed for an operator overloading</value>

@@ -313,7 +313,7 @@
     <value>Nombre d'opérandes invalide pour l'opérateur {0}</value>
   </data>
   <data name="InvalidOperandForWith" xml:space="preserve">
-    <value>L'operande de gauche de 'with' doit être un objet</value>
+    <value>L'operande de gauche de 'with' doit être un enregistrement</value>
   </data>
   <data name="InvalidOperatorModifier" xml:space="preserve">
     <value>Aucun modificateur ne doit être précisé pour une surcharge d'opérateur</value>

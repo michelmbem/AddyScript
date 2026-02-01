@@ -565,6 +565,34 @@ p1 == v1.toPoint(): true
 p1 != v1.toPoint(): false
 ```
 
+### Mutable copy of a record
+
+In AddyScript, you can create a mutable copy of a record by using the **with** operator.
+This operator takes a record as its left operand and a set of field assignments as its right operand.
+The result of the operation is a new record with the same fields as the original record,
+but with the values of the specified fields replaced by the corresponding values from the right operand.
+The following example shows how to use the **with** operator to create a mutable copy of a record:
+
+```JS
+record Point(x, y);
+
+p1 = new Point(10, 20);
+p2 = p1 with {x = 30, y = 40};
+p3 = p1 with {y = 50};
+
+println($'p1 = {p1}');
+println($'p2 = {p2}');
+println($'p3 = {p3}');
+```
+
+Output:
+
+```
+p1 = Point(10, 20)
+p2 = Point(30, 40)
+p3 = Point(10, 50)
+```
+
 <div markdown class="web-only">
 
 [Home](README.md) | [Previous](userfunc.md) | [Next](inheritance.md)

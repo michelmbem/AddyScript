@@ -421,14 +421,27 @@ To create an object using an initializer, simply use this syntax:
 
 `varname = object_initializer;`
 
-An object initializer is a comma-separated list of _field setters_ enclosed in curly braces and preceded by the keyword **new**.
-A field setter consists of an identifier (the field name) followed by an equal sign (=) and then an expression (the initial value of the field).
+Where:
+
+* An object initializer is a comma-separated list of field assignments, enclosed in curly braces and preceded by the keyword **new**.
+* A field assignment consists of an identifier (the field name), followed by an equals sign (`=`), and then an expression (the initial value of the field).
+* If the equals sign and the expression are omitted, the field will be initialized to a variable of the same name, which must be defined in the object's initialization context.
 
 Example:
 
 ```JS
-character = new { firstName = 'John', lastName = 'Snow', age = 24 };
-println('{0} {1} is aged {2}', character.firstName, character.lastName, character.age);
+actor = new { firstName = 'John', lastName = 'Snow', age = 24 };
+movie = new { title = 'The Matrix', year = 1999, rating = 8.5, actor };
+println('{0} {1} is aged {2}', actor.firstName, actor.lastName, actor.age);
+println('{0}, released in {1} is rated {2}; it\'s main actor is {3} {4}',
+        movie.title, movie.year, movie.rating, movie.actor.firstName, movie.actor.lastName);
+```
+
+Output:
+
+```
+John Snow is aged 24
+The Matrix, released in 1999 is rated 8,5; it's main actor is John Snow
 ```
 
 Sometimes it is better to initialize the object with an empty initializer and then add fields to it as needed.
@@ -444,16 +457,32 @@ student.age = 19;
 println('{0} {1} is aged {2}', student.firstName, student.lastName, student.age);
 ```
 
-Finally, it is worth mentioning that AddyScript has the ability to convert a map into an object and vice versa.
-In this case, if one of the keys in the map is not a valid identifier, the resulting field (in the outgoing object)
-will be accessible using a special identifier of the form $1, $if or for\x20each (obtained from "1", "if", and "for each" respectively).
+Output:
+
+```
+André Dikos is aged 19
+```
+
+Finally, it's worth mentioning that AddyScript can convert a map to an object and vice versa.
+In this case, if one of the map's keys isn't a valid identifier,
+the corresponding field in the output object will be accessible via a special identifier—that is,
+an identifier that starts with the dollar sign ($) or contains hexadecimal escape sequences.
+The dollar sign allows you to create identifiers that correspond to keywords or numeric values.
+Escape sequences, on the other hand, allow you to represent special characters contained within identifiers.
+**e.g.:** `$1`, `$if`, or `for\x20each` (respectively derived from `1`, `if`, and `for each`).
 
 Example:
 
 ```JS
-dict = { 'long' => 120, 'large' => 80, 'depth' => 20 };
+dict = { 'long' => 120, 'large' => 80, 'depth in cm' => 20 };
 shape = (object) dict;
-println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth);
+println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth\x20in\x20cm);
+```
+
+Output:
+
+```
+Shape size: 120 x 80 x 20
 ```
 
 ### Object destructuring
@@ -470,7 +499,13 @@ Here is an example of object destructuring:
 ```JS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
 let { firstName, lastName, age } = person;
-println($'{firstName} {lastName} is a {age} years old person');
+println($'{firstName} {lastName} is a {age}-year-old person');
+```
+
+Output:
+
+```
+Mael Jordano is a 25-year-old person
 ```
 
 In the syntax above, each variable in the list within the curly braces must correspond to a property of the same name in the source object.
@@ -482,7 +517,13 @@ Illustration:
 ```JS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
 let { firstName, lastName, job = 'Journalist', age = 17 } = person;
-println($'{firstName} {lastName} is a {age} years old {job}');
+println($'{firstName} {lastName} is a {age}-year-old {job}');
+```
+
+Output:
+
+```
+Mael Jordano is a 25-year-old Journalist
 ```
 
 Objects can be destructured recursively:
@@ -491,7 +532,13 @@ if the source object has a property that is also an objet it can be recursively 
 ```JS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
 let { firstName, lastName, age, { title, company } = job } = person;
-println($'{firstName} {lastName} is a {age} years old {title} at {company}');
+println($'{firstName} {lastName} is a {age}-year-old {title} at {company}');
+```
+
+Output:
+
+```
+Mael Jordano is a 25-year-old Accountant at Paradise Co.
 ```
 
 If the name of a variable is preceded by the _spread_ operator (..),
@@ -500,7 +547,13 @@ it will be used to collect the remaining properties of the source object (those 
 ```JS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
 let { firstName, lastName, age, { title, ..rest } = job } = person;
-println($'{firstName} {lastName} is a {age} years old {title} at {rest.company} since {rest.since:d}');
+println($'{firstName} {lastName} is a {age}-year-old {title} at {rest.company} since {rest.since:d}');
+```
+
+Output:
+
+```
+Mael Jordano is a 25-year-old Accountant at Paradise Co. since 2018-08-12
 ```
 
 ### Manipulating objects

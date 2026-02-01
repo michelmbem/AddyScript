@@ -81,45 +81,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         if (classDef.Attributes is { Length: > 0 })
             DumpAttributesList(classDef.Attributes, true);
 
-        if (classDef.Modifier != Modifier.Default)
-            textWriter.Write($"{classDef.Modifier} ".ToLower());
-
-        textWriter.Write($"class {SafeName(classDef.ClassName)}");
-        if (!string.IsNullOrEmpty(classDef.SuperClassName))
-            textWriter.Write($" : {SafeTypeName(classDef.SuperClassName)}");
-
-        textWriter.WriteLine();
-        textWriter.WriteLine('{');
-        ++textWriter.Indentation;
-
-        if (classDef.Fields.Length > 0)
-        {
-            foreach (ClassFieldDecl field in classDef.Fields)
-                DumpField(field);
-            textWriter.WriteLine();
-        }
-
-        if (classDef.Constructor != null)
-            DumpConstructor(classDef.Constructor);
-
-        if (classDef.Indexer != null)
-            DumpProperty(classDef.Indexer);
-
-        foreach (ClassPropertyDecl property in classDef.Properties)
-            DumpProperty(property);
-
-        if (classDef.Events.Length > 0)
-        {
-            foreach (ClassEventDecl _event in classDef.Events)
-                DumpEvent(_event);
-            textWriter.WriteLine();
-        }
-
-        foreach (ClassMethodDecl method in classDef.Methods)
-            DumpMethod(method);
-
-        --textWriter.Indentation;
-        textWriter.WriteLine('}');
+        if (Equals(classDef.SuperClassName, Class.Record.Name))
+            DumpRecord(classDef);
+        else
+            DumpClass(classDef);
     }
 
     public void TranslateFunctionDecl(FunctionDecl fnDecl)
@@ -735,6 +700,98 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         stringWrapper = stringWrapper == '\'' ? '"' : '\'';
     }
 
+    private void DumpClass(ClassDefinition classDef)
+    {
+        if (classDef.Modifier != Modifier.Default)
+            textWriter.Write($"{classDef.Modifier} ".ToLower());
+
+        textWriter.Write($"class {SafeName(classDef.ClassName)}");
+        if (!string.IsNullOrEmpty(classDef.SuperClassName))
+            textWriter.Write($" : {SafeTypeName(classDef.SuperClassName)}");
+
+        textWriter.WriteLine();
+        textWriter.WriteLine('{');
+        ++textWriter.Indentation;
+
+        if (classDef.Fields.Length > 0)
+        {
+            foreach (ClassFieldDecl field in classDef.Fields)
+                DumpField(field);
+            textWriter.WriteLine();
+        }
+
+        if (classDef.Constructor != null)
+            DumpConstructor(classDef.Constructor);
+
+        if (classDef.Indexer != null)
+            DumpProperty(classDef.Indexer);
+
+        foreach (ClassPropertyDecl property in classDef.Properties)
+            DumpProperty(property);
+
+        if (classDef.Events.Length > 0)
+        {
+            foreach (ClassEventDecl _event in classDef.Events)
+                DumpEvent(_event);
+            textWriter.WriteLine();
+        }
+
+        foreach (ClassMethodDecl method in classDef.Methods)
+            DumpMethod(method);
+
+        --textWriter.Indentation;
+        textWriter.WriteLine('}');
+    }
+
+    private void DumpRecord(ClassDefinition recordDef)
+    {
+        textWriter.Write($"record {SafeName(recordDef.ClassName)}");
+        
+        var parameters = recordDef.Constructor?.Parameters ?? [];
+        DumpParametersList(parameters);
+        
+        var (indexer, fields, methods, events) = (recordDef.Indexer, recordDef.Fields, recordDef.Methods, recordDef.Events);
+        var additionalProps = recordDef.Properties
+                                       .Where(prop => prop.Name != Class.RECORD_MEMBERS_PROPERTY_NAME &&
+                                                      parameters.All(param => param.Name != prop.Name))
+                                       .ToArray();
+
+        if (fields.Length + additionalProps.Length + methods.Length + events.Length == 0 && indexer == null)
+        {
+            textWriter.WriteLine(';');
+            return;
+        }
+
+        textWriter.WriteLine();
+        textWriter.WriteLine('{');
+        ++textWriter.Indentation;
+
+        if (fields.Length > 0)
+        {
+            foreach (ClassFieldDecl field in fields)
+                DumpField(field);
+            textWriter.WriteLine();
+        }
+
+        if (indexer != null) DumpProperty(indexer);
+
+        foreach (ClassPropertyDecl property in additionalProps)
+            DumpProperty(property);
+
+        if (events.Length > 0)
+        {
+            foreach (ClassEventDecl _event in events)
+                DumpEvent(_event);
+            textWriter.WriteLine();
+        }
+
+        foreach (ClassMethodDecl method in methods)
+            DumpMethod(method);
+
+        --textWriter.Indentation;
+        textWriter.WriteLine('}');
+    }
+
     private void DumpConstructor(ClassMethodDecl constructor)
     {
         textWriter.Write(constructor.Scope.ToString().ToLower());
@@ -1133,7 +1190,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
             case ObjectPattern objectPat:
             {
                 // We check ObjectPattern before TypePattern to avoid problems with inheritance!!
-                if (objectPat.TypeName != Class.Object.Name)
+                if (Equals(objectPat.TypeName, Class.Object.Name))
                 {
                     textWriter.Write(objectPat.TypeName);
                     textWriter.Write(' ');

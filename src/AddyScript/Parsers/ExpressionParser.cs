@@ -645,8 +645,17 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         string name = first.ToString();
         Consume(1);
 
-        Match(TokenID.Equal);
-        Expression value = RequiredExpression();
+        Expression value;
+        if (TryMatch(TokenID.Equal))
+        {
+            Consume(1); // To skip the '='
+            value = RequiredExpression();
+        }
+        else
+        {
+            value = new VariableRef(name);
+            value.CopyLocation(first);
+        }
 
         var setter = new VariableSetter(name, value);
         setter.SetLocation(first.Start, value.End);

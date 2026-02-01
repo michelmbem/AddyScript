@@ -1579,17 +1579,26 @@ public class Interpreter
             mutableCopy.Original.AcceptTranslator(this);
             DataItem original = returnedValue;
             
-            if (original.Class.ClassID != ClassID.Object)
+            var klass = original.Class;
+            if (!klass.Inherits(Class.Record))
                 throw new RuntimeError(fileName, mutableCopy, Resources.InvalidOperandForWith);
+            
+            var originalRef = new Literal(original);
+            var args = klass.Constructor.Function.Parameters.ToDictionary(
+                p => p.Name, Expression (p) => new PropertyRef(originalRef, p.Name));
 
-            var copyFields = original.AsDynamicObject.ToDictionary(
-                originalField => originalField.Key,
-                originalField => originalField.Value);
-
-            DataItem copy = new Object(original.Class, copyFields);
-            ApplyPropertySetters(mutableCopy, copy, mutableCopy.PropertySetters);
-
-            returnedValue = copy;
+            foreach (var setter in mutableCopy.PropertySetters)
+            {
+                if (args.ContainsKey(setter.Name))
+                    args[setter.Name] = setter.Value;
+                else
+                    throw new ScriptError(fileName, setter, string.Format(Resources.PropertyNotFoundInClass,
+                                                                          setter.Name, original.Class.Name));
+            }
+            
+            var ctorCall = new ConstructorCall(new QualifiedName(klass.Name), null, args, null);
+            ctorCall.CopyLocation(mutableCopy);
+            ctorCall.AcceptTranslator(this);
         }
         catch (ScriptError se)
         {
