@@ -473,16 +473,50 @@ record recordName(field1, field2, ..., fieldN)
 **Note**:
 
 * _recordName_ is the name you want to give your record type.
-* _additionalMembers_ is a series of field, property, method, operator, and/or event definitions.
-* None of the additional members should match any of the record's fields in name.
+* _additionalMembers_ is a series of definitions for fields, properties, methods, operators, and/or events.
+* None of the additional members should have the same name as any of the record's fields.
 * No constructor can be explicitly defined in a record.
-* Records with additional members are not guaranteed to be immutable as one of their additional members might mutate the record.
-* Manually defined fields and/or properties are not taken into account in the automatically generated methods, if necessary, it is up to the user to override them.
+* The immutability of records with additional members is not guaranteed, as any of these members can modify the record.
+* Manually defined fields and/or properties are not taken into account in automatically generated methods; if necessary, it is up to the user to redefine them.
+* In all its forms, the above syntax is essentially equivalent to the following:
+
+  ```
+  final class recordName
+  {
+      // Generated constructor:
+      public constructor (field1, field2, ..., fieldN)
+      {
+          this.field1 = field1;
+          this.field2 = field2;
+          ...
+          this.fieldN = fieldN;
+      }
+      
+      // Generated properties:
+      public property field1 { read; private write; }
+      public property field2 { read; private write; }
+      ...
+      public property fieldN { read; private write; }
+      
+      // Generated methods:
+      public function equals(any other) => other is recordName &&
+          this.field1 == other.field1 && this.field2 == other.field2 && ... && this.fieldN == other.fieldN;
+      public function hashCode() => hash(this.field1, this.field2, ..., this.fieldN);
+      public function toString(format = 'g') => $'recordName({this.field1}, {this.field2}, ..., {this.fieldN})';
+      
+      // Generated operators:
+      public operator ==(any other) => this.equals(other);
+      public operator !=(any other) => !this.equals(other);
+      
+      // Any additional members are inserted here
+  }
+  ```
 
 Example:
 
 ```JS
 record Point(x, y);
+
 p1 = new Point(10, 20);
 p2 = new Point(30, 40);
 p3 = new Point(10, 20);
@@ -493,13 +527,13 @@ println($'p1 == p2: {p1 == p2}');
 println($'p1 != p2: {p1 != p2}');
 println($'p1 == p3: {p1 == p3}');
 println($'p1 != p3: {p1 != p3}');
-
 println();
 
 record Vector(x, y) {
   public property length => sqrt(this.x * this.x + this.y * this.y);
   public function toPoint() => new Point(this.x,  this.y);
 }
+
 v1 = new Vector(10, 20);
 println($'v1 = {v1}');
 println($'v1.length = {v1.length}');
