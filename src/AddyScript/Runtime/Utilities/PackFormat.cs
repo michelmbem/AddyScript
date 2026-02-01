@@ -46,7 +46,7 @@ public class PackFormatItem
 
     public PackFormatItem(PackFormatType type, int count = 1)
     {
-        Debug.Assert(count > 0);
+        Trace.Assert(count > 0);
         Type = type;
         Count = count;
     }
@@ -106,7 +106,7 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
 
     public static PackFormat Parse(string s)
     {
-        Debug.Assert(!string.IsNullOrEmpty(s));
+        Trace.Assert(!string.IsNullOrEmpty(s));
 
         var endianness = Endianness.Default;
         List<PackFormatItem> items = [];

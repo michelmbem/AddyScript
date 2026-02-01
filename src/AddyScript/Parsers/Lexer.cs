@@ -197,7 +197,7 @@ public class Lexer
                 'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
                 _ => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
                    ? MakeToken(TokenID.LT_Float, aDouble, false)
-                   : MakeToken(TokenID.Unknown, numberStr, false),
+                   : MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), false),
             };
 
         return Ll(1) switch
@@ -957,7 +957,7 @@ public class Lexer
     /// <returns>A <see cref="System.Char"/></returns>
     private char Ll(int k)
     {
-        Debug.Assert(k > 0);
+        Trace.Assert(k > 0);
 
         int realIndex = charIndex + k;
 
@@ -979,7 +979,7 @@ public class Lexer
     /// <param name="count">The number of characters to skip</param>
     private void Consume(int count)
     {
-        Debug.Assert(count > 0 && charIndex + count <= buffer.Length);
+        Trace.Assert(count > 0 && charIndex + count <= buffer.Length);
 
         for (int i = 0, j = charIndex; i < count; ++i, ++j)
         {

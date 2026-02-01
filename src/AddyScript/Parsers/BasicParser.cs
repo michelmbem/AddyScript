@@ -39,11 +39,14 @@ public abstract class BasicParser
     /// <param name="lexer">The bound lexer</param>
     protected BasicParser(Lexer lexer)
     {
+        // Checks if lexer is null
+        ArgumentNullException.ThrowIfNull(lexer);
+
         // Initializes the lexer and peeks the first token from it.
-        this.lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
+        this.lexer = lexer;
         token = Ll(1);
 
-        // Stores the default '__main' function on top of the stack
+        // Stores the default 'main' function on top of the stack
         PushFunction(MAIN_FUNCTION_NAME, false, false, false);
     }
 
@@ -73,7 +76,7 @@ public abstract class BasicParser
     /// <returns>A <see cref="Token"/></returns>
     protected Token Ll(int k)
     {
-        Debug.Assert(k > 0);
+        Trace.Assert(k > 0);
 
         int realIndex = tokenIndex + k;
 
@@ -89,7 +92,7 @@ public abstract class BasicParser
     /// <param name="count">The number of tokens to skip</param>
     protected void Consume(int count)
     {
-        Debug.Assert(count > 0 && tokenIndex + count <= buffer.Count);
+        Trace.Assert(count > 0 && tokenIndex + count <= buffer.Count);
 
         tokenIndex += count;
         token = Ll(1);
