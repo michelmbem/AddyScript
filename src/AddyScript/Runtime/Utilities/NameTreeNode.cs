@@ -14,29 +14,28 @@ namespace AddyScript.Runtime.Utilities;
 /// <param name="value">The attached value</param>
 public class NameTreeNode(string name, object value)
 {
-
     /// <summary>
     /// The name given to the node.
     /// </summary>
-    public string Name { get; set; } = name;
+    public string Name => name;
 
     /// <summary>
     /// The value attached to the node.
     /// </summary>
-    public object Value { get; set; } = value;
+    public object Value => value;
 
     /// <summary>
     /// A reference to the parent node.
     /// </summary>
-    public NameTreeNode Parent { get; set; } = null;
+    public NameTreeNode Parent { get; set; }
 
     /// <summary>
     /// The collection of children nodes.
     /// </summary>
-    public List<NameTreeNode> Children { get; set; } = [];
+    public List<NameTreeNode> Children { get; } = [];
 
     /// <summary>
-    /// Gets the fummy qualified name of this node
+    /// Gets the fully qualified name of this node
     /// </summary>
     public string FullName => Parent == null ? Name : $"{Parent.FullName}::{Name}";
 

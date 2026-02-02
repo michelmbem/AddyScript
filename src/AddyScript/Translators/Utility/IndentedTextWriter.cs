@@ -9,7 +9,6 @@ namespace AddyScript.Translators.Utility;
 
 public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
 {
-    private readonly TextWriter innerWriter = innerWriter;
     private readonly Stack<string> prefixStack = new ();
     private readonly StringBuilder prefixBuilder = new ();
     private string linePrefix = string.Empty;
@@ -49,8 +48,7 @@ public class IndentedTextWriter(TextWriter innerWriter) : TextWriter
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources. </param>
     protected override void Dispose(bool disposing)
     {
-        if (disposing)
-            innerWriter.Dispose();
+        if (disposing) innerWriter.Dispose();
     }
 
     /// <summary>

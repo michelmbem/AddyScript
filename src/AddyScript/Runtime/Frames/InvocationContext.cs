@@ -40,8 +40,5 @@ public class InvocationContext(Class methodHolder, DataItem methodTarget, string
     /// <returns>
     /// <b>true</b> if the invoked method is homonymous to its holding class, <b>false</b> otherwise.
     /// </returns>
-    public bool MethodIsConstructor()
-    {
-        return MethodHolder != null && MethodHolder.Name.Equals(MethodName);
-    }
+    public bool MethodIsConstructor() => Equals(MethodHolder?.Name, MethodName);
 }

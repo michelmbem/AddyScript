@@ -22,9 +22,7 @@ public class ParentConstructorCall(Argument[] positionalArgs, Dictionary<string,
     /// </summary>
     /// <param name="positionalArgs">The list of positional arguments passed to the constructor</param>
     public ParentConstructorCall(params Expression[] positionalArgs)
-        : this(ToArguments(positionalArgs), null)
-    {
-    }
+        : this(ToArguments(positionalArgs), null) { }
 
     /// <summary>
     /// Translates this node.

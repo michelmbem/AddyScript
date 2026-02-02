@@ -28,7 +28,7 @@ public class FunctionDecl(string name, ParameterDecl[] parameters, Block body)
     /// Create a <see cref="Function"/> from this instance.
     /// </summary>
     /// <returns>A <see cref="Function"/></returns>
-    public Function ToFunction() => new ([.. Parameters.Select(p => p.ToParameter())], Body);
+    public Function ToFunction() => new ([..Parameters.Select(p => p.ToParameter())], Body);
 
     /// <summary>
     /// Translates this node.

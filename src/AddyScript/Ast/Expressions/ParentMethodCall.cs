@@ -25,9 +25,7 @@ public class ParentMethodCall(string methodName, Argument[] positionalArgs, Dict
     /// <param name="methodName">The name of the method to invoke</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the method</param>
     public ParentMethodCall(string methodName, params Expression[] positionalArgs)
-        : this(methodName, ToArguments(positionalArgs), null)
-    {
-    }
+        : this(methodName, ToArguments(positionalArgs), null) { }
 
     /// <summary>
     /// Translates this node.

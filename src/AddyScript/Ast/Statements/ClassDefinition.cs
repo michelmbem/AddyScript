@@ -98,7 +98,7 @@ public class ClassDefinition(string className, string superClassName, Modifier m
         if (kind.HasFlag(MemberKind.Event))
             members.AddRange(Events);
 
-        return [.. members];
+        return [..members];
     }
 
     /// <summary>

@@ -28,5 +28,5 @@ public class ClassEventDecl(string name, Scope scope, Modifier modifier, Paramet
     /// Creates a <see cref="ClassMember"/> from this instance.
     /// </summary>
     public override ClassMember ToClassMember() =>
-        new ClassEvent(Name, Scope, Modifier, [.. Parameters.Select(p => p.ToParameter())]);
+        new ClassEvent(Name, Scope, Modifier, [..Parameters.Select(p => p.ToParameter())]);
 }

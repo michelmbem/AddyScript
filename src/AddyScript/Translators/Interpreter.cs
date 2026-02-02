@@ -79,9 +79,7 @@ public class Interpreter
     /// <summary>
     /// Initializes an instance of <see cref="Interpreter"/>.
     /// </summary>
-    public Interpreter() : this(new ScriptContext())
-    {
-    }
+    public Interpreter() : this(new ScriptContext()) { }
 
     #endregion
 

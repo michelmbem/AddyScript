@@ -27,10 +27,7 @@ public class NameTree
     /// </summary>
     /// <param name="name">The name to be added</param>
     /// <param name="value">The value attached to the given name</param>
-    public void Add(QualifiedName name, object value)
-    {
-        Insert(value, null, roots, name, 0);
-    }
+    public void Add(QualifiedName name, object value) => Insert(value, null, roots, name, 0);
 
     /// <summary>
     /// Gets if a qualified name is stored in the tree.
@@ -49,10 +46,7 @@ public class NameTree
     /// <summary>
     /// Empties the tree.
     /// </summary>
-    public void Clear()
-    {
-        roots.Clear();
-    }
+    public void Clear() => roots.Clear();
 
     #endregion
 
@@ -62,11 +56,13 @@ public class NameTree
     {
         if (offset >= name.Length) return;
 
-        int index = BinarySearch(nodes, name[offset].ToString(), out bool found);
+        string nodeName = name[offset].ToString();
+        int index = BinarySearch(nodes, nodeName, out bool found);
+        
         if (!found)
         {
             object nodeValue = offset < name.Length - 1 ? null : value;
-            var node = new NameTreeNode(name[offset].ToString(), nodeValue) {Parent = parent};
+            var node = new NameTreeNode(nodeName, nodeValue) { Parent = parent };
 
             if (index < nodes.Count)
                 nodes.Insert(index, node);

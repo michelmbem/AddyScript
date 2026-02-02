@@ -28,9 +28,7 @@ public class MethodCall(Expression target, string methodName,
     /// <param name="methodName">The name of the method to invoke</param>
     /// <param name="arguments">The list of arguments passed to the method</param>
     public MethodCall(Expression target, string methodName, params Expression[] arguments)
-        : this(target, methodName, ToArguments(arguments), null)
-    {
-    }
+        : this(target, methodName, ToArguments(arguments), null) { }
 
     /// <summary>
     /// Holds the value of 'this'.

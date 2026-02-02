@@ -67,7 +67,7 @@ public class Block(params Statement[] statements) : Statement
     /// <param name="statement">The statement to append</param>
     public Block Append(Statement statement)
     {
-        Statements = [.. Statements, statement];
+        Statements = [..Statements, statement];
         return this;
     }
 
@@ -78,7 +78,7 @@ public class Block(params Statement[] statements) : Statement
     /// <param name="statement">The statement to be inserted</param>
     public Block Insert(int index, Statement statement)
     {
-        Statements = [.. Statements[..index], statement, .. Statements[index..]];
+        Statements = [..Statements[..index], statement, ..Statements[index..]];
         return this;
     }
 

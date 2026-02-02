@@ -16,8 +16,7 @@ namespace AddyScript.Ast.Statements;
 /// <param name="vaList">Determines if the parameter is a variably sized arguments list or not</param>
 /// <param name="defaultValue">The default value for this parameter if any</param>
 /// <param name="canBeEmpty">Tells if empty values are allowed for this parameter or not</param>
-public class ParameterDecl(string name, bool byRef, bool vaList,
-                           DataItem defaultValue, bool canBeEmpty)
+public class ParameterDecl(string name, bool byRef, bool vaList, DataItem defaultValue, bool canBeEmpty)
     : SymbolWithAttributes
 {
     /// <summary>

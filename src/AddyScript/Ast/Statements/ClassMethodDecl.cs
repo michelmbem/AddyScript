@@ -62,7 +62,7 @@ public class ClassMethodDecl(string name, Scope scope, Modifier modifier, Parame
     /// </summary>
     public override ClassMember ToClassMember()
     {
-        Parameter[] memberParams = [.. Parameters.Select(p => p.ToParameter())];
+        Parameter[] memberParams = [..Parameters.Select(p => p.ToParameter())];
         return new ClassMethod(Name, Scope, Modifier, new Function(memberParams, Body));
     }
 }

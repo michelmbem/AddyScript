@@ -5,8 +5,8 @@ function treeAdd(&node, value, parent = null)
 {
 	if (node === null)
 		node = new {
-			value = value,
-			parent = parent,
+			value, // value = value,
+			parent, // parent = parent,
 			left = null,
 			right = null
 		};

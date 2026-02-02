@@ -20,10 +20,7 @@ public class ScriptElement
     /// <summary>
     /// Initializes a new instance of Element.
     /// </summary>
-    protected ScriptElement()
-        : this(ScriptLocation.Empty, ScriptLocation.Empty)
-    {
-    }
+    protected ScriptElement() : this(ScriptLocation.Empty, ScriptLocation.Empty) { }
 
     /// <summary>
     /// The starting position of the element in the source code.

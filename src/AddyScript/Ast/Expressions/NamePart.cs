@@ -9,27 +9,20 @@ namespace AddyScript.Ast.Expressions;
 
 
 /// <summary>
-/// Represents a part in a name like A::B::C i.e. one of A, B or C.
+/// Represents a part in a name like A::B::C i.e.: one of A, B, or C.
 /// </summary>
 /// <remarks>
 /// Initializes an instance of NamePart.
 /// </remarks>
 /// <param name="value">The value of this part</param>
 /// <param name="paramCount">The number of eventual type parameters</param>
-public partial class NamePart(string value, int paramCount) : IComparable, IComparable<NamePart>, IEquatable<NamePart>
+public partial class NamePart(string value, int paramCount = 0)
+    : IComparable, IComparable<NamePart>, IEquatable<NamePart>
 {
     private static readonly string GenericTypeArgument = typeof(DataItem).AssemblyQualifiedName;
 
     private readonly string value = value;
     private readonly int paramCount = paramCount;
-
-    /// <summary>
-    /// Initializes an instance of NamePart.
-    /// </summary>
-    /// <param name="value">The value of this part</param>
-    public NamePart(string value) : this(value, 0)
-    {
-    }
 
     /// <summary>
     /// Gets the value of this part.
@@ -73,14 +66,14 @@ public partial class NamePart(string value, int paramCount) : IComparable, IComp
     /// <returns>
     /// A 32-bit signed integer that indicates the relative order of the objects being compared.
     /// The return value has these meanings:
-    /// Less than zero: this instance is less than <paramref name="obj" />.
-    /// Zero: this instance is equal to <paramref name="obj" />.
-    /// Greater than zero: this instance is greater than <paramref name="obj" />.
+    /// Less than zero: this instance is less than <paramref name="other" />.
+    /// Zero: this instance is equal to <paramref name="other" />.
+    /// Greater than zero: this instance is greater than <paramref name="other" />.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public int CompareTo(NamePart other)
     {
-        int valueCmp = value.CompareTo(other.value);
+        int valueCmp = string.CompareOrdinal(value, other.value);
         return valueCmp == 0 ? paramCount.CompareTo(other.ParamCount) : valueCmp;
     }
 
@@ -94,8 +87,8 @@ public partial class NamePart(string value, int paramCount) : IComparable, IComp
     /// Zero: this instance is equal to <paramref name="obj" />.
     /// Greater than zero: this instance is greater than <paramref name="obj" />.
     /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
+    /// <param name="obj">An object to compare with this object.</param>
+    /// <exception cref="ArgumentException"><paramref name="obj" /> is different type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
     public int CompareTo(object obj)
     {
@@ -111,27 +104,21 @@ public partial class NamePart(string value, int paramCount) : IComparable, IComp
     public bool Equals(NamePart other)
     {
         if (other == null) return false;
-        return value == other.value && paramCount == other.paramCount;
+        return Equals(value, other.value) && paramCount == other.paramCount;
     }
 
     /// <summary>
     /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
-    /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public override bool Equals(object obj)
-    {
-        return (obj is NamePart part) && Equals(part);
-    }
+    /// <returns>true if the current object is equal to the <paramref name="obj" /> parameter; otherwise, false.</returns>
+    /// <param name="obj">An object to compare with this object.</param>
+    public override bool Equals(object obj) => obj is NamePart other && Equals(other);
 
     /// <summary>
     /// Serves as a hash function for a particular type. 
     /// </summary>
     /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(value, paramCount);
-    }
+    public override int GetHashCode() => HashCode.Combine(value, paramCount);
 
     /// <summary>
     /// Returns a string that represents the current <see cref="NamePart" />.
@@ -141,7 +128,7 @@ public partial class NamePart(string value, int paramCount) : IComparable, IComp
     /// <param name="expandTypeArguments">Should type parameters be expanded if the dotnet native syntax is used?</param>
     public string ToString(bool useNativeSyntax, bool expandTypeArguments)
     {
-        var sb = new StringBuilder(value);
+        StringBuilder sb = new (value);
 
         if (paramCount > 0)
         {
@@ -171,8 +158,21 @@ public partial class NamePart(string value, int paramCount) : IComparable, IComp
     /// Returns a string that represents the current <see cref="NamePart" />.
     /// </summary>
     /// <returns>A <see cref="System.String" /></returns>
-    public override string ToString()
-    {
-        return ToString(false, false);
-    }
+    public override string ToString() => ToString(false, false);
+    
+    #region Operators
+
+    public static bool operator ==(NamePart a, NamePart b) => Equals(a, b);
+
+    public static bool operator !=(NamePart a, NamePart b) => !Equals(a, b);
+
+    public static bool operator <(NamePart a, NamePart b) => a.CompareTo(b) < 0;
+
+    public static bool operator >(NamePart a, NamePart b) => a.CompareTo(b) > 0;
+
+    public static bool operator <=(NamePart a, NamePart b) => a.CompareTo(b) <= 0;
+
+    public static bool operator >=(NamePart a, NamePart b) => a.CompareTo(b) >= 0;
+    
+    #endregion
 }

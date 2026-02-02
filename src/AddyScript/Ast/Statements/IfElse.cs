@@ -16,8 +16,7 @@ public class IfElse : FlowControlStatement
     /// <param name="guard">The test expression</param>
     /// <param name="action">The statement to be executed if <paramref name="guard"/> returns true</param>
     /// <param name="altAction">The statement to be executed if <paramref name="guard"/> returns false</param>
-    public IfElse(Expression guard, Statement action, Statement altAction)
-        : base(guard, action)
+    public IfElse(Expression guard, Statement action, Statement altAction) : base(guard, action)
     {
         AlternativeAction = altAction;
     }
@@ -27,9 +26,7 @@ public class IfElse : FlowControlStatement
     /// </summary>
     /// <param name="test">The test expression</param>
     /// <param name="action">The statement to be executed if <paramref name="test"/> returns true</param>
-    public IfElse(Expression test, Statement action) : base(test, action)
-    {
-    }
+    public IfElse(Expression test, Statement action) : base(test, action) { }
 
     /// <summary>
     /// The statement to be executed if <i>Test</i> returns <b>false</b>.

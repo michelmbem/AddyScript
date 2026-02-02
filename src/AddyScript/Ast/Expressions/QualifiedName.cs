@@ -9,7 +9,7 @@ namespace AddyScript.Ast.Expressions;
 /// <summary>
 /// Represents a composite name like A::B::C
 /// </summary>
-public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable<QualifiedName>
+public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable<QualifiedName>
 {
     private readonly NamePart[] parts;
     private readonly int startIndex;
@@ -21,7 +21,7 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// <param name="parts">The parts of the name</param>
     /// <param name="startIndex">The index of the initial part of the name</param>
     /// <param name="length">The length of the name</param>
-    protected QualifiedName(NamePart[] parts, int startIndex, int length)
+    private QualifiedName(NamePart[] parts, int startIndex, int length)
     {
         this.parts = parts;
         this.startIndex = startIndex;
@@ -32,19 +32,14 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// Initializes a new instance of QualifiedName
     /// </summary>
     /// <param name="parts">The parts of the name</param>
-    public QualifiedName(params NamePart[] parts)
-        : this(parts, 0, parts.Length)
-    {
-    }
+    public QualifiedName(params NamePart[] parts) : this(parts, 0, parts.Length) { }
 
     /// <summary>
     /// Initializes a new instance of QualifiedName
     /// </summary>
     /// <param name="parts">The parts of the name given as strings</param>
     public QualifiedName(params string[] parts)
-        : this(parts.Select(s => new NamePart(s)).ToArray())
-    {
-    }
+        : this([..parts.Select(s => new NamePart(s))]) { }
 
     /// <summary>
     /// Gets the part at the specified index.
@@ -75,20 +70,10 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// <param name="separator">The separator</param>
     /// <param name="useNativeSyntax">Tells if <paramref name="str"/> uses the dotnet native syntax or not</param>
     /// <returns>A <see cref="QualifiedName"/></returns>
-    public static QualifiedName Parse(string str, string separator, bool useNativeSyntax)
+    public static QualifiedName Parse(string str, string separator = "::", bool useNativeSyntax = false)
     {
-        var strings = str.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+        var strings = str.Split([separator], StringSplitOptions.RemoveEmptyEntries);
         return new QualifiedName(strings.Select(s => NamePart.Parse(s, useNativeSyntax)).ToArray());
-    }
-
-    /// <summary>
-    /// A factory method that creates qualified names from .Net qualified names.
-    /// </summary>
-    /// <param name="value">The input string</param>
-    /// <returns>A <see cref="QualifiedName"/></returns>
-    public static QualifiedName Parse(string value)
-    {
-        return Parse(value, "::", false);
     }
 
     /// <summary>
@@ -99,8 +84,8 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     public static QualifiedName ParseDottedName(string dottedName)
     {
         // Remove any type argument expansion from the given name
-        if (dottedName.EndsWith("]"))
-            dottedName = dottedName.Substring(0, dottedName.IndexOf("["));
+        if (dottedName.EndsWith(']'))
+            dottedName = dottedName[..dottedName.IndexOf('[')];
             
         return Parse(dottedName.Replace('+', '.'), ".", true);
     }
@@ -110,10 +95,7 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// </summary>
     /// <param name="path">The input string</param>
     /// <returns>A <see cref="QualifiedName"/></returns>
-    public static QualifiedName ParsePath(string path)
-    {
-        return Parse(path, Path.DirectorySeparatorChar.ToString(), false);
-    }
+    public static QualifiedName ParsePath(string path) => Parse(path, Path.DirectorySeparatorChar.ToString(), false);
 
     /// <summary>
     /// Extracts a part of a qualified name.
@@ -137,7 +119,6 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     public QualifiedName Subname(int start)
     {
         while (start < 0) start += length;
-            
         return new QualifiedName(parts, startIndex + start, length - startIndex - start);
     }
 
@@ -235,11 +216,11 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// <returns>
     /// A 32-bit signed integer that indicates the relative order of the objects being compared.
     /// The return value has these meanings:
-    /// Less than zero: this instance is less than <paramref name="other" />.
-    /// Zero: this instance is equal to <paramref name="other" />.
-    /// Greater than zero: this instance is greater than <paramref name="other" />.
+    /// Less than zero: this instance is less than <paramref name="obj" />.
+    /// Zero: this instance is equal to <paramref name="obj" />.
+    /// Greater than zero: this instance is greater than <paramref name="obj" />.
     /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
+    /// <param name="obj">An object to compare with this object.</param>
     /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
     /// <filterpriority>2</filterpriority>
     public int CompareTo(object obj)
@@ -257,7 +238,7 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// <param name="other">An object to compare with this object.</param>
     public bool Equals(QualifiedName other)
     {
-        if (length != other.length) return false;
+        if (length != other!.length) return false;
 
         for (int i = 0; i < length; ++i)
             if (this[i] != other[i])
@@ -270,20 +251,18 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
     /// <returns>
-    /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+    /// true if the current object is equal to the <paramref name="obj" /> parameter; otherwise, false.
     /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public override bool Equals(object obj)
-    {
-        return (obj is QualifiedName qName) && Equals(qName);
-    }
+    /// <param name="obj">An object to compare with this object.</param>
+    public override bool Equals(object obj) => obj is QualifiedName qName && Equals(qName);
 
     /// <summary>
     /// Serves as a hash function for a particular type. 
     /// </summary>
     /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode()
-    {   int hash = 1;
+    {
+        int hash = 1;
 
         for (int i = 0; i < length; ++i)
             hash = 23 * hash + this[i].GetHashCode();
@@ -312,27 +291,34 @@ public class QualifiedName : IComparable, IComparable<QualifiedName>, IEquatable
     /// Converts a QualifiedName to a string.
     /// </summary>
     /// <returns>A string</returns>
-    public override string ToString()
-    {
-        return ToString("::", false, false);
-    }
+    public override string ToString() => ToString("::", false, false);
 
     /// <summary>
     /// Converts a QualifiedName to a string using the .Net's dotted syntax.
     /// </summary>
     /// <param name="expandTypeArguments">Should type parameters be expanded if the dotnet native syntax is used?</param>
     /// <returns>A string</returns>
-    public string ToDottedName(bool expandTypeArguments)
-    {
-        return ToString(".", true, expandTypeArguments);
-    }
+    public string ToDottedName(bool expandTypeArguments) => ToString(".", true, expandTypeArguments);
 
     /// <summary>
     /// Converts a QualifiedName to a string representing a file path.
     /// </summary>
     /// <returns>A string</returns>
-    public string ToFilePath()
-    {
-        return ToString(Path.DirectorySeparatorChar.ToString(), false, false);
-    }
+    public string ToFilePath() => ToString(Path.DirectorySeparatorChar.ToString(), false, false);
+    
+    #region Operators
+
+    public static bool operator ==(QualifiedName a, QualifiedName b) => Equals(a, b);
+
+    public static bool operator !=(QualifiedName a, QualifiedName b) => !Equals(a, b);
+
+    public static bool operator <(QualifiedName a, QualifiedName b) => a.CompareTo(b) < 0;
+
+    public static bool operator >(QualifiedName a, QualifiedName b) => a.CompareTo(b) > 0;
+
+    public static bool operator <=(QualifiedName a, QualifiedName b) => a.CompareTo(b) <= 0;
+
+    public static bool operator >=(QualifiedName a, QualifiedName b) => a.CompareTo(b) >= 0;
+    
+    #endregion
 }

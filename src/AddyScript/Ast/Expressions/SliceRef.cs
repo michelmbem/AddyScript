@@ -41,7 +41,8 @@ public class SliceRef(Expression owner, Expression lowerBound, Expression upperB
     /// A factory method to quickly create instances of <see cref="SliceRef"/>
     /// where the owner is always the keyword <i>this</i>.
     /// </summary>
-    /// <param name="lowerBound">The expression used to evaluate the lowerBound</param>
+    /// <param name="lowerBound">The expression used to evaluate the slice lower bound</param>
+    /// <param name="upperBound">The expression used to evaluate the slice upper bound</param>
     /// <returns>An <see cref="SliceRef"/></returns>
     public static Expression OfSelf(Expression lowerBound, Expression upperBound) =>
         new SliceRef(new SelfReference(), lowerBound, upperBound);

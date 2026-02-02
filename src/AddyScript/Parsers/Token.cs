@@ -33,23 +33,23 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     /// <summary>
     /// Gets if a token represent a literal number.
     /// </summary>
-    public bool IsNumeric => TokenID.LT_Integer <= TokenID && TokenID <= TokenID.LT_Complex;
+    public bool IsNumeric => TokenID is >= TokenID.LT_Integer and <= TokenID.LT_Complex;
 
     /// <summary>
     /// Gets if a token represent a literal string.
     /// </summary>
-    public bool IsAlphabetic => TokenID == TokenID.LT_String || TokenID == TokenID.MutableString;
+    public bool IsAlphabetic => TokenID is TokenID.LT_String or TokenID.MutableString;
 
     /// <summary>
     /// Gets if a token represent a literal value.
     /// </summary>
-    public bool IsLiteral => TokenID.LT_Null <= TokenID && TokenID <= TokenID.LT_Blob;
+    public bool IsLiteral => TokenID is >= TokenID.LT_Null and <= TokenID.LT_Blob;
 
     /// <summary>
     /// Gets if a token represent a keyword.
     /// </summary>
-    public bool IsKeyword => (TokenID.KW_TypeOf <= TokenID && TokenID <= TokenID.LT_Boolean) ||
-                             (TokenID.TypeName <= TokenID && TokenID <= TokenID.Modifier);
+    public bool IsKeyword =>
+        TokenID is >= TokenID.KW_TypeOf and <= TokenID.LT_Boolean or >= TokenID.TypeName and <= TokenID.Modifier;
 
     /// <summary>
     /// Gets if a token is a unary operator.
@@ -64,7 +64,7 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     /// <summary>
     /// Gets if a token is a comment.
     /// </summary>
-    public bool IsComment => TokenID == TokenID.BlockComment || TokenID == TokenID.LineComment;
+    public bool IsComment => TokenID is TokenID.BlockComment or TokenID.LineComment;
 
     /// <summary>
     /// Gets the textual representation of a class of tokens.
@@ -142,10 +142,10 @@ public class Token(TokenID tokenID, object value, ScriptLocation start, ScriptLo
     {
         return TokenID switch
         {
-            TokenID.Scope => Value.ToString().ToLower(),
-            TokenID.Modifier => Value.Equals(Modifier.StaticFinal)
+            TokenID.Scope => Value.ToString()!.ToLower(),
+            TokenID.Modifier => Equals(Value, Modifier.StaticFinal)
                               ? "static final"
-                              : Value.ToString().ToLower(),
+                              : Value.ToString()!.ToLower(),
             TokenID.LT_Blob => StringUtil.ByteArray2String((byte[])Value),
             _ => Value == null ? ToString(TokenID) : Value.ToString(),
         };

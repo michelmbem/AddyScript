@@ -1,7 +1,7 @@
 function listAdd(&node, value)
 {
 	if (node === null)
-		node = new { value = value, next = null };
+		node = new { value, next = null };
 	else
 		listAdd(node.next, value);
 	

@@ -25,9 +25,7 @@ public class AnonymousCall(Expression callee, Argument[] positionalArgs, Diction
     /// <param name="callee">The expression to be used to get a function</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
     public AnonymousCall(Expression callee, params Expression[] positionalArgs)
-        : this(callee, ToArguments(positionalArgs), null)
-    {
-    }
+        : this(callee, ToArguments(positionalArgs), null) { }
 
     /// <summary>
     /// Represents the expression to be used to get a function.

@@ -24,9 +24,7 @@ public class FunctionCall(string functionName, Argument[] positionalArgs, Dictio
     /// <param name="functionName">The name of the function to invoke</param>
     /// <param name="arguments">The list of arguments passed to the function</param>
     public FunctionCall(string functionName, params Expression[] arguments)
-        : this(functionName, ToArguments(arguments), null)
-    {
-    }
+        : this(functionName, ToArguments(arguments), null) { }
 
     /// <summary>
     /// Represents the name of the function to invoke.

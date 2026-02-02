@@ -21,9 +21,7 @@ public class BlockFrame(Dictionary<string, IFrameItem> items) : Frame
     /// <summary>
     /// Initializes an instance of BlockFrame.
     /// </summary>
-    public BlockFrame() : this([])
-    {
-    }
+    public BlockFrame() : this([]) { }
 
     #region Overrides
 

@@ -22,9 +22,7 @@ public class Assignment(BinaryOperator oper, Expression lValue, Expression rValu
     /// <param name="lValue">The variable that should be assigned</param>
     /// <param name="rValue">The value to assign to the variable</param>
     public Assignment(Expression lValue, Expression rValue)
-        : this(BinaryOperator.None, lValue, rValue)
-    {
-    }
+        : this(BinaryOperator.None, lValue, rValue) { }
 
     /// <summary>
     /// Translates this node.

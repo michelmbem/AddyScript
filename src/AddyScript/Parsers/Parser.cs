@@ -493,10 +493,10 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             throw new SyntaxError(FileName, first, Resources.CaseLabelRequired);
         
         foreach (CaseLabel caseLabel in cases)
-            labels.Add(caseLabel.GetLabelName(), caseLabel);
+            labels.Add(caseLabel.LabelName, caseLabel);
 
         if (defCase < int.MaxValue)
-            labels.Add(Ast.Statements.CaseLabel.GetDefaultLabelName(), new Label(defCase));
+            labels.Add(Ast.Statements.CaseLabel.DEFAULT_LABEL_NAME, new Label(defCase));
 
         var switchBlock = new SwitchBlock(expr, [.. cases], defCase, stmts) { Labels = labels };
         switchBlock.SetLocation(first.Start, last.End);
@@ -666,7 +666,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         else
         {
             Match(TokenID.KW_Default);
-            labelName = Ast.Statements.CaseLabel.GetDefaultLabelName();
+            labelName = Ast.Statements.CaseLabel.DEFAULT_LABEL_NAME;
             jumpToCaseLabel = true;
         }
 

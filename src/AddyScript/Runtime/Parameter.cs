@@ -24,9 +24,7 @@ public class Parameter(string name, bool byRef, bool vaList, DataItem defaultVal
     /// <param name="defaultValue">The default value for this parameter if any</param>
     /// <param name="canBeEmpty">Tells if empty values are allowed for this parameter or not</param>
     public Parameter(string name, DataItem defaultValue = null, bool canBeEmpty = true)
-        : this(name, false, false, defaultValue, canBeEmpty)
-    {
-    }
+        : this(name, false, false, defaultValue, canBeEmpty) { }
 
     /// <summary>
     /// The parameter's name.

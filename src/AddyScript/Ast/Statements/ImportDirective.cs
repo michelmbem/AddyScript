@@ -9,22 +9,13 @@ namespace AddyScript.Ast.Statements;
 /// Represents an <b>import</b> directive.
 /// </summary>
 public class ImportDirective : Statement
-{
-    /// <summary>
-    /// Initializes a new instance of ImportDirective.
-    /// </summary>
-    /// <param name="moduleName">The name of the module to be imported</param>
-    public ImportDirective(QualifiedName moduleName)
-    {
-        ModuleName = moduleName;
-    }
-        
+{ 
     /// <summary>
     /// Initializes a new instance of ImportDirective with an alias.
     /// </summary>
     /// <param name="moduleName">The name of the module to be imported</param>
     /// <param name="alias">An eventually shorter name given to the imported namespace</param>
-    public ImportDirective(QualifiedName moduleName, string alias)
+    public ImportDirective(QualifiedName moduleName, string alias = null)
     {
         ModuleName = moduleName;
         Alias = alias;

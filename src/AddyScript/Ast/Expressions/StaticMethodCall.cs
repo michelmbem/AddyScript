@@ -26,9 +26,7 @@ public class StaticMethodCall(QualifiedName name, Argument[] positionalArgs,
     /// <param name="name">The qualified method's name</param>
     /// <param name="arguments">The arguments passed to the method</param>
     public StaticMethodCall(QualifiedName name, params Expression[] arguments)
-        : this(name, ToArguments(arguments), null)
-    {
-    }
+        : this(name, ToArguments(arguments), null) { }
 
     /// <summary>
     /// The qualified method's name.

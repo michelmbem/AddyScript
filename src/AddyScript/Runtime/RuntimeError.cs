@@ -12,14 +12,10 @@ namespace AddyScript.Runtime;
 public class RuntimeError : ScriptError
 {
     public RuntimeError(string fileName, AstNode astNode, Exception exception)
-        : base(fileName, astNode, exception is TargetInvocationException ? exception.InnerException : exception)
-    {
-    }
+        : base(fileName, astNode, exception is TargetInvocationException ? exception.InnerException : exception) { }
 
     public RuntimeError(string fileName, AstNode astNode, string message)
-        : base(fileName, astNode, message)
-    {
-    }
+        : base(fileName, astNode, message) { }
 
     public RuntimeError(string fileName, AstNode astNode, DataItem thrown)
         : base(fileName, astNode, thrown.GetProperty("__message").ToString())

@@ -13,17 +13,13 @@ public class Return : StatementWithExpression
     /// <summary>
     /// Initializes a new instance of Return
     /// </summary>
-    public Return() : base(null)
-    {
-    }
+    public Return() : base(null) { }
 
     /// <summary>
     /// Initializes a new instance of Return
     /// </summary>
     /// <param name="expression">The returned expression</param>
-    public Return(Expression expression) : base(expression)
-    {
-    }
+    public Return(Expression expression) : base(expression) { }
 
     /// <summary>
     /// Translates this node.
