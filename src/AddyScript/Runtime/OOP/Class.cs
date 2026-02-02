@@ -799,7 +799,9 @@ public class Class : IFrameItem
         var toStringFunc = new Function([new Parameter("format", new String(""))],
                                         Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
                                                                               new PropertyRef(PropertyRef.OfSelf("type"), "name"),
-                                                                              PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME))));
+                                                                              new MethodCall(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME),
+                                                                                             "toString",
+                                                                                             new VariableRef("format")))));
 
         var eqOpFunc = new Function([new Parameter("other")],
                                         Block.WithReturn(MethodCall.OfSelf("equals",

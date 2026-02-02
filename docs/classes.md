@@ -511,11 +511,11 @@ record recordName(field1, field2, ..., fieldN)
       // Generated methods:
       public function equals(other) => other is recordName && this.__members == other.__members;
       public function hashCode() => this.__members.hashCode();
-      public function toString(format = 'g') => 'recordName' + this.__members;
+      public function toString(format = '') => 'recordName' + this.__members.toString(format);
       
       // Generated operators:
-      public operator ==(any other) => this.equals(other);
-      public operator !=(any other) => !this.equals(other);
+      public operator ==(other) => this.equals(other);
+      public operator !=(other) => !this.equals(other);
       
       // Any additional members are inserted here
   }

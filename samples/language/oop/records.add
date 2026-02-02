@@ -39,4 +39,13 @@ println($'jane == kitty: {jane == kitty}');
 println($'laura == mario: {laura == mario}');
 println($'laura == ed: {laura == ed}');
 
+println();
+
+record Color(a, r, g, b);
+
+ab = new Color(255, 72, 99, 160);
+println($'Azure Blue = {ab}');
+println($'Azure Blue in hexadecimal = {ab:X}');
+println($'Azure Blue in binary = {ab:b}');
+
 readln();
