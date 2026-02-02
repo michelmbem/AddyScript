@@ -43,7 +43,7 @@ MemberPrefix ::= Attributes? ((SCOPE MODIFIER?)? | (MODIFIER SCOPE?)?)
 
 MemberSpec ::= ConstructorSpec | FieldSpec | PropertySpec | MethodSpec | OperatorSpec | EventSpec
 
-ConstructorSpec ::= 'constructor' ParameterList Block
+ConstructorSpec ::= 'constructor' ParameterList (':' 'super' ArgumentList)? Block
 
 ParameterList ::= '(' (Parameter (',' Parameter)*)? ')'
 

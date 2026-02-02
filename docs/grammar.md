@@ -134,7 +134,7 @@ MemberSpec ::= ConstructorSpec
 ![ConstructorSpec](diagram/ConstructorSpec.svg)
 
 ```
-ConstructorSpec ::= 'constructor' ParameterList Block
+ConstructorSpec ::= 'constructor' ParameterList (':' 'super' ArgumentList)? Block
 ```
 
 #### ParameterList:

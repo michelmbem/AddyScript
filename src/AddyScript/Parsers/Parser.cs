@@ -1034,7 +1034,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         }
 
         var (access, readerScope, readerBody, writerScope, writerBody) =
-            ProperyBody(name, scope, modifier, out ScriptElement last);
+            PropertyBody(name, scope, modifier, out ScriptElement last);
 
         if (isIndexer)
             switch (modifier)
@@ -1071,7 +1071,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// </returns>
     /// <exception cref="SyntaxError">Thrown if an abstract property is declared with a body, which is not allowed.</exception>
     private (PropertyAccess access, Scope readerScope, Block readerBody, Scope writerScope, Block writerBody)
-        ProperyBody(string name, Scope scope, Modifier modifier, out ScriptElement last)
+        PropertyBody(string name, Scope scope, Modifier modifier, out ScriptElement last)
     {
         PropertyAccess access = PropertyAccess.None;
         Scope readerScope = scope;
