@@ -450,7 +450,7 @@ Apart from the _type_ property, any of these members can be overridden in your c
 
 A record is a special type of class that allows you to represent a simple data structure.
 Records are immutable and final by default. The scripting engine automatically generates a constructor for them,
-as well as overriding the `equals`, `hashCode`, and `toString` methods.
+as well as overriding the `equals`, `hashCode`, `toString`, and `clone` methods.
 It also automatically generates a property for each of the record's fields.
 The equality (`==`) and inequality (`!=`) operators are also overloaded to make comparing records easier.
 
@@ -512,6 +512,7 @@ record recordName(field1, field2, ..., fieldN)
       public function equals(other) => other is recordName && this.__members == other.__members;
       public function hashCode() => this.__members.hashCode();
       public function toString(format = '') => 'recordName' + this.__members.toString(format);
+      public function clone() => new recordName(..this.__members);
       
       // Generated operators:
       public operator ==(other) => this.equals(other);

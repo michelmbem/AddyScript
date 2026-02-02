@@ -793,8 +793,7 @@ public class Class : IFrameItem
                                                                                 new PropertyRef(new VariableRef("other"), RECORD_MEMBERS_PROPERTY_NAME)))));
 
         var hashCodeFunc = new Function([],
-                                        Block.WithReturn(new MethodCall(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME),
-                                                                        "hashCode")));
+                                        Block.WithReturn(new MethodCall(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME), "hashCode")));
 
         var toStringFunc = new Function([new Parameter("format", new String(""))],
                                         Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,
@@ -803,19 +802,24 @@ public class Class : IFrameItem
                                                                                              "toString",
                                                                                              new VariableRef("format")))));
 
+        var cloneFunc = new Function([],
+                                     Block.WithReturn(new MethodCall(PropertyRef.OfSelf("type"),
+                                                                     "newInstance",
+                                                                     [new Argument(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME), true)],
+                                                                     null)));
+
         var eqOpFunc = new Function([new Parameter("other")],
-                                        Block.WithReturn(MethodCall.OfSelf("equals",
-                                                                           new VariableRef("other"))));
+                                    Block.WithReturn(MethodCall.OfSelf("equals", new VariableRef("other"))));
 
         var neqOpFunc = new Function([new Parameter("other")],
-                                    Block.WithReturn(new UnaryExpression(UnaryOperator.Not,
-                                                                         MethodCall.OfSelf("equals",
-                                                                             new VariableRef("other")))));
+                                     Block.WithReturn(new UnaryExpression(UnaryOperator.Not,
+                                                                          MethodCall.OfSelf("equals", new VariableRef("other")))));
 
         return [
             new ("equals", Scope.Public, Modifier.Default, equalsFunc),
             new ("hashCode", Scope.Public, Modifier.Default, hashCodeFunc),
             new ("toString", Scope.Public, Modifier.Default, toStringFunc),
+            new ("clone", Scope.Public, Modifier.Default, cloneFunc),
             new (ClassMethod.GetMethodName(BinaryOperator.Equal), Scope.Public, Modifier.Default, eqOpFunc),
             new (ClassMethod.GetMethodName(BinaryOperator.NotEqual), Scope.Public, Modifier.Default, neqOpFunc)
         ];
