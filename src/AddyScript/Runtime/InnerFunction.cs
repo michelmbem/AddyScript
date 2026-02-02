@@ -727,21 +727,12 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem HashLogic(DataItem[] arguments)
     {
         List<DataItem> args = [arguments[0], ..arguments[1].AsList];
-        int hashCode = args.Count switch
-        {
-            1 => HashCode.Combine(args[0]),
-            2 => HashCode.Combine(args[0], args[1]),
-            3 => HashCode.Combine(args[0], args[1], args[2]),
-            4 => HashCode.Combine(args[0], args[1], args[2], args[3]),
-            5 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4]),
-            6 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4], args[5]),
-            7 => HashCode.Combine(args[0], args[1], args[2], args[3], args[4], args[5], args[6]),
-            8 => HashCode.Combine(args[0], args[1], args[2], args[3], args[5], args[6], args[7]),
-            9 => HashCode.Combine(args[0], args[1], args[2], args[3], args[5], args[6], args[7], args[8]),
-            _ => throw new ArgumentException(string.Format(Resources.TooManyArgs, "hash")),
-        };
+        var hashCode = new HashCode();
+
+        foreach (DataItem arg in args)
+            hashCode.Add(arg);
         
-        return new Integer(hashCode);
+        return new Integer(hashCode.ToHashCode());
     }
 
     private static DataItem DaysLogic(DataItem[] arguments) =>

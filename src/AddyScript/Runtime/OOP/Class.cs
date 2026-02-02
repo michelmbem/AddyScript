@@ -793,9 +793,8 @@ public class Class : IFrameItem
                                                                                 new PropertyRef(new VariableRef("other"), RECORD_MEMBERS_PROPERTY_NAME)))));
 
         var hashCodeFunc = new Function([],
-                                        Block.WithReturn(new FunctionCall("hash",
-                                                                          [new Argument(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME), true)],
-                                                                          null)));
+                                        Block.WithReturn(new MethodCall(PropertyRef.OfSelf(RECORD_MEMBERS_PROPERTY_NAME),
+                                                                        "hashCode")));
 
         var toStringFunc = new Function([new Parameter("format", new String(""))],
                                         Block.WithReturn(new BinaryExpression(BinaryOperator.Plus,

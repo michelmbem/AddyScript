@@ -7,7 +7,7 @@ Here is a more general overview of AddyScript's built-in functions:
 ## Utility functions
 
 * `any eval(string expression)` : evaluates the expression contained in the given string and returns its value.
-* `int hash(any first, ..more)` : combines the provided values to calculate their hash code. It accepts a maximum of nine arguments. Only the first argument is required; the others are optional.
+* `int hash(any first, ..more)` : combines the provided values to calculate their hash code. It accepts a variable number of arguments. Only the first argument is required; the others are optional.
 * `void sleep(int milliseconds)` : pauses the script's execution for the specified number of milliseconds.
 * `void exit(int code = 0)` : Exits the program with the given status code. **Note**: This will also terminate the host application.
 
