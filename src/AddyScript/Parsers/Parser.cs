@@ -245,16 +245,16 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             last = Match(TokenID.SemiColon);
         
         PushClass(modifier, className, null);
-        var (otherCtor, indexer, fields, additionalProps, methods, events) =
+        var (otherCtor, indexer, additionalFields, additionalProps, methods, events) =
             IdentifiyClassMembers(modifier, additionalMembers);
         PopClass();
         
         if (otherCtor != null)
             throw new ScriptError(FileName, otherCtor, Resources.RecordCannotDefineConstructor);
         
-        var (constructor, properties) = BuildRecordClassMembers(className, parameters);
+        var (constructor, fields, properties) = BuildRecordClassMembers(className, parameters);
         var classDef = new ClassDefinition(className, Runtime.OOP.Class.Record.Name, modifier, constructor, indexer,
-                                           [..fields], [..properties, ..additionalProps], [..methods], [..events]);
+                                           [..fields, ..additionalFields], [..properties, ..additionalProps], [..methods], [..events]);
         classDef.SetLocation(first.Start, last.End);
         return classDef;
     }
@@ -1398,32 +1398,42 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     /// <param name="className">The name of the class being built</param>
     /// <param name="parameters">The parameters for the record constructor</param>
     /// <returns>A tuple containing the constructor and property declarations for the record class</returns>
-    private static (ClassMethodDecl, ClassPropertyDecl[])
+    private static (ClassMethodDecl, ClassFieldDecl[], ClassPropertyDecl[])
         BuildRecordClassMembers(string className, ParameterDecl[] parameters)
     {
+        static string fieldName(ParameterDecl p) => $"__{p.Name}";
+
+        static Block fieldReaderBody(ParameterDecl p) =>
+            Ast.Statements.Block.WithReturn(PropertyRef.OfSelf(fieldName(p)));
+
         var ctorBody = new Block([
-            ..parameters.Select(p => new Assignment(PropertyRef.OfSelf(p.Name), new VariableRef(p.Name))),
+            ..parameters.Select(p => new Assignment(PropertyRef.OfSelf(fieldName(p)), new VariableRef(p.Name))),
             new Return()
         ]);
         
         var constructor = new ClassMethodDecl(className, Scope.Public, Modifier.Default, parameters, ctorBody);
-        
+
+        ClassFieldDecl[] fields = [
+            ..parameters.Select(p => new ClassFieldDecl(fieldName(p), Scope.Private, Modifier.Final, null))
+        ];
+
         var memberReaderBody = Ast.Statements.Block.WithReturn(
-            new TupleInitializer([..parameters.Select(p => new Argument(PropertyRef.OfSelf(p.Name)))]));
+            new TupleInitializer([..parameters.Select(p => new Argument(PropertyRef.OfSelf(fieldName(p))))]));
         
         var memberProp = new ClassPropertyDecl(Runtime.OOP.Class.RECORD_MEMBERS_PROPERTY_NAME,
                                                Scope.Protected, Modifier.Default, PropertyAccess.None,
                                                Scope.Protected, memberReaderBody,
                                                Scope.Protected, null);
+
         ClassPropertyDecl[] properties = [
             memberProp,
             ..parameters.Select(p => new ClassPropertyDecl(p.Name, Scope.Public,
-                                                           Modifier.Default, PropertyAccess.ReadWrite,
-                                                           Scope.Public, null,
-                                                           Scope.Private, null))
+                                                           Modifier.Default, PropertyAccess.None,
+                                                           Scope.Public, fieldReaderBody(p),
+                                                           Scope.Public, null))
         ];
         
-        return (constructor, properties);
+        return (constructor, fields, properties);
     }
 
     /// <summary>

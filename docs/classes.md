@@ -484,26 +484,34 @@ record recordName(field1, field2, ..., fieldN)
   ```
   final class recordName
   {
+      // Generated fields:
+      private final __field1;
+      private final __field2;
+      ...
+      private final __fieldN;
+      
       // Generated constructor:
       public constructor (field1, field2, ..., fieldN)
       {
-          this.field1 = field1;
-          this.field2 = field2;
+          this.__field1 = field1;
+          this.__field2 = field2;
           ...
-          this.fieldN = fieldN;
+          this.__fieldN = fieldN;
       }
       
       // Generated properties:
-      public property field1 { read; private write; }
-      public property field2 { read; private write; }
+      public property field1 => this.__field1;
+      public property field2 => this.__field2;
       ...
-      public property fieldN { read; private write; }
+      public property fieldN => this.__fieldN;
+      
+      // A protected property that returns a tuple of all declared fields:
+      protected property __members => (this.__field1, this.__field2, ..., this.__fieldN);
       
       // Generated methods:
-      public function equals(other) => other is recordName &&
-          this.field1 == other.field1 && this.field2 == other.field2 && ... && this.fieldN == other.fieldN;
-      public function hashCode() => hash(this.field1, this.field2, ..., this.fieldN);
-      public function toString(format = 'g') => $'recordName({this.field1}, {this.field2}, ..., {this.fieldN})';
+      public function equals(other) => other is recordName && this.__members == other.__members;
+      public function hashCode() => hash(..this.__members);
+      public function toString(format = 'g') => recordName + this.__members;
       
       // Generated operators:
       public operator ==(any other) => this.equals(other);
