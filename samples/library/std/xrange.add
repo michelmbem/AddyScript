@@ -1,8 +1,8 @@
 class Range
 {
-	private start;
-	private end;
-	private step;
+	private final start;
+	private final end;
+	private final step;
 	private current;
 	
 	public constructor(start, end, step)
@@ -21,7 +21,7 @@ class Range
 		read
 		{
 			if (__key < 0 || __key >= this.size)
-				throw 'index out of range';
+				throw $'index {__key} is out of range; it should be between 0 and {this.size - 1}';
 				
 			return this.start + this.step * __key;
 		}
@@ -52,33 +52,34 @@ class Range
 		return this;
 	}
 	
-	public function toList()
-	{
-		var item, res = [];
-		foreach (item in this) res.add(item);
-		return res;
-	}
+	public function toTuple() => (..this);
 	
-	public function toSet()
-	{
-		var item, res = {};
-		foreach (item in this) res.add(item);
-		return res;
-	}
+	public function toList() => [..this];
+	
+	public function toSet() => {..this};
 }
 
 function xrange(start, end = 0, step = 1) => new Range(start, end, step);
 
 if (__name == 'main')
 {
-	var r = xrange(10, step: 2);
+	var start = int(readln('range start (0): ') ?? '0');
+	var end = int(readln('range end (10): ') ?? '10');
+	var step = int(readln('range step (2): ') ?? '2');
+	var r = xrange(start, end, step);
 	
+	print('range items: ');
 	for (i = 0; i < r.size; ++i)
 		print($'{r[i]} ');
 	println();
 	
+	print('range items incremented by 1: ');
 	r.each(|v| => print('{0} ', v + 1));
 	println();
+	
+	println('range as a tuple: ' + r.toTuple());
+	println('range as a list: ' + r.toList());
+	println('range as a set: ' + r.toSet());
 	
 	readln();
 }

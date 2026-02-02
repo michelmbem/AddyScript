@@ -29,8 +29,7 @@ using Void = AddyScript.Runtime.DataItems.Void;
 namespace AddyScript.Translators;
 
 
-public class Interpreter
-    : ITranslator, IAssignmentProcessor, IIntrospectionHelper
+public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelper
 {
     #region Constants
 
@@ -338,7 +337,7 @@ public class Interpreter
             {
                 case null:
                 case DataItem or Constant when frame != currentFrame:
-                    if (setter.Value is VariableRef vr && Equals(vr.Name, setter.Name))
+                    if (setter.Value == null)
                         returnedValue = Undefined.Value;
                     else
                         setter.Value.AcceptTranslator(this);

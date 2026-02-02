@@ -649,10 +649,34 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     }
 
     /// <summary>
-    /// Recognizes a variable or field assignment.
+    /// Recognizes a variable assignment (like <i>x = 42</i> or  <i>y</i>).
     /// </summary>
     /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
     protected VariableSetter VariableSetter()
+    {
+        if (!TryMatch(TokenID.Identifier)) return null;
+
+        Token first = token;
+        ScriptElement last = first;
+        Consume(1);
+
+        Expression value = null;
+        if (TryMatch(TokenID.Equal))
+        {
+            Consume(1); // To skip the '='
+            last = value = RequiredExpression();
+        }
+
+        var setter = new VariableSetter(first.ToString(), value);
+        setter.SetLocation(first.Start, last.End);
+        return setter;
+    }
+
+    /// <summary>
+    /// Recognizes a field assignment (like <i>x = 42</i> or  <i>y</i>).
+    /// </summary>
+    /// <returns>A <see cref="Ast.Expressions.VariableSetter"/></returns>
+    protected VariableSetter PropertySetter()
     {
         if (!TryMatch(TokenID.Identifier)) return null;
 
@@ -833,7 +857,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             case TokenID.LeftBrace:
             {
                 Consume(1);
-                expr = new ObjectInitializer(List(VariableSetter, true, Resources.DuplicatedProperty));
+                expr = new ObjectInitializer(List(PropertySetter, true, Resources.DuplicatedProperty));
                 last = Match(TokenID.RightBrace);
                 break;
             }
@@ -854,7 +878,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 if (TryMatch(TokenID.LeftBrace))
                 {
                     Consume(1);
-                    fields = List(VariableSetter, true, Resources.DuplicatedProperty);
+                    fields = List(PropertySetter, true, Resources.DuplicatedProperty);
                     last = Match(TokenID.RightBrace);
                 }
                 else if (last.TokenID != TokenID.RightParenthesis)

@@ -39,8 +39,8 @@ function randstr(len)
 	return s.ToString();
 }
 
-function readlst(prompt = 'values : ', separator = @'\s+', converter = null) => readln(prompt)
-	.split(separator)
+function readlst(prompt = 'values : ', separator = @'\s+', converter = null) =>
+	[..readln(prompt).split(separator)]
 	.where(|x| => x.length > 0)
 	.select(converter ?? identity);
 
