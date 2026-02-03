@@ -1,7 +1,7 @@
 # AddyScript lexer for pygments
 
 from pygments.lexer import RegexLexer, words, include
-from pygments.token import Comment, Keyword, Operator
+from pygments.token import Comment, String, Literal, Keyword, Operator
 
 class AddyScriptLexer(RegexLexer):
     """
@@ -17,6 +17,7 @@ class AddyScriptLexer(RegexLexer):
 
         "root": [
             include("comments"),
+            include("strings"),
             include("keywords"),
         ],
 
@@ -33,6 +34,108 @@ class AddyScriptLexer(RegexLexer):
             (r'/\*', Comment.Multiline, '#push'),
             (r'\*/', Comment.Multiline, '#pop'),
             (r'[*/]', Comment.Multiline)
+        ],
+
+        # --------------------
+        # Strings
+        # --------------------
+        "strings": [
+            (r"\$@'", String, "interpolated-verbatim-string-single"),
+            (r'\$@"', String, "interpolated-verbatim-string-double"),
+            (r"\$'", String, "interpolated-string-single"),
+            (r'\$"', String, "interpolated-string-double"),
+            (r"@'", String, "verbatim-string-single"),
+            (r'@"', String, "verbatim-string-double"),
+            (r"'", String, "string-single"),
+            (r'"', String, "string-double"),
+            (r'`[^`]*`', Literal.Date),
+        ],
+
+        "string-single": [
+            (r"'", String, "#pop"),
+            (r"\\['\\abfnrtv0]", String.Escape),
+            (r"[^'\\]+", String),
+            (r'.', String),
+        ],
+
+        "string-double": [
+            (r'"', String, "#pop"),
+            (r'\\["\\abfnrtv0]', String.Escape),
+            (r'[^"\\]+', String),
+            (r'.', String),
+        ],
+
+        "verbatim-string-single": [
+            (r"''", String),
+            (r"'", String, "#pop"),
+            (r"[^']+", String),
+            (r'.', String),
+        ],
+
+        "verbatim-string-double": [
+            (r'""', String),
+            (r'"', String, "#pop"),
+            (r'[^"]+', String),
+            (r'.', String),
+        ],
+
+        # --------------------
+        # Interpolated Strings
+        # --------------------
+        "interpolated-string-single": [
+            (r"'", String, "#pop"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
+            (r"\\['\\abfnrtv0]", String.Escape),
+            (r"[^'\\{]+", String),
+            (r'.', String),
+        ],
+
+        "interpolated-string-double": [
+            (r'"', String, "#pop"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
+            (r'\\["\\abfnrtv0]', String.Escape),
+            (r'[^"\\{]+', String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-single": [
+            (r"''", String),
+            (r"'", String, "#pop"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
+            (r"[^'{]+", String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-double": [
+            (r'""', String),
+            (r'"', String, "#pop"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
+            (r'[^"{]+', String),
+            (r'.', String),
+        ],
+
+        # --------------------
+        # Interpolation Expression
+        # --------------------
+        "interpolation": [
+            (r'\}', String.Interpol, "#pop"),
+            include("whitespace"),
+            include("comments"),
+            include("keywords"),
+            include("types"),
+            include("numbers"),
+            include("strings"),
+            include("operators"),
+            include("punctuation"),
+            include("identifiers"),
         ],
 
         # --------------------
