@@ -24,6 +24,7 @@ markdown_extensions:
 
 plugins:
   - search
+  - load-addyscript-lexer
   - to-pdf:
       output_path: assets/manual.pdf
       cover_logo: assets/cover.jpg
@@ -35,6 +36,8 @@ plugins:
       debug_html: false
       exclude_pages:
         - grammar.*
+          
+plugins_dir: docs/tools
 
 nav:
   - Home: README.md
