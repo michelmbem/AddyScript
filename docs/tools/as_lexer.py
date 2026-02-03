@@ -1,7 +1,7 @@
 # AddyScript lexer for pygments
 
 from pygments.lexer import RegexLexer, words, include
-from pygments.token import Keyword
+from pygments.token import Comment, Keyword
 
 class AddyScriptLexer(RegexLexer):
     """
@@ -16,7 +16,23 @@ class AddyScriptLexer(RegexLexer):
     tokens = {
 
         "root": [
+            include("comments"),
             include("keywords"),
+        ],
+
+        # --------------------
+        # Comments
+        # --------------------
+        "comments": [
+            (r'/\*', Comment.Multiline, 'comment'),
+            (r'//.*?$', Comment.Singleline),
+        ],
+
+        "comment": [
+            (r'[^*/]', Comment.Multiline),
+            (r'/\*', Comment.Multiline, '#push'),
+            (r'\*/', Comment.Multiline, '#pop'),
+            (r'[*/]', Comment.Multiline)
         ],
 
         # --------------------
