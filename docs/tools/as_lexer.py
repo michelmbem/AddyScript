@@ -62,20 +62,20 @@ class AddyScriptLexer(RegexLexer):
                 "for", "foreach", "function", "goto", "if", "import",
                 "operator", "private", "property", "protected", "public",
                 "record", "return", "static", "super", "switch", "this",
-                "throw", "try", "typeof", "var", "when", "while", "yield"
+                "throw", "try", "typeof", "var", "when", "while", "yield",
             ), suffix=r"\b"), Keyword),
 
             (words((
                 "and", "contains", "endswith", "in", "is", "matches",
-                "new", "not", "or", "startswith", "with"
+                "new", "not", "or", "startswith", "with",
             ), suffix=r"\b"), Operator.Word),
 
             (words((
-                "__context", "__key", "__value", "read", "write"
+                "__context", "__key", "__value", "read", "write",
             ), suffix=r"\b"), Keyword.Pseudo),
 
             (words((
-                "false", "null", "true"
+                "false", "null", "true",
             ), suffix=r"\b"), Keyword.Constant),
         ],
 
@@ -87,7 +87,7 @@ class AddyScriptLexer(RegexLexer):
                 "blob", "bool", "closure", "complex", "date", "decimal",
                 "duration", "float", "int", "list", "long", "map", "object",
                 "queue", "rational", "resource", "set", "stack", "string-double",
-                "tuple", "void"
+                "tuple", "void",
             ), suffix=r"\b"), Keyword.Type),
         ],
 
@@ -149,9 +149,9 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "interpolated-string-single": [
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\{]+", String),
             (r'.', String),
@@ -159,9 +159,9 @@ class AddyScriptLexer(RegexLexer):
 
         "interpolated-string-double": [
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\{]+', String),
             (r'.', String),
@@ -170,9 +170,9 @@ class AddyScriptLexer(RegexLexer):
         "interpolated-verbatim-string-single": [
             (r"''", String),
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r"[^'{]+", String),
             (r'.', String),
         ],
@@ -180,9 +180,9 @@ class AddyScriptLexer(RegexLexer):
         "interpolated-verbatim-string-double": [
             (r'""', String),
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r'[^"{]+', String),
             (r'.', String),
         ],
@@ -191,7 +191,7 @@ class AddyScriptLexer(RegexLexer):
         # Interpolation Expression
         # --------------------
         "interpolation": [
-            (r'}', String.Interpol, "#pop"),
+            (r'\}', String.Interpol, "#pop"),
             include("whitespace"),
             include("comments"),
             include("keywords"),
