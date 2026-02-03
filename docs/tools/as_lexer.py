@@ -62,7 +62,7 @@ class AddyScriptLexer(RegexLexer):
             (r"'", String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Escape, "substitution"),
+            (r'{', String.Interpol, "substitution"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String),
             (r'.', String),
@@ -72,7 +72,7 @@ class AddyScriptLexer(RegexLexer):
             (r'"', String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Escape, "substitution"),
+            (r'{', String.Interpol, "substitution"),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\]+', String),
             (r'.', String),
@@ -83,7 +83,7 @@ class AddyScriptLexer(RegexLexer):
             (r"'", String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Escape, "substitution"),
+            (r'{', String.Interpol, "substitution"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^']+", String),
             (r'.', String),
@@ -94,7 +94,7 @@ class AddyScriptLexer(RegexLexer):
             (r'"', String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Escape, "substitution"),
+            (r'{', String.Interpol, "substitution"),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"]+', String),
             (r'.', String),
@@ -144,19 +144,16 @@ class AddyScriptLexer(RegexLexer):
             (r'[^"{]+', String),
             (r'.', String),
         ],
-
+        
         # --------------------
-        # Substitutions insertion
+        # Interpolation Expression
         # --------------------
         "substitution": [
-            (r'}', String.Escape, "#pop"),
+            (r'}', String.Interpol, "#pop"),
             (r'[^}]+', String.Escape),
             (r'.', String.Escape),
         ],
 
-        # --------------------
-        # Interpolation Expression
-        # --------------------
         "interpolation": [
             (r'}', String.Interpol, "#pop"),
 
