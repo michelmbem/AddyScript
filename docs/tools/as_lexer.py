@@ -3,7 +3,7 @@
 from pygments.lexer import RegexLexer, words, include
 from pygments.token import (
     Text, Comment, Operator, Keyword, Name, String,
-    Number, Punctuation, Literal
+    Number, Punctuation
 )
 
 class AddyScriptLexer(RegexLexer):
@@ -98,6 +98,8 @@ class AddyScriptLexer(RegexLexer):
             (r"0b[01_]+", Number.Bin),
             (r"0x[0-9a-fA-F_]+", Number.Hex),
             (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?", Number.Float),
+            (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?", Number.Float),
+            (r"\d[\d_]*[eE][+-]?\d[\d_]*", Number.Float),
             (r"\d[\d_]*", Number.Integer),
         ],
 
@@ -113,7 +115,7 @@ class AddyScriptLexer(RegexLexer):
             (r'@"', String, "verbatim-string-double"),
             (r"'", String, "string-single"),
             (r'"', String, "string-double"),
-            (r'`[^`]*`', Literal.Date),
+            (r'`[^`]*`', String.Char),
         ],
 
         "string-single": [
