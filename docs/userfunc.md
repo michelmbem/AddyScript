@@ -18,7 +18,7 @@ function functionName (comma_separated_list_of_parameters)
 
 Example:
 
-```JS
+```AS
 function sayHello()
 {
     println("Hello to anyone!");
@@ -50,7 +50,7 @@ function functionName (comma_separated_list_of_parameters) => expression;
 
 Example:
 
-```JS
+```AS
 function addTwo(a, b) => a + b;
 
 n = (float)readln('first number: ');
@@ -77,7 +77,7 @@ Once a named argument is encountered by the parser, it expects all subsequent ar
 
 Example:
 
-```JS
+```AS
 // A function that concatenates values and wrap between a prefix and a suffix
 function concat(values, separator = ', ', prefix = '{', suffix = '}')
 	=> prefix + separator.join(..values) + suffix;
@@ -174,7 +174,7 @@ Both techniques are illustrated in the example below:
 
 Example:
 
-```JS
+```AS
 // Repeats an action on each item of a list; parameter 'action' is a (mandatory) closure
 function repeat(l, action!)
 {
@@ -212,7 +212,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 
 1. If _parameterName_ matches the name of an existing parameter in the original function's header, "bind" proceeds to **currying**: The parameter _parameterName_ is removed from the resulting function's header and is replaced by a fixed value, which in this case is _defaultValue_. The resulting function will then have one parameter less than the original one, with the exact same body that will always evaluate _parameterName_ to _defaultValue_. Here is an example of how to curry a function:
 
-    ```JS
+    ```AS
     // add is the original function: it simply adds two numbers
     function add(a, b) => a + b;
 
@@ -232,7 +232,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 
 2. If _parameterName_ doesn't match the name of an existing parameter in the original function's header, "bind" simply adds an optional parameter with the given name and default value to the resulting function. This is very helpful when you are creating a function that expects a closure as an argument and that you want the closure to match variable prototypes. As an example, the "each" method of the **list** type is defined as follows:
 
-    ```JS
+    ```AS
     public function each(action)
     {
         // action is replaced by a clone that has an optional parameter named __index
@@ -271,7 +271,7 @@ Where :
 
 The following example shows how to invoke the Win32 _MessageBox_ function from a script:
 
-```JS
+```AS
 [LibImport("user32", procName = "MessageBox", returnType = "Int32")]
 extern function msgbox(
         [Type("IntPtr")] hWnd,

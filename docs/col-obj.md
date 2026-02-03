@@ -18,7 +18,7 @@ Here is an example of using a tuple in AddyScript.
 
 Example:
 
-```JS
+```AS
 t = ('John Doe', 19, 'New York');
 
 println($'t.size = {t.size}');
@@ -64,7 +64,7 @@ Like a tuple, a list is a collection in which items are accessed by index. But o
 
 Example:
 
-```JS
+```AS
 n = (int) readln('How many names? ');
 names = [];
 
@@ -165,7 +165,7 @@ Here is an example of using a set in AddyScript.
 
 Example:
 
-```JS
+```AS
 t = {'john', 'mike', 'bob'};
 u = {'steve', 'mike', 'john'};
 
@@ -286,7 +286,7 @@ Here is an example of using the map in AddyScript.
 
 Example:
 
-```JS
+```AS
 tom = {'name' => 'Tom Berenger', 'job' => 'Lawyer', 'age' => 38};
 tom['company'] = 'Holy Lawyers & co.';
 tom['hire date'] = `2004-05-18`;
@@ -394,7 +394,7 @@ For iteration methods that are invoked on strings, blobs, tuples, or lists, the 
 
 Example:
 
-```JS
+```AS
 l = ['one', 'two', 'three', 'four', 'five'];
 l.each(|x, i| => println('Item #' + i + ' : ' + x));
 ranks = l.groupBy(|x, i| => i % 2 ? 'odd rank' : 'even rank');
@@ -429,7 +429,7 @@ Where:
 
 Example:
 
-```JS
+```AS
 actor = new { firstName = 'John', lastName = 'Snow', age = 24 };
 movie = new { title = 'The Matrix', year = 1999, rating = 8.5, actor };
 println('{0} {1} is aged {2}', actor.firstName, actor.lastName, actor.age);
@@ -448,7 +448,7 @@ Sometimes it is better to initialize the object with an empty initializer and th
 
 Example:
 
-```JS
+```AS
 student = new {};
 student.firstName = 'André';
 student.lastName = 'Dikos';
@@ -473,7 +473,7 @@ Escape sequences, on the other hand, allow you to represent special characters c
 
 Example:
 
-```JS
+```AS
 dict = { 'long' => 120, 'large' => 80, 'depth in cm' => 20 };
 shape = (object) dict;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth\x20in\x20cm);
@@ -496,7 +496,7 @@ Such an assignment requires the use of the **let** keyword
 
 Here is an example of object destructuring:
 
-```JS
+```AS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
 let { firstName, lastName, age } = person;
 println($'{firstName} {lastName} is a {age}-year-old person');
@@ -514,7 +514,7 @@ The default value is ignored if a property of the same name is found in the sour
 
 Illustration:
 
-```JS
+```AS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25 };
 let { firstName, lastName, job = 'Journalist', age = 17 } = person;
 println($'{firstName} {lastName} is a {age}-year-old {job}');
@@ -529,7 +529,7 @@ Mael Jordano is a 25-year-old Journalist
 Objects can be destructured recursively:
 if the source object has a property that is also an objet it can be recursively destructured as illustrated below.
 
-```JS
+```AS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
 let { firstName, lastName, age, { title, company } = job } = person;
 println($'{firstName} {lastName} is a {age}-year-old {title} at {company}');
@@ -544,7 +544,7 @@ Mael Jordano is a 25-year-old Accountant at Paradise Co.
 If the name of a variable is preceded by the _spread_ operator (..),
 it will be used to collect the remaining properties of the source object (those that were not explicitly extracted).
 
-```JS
+```AS
 person = new { firstName = 'Mael', lastName = 'Jordano', age = 25, job = new { title = 'Accountant', company = 'Paradise Co.', since = `2018-08-12` } };
 let { firstName, lastName, age, { title, ..rest } = job } = person;
 println($'{firstName} {lastName} is a {age}-year-old {title} at {rest.company} since {rest.since:d}');

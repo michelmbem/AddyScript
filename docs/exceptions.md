@@ -10,7 +10,7 @@ and you don't want your script to be interrupted because of those errors. Here's
 
 Let the user enter an expression that we will evaluate. The expression entered by the user may be wrong.
 
-```JS
+```AS
 retry:
 f = readln('f(x) = ');
 x = (float) readln('x = ');
@@ -69,7 +69,7 @@ There are some cases where a **throw** statement can be used as an expression (c
 
 1. In a ternary conditional expression (?:), any of the results can be a _throw expression_. Example:
 
-    ```JS
+    ```AS
     age = (int) readln('type your age: ');
     category = (age < 0) ? throw "Age cannot be negative" :
                (age < 13) ? 'child' :
@@ -80,13 +80,13 @@ There are some cases where a **throw** statement can be used as an expression (c
 
 2. In a logical expression with the **??** operator, the right operand can be a _throw expression_. That syntax has a similar effect to using the postfix **!** operator but it gives us control over the message of the exception that is thrown when the first operand is empty. Example:
 
-    ```JS
+    ```AS
     name = readln('type a number: ') ?? throw "You didn't type any name";
     ```
 
 3. As seen in the pattern matching section, a switch expression can throw an exception when a pattern is matched. Example:
 
-    ```JS
+    ```AS
     score = getScore();
     mention = score switch {
         >= 0 and <= 3 => 'low',
@@ -108,7 +108,7 @@ In a **try-with-resource** statement, the **catch** and **finally** blocks can b
 
 Let's copy a file from one place to another with a Stream that should be closed at the end.
 
-```JS
+```AS
 import System::Environment;
 import System::IO;
 

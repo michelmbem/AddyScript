@@ -163,7 +163,7 @@ An operator overload specification consists of the **operator** keyword followed
 
 In this example, we will define a Person class with three fields, four properties (three of them mapping the three fields plus an automatic one), a method, and an event.
 
-```JS
+```AS
 class Person
 {
     // Fields
@@ -237,7 +237,7 @@ Mrs. John, Female person aged 42
 
 Example of a class that has an indexer:
 
-```JS
+```AS
 class PhoneBook
 {
     // Backing field for the indexer
@@ -310,7 +310,7 @@ Where
 
 Example: let's add a constructor in the Person class
 
-```JS
+```AS
 class Person
 {
     // Fields: we don't need default values anymore as the constructor is supplying them
@@ -393,7 +393,7 @@ When using property initializers, if the constructor has no parameters, there is
 
 Example:
 
-```JS
+```AS
 class Point
 {
     public property x;
@@ -524,7 +524,7 @@ record recordName(field1, field2, ..., fieldN)
 
 Example:
 
-```JS
+```AS
 record Point(x, y);
 
 p1 = new Point(10, 20);
@@ -582,7 +582,7 @@ The result of the operation is a new record with the same fields as the original
 but with the values of the specified fields replaced by the corresponding values from the right operand.
 The following example shows how to use the **with** operator to create a mutable copy of a record:
 
-```JS
+```AS
 record Point(x, y);
 
 p1 = new Point(10, 20);

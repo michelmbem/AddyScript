@@ -10,7 +10,7 @@ In the example below, we will illustrate how inheritance is handled in AddyScrip
 a subclass of the Person class introduced in the previous section.
 The example also shows how to invoke the parent class's constructor (to initialize inherited fields).
 
-```JS
+```AS
 class Employee : Person
 {
     public constructor(name, sex, age, hireDate, department, jobTitle)
@@ -54,7 +54,7 @@ Also, when the parent class is **abstract**, any subclass that is not abstract m
 
 Example:
 
-```JS
+```AS
 // A base abstract class with a single abstract method
 abstract class Pet
 {
@@ -121,7 +121,7 @@ Finally, **moveNext** is responsible for moving the internal cursor forward, ret
 
 Example:
 
-```JS
+```AS
 class Range
 {
    private start;
@@ -176,7 +176,7 @@ It only tells AddyScript what value the iterator being constructed should return
 
 Example:
 
-```JS
+```AS
 class Range
 {
    private start;
