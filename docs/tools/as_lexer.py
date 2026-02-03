@@ -205,12 +205,12 @@ class AddyScriptLexer(RegexLexer):
         # Numbers
         # --------------------
         "numbers": [
-            (r"0b[01_]+", Number.Bin),
-            (r"0x[0-9a-fA-F_]+", Number.Hex),
-            (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?", Number.Float),
-            (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?", Number.Float),
-            (r"\d[\d_]*[eE][+-]?\d[\d_]*", Number.Float),
-            (r"\d[\d_]*", Number.Integer),
+            (r"0b[01_]+[lfdi]?", Number.Bin),
+            (r"0x[0-9a-fA-F_]+[lfdi]?", Number.Hex),
+            (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fdi]?", Number.Float),
+            (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fdi]?", Number.Float),
+            (r"\d[\d_]*[eE][+-]?\d[\d_]*[fdi]?", Number.Float),
+            (r"\d[\d_]*[lfdi]?", Number.Integer),
         ],
 
         # --------------------
