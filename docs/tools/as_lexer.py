@@ -182,7 +182,7 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "identifiers": [
             (r"[A-Za-z_]\w*(?=\s*\()", Name.Function),
-            (r"\$[A-Za-z_]\w*", Name),
+            (r"\$?[A-Za-z_]\w*", Name),
         ],
 
         # --------------------

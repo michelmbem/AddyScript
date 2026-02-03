@@ -120,7 +120,7 @@ The only requirement here is that none of the parameters provided by the spread 
 
 Example:
 
-```Js
+```addyscript
 function add(a, b, c) => a + b + c;
 
 res = add(1, 2, 3);
@@ -184,6 +184,7 @@ function repeat(l, action!)
 
 // A list for testing purpose
 myList = [2, 5, 7, 8, 3, 0, 1, 6, 9, 4];
+
 // Invoke repeat with a reference to the builtin 'println' function
 repeat(myList, println);
 
