@@ -84,7 +84,7 @@ bar();
 println('back to main, toto = ' + toto);
 ```
 
-``` { .text .no-copy } title="Output"
+``` { .text .no-copy .title: 'Output' }
 in main, toto = 10
 in foo, toto = 15
 back to main, toto = 10
@@ -246,7 +246,7 @@ foreach (item in lst)
        println('something else');
 ```
 
-``` { .text .no-copy } title="Output"
+``` { .text .no-copy .title: 'Output' }
 int
 something else
 date

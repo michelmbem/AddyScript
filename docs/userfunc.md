@@ -224,7 +224,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
     println(add10(-7));
     ```
    
-   ``` { .text .no-copy } title="Output"
+   ``` { .text .no-copy .title: 'Output' }
    15
    3
    ```
