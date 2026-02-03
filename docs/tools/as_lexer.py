@@ -213,3 +213,13 @@ class AddyScriptLexer(RegexLexer):
             (r"[A-Za-z_]\w*", Name),
         ],
     }
+
+from pygments.lexers import _mapping
+
+_mapping.LEXERS['AddyScriptLexer'] = (
+    'as_lexer',
+    'AddyScript',
+    ('addyscript', 'add'),
+    ('*.add',),
+    ('text/x-addyscript',),
+)
