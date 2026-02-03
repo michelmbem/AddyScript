@@ -7,7 +7,7 @@ The following sections describe how to do this.
 
 To create a function in AddyScript, simply use the following syntax:
 
-``` { .no-copy }
+``` { .text .no-copy }
 function functionName (comma_separated_list_of_parameters)
 {
     // function's logic goes here
@@ -44,7 +44,7 @@ if (ans != "fine")
 When the body of a function is reduced to a **return** statement or a simple expression,
 the entire function can be formulated with this shorter syntax:
 
-``` { .no-copy }
+``` { .text .no-copy }
 function functionName (comma_separated_list_of_parameters) => expression;
 ```
 
@@ -224,7 +224,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
     println(add10(-7));
     ```
    
-   ``` { .no-copy } title="Output"
+   ``` { .text .no-copy } title="Output"
    15
    3
    ```
@@ -247,7 +247,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 ## External functions
 AddyScript allows a script to invoke a function declared in a native library (such as a DLL or a shared object). To do this, the target function must first be declared as an external function in the script using this syntax:
 
-``` { .no-copy }
+``` { .text .no-copy }
 [LibImport("nativeLibraryName", procName = "importedFunctionName", returnType = "someDotNetType")]
 extern function functionName(list_of_parameters_with_type_attribute);
 ```

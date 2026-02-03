@@ -40,7 +40,7 @@ t = new Tuple{3}('Jason Donovan', 32, `2010-03-15`);
 println($"{t[0]} is {t[1]} years old, he works for us since {t[2]:d}.");
 ```
 
-``` { .no-copy } title="Output"
+``` { .text .no-copy } title="Output"
 LinkedList{1}:
 --------------
 [1]->[2]->[4]->[8]->[16]->[32]->[64]->[128]->[256]->[512]

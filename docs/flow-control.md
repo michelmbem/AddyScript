@@ -48,7 +48,7 @@ Like the if-else statement, the switch statement is used to choose the action to
 The main difference is that unlike the if-else statement, the switch statement is not limited to 2 alternatives.
 Its syntax is as follows:
 
-``` { .no-copy }
+``` { .text .no-copy }
 switch (expression)
 {
     case value1:
@@ -268,7 +268,7 @@ It combines a better matching syntax with the **switch** keyword, which this tim
 helping us create expressions that not only choose what action to perform based on the value of an expression,
 but also return a value. A pattern matching expression typically looks like this:
 
-``` { .no-copy }
+``` { .text .no-copy }
 expression switch {
     pattern1 => result1,
     pattern2 => result2,
@@ -339,7 +339,7 @@ foreach (o in l) {
 }
 ```
 
-``` { .no-copy } title="Output"
+``` { .text .no-copy } title="Output"
 o is: <object {name = cube, size = 18, color = blue}>
 result with o: "a blue cube"
 

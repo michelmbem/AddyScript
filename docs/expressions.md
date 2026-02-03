@@ -40,7 +40,7 @@ Such a variable will hide any constant or variable with the same name declared i
 
 The syntax for explicitly declaring variables is the following:
 
-``` { .no-copy }
+``` { .text .no-copy }
 var <variable_name1> = <initial_value1>, <variable_name2> = <initial_value2>, ... ,<variable_nameN> = <initial_valueN>
 ```
 
@@ -48,7 +48,7 @@ Setting the initial value of a variable is optional.
 However, an uninitialized variable remains unusable until it is assigned a value.
 Therefore, the above syntax is equivalent to the following:
 
-``` { .no-copy }
+``` { .text .no-copy }
 var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 <variable_name1> = <initial_value1>;
 <variable_name2> = <initial_value2>;
@@ -84,7 +84,7 @@ bar();
 println('back to main, toto = ' + toto);
 ```
 
-``` { .no-copy } title="Output"
+``` { .text .no-copy } title="Output"
 in main, toto = 10
 in foo, toto = 15
 back to main, toto = 10
@@ -99,7 +99,7 @@ You will typically declare constants using the **const** keyword like in the fol
 
 The syntax for declaring constants is the following:
 
-``` { .no-copy }
+``` { .text .no-copy }
 const <constant_name1> = <constant_value1>, <constant_name2> = <constant_value2>, ... ,<constant_nameN> = <constant_valueN>;
 ```
 
@@ -246,7 +246,7 @@ foreach (item in lst)
        println('something else');
 ```
 
-``` { .no-copy } title="Output"
+``` { .text .no-copy } title="Output"
 int
 something else
 date
@@ -358,7 +358,7 @@ and the **rvalue** which represents the value that's being assigned to the lvalu
 Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (`=`).
 So an assignment in AddyScript typically looks like this:
 
-``` { .no-copy }
+``` { .text .no-copy }
 lvalue = rvalue;
 ```
 
@@ -388,7 +388,7 @@ But AddyScript has a type of statement in its syntax that allows you to do this 
 In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term).
 This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
 
-``` { .no-copy }
+``` { .text .no-copy }
 (var1, var2, ..., varN) = (val1, val2, ..., valN);
 ```
 
@@ -425,7 +425,7 @@ It's especially useful when there is a risk of ambiguity in the way the code is 
 
 An assignment with the **let** keyword looks like this:
 
-``` { .no-copy }
+``` { .text .no-copy }
 let lvalue = rvalue;
 ```
 
