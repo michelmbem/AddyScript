@@ -176,6 +176,7 @@ class AddyScriptLexer(RegexLexer):
         # Interpolation Expression
         # --------------------
         "interpolation": [
+            (r'\}', String.Interpol, "#pop"),
             include("whitespace"),
             include("comments"),
             include("keywords"),
@@ -185,7 +186,6 @@ class AddyScriptLexer(RegexLexer):
             include("operators"),
             include("punctuation"),
             include("identifiers"),
-            (r'\}', String.Interpol, "#pop"),
         ],
 
         # --------------------
