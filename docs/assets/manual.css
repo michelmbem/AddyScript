@@ -3,3 +3,27 @@
         display: none !important;
     }
 }
+
+/**************************/
+/* Custom Pygments styles */
+/**************************/
+
+/* Types */
+.highlight .kt {
+    color: maroon;
+}
+
+/* Peudo-keyword */
+.highlight .kp {
+    color: teal;
+}
+
+/* Dates */
+.highlight .ld {
+    color: steelblue;
+}
+
+/* Punctuations */
+.highlight .p {
+    color: orangered;
+}
