@@ -41,7 +41,7 @@ class AddyScriptLexer(RegexLexer):
         # Comments
         # --------------------
         "comments": [
-            (r"//.*?$", Comment.Single),
+            (r"//.*$", Comment.Single),
             (r"/\*", Comment.Multiline, "comment"),
         ],
 
@@ -99,7 +99,7 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "strings": [
             (r"\$@'", String.Interpol, "interpolated-verbatim-char"),
-            (r"\$@\"", String.Interpol, "interpolated-verbatim-string"),
+            (r'\$@"', String.Interpol, "interpolated-verbatim-string"),
             (r"\$'", String.Interpol, "interpolated-char"),
             (r'\$"', String.Interpol, "interpolated-string"),
             (r"@'", String, "verbatim-char"),
@@ -112,8 +112,7 @@ class AddyScriptLexer(RegexLexer):
         "string": [
             (r'"', String, "#pop"),
             (r'\\["\\abfnrtv0]', String.Escape),
-            (r'[^"\\]+', String),
-            (r'.', String),
+            (r'[^"\\]+', String)
         ],
 
         "verbatim-string": [
@@ -126,7 +125,6 @@ class AddyScriptLexer(RegexLexer):
             (r"'", String, "#pop"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String),
-            (r".", String),
         ],
 
         "verbatim-char": [
@@ -139,38 +137,36 @@ class AddyScriptLexer(RegexLexer):
         # Interpolated Strings
         # --------------------
         "interpolated-string": [
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r'"', String.Interpol, "#pop"),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\{]+', String.Interpol),
-            (r'.', String.Interpol),
         ],
 
         "interpolated-verbatim-string": [
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r'""', String),
             (r'"', String.Interpol, "#pop"),
             (r'[^"{]+', String.Interpol),
         ],
 
         "interpolated-char": [
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r"'", String.Interpol, "#pop"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String.Interpol),
-            (r".", String.Interpol),
         ],
 
         "interpolated-verbatim-char": [
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
-            (r'{', String.Interpol, "interpolation"),
+            (r'\{\{', String.Escape),
+            (r'\}\}', String.Escape),
+            (r'\{', String.Interpol, "interpolation"),
             (r"''", String),
             (r"'", String.Interpol, "#pop"),
             (r"[^'{]+", String.Interpol),
@@ -189,7 +185,7 @@ class AddyScriptLexer(RegexLexer):
             include("operators"),
             include("punctuation"),
             include("identifiers"),
-            (r'}', String.Interpol, "#pop"),
+            (r'\}', String.Interpol, "#pop"),
         ],
 
         # --------------------
