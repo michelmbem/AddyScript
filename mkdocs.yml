@@ -17,6 +17,7 @@ theme:
     - navigation.sections
     - search.suggest
     - search.highlight
+    - content.code.copy
 
 extra_css:
   - assets/manual.css
