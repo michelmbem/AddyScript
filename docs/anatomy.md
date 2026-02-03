@@ -2,7 +2,7 @@
 
 A script in AddyScript is a sequence of statements in any order. Even an empty file is a valid script. Statements come in many different forms: **import** directives, class or function definitions, tests, loops, blocks, assignments, **try-catch-finally** structures, etc.... There is no particular order in which you should organize your statements. For example, you might assign a value to a variable, then declare a class, and then call a function. Some statements are elementary, while others may contain child statements. We will learn about the different types of statements and the proper syntax for each as we progress through this manual. Here are some sample scripts to get you started:
 
-### Simply printing _"Hello World!"_ to the standard ``` { .text .no-copy .title: 'Output' }addyscript linenums="1"
+### Simply printing _"Hello World!"_ to the standard ``` title="Output" { .text .no-copy }addyscript linenums="1"
 println('Hello World!');
 ```
 

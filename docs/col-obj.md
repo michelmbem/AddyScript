@@ -437,7 +437,7 @@ println('{0}, released in {1} is rated {2}; it\'s main actor is {3} {4}',
         movie.title, movie.year, movie.rating, movie.actor.firstName, movie.actor.lastName);
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 John Snow is aged 24
 The Matrix, released in 1999 is rated 8,5; it's main actor is John Snow
 ```
@@ -455,7 +455,7 @@ student.age = 19;
 println('{0} {1} is aged {2}', student.firstName, student.lastName, student.age);
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 André Dikos is aged 19
 ```
 
@@ -475,7 +475,7 @@ shape = (object) dict;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth\x20in\x20cm);
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 Shape size: 120 x 80 x 20
 ```
 
@@ -496,7 +496,7 @@ let { firstName, lastName, age } = person;
 println($'{firstName} {lastName} is a {age}-year-old person');
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 Mael Jordano is a 25-year-old person
 ```
 
@@ -512,7 +512,7 @@ let { firstName, lastName, job = 'Journalist', age = 17 } = person;
 println($'{firstName} {lastName} is a {age}-year-old {job}');
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 Mael Jordano is a 25-year-old Journalist
 ```
 
@@ -525,7 +525,7 @@ let { firstName, lastName, age, { title, company } = job } = person;
 println($'{firstName} {lastName} is a {age}-year-old {title} at {company}');
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 Mael Jordano is a 25-year-old Accountant at Paradise Co.
 ```
 
@@ -538,7 +538,7 @@ let { firstName, lastName, age, { title, ..rest } = job } = person;
 println($'{firstName} {lastName} is a {age}-year-old {title} at {rest.company} since {rest.since:d}');
 ```
 
-``` { .text .no-copy .title: 'Output' }
+``` title="Output" { .text .no-copy }
 Mael Jordano is a 25-year-old Accountant at Paradise Co. since 2018-08-12
 ```
 
