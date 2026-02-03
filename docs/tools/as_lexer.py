@@ -2,8 +2,8 @@
 
 from pygments.lexer import RegexLexer, words, include
 from pygments.token import (
-    Comment, String, Literal, Keyword, Operator,
-    Number, Punctuation
+    Comment, String, Literal, Keyword, Name,
+    Operator, Number, Punctuation
 )
 
 class AddyScriptLexer(RegexLexer):
@@ -22,6 +22,7 @@ class AddyScriptLexer(RegexLexer):
             include("comments"),
             include("strings"),
             include("keywords"),
+            include("identifiers"),
             include("numbers"),
             include("operators"),
             include("punctuation"),
@@ -135,6 +136,7 @@ class AddyScriptLexer(RegexLexer):
             (r'\}', String.Interpol, "#pop"),
             include("strings"),
             include("keywords"),
+            include("identifiers"),
             include("numbers"),
             include("operators"),
             include("punctuation"),
@@ -173,6 +175,15 @@ class AddyScriptLexer(RegexLexer):
                 "and", "contains", "endswith", "in", "is", "matches",
                 "new", "not", "or", "startswith", "typeof", "with",
             ), prefix=r"\b", suffix=r"\b"), Operator.Word),
+        ],
+
+        # --------------------
+        # Identifiers
+        # --------------------
+        "identifiers": [
+            (r"[A-Za-z_]\w*(?=\s*\())", Name.Function),
+            (r"[A-Za-z_]\w*", Name),
+            (r"\$[A-Za-z_]\w*", Name),
         ],
 
         # --------------------
