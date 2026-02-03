@@ -63,7 +63,7 @@ class AddyScriptLexer(RegexLexer):
             (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'(?=.*){[^}]+}', String.Escape),
+            (r'{', String.Escape, "substitution"),
             (r"[^'\\]+", String),
             (r'.', String),
         ],
@@ -73,7 +73,7 @@ class AddyScriptLexer(RegexLexer):
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'(?=.*){[^}]+}', String.Escape),
+            (r'{', String.Escape, "substitution"),
             (r'[^"\\]+', String),
             (r'.', String),
         ],
@@ -84,7 +84,7 @@ class AddyScriptLexer(RegexLexer):
             (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'(?=.*){[^}]+}', String.Escape),
+            (r'{', String.Escape, "substitution"),
             (r"[^']+", String),
             (r'.', String),
         ],
@@ -95,7 +95,7 @@ class AddyScriptLexer(RegexLexer):
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'(?=.*){[^}]+}', String.Escape),
+            (r'{', String.Escape, "substitution"),
             (r'[^"]+', String),
             (r'.', String),
         ],
@@ -143,6 +143,13 @@ class AddyScriptLexer(RegexLexer):
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"{]+', String),
             (r'.', String),
+        ],
+
+        # --------------------
+        # Substitutions insertion
+        # --------------------
+        "substitution": [
+            (r'}', String.Escape, "#pop"),
         ],
 
         # --------------------
