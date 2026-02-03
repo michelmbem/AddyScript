@@ -31,8 +31,13 @@ body[data-md-color-scheme="default"] .highlight .p {
 }
 
 /* Keyword operators */
-body[data-md-color-scheme="default"] .highlight .ok {
+body[data-md-color-scheme="default"] .highlight .ow {
     color: darkslategray;
+}
+
+/* String escape sequences */
+body[data-md-color-scheme="default"] .highlight .se {
+    color: darkolivegreen;
 }
 
 /***** Dark Mode *****/
@@ -44,7 +49,7 @@ body[data-md-color-scheme="slate"] .highlight .kt {
 
 /* Peudo-keyword */
 body[data-md-color-scheme="slate"] .highlight .kp {
-    color: darkturquoise;
+    color: mediumaquamarine;
 }
 
 /* Dates */
@@ -55,4 +60,14 @@ body[data-md-color-scheme="slate"] .highlight .ld {
 /* Punctuations */
 body[data-md-color-scheme="slate"] .highlight .p {
     color: darkgoldenrod;
+}
+
+/* Keyword operators */
+body[data-md-color-scheme="slate"] .highlight .ow {
+    color: slategray;
+}
+
+/* String escape sequences */
+body[data-md-color-scheme="slate"] .highlight .se {
+    color: olive;
 }
