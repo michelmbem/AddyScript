@@ -6,7 +6,7 @@ You can easily export an Abstract Syntax Tree to XML format by invoking the _Exp
 
 Simply do as follows:
 
-```csharp
+```csharp linenums="1"
 var program = ScriptEngine.ParseString(txtScript.Text);
 // Alternatively: var program = ScriptEngine.ParseFile(@"path/to/my/script");
 ScriptEngine.ExportXml(program, @"C:\myScript.xml");
@@ -23,7 +23,7 @@ The generated source code is so nicely formatted than the "Reformat code" functi
 
 Here is an example of how to use it:
 
-```csharp
+```csharp linenums="1"
 var program = ScriptEngine.ParseString(txtScript.Text);
 txtScript.Text = ScriptEngine.GenerateCode(program);
 ```

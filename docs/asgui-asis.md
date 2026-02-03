@@ -70,7 +70,7 @@ Using the console is simple, just type a command and press [Enter]. Remember to 
 
 Suppose you want to enter a sequence of statements like this:
 
-```addyscript
+```addyscript linenums="1"
 a = randint(10);
 if (a > 5)
     println('Greater than five');
@@ -80,7 +80,7 @@ else
 
 You'll start by typing the first three lines. But as soon as AddyScript encounters the semicolon at the end of the third line, it assumes your if-else statement is complete, throwing an error when it encounters the next **else** (of course, no statement in AddyScript begins with the keyword **else**). To solve this problem, I recommend that you always use curly braces when typing an if-else statement. In particular, be sure to always place your **else** keyword between the closing brace of the **if** block and the opening brace of its own block. If you do this, the previous example would look like this:
 
-```addyscript
+```addyscript linenums="1"
 a = randint(10);
 if (a > 5) {
     println('Greater than five');
@@ -111,9 +111,7 @@ Here are some useful examples of how to invoke asis:
 * Run _test5.add_ using the _es_ (Spanish) culture and writing logs in _test5.log_: `asis -f test5.add -l test5.log -c es`
 * Evaluate an expression: `asis -e "x = 10; y = 5; 2*x - 5*y + 3"`.
 
-    Output:
-
-    ```
+    ``` { .no-copy } title="Output"
     -2
     ```
 

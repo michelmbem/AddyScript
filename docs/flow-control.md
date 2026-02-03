@@ -15,7 +15,7 @@ An if-else therefore has the following 2 possible forms:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 n = randint(20); // n is a randomly generated number between 0 and 20
 
 if (n > 10)
@@ -28,7 +28,7 @@ if (n > 10)
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 i = randint(100); // i is a randomly generated number between 0 and 100
 
 if (i % 2 == 0)
@@ -48,7 +48,7 @@ Like the if-else statement, the switch statement is used to choose the action to
 The main difference is that unlike the if-else statement, the switch statement is not limited to 2 alternatives.
 Its syntax is as follows:
 
-```
+``` { .no-copy }
 switch (expression)
 {
     case value1:
@@ -74,7 +74,7 @@ The **default** section is also optional but at least one **case** section (or *
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 result = int(readln("What's your result? "));
 
 switch (result)
@@ -124,7 +124,7 @@ Syntax:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 i = 1;
 while (i <= 12)
 {
@@ -161,7 +161,7 @@ Syntax:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 i = 1;
 
 do
@@ -181,7 +181,7 @@ Syntax:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 for (i = 1; i <= 12; ++i)
    println('2 x {0} = {1}', i, 2*i);
 ```
@@ -203,7 +203,7 @@ Form 1:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 words = ['john', 'paul', 'second', 'the', 'pope'];
 
 foreach (word in words)
@@ -224,7 +224,7 @@ Form 2:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 jobs = {'paul' => 'general manager', 'roland' => 'accountant', 'david' => 'driver'};
 
 foreach (name => job in jobs)
@@ -268,7 +268,7 @@ It combines a better matching syntax with the **switch** keyword, which this tim
 helping us create expressions that not only choose what action to perform based on the value of an expression,
 but also return a value. A pattern matching expression typically looks like this:
 
-```
+``` { .no-copy }
 expression switch {
     pattern1 => result1,
     pattern2 => result2,
@@ -290,7 +290,7 @@ expression switch {
 
 Example 1:
 
-```addyscript
+```addyscript linenums="1"
 n = (int)readln('Please type a number: ');
 
 res = n switch {
@@ -311,7 +311,7 @@ println(res);
 
 Example 2:
 
-```addyscript
+```addyscript linenums="1"
 l = [
     new { name = 'cube', size = 18, color = 'blue' },
     'hello funny people, how funny are you?',
@@ -339,9 +339,7 @@ foreach (o in l) {
 }
 ```
 
-**Output**:
-
-```
+``` { .no-copy } title="Output"
 o is: <object {name = cube, size = 18, color = blue}>
 result with o: "a blue cube"
 

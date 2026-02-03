@@ -21,7 +21,7 @@ is by dividing two integers (**int** or **long**). Here is an example script tha
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 a = 3/4;
 b = 1/4;
 c = 11/7;
@@ -52,9 +52,7 @@ foreach (n in l) {
 }
 ```
 
-**Output**:
-
-```
+``` { .no-copy } title="Output"
 the numerator of (3/4) is 3
 the denominator of (3/4) is 4
 the inverse of (3/4) is (4/3)
@@ -106,7 +104,7 @@ Here is an example script using complex numbers:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 a = 2 - 1i;
 b = 1 + 2i;
 
@@ -121,9 +119,7 @@ println('{0} ** 2 = {1}', a, a ** 2);
 println('abs({0}) = {1}', a, abs(a));
 ```
 
-**Output**:
-
-```
+``` { .no-copy } title="Output"
 the real part of (2-1i) is 2
 the imaginary part of (2-1i) is -1
 the conjugate of (2-1i) is (2+1i)
@@ -156,7 +152,7 @@ Here is an example of a script that manipulates dates:
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 println("hello! it's {0:t} o'clock", now());
 d = (date)readln("what's your birth date? ");
 println("it was a " + d.weekday);
@@ -207,7 +203,7 @@ Those are described in one of the tables bellow.
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 d1 = `2025-09-17 14:30`;
 d2 = date::of(2019, 8, 30, 19, 15);
 elapsed = d1 - d2;
@@ -263,7 +259,7 @@ In AddyScript, sequences of characters more commonly called _strings_ are instan
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 s = readln("Type some text: ");
 
 println("Lower case: " + s.toLower());
@@ -350,7 +346,7 @@ You can also create slices of blobs like you do with strings.
 
 Here is an example script that manipulates blobs:
 
-```addyscript
+```addyscript linenums="1"
 b1 = b'Hello friends!';
 b2 = blob::of(24);
 println($'b1 = {b1}, b1.length = {b1.length}');

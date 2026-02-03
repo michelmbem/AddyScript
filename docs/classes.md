@@ -4,7 +4,7 @@
 
 Declaring a class in AddyScript is straightforward. Simply use this syntax:
 
-```
+``` { .no-copy }
 [modifier] class className [: superClassName]
 {
     classMembers
@@ -48,7 +48,7 @@ A property is a pair of methods used to read and/or write the value of a field.
 AddyScript provides a dedicated syntax for defining the properties of a class.
 The specification of a property follows this syntax:
 
-```
+``` { .no-copy }
 property property_name
 {
     [scope] read
@@ -79,7 +79,7 @@ Since defining a property consists of declaring a backing field, then defining t
 AddyScript can help the programmer save time by doing most of the work automatically.
 To this end, the scripting language supports a shorter syntax for the definition of a property:
 
-```
+``` { .no-copy }
 property property_name { [scope] read; [scope] write; }
 ```
 
@@ -98,7 +98,7 @@ Such a property is called a **semi-automatic property**. The scripting engine wi
 An auto-generated backing field is always private and has the same name as the property itself prefixed by a double underscore (`__`).
 The syntax for defining a semi-automatic property is as follows.
 
-```
+``` { .no-copy }
 property property_name
 {
   [scope] read;
@@ -111,7 +111,7 @@ property property_name
 
 Or
 
-```
+``` { .no-copy }
 property property_name
 {
   [scope] read
@@ -163,7 +163,7 @@ An operator overload specification consists of the **operator** keyword followed
 
 In this example, we will define a Person class with three fields, four properties (three of them mapping the three fields plus an automatic one), a method, and an event.
 
-```addyscript
+```addyscript linenums="1"
 class Person
 {
     // Fields
@@ -224,9 +224,7 @@ john.sex = 'Female';
 println(john.summary());
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 Mr. John, Male person aged 42
 Sex changed from Male to Female
 Maybe the name should change too
@@ -237,7 +235,7 @@ Mrs. John, Female person aged 42
 
 Example of a class that has an indexer:
 
-```addyscript
+```addyscript linenums="1"
 class PhoneBook
 {
     // Backing field for the indexer
@@ -269,9 +267,7 @@ pb['Jane Smith'] = '555-5678';
 println(pb);
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 Phone Book:
  - John Doe: 555-1234
  - Jane Smith: 555-5678
@@ -288,7 +284,7 @@ A **constructor** is a special method automatically invoked by the scripting eng
 In AddyScript, a class has only one constructor since the language does not support method overloading.
 The definition of a constructor follows this special syntax:
 
-```
+``` { .no-copy }
  [scope] constructor (list_of_parameters) [: super(list_of_arguments)]
  {
     statements;
@@ -310,7 +306,7 @@ Where
 
 Example: let's add a constructor in the Person class
 
-```addyscript
+```addyscript linenums="1"
 class Person
 {
     // Fields: we don't need default values anymore as the constructor is supplying them
@@ -375,9 +371,7 @@ jane.sex = "Male";
 println(jane.summary());
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 Mrs. Jane, Female person aged 30
 Sex changed from Female to Male
 Why not call him John?
@@ -393,7 +387,7 @@ When using property initializers, if the constructor has no parameters, there is
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 class Point
 {
     public property x;
@@ -411,9 +405,7 @@ pt = new Point {x = 10, y = -5};
 println(pt.toString());
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 (10, -5)
 ```
 
@@ -458,13 +450,13 @@ The syntax for defining a record is as follows:
 
 Form 1:
 
-```
+``` { .no-copy }
 record recordName(field1, field2, ..., fieldN);
 ```
 
 Form 2:
 
-```
+``` { .no-copy }
 record recordName(field1, field2, ..., fieldN)
 {
     additionalMembers
@@ -481,7 +473,7 @@ record recordName(field1, field2, ..., fieldN)
 * Manually defined fields and/or properties are not taken into account in automatically generated methods; if necessary, it is up to the user to redefine them.
 * In all its forms, the above syntax is essentially equivalent to the following:
 
-  ```
+  ``` { .no-copy }
   final class recordName
   {
       // Generated fields:
@@ -524,7 +516,7 @@ record recordName(field1, field2, ..., fieldN)
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 record Point(x, y);
 
 p1 = new Point(10, 20);
@@ -554,9 +546,7 @@ println($'p1 == v1.toPoint(): {p1 == v1.toPoint()}');
 println($'p1 != v1.toPoint(): {p1 != v1.toPoint()}');
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 p1 = Point(10, 20)
 p2 = Point(30, 40)
 p3 = Point(10, 20)
@@ -582,7 +572,7 @@ The result of the operation is a new record with the same fields as the original
 but with the values of the specified fields replaced by the corresponding values from the right operand.
 The following example shows how to use the **with** operator to create a mutable copy of a record:
 
-```addyscript
+```addyscript linenums="1"
 record Point(x, y);
 
 p1 = new Point(10, 20);
@@ -594,9 +584,7 @@ println($'p2 = {p2}');
 println($'p3 = {p3}');
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 p1 = Point(10, 20)
 p2 = Point(30, 40)
 p3 = Point(10, 50)

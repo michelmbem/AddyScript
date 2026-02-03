@@ -11,7 +11,7 @@ Creating a custom statement can be summarized as follows:
 5. Update the _AddyScript.Parsers.Parser_ class to recognize your statement (or the _AddyScript.Parsers.ExpressionParser_ class if you are creating a new kind of expression). This is typically done in two stages: first, find the _Statement_ method and add a case label for your statement (something like: `case TokenID.KW_Unless: return Unless();`). secondly, define the method that recognizes your statement.
 6. Recognizing a statement is somehow straightforward. Assuming that your statement is a sequence of terminal and non terminal symbols, you just have to ensure that each of those symbols appears at the right place. To ensure that a terminal symbol (a token) is where it should be, use the _Match_ method of the parser. The _TryMatch_ method does the same job except that it does not throw an exception when the expected token is not matched. Use it for optional tokens. There are also variants of _Match_ and _TryMatch_ (respectively _MatchAny_ and _TryMatchAny_) which accept several tokens and try to match any of them. For a non-terminal symbol, use the method that recognizes that symbol; such a method generally has the same name than the corresponding symbol, expects no parameter and returns the recognized non-terminal symbol upon completion. Don't forget to set the location of your symbol in the source file upon completion. So recognizing the unless-statement could be done like this:
 
-   ```csharp
+   ```csharp linenums="1"
    protected Unless Unless()
    {
       // Trying to recognize: unless (expr) stmt
@@ -39,7 +39,7 @@ Creating a custom statement can be summarized as follows:
 7. The _BasicParser_ class provides some helper methods to recognize a sequence of non-terminal symbols of the same kind or a non-null instance of some symbol.
 8. Once you've recognized your statement, the next stage is to interpret it. It's up to you to define the logic of your statement. But an unless-statement would probably be similar to an if-statement, so the _TranslateUnless_ method of the _Interpreter_ class could look like this:
 
-   ```csharp
+   ```csharp linenums="1"
    public void TranslateUnless(Unless unless)
    {
        if (!IsTrue(unless.Condition))

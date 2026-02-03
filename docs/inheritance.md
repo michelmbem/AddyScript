@@ -10,7 +10,7 @@ In the example below, we will illustrate how inheritance is handled in AddyScrip
 a subclass of the Person class introduced in the previous section.
 The example also shows how to invoke the parent class's constructor (to initialize inherited fields).
 
-```addyscript
+```addyscript linenums="1"
 class Employee : Person
 {
     public constructor(name, sex, age, hireDate, department, jobTitle)
@@ -34,9 +34,7 @@ println('{0} works for us since {1} years', steve.summary(), now().subtract(stev
 println('He is currently a {0} at the {1} department', steve.jobTitle, steve.department);
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 Mr. Steve, Male person aged 32 works for us since 23 years
 He is currently a Senior Analyst at the IT department
 ```
@@ -54,7 +52,7 @@ Also, when the parent class is **abstract**, any subclass that is not abstract m
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 // A base abstract class with a single abstract method
 abstract class Pet
 {
@@ -87,9 +85,7 @@ foreach (pet in pets)
     pet.cry();
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 As a dog, I bark
 As a cat, I meow
 As a pig, I grunt
@@ -121,7 +117,7 @@ Finally, **moveNext** is responsible for moving the internal cursor forward, ret
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 class Range
 {
    private start;
@@ -157,9 +153,7 @@ foreach (item in new Range(5, 25, 5))
    println(item);
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 5
 10
 15
@@ -176,7 +170,7 @@ It only tells AddyScript what value the iterator being constructed should return
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 class Range
 {
    private start;
@@ -206,9 +200,7 @@ foreach (item in new Range(5, 25, 5))
    println(item);
 ```
 
-Output:
-
-```
+``` { .no-copy } title="Output"
 5
 10
 15

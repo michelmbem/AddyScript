@@ -9,7 +9,7 @@ As far as that aspect is concerned, a single variable can hold an integer at a c
 
 Examples:
 
-```addyscript
+```addyscript linenums="1"
 n = 10; // n is an integer
 n = 7.5; // now n is of type float
 n = now(); // n becomes a date
@@ -40,7 +40,7 @@ Such a variable will hide any constant or variable with the same name declared i
 
 The syntax for explicitly declaring variables is the following:
 
-```
+``` { .no-copy }
 var <variable_name1> = <initial_value1>, <variable_name2> = <initial_value2>, ... ,<variable_nameN> = <initial_valueN>
 ```
 
@@ -48,7 +48,7 @@ Setting the initial value of a variable is optional.
 However, an uninitialized variable remains unusable until it is assigned a value.
 Therefore, the above syntax is equivalent to the following:
 
-```
+``` { .no-copy }
 var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 <variable_name1> = <initial_value1>;
 <variable_name2> = <initial_value2>;
@@ -58,7 +58,7 @@ var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 // a global variable named toto
 toto = 10;
 
@@ -84,9 +84,7 @@ bar();
 println('back to main, toto = ' + toto);
 ```
 
-**Output**:
-
-```
+``` { .no-copy } title="Output"
 in main, toto = 10
 in foo, toto = 15
 back to main, toto = 10
@@ -101,7 +99,7 @@ You will typically declare constants using the **const** keyword like in the fol
 
 The syntax for declaring constants is the following:
 
-```
+``` { .no-copy }
 const <constant_name1> = <constant_value1>, <constant_name2> = <constant_value2>, ... ,<constant_nameN> = <constant_valueN>;
 ```
 
@@ -111,7 +109,7 @@ Only values of the types **bool**, **int**, **long**, **rational**, **float**, *
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 // declare a constant named MAX_ITEMS
 const MAX_ITEMS = 10;
 
@@ -232,7 +230,7 @@ Initializers are like literal values for composite types: they provide an initia
 
 You can check the type of an expression by using the **is** operator. Here is an illustration:
 
-```addyscript
+```addyscript linenums="1"
 lst = [5, 'andy', now(), PI, new Exception("")];
 
 foreach (item in lst)
@@ -248,9 +246,7 @@ foreach (item in lst)
        println('something else');
 ```
 
-**Output**:
-
-```
+``` { .no-copy } title="Output"
 int
 something else
 date
@@ -269,14 +265,14 @@ Exception
 
 For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
 
-```addyscript
+```addyscript linenums="1"
 d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
 
 AddyScript also supports an alternative conversion syntax that uses type names as functions:
 
-```addyscript
+```addyscript linenums="1"
 d = date('2026-01-10T19:35'); // d is a date
 n = decimal('1234567890.987654321'); // n is a decimal
 ```
@@ -362,7 +358,7 @@ and the **rvalue** which represents the value that's being assigned to the lvalu
 Both children are separated by an operator. The typical assignment operator in AddyScript is the equal sign (`=`).
 So an assignment in AddyScript typically looks like this:
 
-```
+``` { .no-copy }
 lvalue = rvalue;
 ```
 
@@ -392,7 +388,7 @@ But AddyScript has a type of statement in its syntax that allows you to do this 
 In a group assignment, a tuple of values is assigned to a tuple of variables (in the broad sense of the term).
 This allows you to set the value of multiple variables at once. So a typical group assignment looks like this:
 
-```
+``` { .no-copy }
 (var1, var2, ..., varN) = (val1, val2, ..., valN);
 ```
 
@@ -406,7 +402,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
     
     Example:
 
-    ```addyscript
+    ```addyscript linenums="1"
     l = [7, 6, 4, 2];
     (a, b, _, c) = (..l);
     println($'a = {a}');
@@ -429,7 +425,7 @@ It's especially useful when there is a risk of ambiguity in the way the code is 
 
 An assignment with the **let** keyword looks like this:
 
-```
+``` { .no-copy }
 let lvalue = rvalue;
 ```
 
@@ -437,7 +433,7 @@ With this syntax chaining assignments is not allowed. No other operator than the
 
 Example:
 
-```addyscript
+```addyscript linenums="1"
 let a = 5;
 let b = 8;
 let c = a + b;
