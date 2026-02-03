@@ -11,13 +11,13 @@ Here are some sample scripts to get you started:
 
 ### Simply printing _"Hello World!"_ to the standard output:
 
-```addyscript linenums="1"
+```addyscript linenums="1" title="Hello World"
 println('Hello World!');
 ```
 
 ### Reading _n_ from the standard input and computing the sum and average of n numbers:
 
-```addyscript linenums="1"
+```addyscript linenums="1" title="Sum and averrage of n numbers"
 n = (int)readln('How many numbers? ');
 sum = 0;
 
@@ -34,7 +34,7 @@ println($'The averrage is {sum / n}');
 
 ### Declaring a function to say _"Hello"_ to each name in a list:
 
-```addyscript linenums="1"
+```addyscript linenums="1" title="Hello to each one"
 function hello(name)
 {
    println($'Hello {name}');

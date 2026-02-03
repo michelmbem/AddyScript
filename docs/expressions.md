@@ -7,9 +7,7 @@ A variable starts existing as soon as you assign a value to it.
 This also means that variables are dynamically typed: they simply accept anything you put into them.
 As far as that aspect is concerned, a single variable can hold an integer at a certain time and hold a list of dates later.
 
-Examples:
-
-```addyscript linenums="1"
+```addyscript linenums="1" title="Examples"
 n = 10; // n is an integer
 n = 7.5; // now n is of type float
 n = now(); // n becomes a date

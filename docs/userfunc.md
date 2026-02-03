@@ -203,21 +203,21 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 
 1. If _parameterName_ matches the name of an existing parameter in the original function's header, "bind" proceeds to **currying**: The parameter _parameterName_ is removed from the resulting function's header and is replaced by a fixed value, which in this case is _defaultValue_. The resulting function will then have one parameter less than the original one, with the exact same body that will always evaluate _parameterName_ to _defaultValue_. Here is an example of how to curry a function:
 
-    ```addyscript linenums="1"
-    // add is the original function: it simply adds two numbers
-    function add(a, b) => a + b;
+	```addyscript linenums="1"
+	// add is the original function: it simply adds two numbers
+	function add(a, b) => a + b;
 
-    // add10 is a variant of add that always use 10 for parameter a
-    add10 = add.bind('a', 10);
+	// add10 is a variant of add that always use 10 for parameter a
+	add10 = add.bind('a', 10);
 
-    println(add10(5));
-    println(add10(-7));
-    ```
-   
-   ```text title="Output"
-   15
-   3
-   ```
+	println(add10(5));
+	println(add10(-7));
+	```
+
+	```text title="Output"
+	15
+	3
+	```
 
 2. If _parameterName_ doesn't match the name of an existing parameter in the original function's header, "bind" simply adds an optional parameter with the given name and default value to the resulting function. This is very helpful when you are creating a function that expects a closure as an argument and that you want the closure to match variable prototypes. As an example, the "each" method of the **list** type is defined as follows:
 

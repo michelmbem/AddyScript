@@ -336,7 +336,7 @@ You can also create slices of blobs like you do with strings.
 
 Here is an example script that manipulates blobs:
 
-```addyscript linenums="1" title="Blob demo"
+```addyscript linenums="1" title="Manipulating blobs"
 b1 = b'Hello friends!';
 b2 = blob::of(24);
 println($'b1 = {b1}, b1.length = {b1.length}');
