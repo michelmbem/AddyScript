@@ -40,19 +40,28 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "keywords": [
             (words((
-                "__context", "__key", "__value", "abstract", "and", "as",
-                "blob", "bool", "break", "case", "catch", "class", "closure",
-                "complex", "const", "constructor", "contains", "continue",
-                "date", "decimal", "default", "do", "duration", "else",
-                "endswith", "event", "extern", "false", "final", "finally",
-                "float", "for", "foreach", "function", "goto", "if", "import",
-                "in", "int", "is", "let", "list", "long", "map", "matches",
-                "new", "not", "null", "object", "operator", "or", "private",
-                "property", "protected", "public", "queue", "rational", "read",
-                "record", "resource", "return", "set", "stack", "startswith",
-                "static", "string", "super", "switch", "this", "throw", "true",
-                "try", "tuple", "typeof", "var", "void", "when", "while", "with",
-                "write", "yield"
+                "let", "abstract", "as", "break", "case", "catch",
+                "class", "const", "constructor", "continue", "default",
+                "do", "else", "event", "extern", "final", "finally",
+                "for", "foreach", "function", "goto", "if", "import",
+                "operator", "private", "property", "protected", "public",
+                "record", "return", "static", "super", "switch", "this",
+                "throw", "try", "var", "when", "while", "yield",
             ), prefix=r"\b", suffix=r"\b"), Keyword),
+
+            (words((
+                "__context", "__key", "__value", "read", "write",
+            ), prefix=r"\b", suffix=r"\b"), Keyword.Pseudo),
+
+            (words((
+                "false", "null", "true",
+            ), prefix=r"\b", suffix=r"\b"), Keyword.Constant),
+
+            (words((
+                "blob", "bool", "closure", "complex", "date", "decimal",
+                "duration", "float", "int", "list", "long", "map", "object",
+                "queue", "rational", "resource", "set", "stack", "string",
+                "tuple", "void",
+            ), prefix=r"\b", suffix=r"\b"), Keyword.Type),
         ],
     }
