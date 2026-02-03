@@ -1,7 +1,7 @@
 # AddyScript lexer for pygments
 
 from pygments.lexer import RegexLexer, words, include
-from pygments.token import Comment, Keyword
+from pygments.token import Comment, Keyword, Operator
 
 class AddyScriptLexer(RegexLexer):
     """
@@ -63,5 +63,10 @@ class AddyScriptLexer(RegexLexer):
                 "queue", "rational", "resource", "set", "stack", "string",
                 "tuple", "void",
             ), prefix=r"\b", suffix=r"\b"), Keyword.Type),
+
+            (words((
+                "and", "contains", "endswith", "in", "is", "matches",
+                "new", "not", "or", "startswith", "typeof", "with",
+            ), prefix=r"\b", suffix=r"\b"), Operator.Word),
         ],
     }
