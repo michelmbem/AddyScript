@@ -62,12 +62,12 @@ class AddyScriptLexer(RegexLexer):
                 "for", "foreach", "function", "goto", "if", "import",
                 "operator", "private", "property", "protected", "public",
                 "record", "return", "static", "super", "switch", "this",
-                "throw", "try", "typeof", "var", "when", "while", "yield",
+                "throw", "try", "typeof", "var", "when", "while", "yield"
             ), suffix=r"\b"), Keyword),
 
             (words((
                 "and", "contains", "endswith", "in", "is", "matches",
-                "new", "not", "or", "startswith", "with",
+                "new", "not", "or", "startswith", "with"
             ), suffix=r"\b"), Operator.Word),
 
             (words((
@@ -153,7 +153,7 @@ class AddyScriptLexer(RegexLexer):
             (r'}}', String.Escape),
             (r'{', String.Interpol, "interpolation"),
             (r"\\['\\abfnrtv0]", String.Escape),
-            (r"[^'\\]+", String),
+            (r"[^'\\{]+", String),
             (r'.', String),
         ],
 
@@ -191,7 +191,7 @@ class AddyScriptLexer(RegexLexer):
         # Interpolation Expression
         # --------------------
         "interpolation": [
-            (r'}', String, "#pop"),
+            (r'}', String.Interpol, "#pop"),
             include("whitespace"),
             include("comments"),
             include("keywords"),
