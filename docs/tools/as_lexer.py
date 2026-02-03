@@ -53,8 +53,8 @@ class AddyScriptLexer(RegexLexer):
             (r'\$"', String, "interpolated-string-double"),
             (r"@'", String, "verbatim-string-single"),
             (r'@"', String, "verbatim-string-double"),
-            (r"'", String, "string-single"),
-            (r'"', String, "string-double"),
+            (r"[bB]?'", String, "string-single"),
+            (r'[bB]?"', String, "string-double"),
             (r'`[^`]*`', Literal.Date),
         ],
 
