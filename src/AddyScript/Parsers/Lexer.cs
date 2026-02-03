@@ -129,111 +129,110 @@ public class Lexer
          * Whenever the sequence starts with a dot, it's prepended a literal zero.
          */
         StringBuilder numberBuilder = new ();
-        CultureInfo ci = CultureInfo.InvariantCulture;
-        bool isReal = false, prependZero = true;
-        char ch = Ll(1);
+        bool prependZero, isReal = false;
+        char current;
 
-        // Integral part: ([0-9](_?[0-9])*)+
-        while (char.IsDigit(ch))
-        {
-            prependZero = false;
-            ch = ReadDigit(numberBuilder, ch);
-        }
+        // Integral part: (\d[\d_]*)+
+        prependZero = ReadDigits(numberBuilder);
 
-        // Decimal part: (\.([0-9](_?[0-9])*)+)?
-        if (ch == '.' && char.IsDigit(Ll(2)))
+        // Decimal part: (\.(\d[\d_]*)+)?
+        current = Ll(1);
+        if (current == '.' && Ll(2) is >= '0' and <= '9')
         {
             if (prependZero) numberBuilder.Append('0');
-
+            numberBuilder.Append(current);
+            Consume(1); // To skip '.'
+            ReadDigits(numberBuilder);
             isReal = true;
-            numberBuilder.Append(ch).Append(Ll(2));
-            Consume(2);
-            ch = Ll(1);
-
-            while (char.IsDigit(ch))
-            {
-                ch = ReadDigit(numberBuilder, ch);
-            }
+            current = Ll(1);
         }
 
-        // Exponent part: ([Ee]?[+-]?([0-9](_?[0-9])*)+)?
-        if (ch is 'e' or 'E')
+        // Exponent part: ([Ee][+-]?(\d[\d_]*)+)?
+        if (current is 'e' or 'E')
         {
-            bool error = true;
+            numberBuilder.Append(current);
+            Consume(1); // To skip 'e' or 'E'
+
+            current = Ll(1);
+            if (current is '+' or '-')
+            {
+                numberBuilder.Append(current);
+                Consume(1); // To skip '+' or '-'
+            }
+
+            if (ReadDigits(numberBuilder))
+                return MakeToken(TokenID.Unknown, numberBuilder.ToString(), false);
 
             isReal = true;
-            numberBuilder.Append(ch);
-            Consume(1);
-            ch = Ll(1);
-
-            if (ch is '+' or '-')
-            {
-                numberBuilder.Append(ch);
-                Consume(1);
-                ch = Ll(1);
-            }
-
-            while (char.IsDigit(ch))
-            {
-                error = false;
-                ch = ReadDigit(numberBuilder, ch);
-            }
-
-            if (error) return MakeToken(TokenID.Unknown, numberBuilder.ToString(), false);
         }
 
-        // Suffix part: [LlFfDd]?
-        string numberStr = numberBuilder.ToString();
-
-        if (isReal)
-            return Ll(1) switch
-            {
-                'f' or 'F' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
-                            ? MakeToken(TokenID.LT_Float, aDouble, true)
-                            : MakeToken(TokenID.Unknown, numberStr, true),
-                'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
-                            ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                            : MakeToken(TokenID.Unknown, numberStr, true),
-                'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
-                _ => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
-                   ? MakeToken(TokenID.LT_Float, aDouble, false)
-                   : MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), false),
-            };
-
-        return Ll(1) switch
-        {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr), true),
-            'f' or 'F' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
-                        ? MakeToken(TokenID.LT_Float, aDouble, true)
-                        : MakeToken(TokenID.Unknown, numberStr, true),
-            'i' or 'I' => double.TryParse(numberStr, NumberStyles.Float, ci, out double aDouble)
-                        ? MakeToken(TokenID.LT_Complex, new Complex(0, aDouble), true)
-                        : MakeToken(TokenID.Unknown, numberStr, true),
-            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
-            _ => int.TryParse(numberStr, NumberStyles.Integer, ci, out int anInt)
-               ? MakeToken(TokenID.LT_Integer, anInt, false)
-               : MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr), false),
-        };
+        // Process the suffix: [LlFfDd]?
+        return NumberWithSuffix(numberBuilder.ToString(), isReal);
     }
 
     /// <summary>
-    /// Reads a decimal digit from the input stream. Eventually skips underscores.
+    /// Attempts to read a sequence of digit characters and underscores from the current position, appending them to the
+    /// specified buffer.
     /// </summary>
-    /// <param name="sb">The <see cref="StringBuilder"/> where to store the digits</param>
-    /// <param name="c">The char read from the input stream</param>
-    private char ReadDigit(StringBuilder sb, char c)
+    /// <remarks>
+    /// This method appends consecutive digit characters ('0'-'9') and underscores ('_') to the buffer, starting from the current position.
+    /// The method advances the position for each character read. If the first character is not a digit, no characters are appended and the method returns <b>true</b>.
+    /// </remarks>
+    /// <param name="buffer">The buffer to which the parsed digit characters and underscores are appended. Must not be null.</param>
+    /// <returns><b>true</b> if no digit was found at the current position; otherwise, <b>false</b>.</returns>
+    private bool ReadDigits(StringBuilder buffer)
     {
-        sb.Append(c);
+        char c = Ll(1);
+        if (c is not (>= '0' and <= '9')) return true;
+
+        buffer.Append(c);
         Consume(1);
         c = Ll(1);
 
-        if (c == '_' && char.IsDigit(Ll(2)))
+        while (c is '_' or >= '0' and <= '9')
         {
+            buffer.Append(c);
             Consume(1);
             c = Ll(1);
         }
 
-        return c;
+        return false;
+    }
+
+    /// <summary>
+    /// Parses a numeric string and returns a token representing the number, applying a type suffix if present.
+    /// </summary>
+    /// <remarks>
+    /// Supported suffixes include 'f' or 'F' for float, 'i' or 'I' for complex, 'd' or 'D' for decimal, and 'l' or 'L' for long integers.
+    /// If no recognized suffix is present, the method defaults to integer, long, or float types based on the input and context.
+    /// </remarks>
+    /// <param name="numberStr">The string representation of the number to parse. Must be a valid numeric value in invariant culture format.</param>
+    /// <param name="isReal">Indicates whether the number should be treated as a real (floating-point) value. If <see langword="true"/>, real
+    /// number suffixes are considered; otherwise, integer and other suffixes are processed.</param>
+    /// <returns>A <see cref="Token"/> instance representing the parsed number, with its type determined by any recognized suffix.</returns>
+    private Token NumberWithSuffix(string numberStr, bool isReal)
+    {
+        CultureInfo ci = CultureInfo.InvariantCulture;
+
+        if (isReal)
+            return Ll(1) switch
+            {
+                'f' or 'F' => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), true),
+                'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
+                'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
+                _ => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), false),
+            };
+
+        return Ll(1) switch
+        {
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), true),
+            'f' or 'F' => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), true),
+            'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
+            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
+            _ => int.TryParse(numberStr, ci, out var n)
+               ? MakeToken(TokenID.LT_Integer, n, false)
+               : MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), false),
+        };
     }
 
     /// <summary>
@@ -254,11 +253,13 @@ public class Lexer
             ch = Ll(1);
         }
 
-        return ch == EOF
-             ? MakeToken(TokenID.Unknown, $"`{dateBuilder}", false)
-             : DateTime.TryParse(dateBuilder.ToString(), CultureInfo.InvariantCulture, out var dateTime)
-                 ? MakeToken(TokenID.LT_Date, dateTime, true)
-                 : MakeToken(TokenID.Unknown, $"`{dateBuilder}`", true);
+        string dateStr = dateBuilder.ToString();
+
+        if (ch == EOF) return MakeToken(TokenID.Unknown, $"`{dateStr}", false);
+
+        return DateTime.TryParse(dateStr, CultureInfo.InvariantCulture, out var d)
+             ? MakeToken(TokenID.LT_Date, d, true)
+             : MakeToken(TokenID.Unknown, $"`{dateStr}`", true);
     }
 
     /// <summary>

@@ -211,7 +211,7 @@ class AddyScriptLexer(RegexLexer):
         # Numbers
         # --------------------
         "numbers": [
-            (r"0b[01_]+[lfdi]?", Number.Bin),
+            (r"0b[01_]+[lLfFdDiI]?", Number.Bin),
             (r"0x[0-9a-fA-F_]+[lLfFdDiI]?", Number.Hex),
             (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fFdDiI]?", Number.Float),
             (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fFdDiI]?", Number.Float),
