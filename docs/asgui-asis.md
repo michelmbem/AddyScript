@@ -111,7 +111,7 @@ Here are some useful examples of how to invoke asis:
 * Run _test5.add_ using the _es_ (Spanish) culture and writing logs in _test5.log_: `asis -f test5.add -l test5.log -c es`
 * Evaluate an expression: `asis -e "x = 10; y = 5; 2*x - 5*y + 3"`.
 
-    ```text title="Output" { .no-copy }
+    ```text title="Output"
     -2
     ```
 
