@@ -37,6 +37,6 @@ class AddyScriptLexer(RegexLexer):
                 "static", "string", "super", "switch", "this", "throw", "true",
                 "try", "tuple", "typeof", "var", "void", "when", "while", "with",
                 "write", "yield"
-            ), suffix=r"\b"), Keyword),
+            ), prefix=r"\b", suffix=r"\b"), Keyword),
         ],
     }
