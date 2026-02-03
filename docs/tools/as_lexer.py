@@ -3,7 +3,7 @@
 from pygments.lexer import RegexLexer, words, include
 from pygments.token import (
     Comment, String, Literal, Keyword, Name,
-    Text, Operator, Number, Punctuation
+    Operator, Number, Punctuation
 )
 
 class AddyScriptLexer(RegexLexer):
@@ -181,8 +181,8 @@ class AddyScriptLexer(RegexLexer):
         # Identifiers
         # --------------------
         "identifiers": [
-            (r"[A-Za-z_]\w*(?=\s*\()", Name),
-            (r"\$[A-Za-z_]\w*", Text),
+            (r"[A-Za-z_]\w*(?=\s*\()", Name.Function),
+            (r"\$[A-Za-z_]\w*", Name),
         ],
 
         # --------------------
