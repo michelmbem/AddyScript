@@ -63,7 +63,7 @@ class AddyScriptLexer(RegexLexer):
             (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{[^}]+}', String.Escape),
+            (r'\{[^}]*\}', String.Escape),
             (r"[^'\\]+", String),
             (r'.', String),
         ],
@@ -73,7 +73,7 @@ class AddyScriptLexer(RegexLexer):
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{[^}]+}', String.Escape),
+            (r'\{[^}]*\}', String.Escape),
             (r'[^"\\]+', String),
             (r'.', String),
         ],
@@ -84,7 +84,7 @@ class AddyScriptLexer(RegexLexer):
             (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{[^}]+}', String.Escape),
+            (r'\{[^}]*\}', String.Escape),
             (r"[^']+", String),
             (r'.', String),
         ],
@@ -95,7 +95,7 @@ class AddyScriptLexer(RegexLexer):
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{[^}]+}', String.Escape),
+            (r'\{[^}]*\}', String.Escape),
             (r'[^"]+', String),
             (r'.', String),
         ],
@@ -150,7 +150,13 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "interpolation": [
             (r'}', String.Interpol, "#pop"),
-            include("strings"),
+
+            # string literals INSIDE interpolation
+            (r"'", String, "string-single"),
+            (r'"', String, "string-double"),
+            (r"@'", String, "verbatim-string-single"),
+            (r'@"', String, "verbatim-string-double"),
+
             include("keywords"),
             include("identifiers"),
             include("numbers"),
@@ -206,11 +212,11 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "numbers": [
             (r"0b[01_]+[lfdi]?", Number.Bin),
-            (r"0x[0-9a-fA-F_]+[lfdi]?", Number.Hex),
-            (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fdi]?", Number.Float),
-            (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fdi]?", Number.Float),
-            (r"\d[\d_]*[eE][+-]?\d[\d_]*[fdi]?", Number.Float),
-            (r"\d[\d_]*[lfdi]?", Number.Integer),
+            (r"0x[0-9a-fA-F_]+[lLfFdDiI]?", Number.Hex),
+            (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fFdDiI]?", Number.Float),
+            (r"\.\d[\d_]*([eE][+-]?\d[\d_]*)?[fFdDiI]?", Number.Float),
+            (r"\d[\d_]*[eE][+-]?\d[\d_]*[fFdDiI]?", Number.Float),
+            (r"\d[\d_]*[lLfFdDiI]?", Number.Integer),
         ],
 
         # --------------------
