@@ -60,20 +60,20 @@ class AddyScriptLexer(RegexLexer):
 
         "string-single": [
             (r"'", String, "#pop"),
-            (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
             (r'{', String.Escape, "substitution"),
+            (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String),
             (r'.', String),
         ],
 
         "string-double": [
             (r'"', String, "#pop"),
-            (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
             (r'{', String.Escape, "substitution"),
+            (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\]+', String),
             (r'.', String),
         ],
@@ -81,10 +81,10 @@ class AddyScriptLexer(RegexLexer):
         "verbatim-string-single": [
             (r"''", String),
             (r"'", String, "#pop"),
-            (r"\\['\\abfnrtv0]", String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
             (r'{', String.Escape, "substitution"),
+            (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^']+", String),
             (r'.', String),
         ],
@@ -92,10 +92,10 @@ class AddyScriptLexer(RegexLexer):
         "verbatim-string-double": [
             (r'""', String),
             (r'"', String, "#pop"),
-            (r'\\["\\abfnrtv0]', String.Escape),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
             (r'{', String.Escape, "substitution"),
+            (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"]+', String),
             (r'.', String),
         ],
@@ -150,6 +150,8 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "substitution": [
             (r'}', String.Escape, "#pop"),
+            (r'[^}]+', String.Escape),
+            (r'.', String.Escape),
         ],
 
         # --------------------
