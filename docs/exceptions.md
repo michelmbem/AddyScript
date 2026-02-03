@@ -67,7 +67,9 @@ But if you throw something else, it will be used as the exception message.
 
 There are some cases where a **throw** statement can be used as an expression (called a **throw expression**):
 
-1. In a ternary conditional expression (?:), any of the results can be a _throw expression_. ```addyscript title="Example" linenums="1"
+1. In a ternary conditional expression (?:), any of the results can be a _throw expression_.
+
+	```addyscript linenums="1" title="Example"
     age = (int) readln('type your age: ');
     category = (age < 0) ? throw "Age cannot be negative" :
                (age < 13) ? 'child' :
@@ -76,11 +78,15 @@ There are some cases where a **throw** statement can be used as an expression (c
                'senior';
     ```
 
-2. In a logical expression with the **??** operator, the right operand can be a _throw expression_. That syntax has a similar effect to using the postfix **!** operator but it gives us control over the message of the exception that is thrown when the first operand is empty. ```addyscript title="Example" linenums="1"
+2. In a logical expression with the **??** operator, the right operand can be a _throw expression_. That syntax has a similar effect to using the postfix **!** operator but it gives us control over the message of the exception that is thrown when the first operand is empty.
+
+	```addyscript linenums="1" title="Example"
     name = readln('type a number: ') ?? throw "You didn't type any name";
     ```
 
-3. As seen in the pattern matching section, a switch expression can throw an exception when a pattern is matched. ```addyscript title="Example" linenums="1"
+3. As seen in the pattern matching section, a switch expression can throw an exception when a pattern is matched.
+
+	```addyscript linenums="1" title="Example"
     score = getScore();
     mention = score switch {
         >= 0 and <= 3 => 'low',

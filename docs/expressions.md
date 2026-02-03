@@ -56,7 +56,7 @@ var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 <variable_nameN> = <initial_valueN>;
 ```
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 // a global variable named toto
 toto = 10;
 
@@ -105,7 +105,7 @@ Unlike variables, constants cannot be declared without an initial value.
 Only values of the types **bool**, **int**, **long**, **rational**, **float**, **decimal**, **complex**, **date**,
 **duration**, and **string** can be used as initial values for constants.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 // declare a constant named MAX_ITEMS
 const MAX_ITEMS = 10;
 
@@ -259,7 +259,10 @@ Exception
 
 ## Conversion
 
-For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following ```addyscript title="Example" linenums="1"
+For some operations, data are automatically converted to the right type. But this is not always the case.
+In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
+
+```addyscript linenums="1"
 d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
@@ -394,7 +397,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
 * The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (`..`). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
 * Any underscore (`_`) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
     
-    ```addyscript title="Example" linenums="1"
+    ```addyscript linenums="1" title="Example"
     l = [7, 6, 4, 2];
     (a, b, _, c) = (..l);
     println($'a = {a}');
@@ -421,7 +424,7 @@ let lvalue = rvalue;
 
 With this syntax chaining assignments is not allowed. No other operator than the equal-sign (`=`) can be used.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 let a = 5;
 let b = 8;
 let c = a + b;
@@ -431,11 +434,21 @@ let c = a + b;
 
 ## Reading and printing values from/to the console
 
-As you may have already guessed, you typically read a value from the console in AddyScript by using the **readln** function. It lets the user type a string and returns that string once the user presses on the [Return] key. The returned string can be converted to any type following your needs and expectations. **readln** accepts an optional parameter, a string that would be displayed as a prompt if given.
+As you may have already guessed, you typically read a value from the console in AddyScript by using the **readln** function.
+It lets the user type a string and returns that string once the user presses on the [Return] key.
+The returned string can be converted to any type following your needs and expectations.
+**readln** accepts an optional parameter, a string that would be displayed as a prompt if given.
 
-Similarly, you print values to the console in AddyScript by using the **print** and **println** functions. Both functions are similar except that **print** remains on the same line after printing a value while **println** automatically skips to the next line. Both functions accept a variable number of arguments. The first argument, if present, represents a format string; any `{n}` sequence (n being an integral number) in that string will be replaced with one of the corresponding following argument (`0` for the second, `1` for the third, and so on...). **print** requires at least on argument while **println** can be used without any argument. When used without an argument, **println** simply skips to the next line.
+Similarly, you print values to the console in AddyScript by using the **print** and **println** functions.
+Both functions are similar except that **print** remains on the same line after printing a value
+while **println** automatically skips to the next line. Both functions accept a variable number of arguments.
+The first argument, if present, represents a format string; any `{n}` sequence (n being an integral number) in that string
+will be replaced with one of the corresponding following argument (`0` for the second, `1` for the third, and so on...).
+**print** requires at least on argument while **println** can be used without any argument.
+When used without an argument, **println** simply skips to the next line.
 
-If you are integrating AddyScript in your own system, you could change the meaning of those statements and make **print** and **println** display a popup window for example.
+If you are integrating AddyScript in your own system, you could change the meaning of those statements
+and make **print** and **println** display a popup window for example.
 
 <div markdown class="web-only">
 

@@ -6,7 +6,8 @@ I will try to explain in the following lines how to use them.
 
 ## Using the graphical script editor
 
-The AddyScript Graphical User Interface (**asgui**) is an [Avalonia UI](https://avaloniaui.net/) application built around the [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) control.
+The AddyScript Graphical User Interface (**asgui**) is an [Avalonia UI](https://avaloniaui.net/) application
+built around the [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) control.
 It offers useful features such as syntax highlighting, automatic indentation, call tips, code completion and code snippets insertion.
 Its use of the [Avalonia UI](https://avaloniaui.net/) toolkit ensures compatibility with most operating systems and desktop environments.
 Upon opening, it appears as a single window with a toolbar at the top, a text area (or code editor) in the middle, and a status bar at the bottom.

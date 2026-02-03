@@ -16,7 +16,7 @@ function functionName (comma_separated_list_of_parameters)
 }
 ```
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 function sayHello()
 {
     println("Hello to anyone!");
@@ -46,7 +46,7 @@ the entire function can be formulated with this shorter syntax:
 function functionName (comma_separated_list_of_parameters) => expression;
 ```
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 function addTwo(a, b) => a + b;
 
 n = (float)readln('first number: ');
@@ -71,7 +71,7 @@ and you do not want to provide values for some of the ones that come first in th
 Positional arguments must always come first in an argument list.
 Once a named argument is encountered by the parser, it expects all subsequent arguments to be named as well.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 // A function that concatenates values and wrap between a prefix and a suffix
 function concat(values, separator = ', ', prefix = '{', suffix = '}')
 	=> prefix + separator.join(..values) + suffix;
@@ -112,7 +112,7 @@ This tells AddyScript that the **list** or **set** should be substituted for its
 This works similarly to the right operand of group assignment.
 The only requirement here is that none of the parameters provided by the spread collection should be passed to the function by reference.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 function add(a, b, c) => a + b + c;
 
 res = add(1, 2, 3);
@@ -164,7 +164,7 @@ A function reference is like a reference to a variable (a simple identifier in t
 while an inline function declaration is an anonymous function definition that appears where an expression was expected.
 Both techniques are illustrated in the example below:
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 // Repeats an action on each item of a list; parameter 'action' is a (mandatory) closure
 function repeat(l, action!)
 {
@@ -260,7 +260,7 @@ Where :
 
 The following example shows how to invoke the Win32 _MessageBox_ function from a script:
 
-```addyscript linenums="1"
+```addyscript linenums="1" title="External function demo"
 [LibImport("user32", procName = "MessageBox", returnType = "Int32")]
 extern function msgbox(
         [Type("IntPtr")] hWnd,

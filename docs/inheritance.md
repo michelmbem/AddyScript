@@ -50,7 +50,7 @@ it handles polymorphism without any additional semantics.
 Any class method is overridable unless it is marked as **private**, **final**, or **static** in the parent class.
 Also, when the parent class is **abstract**, any subclass that is not abstract must override its abstract properties and methods.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 // A base abstract class with a single abstract method
 abstract class Pet
 {
@@ -113,7 +113,7 @@ The role of **moveFirst** is to position the internal cursor on the first logica
 **hasNext** is supposed to return a boolean indicating whether the iteration can continue or not.
 Finally, **moveNext** is responsible for moving the internal cursor forward, returning the value pointed to by the cursor at each step.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 class Range
 {
    private start;
@@ -164,7 +164,7 @@ The **yield** statement has a syntax similar to that of a **throw** statement or
 a parameterized **return** statement, but it is not actually a jump.
 It only tells AddyScript what value the iterator being constructed should return on each iteration.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 class Range
 {
    private start;

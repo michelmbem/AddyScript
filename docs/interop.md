@@ -64,7 +64,9 @@ like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its d
 
 ## Accessing to .NET types static members
 
-Well, you do this the same way you access static members of AddyScript types. Here's an ```addyscript title="Example" linenums="1"
+Well, you do this the same way you access static members of AddyScript types. Here's an example:
+
+```addyscript linenums="1"
 // Enumeration members can either be represented by their name or by their integer value.
 path = System::IO::Path::Combine(System::Environment::GetFolderPath('DesktopDirectory'), 'Products.xls');
 

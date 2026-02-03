@@ -13,7 +13,7 @@ An if-else therefore has the following 2 possible forms:
 
 `if (condition) action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 n = randint(20); // n is a randomly generated number between 0 and 20
 
 if (n > 10)
@@ -24,7 +24,7 @@ if (n > 10)
 
 `if (condition) action else alternative_action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 i = randint(100); // i is a randomly generated number between 0 and 100
 
 if (i % 2 == 0)
@@ -68,7 +68,7 @@ switch (expression)
 Breaks are not required but if a **break** is missing, execution will continue at the next **case** section.
 The **default** section is also optional but at least one **case** section (or *default* section) must be present in the switch block.
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 result = int(readln("What's your result? "));
 
 switch (result)
@@ -116,7 +116,7 @@ Syntax:
 
 `while (condition) action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 i = 1;
 while (i <= 12)
 {
@@ -149,7 +149,7 @@ Syntax:
 
 `do action while (condition);`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 i = 1;
 
 do
@@ -167,7 +167,7 @@ Syntax:
 
 `for (counter_initialization; counter_limit_test; counter_increment) action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 for (i = 1; i <= 12; ++i)
    println('2 x {0} = {1}', i, 2*i);
 ```
@@ -187,7 +187,7 @@ Form 1:
 
 `foreach (item in collection) action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 words = ['john', 'paul', 'second', 'the', 'pope'];
 
 foreach (word in words)
@@ -204,7 +204,7 @@ Form 2:
 
 `foreach (key => value in collection) action`
 
-```addyscript title="Example" linenums="1"
+```addyscript linenums="1" title="Example"
 jobs = {'paul' => 'general manager', 'roland' => 'accountant', 'david' => 'driver'};
 
 foreach (name => job in jobs)
@@ -266,9 +266,7 @@ expression switch {
 7. The **guard** restricts the cases that should match by adding a condition to check.
 8. During pattern evaluation the value of the tested expression is represented by the **__value** automatic variable.
 
-Example 1:
-
-```addyscript linenums="1"
+```addyscript linenums="1" title="Example 1"
 n = (int)readln('Please type a number: ');
 
 res = n switch {
@@ -287,9 +285,7 @@ res = n switch {
 println(res);
 ```
 
-Example 2:
-
-```addyscript linenums="1"
+```addyscript linenums="1" title="Example 2"
 l = [
     new { name = 'cube', size = 18, color = 'blue' },
     'hello funny people, how funny are you?',
