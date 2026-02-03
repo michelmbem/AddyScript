@@ -14,7 +14,7 @@ and returns an object of the same _DataItem_ type as a result.
 Any method in a .NET class that has this prototype can be used as the body of an inner function.
 Here is a C# code example that demonstrates how to add a "clrscr" function to AddyScript to clear the screen:
 
-```CSharp
+```csharp
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 
@@ -64,7 +64,7 @@ Example:
 
 This is how we could define the _Exception_ class if it didn't exist in AddyScript
 
-```CSharp
+```csharp
 using System.Collections.Generic;
 
 using AddyScript.Ast.Expressions;

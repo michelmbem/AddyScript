@@ -15,7 +15,7 @@ An if-else therefore has the following 2 possible forms:
 
 Example:
 
-```AS
+```addyscript
 n = randint(20); // n is a randomly generated number between 0 and 20
 
 if (n > 10)
@@ -28,7 +28,7 @@ if (n > 10)
 
 Example:
 
-```AS
+```addyscript
 i = randint(100); // i is a randomly generated number between 0 and 100
 
 if (i % 2 == 0)
@@ -74,7 +74,7 @@ The **default** section is also optional but at least one **case** section (or *
 
 Example:
 
-```AS
+```addyscript
 result = int(readln("What's your result? "));
 
 switch (result)
@@ -124,7 +124,7 @@ Syntax:
 
 Example:
 
-```AS
+```addyscript
 i = 1;
 while (i <= 12)
 {
@@ -161,7 +161,7 @@ Syntax:
 
 Example:
 
-```AS
+```addyscript
 i = 1;
 
 do
@@ -181,7 +181,7 @@ Syntax:
 
 Example:
 
-```AS
+```addyscript
 for (i = 1; i <= 12; ++i)
    println('2 x {0} = {1}', i, 2*i);
 ```
@@ -203,7 +203,7 @@ Form 1:
 
 Example:
 
-```AS
+```addyscript
 words = ['john', 'paul', 'second', 'the', 'pope'];
 
 foreach (word in words)
@@ -224,7 +224,7 @@ Form 2:
 
 Example:
 
-```AS
+```addyscript
 jobs = {'paul' => 'general manager', 'roland' => 'accountant', 'david' => 'driver'};
 
 foreach (name => job in jobs)
@@ -290,7 +290,7 @@ expression switch {
 
 Example 1:
 
-```AS
+```addyscript
 n = (int)readln('Please type a number: ');
 
 res = n switch {
@@ -311,7 +311,7 @@ println(res);
 
 Example 2:
 
-```AS
+```addyscript
 l = [
     new { name = 'cube', size = 18, color = 'blue' },
     'hello funny people, how funny are you?',

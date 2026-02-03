@@ -9,7 +9,7 @@ As far as that aspect is concerned, a single variable can hold an integer at a c
 
 Examples:
 
-```AS
+```addyscript
 n = 10; // n is an integer
 n = 7.5; // now n is of type float
 n = now(); // n becomes a date
@@ -58,7 +58,7 @@ var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 
 Example:
 
-```AS
+```addyscript
 // a global variable named toto
 toto = 10;
 
@@ -111,7 +111,7 @@ Only values of the types **bool**, **int**, **long**, **rational**, **float**, *
 
 Example:
 
-```AS
+```addyscript
 // declare a constant named MAX_ITEMS
 const MAX_ITEMS = 10;
 
@@ -232,7 +232,7 @@ Initializers are like literal values for composite types: they provide an initia
 
 You can check the type of an expression by using the **is** operator. Here is an illustration:
 
-```AS
+```addyscript
 lst = [5, 'andy', now(), PI, new Exception("")];
 
 foreach (item in lst)
@@ -269,14 +269,14 @@ Exception
 
 For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
 
-```AS
+```addyscript
 d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
 
 AddyScript also supports an alternative conversion syntax that uses type names as functions:
 
-```AS
+```addyscript
 d = date('2026-01-10T19:35'); // d is a date
 n = decimal('1234567890.987654321'); // n is a decimal
 ```
@@ -406,7 +406,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
     
     Example:
 
-    ```AS
+    ```addyscript
     l = [7, 6, 4, 2];
     (a, b, _, c) = (..l);
     println($'a = {a}');
@@ -437,7 +437,7 @@ With this syntax chaining assignments is not allowed. No other operator than the
 
 Example:
 
-```AS
+```addyscript
 let a = 5;
 let b = 8;
 let c = a + b;

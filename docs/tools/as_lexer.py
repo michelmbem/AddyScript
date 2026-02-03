@@ -12,7 +12,7 @@ class AddyScriptLexer(RegexLexer):
     """
 
     name = "AddyScript"
-    aliases = ["addy", "as"]
+    aliases = ["addyscript", "add"]
     filenames = ["*.add"]
     mimetypes = ["text/x-addyscript"]
 

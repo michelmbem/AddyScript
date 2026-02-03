@@ -12,7 +12,7 @@ To interpret a script with AddyScript, just proceed as follows:
 6. You could import any additional namespace from the AddyScript assembly depending on what you intend to do.
 7. Finally, type a code snippet like the following one in an event handler:
 
-```CSharp
+```csharp
 var context = new ScriptContext();
 context.Bindings["myString"] = "Hello!";
 context.Bindings["myFloat"] = 0.9;
@@ -33,7 +33,7 @@ The _ScriptEngine_ class provides means to accomplish this in a straightforward 
 
 Look at this example:
 
-```CSharp
+```csharp
 var context = new ScriptContext();
 var program = ScriptEngine.ParseString(txtScript.Text);
 // Alternatively: var program = ScriptEngine.ParseFile(@"path/to/my/script");
@@ -63,7 +63,7 @@ The AddyScript Interactive Shell (**asis**) heavily relies on that possibility t
 
 Here is an example of how to use the _ScriptEngine.Execute_ instance method:
 
-```CSharp
+```csharp
 const string MAIN_PROMPT = ">>> ";
 const string CONTINUATION_PROMPT = "... ";
 
@@ -109,7 +109,7 @@ It takes the function's name as a parameter. The target delegate type is indicat
 
 Here is an example of how to use both methods:
 
-```CSharp
+```csharp
 delegate int SumType(int a, int b);
 
 var context = new ScriptContext();

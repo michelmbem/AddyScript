@@ -11,7 +11,7 @@ To evaluate an expression with AddyScript, do the following:
 5. You can import any additional namespaces from the AddyScript assembly depending on what you intend to do.
 6. Finally, type a code snippet like this into an event handler:
 
-```CSharp
+```csharp
 var context = new ScriptContext();
 context.Bindings["myString"] = "Hello!";
 context.Bindings["myFloat"] = 0.9;
@@ -28,7 +28,7 @@ Don't forget to embed this code in a try-catch block.
 Below is another example where the expression is parsed once and evaluated multiple times in a loop.
 Before testing it, you need to create the GUI and provide the logic for the _MoveTo_ and _LineTo_ methods yourself:
 
-```CSharp
+```csharp
 // txtFunction is a text widget where the user types the expression in.
 // A single parameter named 'x' is expected.
 var expression = ScriptEngine.ParseExpression(txtFunction.Text);

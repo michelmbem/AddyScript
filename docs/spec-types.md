@@ -21,7 +21,7 @@ is by dividing two integers (**int** or **long**). Here is an example script tha
 
 Example:
 
-```AS
+```addyscript
 a = 3/4;
 b = 1/4;
 c = 11/7;
@@ -106,7 +106,7 @@ Here is an example script using complex numbers:
 
 Example:
 
-```AS
+```addyscript
 a = 2 - 1i;
 b = 1 + 2i;
 
@@ -156,7 +156,7 @@ Here is an example of a script that manipulates dates:
 
 Example:
 
-```AS
+```addyscript
 println("hello! it's {0:t} o'clock", now());
 d = (date)readln("what's your birth date? ");
 println("it was a " + d.weekday);
@@ -207,7 +207,7 @@ Those are described in one of the tables bellow.
 
 Example:
 
-```AS
+```addyscript
 d1 = `2025-09-17 14:30`;
 d2 = date::of(2019, 8, 30, 19, 15);
 elapsed = d1 - d2;
@@ -263,7 +263,7 @@ In AddyScript, sequences of characters more commonly called _strings_ are instan
 
 Example:
 
-```AS
+```addyscript
 s = readln("Type some text: ");
 
 println("Lower case: " + s.toLower());
@@ -350,7 +350,7 @@ You can also create slices of blobs like you do with strings.
 
 Here is an example script that manipulates blobs:
 
-```AS
+```addyscript
 b1 = b'Hello friends!';
 b2 = blob::of(24);
 println($'b1 = {b1}, b1.length = {b1.length}');

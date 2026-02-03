@@ -11,7 +11,7 @@ the ScriptContext object passed to the constructor of the current instance of th
 Here is an example of using the System.Collections.Generic.LinkedList&lt;T&gt;, the System.Collections.Generic.SortedDictionary&lt;TKey, TValue&gt;
 and the System.Tuple&lt;TItem1, TItem2, TItem3&gt; classes:
 
-```AS
+```addyscript
 import System;
 import System::Collections::Generic;
 
@@ -68,7 +68,7 @@ like _datagrid.add_, _copy-stream.add_, _guibuilder.add_ or _dbo.add_ (and its d
 
 Well, you do this the same way you access static members of AddyScript types. Here's an example:
 
-```AS
+```addyscript
 // Enumeration members can either be represented by their name or by their integer value.
 path = System::IO::Path::Combine(System::Environment::GetFolderPath('DesktopDirectory'), 'Products.xls');
 
@@ -81,7 +81,7 @@ if (System::IO::File::Exists(path))
 The **import** directive can be used to import .NET types and/or namespaces.
 Here is what the previous example would look like with an import directive:
 
-```AS
+```addyscript
 // from the System namespace, import only the Environment type
 import System::Environment;
 // import the entire System.IO namespace
@@ -94,7 +94,7 @@ if (File::Exists(path)) File::Delete(path);
 
 An optional alias can be provided for the imported namespace or type to avoid possible naming conflicts. Illustration:
 
-```AS
+```addyscript
 import System::Environment as Env;
 import System::IO as IO;
 
@@ -109,7 +109,7 @@ The scripting engine supports COM interoperability over .NET.
 This allows you to create and manage instances of COM objects just like you do with regular .NET classes.
 Below is an example of a script that automates MS Word:
 
-```AS
+```addyscript
 objWord = new Word::Application();
 objWord.Visible = true;
 

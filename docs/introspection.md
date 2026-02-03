@@ -110,7 +110,7 @@ The **ParameterInfo** class represents a parameter of a method or event and prov
 
 The following example shows how this functionality is handled in AddyScript.
 
-```AS
+```addyscript
 function dumpScope(scope)
 {
     switch (scope)
