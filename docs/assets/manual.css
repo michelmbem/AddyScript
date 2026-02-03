@@ -30,11 +30,16 @@ body[data-md-color-scheme="default"] .highlight .p {
     color: orangered;
 }
 
+/* Keyword operators */
+body[data-md-color-scheme="default"] .highlight .ok {
+    color: darkslategray;
+}
+
 /***** Dark Mode *****/
 
 /* Types (dark mode) */
 body[data-md-color-scheme="slate"] .highlight .kt {
-    color: coral;
+    color: chocolate;
 }
 
 /* Peudo-keyword */
@@ -49,5 +54,5 @@ body[data-md-color-scheme="slate"] .highlight .ld {
 
 /* Punctuations */
 body[data-md-color-scheme="slate"] .highlight .p {
-    color: darkorange;
+    color: darkgoldenrod;
 }
