@@ -34,7 +34,7 @@ println('{0} works for us since {1} years', steve.summary(), now().subtract(stev
 println('He is currently a {0} at the {1} department', steve.jobTitle, steve.department);
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 Mr. Steve, Male person aged 32 works for us since 23 years
 He is currently a Senior Analyst at the IT department
 ```
@@ -85,7 +85,7 @@ foreach (pet in pets)
     pet.cry();
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 As a dog, I bark
 As a cat, I meow
 As a pig, I grunt
@@ -153,7 +153,7 @@ foreach (item in new Range(5, 25, 5))
    println(item);
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 5
 10
 15
@@ -200,7 +200,7 @@ foreach (item in new Range(5, 25, 5))
    println(item);
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 5
 10
 15

@@ -52,7 +52,7 @@ foreach (n in l) {
 }
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 the numerator of (3/4) is 3
 the denominator of (3/4) is 4
 the inverse of (3/4) is (4/3)
@@ -119,7 +119,7 @@ println('{0} ** 2 = {1}', a, a ** 2);
 println('abs({0}) = {1}', a, abs(a));
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 the real part of (2-1i) is 2
 the imaginary part of (2-1i) is -1
 the conjugate of (2-1i) is (2+1i)

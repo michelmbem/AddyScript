@@ -224,7 +224,7 @@ john.sex = 'Female';
 println(john.summary());
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 Mr. John, Male person aged 42
 Sex changed from Male to Female
 Maybe the name should change too
@@ -267,7 +267,7 @@ pb['Jane Smith'] = '555-5678';
 println(pb);
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 Phone Book:
  - John Doe: 555-1234
  - Jane Smith: 555-5678
@@ -371,7 +371,7 @@ jane.sex = "Male";
 println(jane.summary());
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 Mrs. Jane, Female person aged 30
 Sex changed from Female to Male
 Why not call him John?
@@ -405,7 +405,7 @@ pt = new Point {x = 10, y = -5};
 println(pt.toString());
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 (10, -5)
 ```
 
@@ -546,7 +546,7 @@ println($'p1 == v1.toPoint(): {p1 == v1.toPoint()}');
 println($'p1 != v1.toPoint(): {p1 != v1.toPoint()}');
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 p1 = Point(10, 20)
 p2 = Point(30, 40)
 p3 = Point(10, 20)
@@ -584,7 +584,7 @@ println($'p2 = {p2}');
 println($'p3 = {p3}');
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 p1 = Point(10, 20)
 p2 = Point(30, 40)
 p3 = Point(10, 50)

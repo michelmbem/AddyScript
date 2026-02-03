@@ -339,7 +339,7 @@ foreach (o in l) {
 }
 ```
 
-``` title="Output" { .text .no-copy }
+```text title="Output" { .no-copy }
 o is: <object {name = cube, size = 18, color = blue}>
 result with o: "a blue cube"
 
