@@ -31,8 +31,8 @@ jobs:
       - name: Install dependencies
         run: pip install mkdocs-material mkdocs-to-pdf pymdown-extensions pygments
 
-      - name: Export PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/docs/tools" >> $GITHUB_ENV
+      - name: Install tools
+        run: pip install -e $(pwd)/docs/tools
 
       - name: Run MkDocs build
         run: mkdocs build
