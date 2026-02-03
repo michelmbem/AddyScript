@@ -56,19 +56,26 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "keywords": [
             (words((
-                "let", "abstract", "and", "as", "break", "case", "catch",
-                "class", "const", "constructor", "contains", "continue",
-                "default", "do", "else", "endswith", "event", "extern",
-                "final", "finally", "for", "foreach", "function", "goto",
-                "if", "import", "in", "is", "matches", "new", "not",
-                "operator", "or", "private", "property", "protected",
-                "public", "read", "record", "return", "startswith",
-                "static", "super", "switch", "this", "throw", "try",
-                "typeof", "var", "when", "while", "with", "write", "yield"
+                "let", "abstract", "as", "break", "case", "catch",
+                "class", "const", "constructor", "continue", "default",
+                "do", "else", "event", "extern", "final", "finally",
+                "for", "foreach", "function", "goto", "if", "import",
+                "operator", "private", "property", "protected", "public",
+                "record", "return", "static", "super", "switch", "this",
+                "throw", "try", "typeof", "var", "when", "while", "yield",
             ), suffix=r"\b"), Keyword),
 
             (words((
-                "__context", "__key", "__value", "false", "null", "true"
+                "and", "contains", "endswith", "in", "is", "matches",
+                "new", "not", "or", "startswith", "with",
+            ), suffix=r"\b"), Operator.Word),
+
+            (words((
+                "__context", "__key", "__value", "read", "write"
+            ), suffix=r"\b"), Keyword.Pseudo),
+
+            (words((
+                "false", "null", "true"
             ), suffix=r"\b"), Keyword.Constant),
         ],
 
@@ -79,7 +86,7 @@ class AddyScriptLexer(RegexLexer):
             (words((
                 "blob", "bool", "closure", "complex", "date", "decimal",
                 "duration", "float", "int", "list", "long", "map", "object",
-                "queue", "rational", "resource", "set", "stack", "string",
+                "queue", "rational", "resource", "set", "stack", "string-double",
                 "tuple", "void"
             ), suffix=r"\b"), Keyword.Type),
         ],
@@ -90,101 +97,101 @@ class AddyScriptLexer(RegexLexer):
         "numbers": [
             (r"0b[01_]+", Number.Bin),
             (r"0x[0-9a-fA-F_]+", Number.Hex),
-            (r"\d[\d_]*\.\d[\d_]*(e[+-]?\d+)?", Number.Float),
+            (r"\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?", Number.Float),
             (r"\d[\d_]*", Number.Integer),
         ],
 
         # --------------------
-        # Strings / Chars
+        # Strings
         # --------------------
         "strings": [
-            (r"\$@'", String.Interpol, "interpolated-verbatim-char"),
-            (r'\$@"', String.Interpol, "interpolated-verbatim-string"),
-            (r"\$'", String.Interpol, "interpolated-char"),
-            (r'\$"', String.Interpol, "interpolated-string"),
-            (r"@'", String, "verbatim-char"),
-            (r'@"', String, "verbatim-string"),
-            (r"'", String, "char"),
-            (r'"', String, "string"),
-            (r'`[^`]+`', String.Char),
+            (r"\$@'", String, "interpolated-verbatim-string-single"),
+            (r'\$@"', String, "interpolated-verbatim-string-double"),
+            (r"\$'", String, "interpolated-string-single"),
+            (r'\$"', String, "interpolated-string-double"),
+            (r"@'", String, "verbatim-string-single"),
+            (r'@"', String, "verbatim-string-double"),
+            (r"'", String, "string-single"),
+            (r'"', String, "string-double"),
+            (r'`[^`]*`', Literal.Date),
         ],
 
-        "string": [
-            (r'"', String, "#pop"),
-            (r'\\["\\abfnrtv0]', String.Escape),
-            (r'[^"\\]+', String),
-            (r'.', String),
-        ],
-
-        "verbatim-string": [
-            (r'""', String),
-            (r'"', String, "#pop"),
-            (r'[^"]+', String),
-            (r'.', String),
-        ],
-
-        "char": [
+        "string-single": [
             (r"'", String, "#pop"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String),
             (r'.', String),
         ],
 
-        "verbatim-char": [
+        "string-double": [
+            (r'"', String, "#pop"),
+            (r'\\["\\abfnrtv0]', String.Escape),
+            (r'[^"\\]+', String),
+            (r'.', String),
+        ],
+
+        "verbatim-string-single": [
             (r"''", String),
             (r"'", String, "#pop"),
             (r"[^']+", String),
             (r'.', String),
         ],
 
+        "verbatim-string-double": [
+            (r'""', String),
+            (r'"', String, "#pop"),
+            (r'[^"]+', String),
+            (r'.', String),
+        ],
+
         # --------------------
         # Interpolated Strings
         # --------------------
-        "interpolated-string": [
-            (r'\{\{', String.Escape),
-            (r'\}\}', String.Escape),
-            (r'\{', String.Interpol, "interpolation"),
-            (r'"', String.Interpol, "#pop"),
-            (r'\\["\\abfnrtv0]', String.Escape),
-            (r'[^"\\{]+', String.Interpol),
-            (r'.', String.Interpol),
-        ],
-
-        "interpolated-verbatim-string": [
-            (r'\{\{', String.Escape),
-            (r'\}\}', String.Escape),
-            (r'\{', String.Interpol, "interpolation"),
-            (r'""', String),
-            (r'"', String.Interpol, "#pop"),
-            (r'[^"{]+', String.Interpol),
-            (r'.', String.Interpol),
-        ],
-
-        "interpolated-char": [
-            (r'\{\{', String.Escape),
-            (r'\}\}', String.Escape),
-            (r'\{', String.Interpol, "interpolation"),
-            (r"'", String.Interpol, "#pop"),
+        "interpolated-string-single": [
+            (r"'", String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
             (r"\\['\\abfnrtv0]", String.Escape),
-            (r"[^'\\]+", String.Interpol),
-            (r'.', String.Interpol),
+            (r"[^'\\]+", String),
+            (r'.', String),
         ],
 
-        "interpolated-verbatim-char": [
-            (r'\{\{', String.Escape),
-            (r'\}\}', String.Escape),
-            (r'\{', String.Interpol, "interpolation"),
+        "interpolated-string-double": [
+            (r'"', String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r'\\["\\abfnrtv0]', String.Escape),
+            (r'[^"\\{]+', String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-single": [
             (r"''", String),
-            (r"'", String.Interpol, "#pop"),
-            (r"[^'{]+", String.Interpol),
-            (r'.', String.Interpol),
+            (r"'", String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r"[^'{]+", String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-double": [
+            (r'""', String),
+            (r'"', String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r'[^"{]+', String),
+            (r'.', String),
         ],
 
         # --------------------
         # Interpolation Expression
         # --------------------
         "interpolation": [
-            (r'\}', String.Interpol, "#pop"),
+            (r'}', String, "#pop"),
             include("whitespace"),
             include("comments"),
             include("keywords"),
@@ -214,6 +221,7 @@ class AddyScriptLexer(RegexLexer):
         # Identifiers
         # --------------------
         "identifiers": [
+            (r"[A-Za-z_]\w*\s*\()", Name.Function),
             (r"[A-Za-z_]\w*", Name),
         ],
     }
