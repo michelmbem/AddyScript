@@ -3,6 +3,15 @@ docs_dir: docs
 
 theme:
   name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Light mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
   features:
     - navigation.instant
     - navigation.sections
@@ -17,7 +26,8 @@ markdown_extensions:
       anchor_linenums: true
       use_pygments: true
       pygments_lang_class: true
-      pygments_style: monokai
+      pygments_style: material
+      pygments_dark_style: material
   - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.snippets
