@@ -11,43 +11,43 @@
 /***** Light Mode *****/
 
 /* Types */
-html[data-md-color-scheme="default"] .highlight .kt {
+body[data-md-color-scheme="default"] .highlight .kt {
     color: maroon;
 }
 
 /* Peudo-keyword */
-html[data-md-color-scheme="default"] .highlight .kp {
+body[data-md-color-scheme="default"] .highlight .kp {
     color: teal;
 }
 
 /* Dates */
-html[data-md-color-scheme="default"] .highlight .ld {
+body[data-md-color-scheme="default"] .highlight .ld {
     color: steelblue;
 }
 
 /* Punctuations */
-html[data-md-color-scheme="default"] .highlight .p {
+body[data-md-color-scheme="default"] .highlight .p {
     color: orangered;
 }
 
 /***** Dark Mode *****/
 
 /* Types (dark mode) */
-html[data-md-color-scheme="slate"] .highlight .kt {
+body[data-md-color-scheme="slate"] .highlight .kt {
     color: coral;
 }
 
 /* Peudo-keyword */
-html[data-md-color-scheme="slate"] .highlight .kp {
+body[data-md-color-scheme="slate"] .highlight .kp {
     color: darkturquoise;
 }
 
 /* Dates */
-html[data-md-color-scheme="slate"] .highlight .ld {
+body[data-md-color-scheme="slate"] .highlight .ld {
     color: cornflowerblue;
 }
 
 /* Punctuations */
-html[data-md-color-scheme="slate"] .highlight .p {
+body[data-md-color-scheme="slate"] .highlight .p {
     color: darkorange;
 }
