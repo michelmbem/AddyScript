@@ -17,6 +17,7 @@ markdown_extensions:
       anchor_linenums: true
       use_pygments: true
       pygments_lang_class: true
+      pygments_style: monokai
   - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.snippets
