@@ -385,9 +385,7 @@ This allows you to quickly initialize fields or properties that are not initiali
 It can also be used to add undeclared fields to a specific instance of a class.
 When using property initializers, if the constructor has no parameters, there is no need to add parentheses to it.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 class Point
 {
     public property x;
@@ -514,9 +512,7 @@ record recordName(field1, field2, ..., fieldN)
   }
   ```
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 record Point(x, y);
 
 p1 = new Point(10, 20);

@@ -16,9 +16,7 @@ You can search for an item in a tuple using the **contains** operator or the "in
 You can read the "size" property to get the number of items stored in the tuple.
 Here is an example of using a tuple in AddyScript.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 t = ('John Doe', 19, 'New York');
 
 println($'t.size = {t.size}');
@@ -62,9 +60,7 @@ In addition to the above operators, the **tuple** class exposes the following me
 
 Like a tuple, a list is a collection in which items are accessed by index. But on contrary of tuples, lists are not immutable. A list is a kind of dynamically sized array. You typically create a list using a list initializer. After creating a list, you can add new items to it using the "add" or "insert" methods. You can remove existing items from it using the "remove" and "removeAt" methods. You can search for an item in a list using the **contains** operator or the "indexOf" and "lastIndexOf" methods. The contents of the list can be sorted using the "sort" method. The "inverse" method returns a list with the same contents but with the items ordered in reverse order. To get the number of items currently stored in the list, simply read the "size" property and finally, to empty the list, call the "clear" method. Here is an example of using a list in AddyScript.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 n = (int) readln('How many names? ');
 names = [];
 
@@ -163,9 +159,7 @@ To remove an element from a set, simply call the "remove" method.
 Finally, to empty a set, simply call its "clear" method.
 Here is an example of using a set in AddyScript.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 t = {'john', 'mike', 'bob'};
 u = {'steve', 'mike', 'john'};
 
@@ -284,9 +278,7 @@ The "inverse" method is used to create a map in which the key-value pairs are in
 Finally, to make a map empty, simply call its "clear" method.
 Here is an example of using the map in AddyScript.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 tom = {'name' => 'Tom Berenger', 'job' => 'Lawyer', 'age' => 38};
 tom['company'] = 'Holy Lawyers & co.';
 tom['hire date'] = `2004-05-18`;
@@ -392,9 +384,7 @@ In addition to the members listed in the tables above, collection classes also h
 
 For iteration methods that are invoked on strings, blobs, tuples, or lists, the closure argument can optionally take a second parameter that will receive the value of the index of the current element on each iteration.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 l = ['one', 'two', 'three', 'four', 'five'];
 l.each(|x, i| => println('Item #' + i + ' : ' + x));
 ranks = l.groupBy(|x, i| => i % 2 ? 'odd rank' : 'even rank');
@@ -427,9 +417,7 @@ Where:
 * A field assignment consists of an identifier (the field name), followed by an equals sign (`=`), and then an expression (the initial value of the field).
 * If the equals sign and the expression are omitted, the field will be initialized to a variable of the same name, which must be defined in the object's initialization context.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 actor = new { firstName = 'John', lastName = 'Snow', age = 24 };
 movie = new { title = 'The Matrix', year = 1999, rating = 8.5, actor };
 println('{0} {1} is aged {2}', actor.firstName, actor.lastName, actor.age);
@@ -444,9 +432,7 @@ The Matrix, released in 1999 is rated 8,5; it's main actor is John Snow
 
 Sometimes it is better to initialize the object with an empty initializer and then add fields to it as needed.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 student = new {};
 student.firstName = 'André';
 student.lastName = 'Dikos';
@@ -467,9 +453,7 @@ The dollar sign allows you to create identifiers that correspond to keywords or 
 Escape sequences, on the other hand, allow you to represent special characters contained within identifiers.
 **e.g.:** `$1`, `$if`, or `for\x20each` (respectively derived from `1`, `if`, and `for each`).
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 dict = { 'long' => 120, 'large' => 80, 'depth in cm' => 20 };
 shape = (object) dict;
 println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth\x20in\x20cm);

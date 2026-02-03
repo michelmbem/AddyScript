@@ -56,9 +56,7 @@ var <variable_name1>, <variable_name2>, ... ,<variable_nameN>
 <variable_nameN> = <initial_valueN>;
 ```
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 // a global variable named toto
 toto = 10;
 
@@ -107,9 +105,7 @@ Unlike variables, constants cannot be declared without an initial value.
 Only values of the types **bool**, **int**, **long**, **rational**, **float**, **decimal**, **complex**, **date**,
 **duration**, and **string** can be used as initial values for constants.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 // declare a constant named MAX_ITEMS
 const MAX_ITEMS = 10;
 
@@ -216,7 +212,7 @@ Depending on their type, literal values have the following forms:
 
 Initializers are like literal values for composite types: they provide an initial value to them in a single step. AddyScript provides initializers for 4 data types: tuples, lists, maps, and sets. Depending on their type, initializers have the following forms:
 
-* **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e.: another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (`..`) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` **Output**: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
+* **Tuple**: a sequence of expressions (literal or not) in parentheses separated by commas (**e.g.**: `(5, -7, 2)`, `('Joe', 'Martin')`). The expressions that figure between the parentheses are called tuple items. If a tuple item is a sequential collection (i.e.: another **tuple**, a **list** or a **set**), it can be preceded by the **spread operator** (`..`) to indicate that it is not the item itself that is to be added to the tuple being initialized, but its contents (**e.g.**: `t1 = (5, 10, 15); t2 = (..t1, 20, 25); println(t2);` Output: `(5, 10, 15, 20, 25)`). For a single-item tuple, a final comma should be appended to the list to avoid confusion with parenthesized expressions (**e.g.**: `(18,)`, `(now(),)`). AddyScript doesn't allow a tuple to be empty. There should always be at least one item in a tuple.
 
     **Note**: Tuples are a new data type in AddyScript. The syntax used to represent tuple initializers was formerly used for complex initializers (with two items between the parentheses only respectively representing the real and the imaginary parts). AddyScript doesn't need complex initializers anymore as it has a built-in support for complex literals.
 
@@ -263,9 +259,7 @@ Exception
 
 ## Conversion
 
-For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following example:
-
-```addyscript linenums="1"
+For some operations, data are automatically converted to the right type. But this is not always the case. In the case where you have to manage conversion by yourself, use the C language conversion syntax like in the following ```addyscript title="Example" linenums="1"
 d = (date)'5/12/1980'; // d is a date
 n = (decimal)'9876543210'; // n is a decimal
 ```
@@ -400,9 +394,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
 * The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (`..`). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
 * Any underscore (`_`) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
     
-    Example:
-
-    ```addyscript linenums="1"
+    ```addyscript title="Example" linenums="1"
     l = [7, 6, 4, 2];
     (a, b, _, c) = (..l);
     println($'a = {a}');
@@ -410,9 +402,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
     println($'c = {c}');
     ```
   
-    **Output**:
-
-    ```
+    ```text title="Output"
     a = 7
     b = 6
     c = 2
@@ -431,9 +421,7 @@ let lvalue = rvalue;
 
 With this syntax chaining assignments is not allowed. No other operator than the equal-sign (`=`) can be used.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 let a = 5;
 let b = 8;
 let c = a + b;

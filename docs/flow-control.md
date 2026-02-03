@@ -13,9 +13,7 @@ An if-else therefore has the following 2 possible forms:
 
 `if (condition) action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 n = randint(20); // n is a randomly generated number between 0 and 20
 
 if (n > 10)
@@ -26,9 +24,7 @@ if (n > 10)
 
 `if (condition) action else alternative_action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 i = randint(100); // i is a randomly generated number between 0 and 100
 
 if (i % 2 == 0)
@@ -72,9 +68,7 @@ switch (expression)
 Breaks are not required but if a **break** is missing, execution will continue at the next **case** section.
 The **default** section is also optional but at least one **case** section (or *default* section) must be present in the switch block.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 result = int(readln("What's your result? "));
 
 switch (result)
@@ -122,9 +116,7 @@ Syntax:
 
 `while (condition) action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 i = 1;
 while (i <= 12)
 {
@@ -133,9 +125,7 @@ while (i <= 12)
 }
 ```
 
-**Output**:
-
-```
+```text title="Output"
 2 x 1 = 2
 2 x 2 = 4
 2 x 3 = 6
@@ -159,9 +149,7 @@ Syntax:
 
 `do action while (condition);`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 i = 1;
 
 do
@@ -179,9 +167,7 @@ Syntax:
 
 `for (counter_initialization; counter_limit_test; counter_increment) action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 for (i = 1; i <= 12; ++i)
    println('2 x {0} = {1}', i, 2*i);
 ```
@@ -201,9 +187,7 @@ Form 1:
 
 `foreach (item in collection) action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 words = ['john', 'paul', 'second', 'the', 'pope'];
 
 foreach (word in words)
@@ -212,9 +196,7 @@ foreach (word in words)
 println();
 ```
 
-**Output**:
-
-```
+```text title="Output"
 john paul second the pope
 ```
 
@@ -222,18 +204,14 @@ Form 2:
 
 `foreach (key => value in collection) action`
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 jobs = {'paul' => 'general manager', 'roland' => 'accountant', 'david' => 'driver'};
 
 foreach (name => job in jobs)
    println(name + ' is a ' + job);
 ```
 
-**Output**:
-
-```
+```text title="Output"
 paul is a general manager
 roland is a accountant
 david is a driver

@@ -19,9 +19,7 @@ it attempts to guess which fraction might have generated the floating-point or d
 However, there is no literal value or initializer for the **rational** type; the only way to get a rational number
 is by dividing two integers (**int** or **long**). Here is an example script that uses rational numbers:
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 a = 3/4;
 b = 1/4;
 c = 11/7;
@@ -102,9 +100,7 @@ The purely _imaginary one_ **i** is always represented as `1i`, so instead of `2
 The _sqrt_ (square root) function always returns a complex number when its argument is negative (**e.g.:** `sqrt(-1)` returns `1i`).
 Here is an example script using complex numbers:
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 a = 2 - 1i;
 b = 1 + 2i;
 
@@ -150,9 +146,7 @@ A date literal is anything enclosed in backticks (\`) that can be translated by 
 They typically conform to the date format of the local culture (**e.g.**: \``03/03/1980`\`, \``nov, 16 2002`\`).
 Here is an example of a script that manipulates dates:
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 println("hello! it's {0:t} o'clock", now());
 d = (date)readln("what's your birth date? ");
 println("it was a " + d.weekday);
@@ -201,9 +195,7 @@ A duration can only be obtained by computing the difference of two dates or by i
 AddyScript has five (5) functions that all take a numeric value as argument and return a properly initialized duration.
 Those are described in one of the tables bellow.
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 d1 = `2025-09-17 14:30`;
 d2 = date::of(2019, 8, 30, 19, 15);
 elapsed = d1 - d2;
@@ -257,9 +249,7 @@ In addition to those operators, the **date** class exposes the following members
 
 In AddyScript, sequences of characters more commonly called _strings_ are instances of the **string** class. You can obtain a string in various ways such as using a literal string value, invoking the global **format** or **readln** functions, invoking the "toString" method of any object and so on. In fact, the **string** class is one of the more commonly used data type in AddyScript (and I think, in any scripting language). This is why it exposes a wide range of methods. Here is an example of a script that uses strings:
 
-Example:
-
-```addyscript linenums="1"
+```addyscript title="Example" linenums="1"
 s = readln("Type some text: ");
 
 println("Lower case: " + s.toLower());
