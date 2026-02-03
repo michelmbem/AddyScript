@@ -62,7 +62,7 @@ class AddyScriptLexer(RegexLexer):
             (r"'", String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Interpol, "substitution"),
+            (r'{.*}', String.Escape),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\]+", String),
             (r'.', String),
@@ -72,7 +72,7 @@ class AddyScriptLexer(RegexLexer):
             (r'"', String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Interpol, "substitution"),
+            (r'{.*}', String.Escape),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\]+', String),
             (r'.', String),
@@ -83,7 +83,7 @@ class AddyScriptLexer(RegexLexer):
             (r"'", String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Interpol, "substitution"),
+            (r'{.*}', String.Escape),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^']+", String),
             (r'.', String),
@@ -94,7 +94,7 @@ class AddyScriptLexer(RegexLexer):
             (r'"', String, "#pop"),
             (r'{{', String.Escape),
             (r'}}', String.Escape),
-            (r'{', String.Interpol, "substitution"),
+            (r'{.*}', String.Escape),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"]+', String),
             (r'.', String),
@@ -148,12 +148,6 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         # Interpolation Expression
         # --------------------
-        "substitution": [
-            (r'}', String.Interpol, "#pop"),
-            (r'[^}]+', String.Escape),
-            (r'.', String.Escape),
-        ],
-
         "interpolation": [
             (r'}', String.Interpol, "#pop"),
 
