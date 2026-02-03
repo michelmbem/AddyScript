@@ -102,6 +102,10 @@ class AddyScriptLexer(RegexLexer):
         # Strings
         # --------------------
         "strings": [
+            (r"\$@'", String, "interpolated-verbatim-string-single"),
+            (r'\$@"', String, "interpolated-verbatim-string-double"),
+            (r"\$'", String, "interpolated-string-single"),
+            (r'\$"', String, "interpolated-string-double"),
             (r"@'", String, "verbatim-string-single"),
             (r'@"', String, "verbatim-string-double"),
             (r"'", String, "string-single"),
@@ -135,6 +139,65 @@ class AddyScriptLexer(RegexLexer):
             (r'"', String, "#pop"),
             (r'[^"]+', String),
             (r'.', String),
+        ],
+
+        # --------------------
+        # Interpolated Strings
+        # --------------------
+        "interpolated-string-single": [
+            (r"'", String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r"\\['\\abfnrtv0]", String.Escape),
+            (r"[^'\\{]+", String),
+            (r'.', String),
+        ],
+
+        "interpolated-string-double": [
+            (r'"', String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r'\\["\\abfnrtv0]', String.Escape),
+            (r'[^"\\{]+', String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-single": [
+            (r"''", String),
+            (r"'", String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r"[^'{]+", String),
+            (r'.', String),
+        ],
+
+        "interpolated-verbatim-string-double": [
+            (r'""', String),
+            (r'"', String, "#pop"),
+            (r'{{', String.Escape),
+            (r'}}', String.Escape),
+            (r'{', String.Interpol, "interpolation"),
+            (r'[^"{]+', String),
+            (r'.', String),
+        ],
+
+        # --------------------
+        # Interpolation Expression
+        # --------------------
+        "interpolation": [
+            (r'}', String.Interpol, "#pop"),
+            include("whitespace"),
+            include("comments"),
+            include("keywords"),
+            include("types"),
+            include("numbers"),
+            include("strings"),
+            include("operators"),
+            include("punctuation"),
+            include("identifiers"),
         ],
 
         # --------------------
