@@ -3,7 +3,7 @@
 from pygments.lexer import RegexLexer, words, include
 from pygments.token import (
     Text, Comment, Operator, Keyword, Name, String,
-    Number, Punctuation
+    Number, Punctuation, Literal
 )
 
 class AddyScriptLexer(RegexLexer):
@@ -66,11 +66,6 @@ class AddyScriptLexer(RegexLexer):
             ), suffix=r"\b"), Keyword),
 
             (words((
-                "and", "contains", "endswith", "in", "is", "matches",
-                "new", "not", "or", "startswith", "typeof", "with",
-            ), suffix=r"\b"), Operator.Word),
-
-            (words((
                 "__context", "__key", "__value", "read", "write",
             ), suffix=r"\b"), Keyword.Pseudo),
 
@@ -115,7 +110,7 @@ class AddyScriptLexer(RegexLexer):
             (r'@"', String, "verbatim-string-double"),
             (r"'", String, "string-single"),
             (r'"', String, "string-double"),
-            (r'`[^`]*`', String.Char),
+            (r'`[^`]*`', Literal.Date),
         ],
 
         "string-single": [
@@ -210,6 +205,11 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "operators": [
             (r"[+\-*/%&|\^!~=<>?:]+", Operator),
+
+            (words((
+                "and", "contains", "endswith", "in", "is", "matches",
+                "new", "not", "or", "startswith", "typeof", "with",
+            ), suffix=r"\b"), Operator.Word),
         ],
 
         # --------------------
