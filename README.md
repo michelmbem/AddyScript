@@ -49,7 +49,7 @@ Let's say you just want to parse and run a script from your program. Then do the
 4. Type your script somewhere (either in a file or as a string in memory).
 5. Finally, add a code snippet like this:
 
-```csharp linenums="1"
+```csharp linenums="1" title="C#"
 var program = ScriptEngine.ParseFile("path/to/your/script");
 // Alternatively: var program = ScriptEngine.ParseString("your script text in memory");
 var context = new ScriptContext();
@@ -67,7 +67,7 @@ Now suppose you want to evaluate a formula contained in a string. Here's how to 
 3. I'm assuming the formula to be evaluated is stored in a string called _strFormula_ and expects a parameter named _x_; successive values of the _x_ parameter are stored in a collection named _inputValues_.
 4. Add a code snippet like this:
 
-```csharp linenums="1"
+```csharp linenums="1" title="C#"
 var formula = ScriptEngine.ParseExpression(strFormula);
 var context = new ScriptContext();
 
@@ -85,7 +85,7 @@ The last part of this introductory tutorial is about how to invoke parts of a sc
 2. Import _AddyScript_ and any other namespaces from the _AddyScript.dll_ assembly.
 3. The rest is as follows:
 
-```csharp linenums="1"
+```csharp linenums="1" title="C#"
 // Declare a type of delegate with a signature that matches that of a function you are about to define in the script
 delegate double DummyDelegate(double x);
 
