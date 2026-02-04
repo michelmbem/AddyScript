@@ -1,7 +1,10 @@
+using System.Globalization;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 using AddyScript.Parsers;
 using AddyScript.Runtime.NativeTypes;
+using AddyScript.Runtime.OOP;
 
 
 namespace AddyScript.Tests;
@@ -9,7 +12,7 @@ namespace AddyScript.Tests;
 
 public class LexerTest
 {
-    private static Lexer GetLexer(string input) => new(new StringReader(input));
+    public static Lexer GetLexer(string input) => new (new StringReader(input));
 
     private static List<Token> GetTokens(string input)
     {
@@ -208,6 +211,32 @@ public class LexerTest
     }
 
     [Fact]
+    public void LiteralDateTest()
+    {
+        // Arrange
+        string input = "`2017-09-21` `14:30:53.987` `2025-10-01T11:40:15`";
+        CultureInfo ci = CultureInfo.InvariantCulture;
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(4, tokens.Count);
+
+        Assert.Equal(TokenID.LT_Date, tokens[0].TokenID);
+        Assert.IsType<DateTime>(tokens[0].Value);
+        Assert.Equal(DateTime.Parse("2017-09-21", ci), tokens[0].Value);
+
+        Assert.Equal(TokenID.LT_Date, tokens[1].TokenID);
+        Assert.IsType<DateTime>(tokens[1].Value);
+        Assert.Equal(DateTime.Parse("14:30:53.987", ci), tokens[1].Value);
+
+        Assert.Equal(TokenID.LT_Date, tokens[2].TokenID);
+        Assert.IsType<DateTime>(tokens[2].Value);
+        Assert.Equal(DateTime.Parse("2025-10-01T11:40:15", ci), tokens[2].Value);
+    }
+
+    [Fact]
     public void LiteralStringTest()
     {
         // Arrange
@@ -250,5 +279,271 @@ public class LexerTest
         Assert.IsType<string>(tokens[3].Value);
         Assert.StartsWith("Donec tristique", (string)tokens[3].Value);
         Assert.EndsWith("semper vel", (string)tokens[3].Value);
+    }
+
+    [Fact]
+    public void LiteralBlobTest()
+    {
+        // Arrange
+        string input = """
+                       b'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae'
+                       B"Praesent tortor lorem, aliquam nec libero in, ultrices elementum felis"
+                       """;
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(3, tokens.Count);
+
+        Assert.Equal(TokenID.LT_Blob, tokens[0].TokenID);
+        Assert.IsType<byte[]>(tokens[0].Value);
+        Assert.Equal(86, ((byte[])tokens[0].Value).Length);
+
+        Assert.Equal(TokenID.LT_Blob, tokens[1].TokenID);
+        Assert.IsType<byte[]>(tokens[1].Value);
+        Assert.Equal(70, ((byte[])tokens[1].Value).Length);
+    }
+
+    [Fact]
+    public void CommentTest()
+    {
+        // Arrange
+        string input = """
+                       // Cras at orci fermentum, mollis ante vitae, varius dolor
+
+                       /*
+                       Mauris sagittis consequat nibh, vitae aliquet magna volutpat sit amet.
+                       Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;
+                       Donec pulvinar id velit eget placerat. Donec vitae libero tincidunt, consequat purus ac, sodales eros.
+                       Nunc tortor massa, faucibus et quam nec, aliquam hendrerit urna
+                       */
+                       """;
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(3, tokens.Count);
+
+        Assert.Equal(TokenID.LineComment, tokens[0].TokenID);
+        Assert.IsType<string>(tokens[0].Value);
+        Assert.StartsWith(" Cras at orci", (string)tokens[0].Value);
+        Assert.EndsWith("varius dolor", (string)tokens[0].Value);
+
+        Assert.Equal(TokenID.BlockComment, tokens[1].TokenID);
+        Assert.IsType<string>(tokens[1].Value);
+        Assert.StartsWith("\nMauris sagittis", (string)tokens[1].Value);
+        Assert.EndsWith("hendrerit urna\n", (string)tokens[1].Value);
+    }
+
+    [Fact]
+    public void IdentifierTest()
+    {
+        // Arrange
+        string input = @"counter _ __fields one_shot $bool $75 all\x20of b16";
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(9, tokens.Count);
+
+        Assert.Equal(TokenID.Identifier, tokens[0].TokenID);
+        Assert.IsType<string>(tokens[0].Value);
+        Assert.Equal("counter", tokens[0].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[1].TokenID);
+        Assert.IsType<string>(tokens[1].Value);
+        Assert.Equal("_", tokens[1].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[2].TokenID);
+        Assert.IsType<string>(tokens[2].Value);
+        Assert.Equal("__fields", tokens[2].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[3].TokenID);
+        Assert.IsType<string>(tokens[3].Value);
+        Assert.Equal("one_shot", tokens[3].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[4].TokenID);
+        Assert.IsType<string>(tokens[4].Value);
+        Assert.Equal("bool", tokens[4].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[5].TokenID);
+        Assert.IsType<string>(tokens[5].Value);
+        Assert.Equal("75", tokens[5].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[6].TokenID);
+        Assert.IsType<string>(tokens[6].Value);
+        Assert.Equal("all of", tokens[6].Value);
+
+        Assert.Equal(TokenID.Identifier, tokens[7].TokenID);
+        Assert.IsType<string>(tokens[7].Value);
+        Assert.Equal("b16", tokens[7].Value);
+    }
+
+    [Fact]
+    public void ScopeTest()
+    {
+        // Arrange
+        string input = "private protected public";
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(4, tokens.Count);
+
+        Assert.Equal(TokenID.Scope, tokens[0].TokenID);
+        Assert.IsType<Scope>(tokens[0].Value);
+        Assert.Equal(Scope.Private, tokens[0].Value);
+
+        Assert.Equal(TokenID.Scope, tokens[1].TokenID);
+        Assert.IsType<Scope>(tokens[1].Value);
+        Assert.Equal(Scope.Protected, tokens[1].Value);
+
+        Assert.Equal(TokenID.Scope, tokens[2].TokenID);
+        Assert.IsType<Scope>(tokens[2].Value);
+        Assert.Equal(Scope.Public, tokens[2].Value);
+    }
+
+    [Fact]
+    public void ModifierTest()
+    {
+        // Arrange
+        string input = "final static abstract";
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(4, tokens.Count);
+
+        Assert.Equal(TokenID.Modifier, tokens[0].TokenID);
+        Assert.IsType<Modifier>(tokens[0].Value);
+        Assert.Equal(Modifier.Final, tokens[0].Value);
+
+        Assert.Equal(TokenID.Modifier, tokens[1].TokenID);
+        Assert.IsType<Modifier>(tokens[1].Value);
+        Assert.Equal(Modifier.Static, tokens[1].Value);
+
+        Assert.Equal(TokenID.Modifier, tokens[2].TokenID);
+        Assert.IsType<Modifier>(tokens[2].Value);
+        Assert.Equal(Modifier.Abstract, tokens[2].Value);
+    }
+
+    [Fact]
+    public void TypeNameTest()
+    {
+        // Arrange
+        string input = @"void bool int long float decimal rational complex date duration
+                        string blob tuple list set queue stack map object resource closure";
+
+        string[] typeNames = Regex.Split(input, @"\s+");
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(typeNames.Length + 1, tokens.Count);
+
+        for (int i = 0; i < typeNames.Length; i++)
+        {
+            Assert.Equal(TokenID.TypeName, tokens[i].TokenID);
+            Assert.Equal(typeNames[i], tokens[i].Value);
+        }
+    }
+
+    [Fact]
+    public void PunctuationTest()
+    {
+        // Arrange
+        string input = ", ; : :: . .. ( ) [ ] { }";
+        TokenID[] ids = [
+            TokenID.Comma, TokenID.SemiColon, TokenID.Colon, TokenID.DoubleColon,
+            TokenID.Dot, TokenID.DoubleDot, TokenID.LeftParenthesis, TokenID.RightParenthesis,
+            TokenID.LeftBracket, TokenID.RightBracket, TokenID.LeftBrace, TokenID.RightBrace,
+        ];
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(ids.Length + 1, tokens.Count);
+
+        for (int i = 0; i < ids.Length; i++)
+        {
+            Assert.Equal(ids[i], tokens[i].TokenID);
+            Assert.Null(tokens[i].Value);
+        }
+    }
+
+    [Fact]
+    public void OperatorTest()
+    {
+        // Arrange
+        string input = @"+ ++ += - -- -= * ** *= **= / /= & && &= | || |= ^ ^= ! != !==
+                        ~ ? ?? ??= ?. ?[ = == === => < << <= <<= > >> >= >>=";
+
+        TokenID[] ids = [
+            TokenID.Plus, TokenID.DoublePlus, TokenID.PlusEqual, TokenID.Minus, TokenID.DoubleMinus, TokenID.MinusEqual,
+            TokenID.Asterisk, TokenID.DoubleAsterisk, TokenID.AsteriskEqual, TokenID.DoubleAsteriskEqual, TokenID.Slash,
+            TokenID.SlashEqual, TokenID.Ampersand, TokenID.DoubleAmpersand, TokenID.AmpersandEqual, TokenID.VerticalBar,
+            TokenID.DoubleVerticalBar, TokenID.VerticalBarEqual, TokenID.Circumflex, TokenID.CircumflexEqual, TokenID.Exclamation,
+            TokenID.ExclamationEqual, TokenID.ExclamationDoubleEqual, TokenID.Tilda, TokenID.Question, TokenID.DoubleQuestion,
+            TokenID.DoubleQuestionEqual, TokenID.QuestionDot, TokenID.QuestionBracket, TokenID.Equal, TokenID.DoubleEqual,
+            TokenID.TripleEqual, TokenID.Arrow, TokenID.LessThan, TokenID.DoubleLessThan, TokenID.LessThanEqual,
+            TokenID.DoubleLessThanEqual, TokenID.GreaterThan, TokenID.DoubleGreaterThan, TokenID.GreaterThanEqual,
+            TokenID.DoubleGreaterThanEqual
+        ];
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(ids.Length + 1, tokens.Count);
+
+        for (int i = 0; i < ids.Length; i++)
+        {
+            Assert.Equal(ids[i], tokens[i].TokenID);
+            Assert.Null(tokens[i].Value);
+        }
+    }
+
+    [Fact]
+    public void KeywordTest()
+    {
+        // Arrange
+        string input = """
+            and as break case catch class const constructor contains continue
+            default do else endswith event extern finally for foreach function
+            goto if import in is let matches new not operator or property record
+            return startswith super switch this throw try typeof var when while
+            with yield
+            """;
+
+        TokenID[] ids = [
+            TokenID.KW_And, TokenID.KW_As, TokenID.KW_Break, TokenID.KW_Case, TokenID.KW_Catch, TokenID.KW_Class,
+            TokenID.KW_Const, TokenID.KW_Constructor, TokenID.KW_Contains, TokenID.KW_Continue, TokenID.KW_Default,
+            TokenID.KW_Do, TokenID.KW_Else, TokenID.KW_EndsWith, TokenID.KW_Event, TokenID.KW_Extern, TokenID.KW_Finally,
+            TokenID.KW_For, TokenID.KW_ForEach, TokenID.KW_Function, TokenID.KW_Goto, TokenID.KW_If, TokenID.KW_Import,
+            TokenID.KW_In, TokenID.KW_Is, TokenID.KW_Let, TokenID.KW_Matches, TokenID.KW_New, TokenID.KW_Not,
+            TokenID.KW_Operator, TokenID.KW_Or, TokenID.KW_Property, TokenID.KW_Record, TokenID.KW_Return,
+            TokenID.KW_StartsWith, TokenID.KW_Super, TokenID.KW_Switch, TokenID.KW_This, TokenID.KW_Throw,
+            TokenID.KW_Try, TokenID.KW_TypeOf, TokenID.KW_Var, TokenID.KW_When, TokenID.KW_While, TokenID.KW_With,
+            TokenID.KW_Yield,
+        ];
+
+        // Act
+        List<Token> tokens = GetTokens(input);
+
+        // Assert
+        Assert.Equal(ids.Length + 1, tokens.Count);
+
+        for (int i = 0; i < ids.Length; i++)
+        {
+            Assert.Equal(ids[i], tokens[i].TokenID);
+            Assert.Null(tokens[i].Value);
+        }
     }
 }

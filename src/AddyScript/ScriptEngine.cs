@@ -78,9 +78,9 @@ public class ScriptEngine
             commandPrefix = string.Empty;
             satisfied = true;
         }
-        catch (SyntaxError px)
+        catch (SyntaxError se)
         {
-            if (px.Token.TokenID == TokenID.EndOfFile)
+            if (se.Token.TokenID == TokenID.EndOfFile)
             {
                 commandPrefix = fullCommand;
                 satisfied = false;
