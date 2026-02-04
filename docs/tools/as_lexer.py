@@ -193,6 +193,12 @@ class AddyScriptLexer(RegexLexer):
                 "and", "contains", "endswith", "in", "is", "matches",
                 "new", "not", "or", "startswith", "typeof", "with",
             ), prefix=r"\b", suffix=r"\b"), Operator.Word),
+
+            (words((
+                "E", "EPSILON", "MAXDATE", "MAXFLOAT", "MAXINT", "MINDATE",
+                "MINFLOAT", "MININT", "NAN", "NEWLINE", "NINFINITY", "PI",
+                "PINFINITY",
+            ), prefix=r"\b", suffix=r"\b"), Name.Constant),
         ],
 
         # --------------------

@@ -11,63 +11,63 @@
 /***** Light Mode *****/
 
 /* Types */
-body[data-md-color-scheme="default"] .highlight .kt {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .kt {
     color: maroon;
 }
 
 /* Peudo-keyword */
-body[data-md-color-scheme="default"] .highlight .kp {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .kp {
     color: teal;
 }
 
 /* Dates */
-body[data-md-color-scheme="default"] .highlight .ld {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .ld {
     color: steelblue;
 }
 
 /* Punctuations */
-body[data-md-color-scheme="default"] .highlight .p {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .p {
     color: orangered;
 }
 
 /* Keyword operators */
-body[data-md-color-scheme="default"] .highlight .ow {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .ow {
     color: darkslategray;
 }
 
 /* String escape sequences */
-body[data-md-color-scheme="default"] .highlight .se {
+body[data-md-color-scheme="default"] .language-addyscript.highlight .se {
     color: darkolivegreen;
 }
 
 /***** Dark Mode *****/
 
 /* Types (dark mode) */
-body[data-md-color-scheme="slate"] .highlight .kt {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .kt {
     color: chocolate;
 }
 
 /* Peudo-keyword */
-body[data-md-color-scheme="slate"] .highlight .kp {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .kp {
     color: mediumaquamarine;
 }
 
 /* Dates */
-body[data-md-color-scheme="slate"] .highlight .ld {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .ld {
     color: cornflowerblue;
 }
 
 /* Punctuations */
-body[data-md-color-scheme="slate"] .highlight .p {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .p {
     color: darkgoldenrod;
 }
 
 /* Keyword operators */
-body[data-md-color-scheme="slate"] .highlight .ow {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .ow {
     color: slategray;
 }
 
 /* String escape sequences */
-body[data-md-color-scheme="slate"] .highlight .se {
+body[data-md-color-scheme="slate"] .language-addyscript.highlight .se {
     color: olive;
 }

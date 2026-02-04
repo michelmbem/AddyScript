@@ -312,11 +312,9 @@
             <Word>MAXDATE</Word>
         </Keywords>
 
-        <!-- Mark previous rule-->
+        <!-- Function and method calls -->
         <Rule color="MethodCall">
-            (?&lt;!\bnew\s+)\b    # no initial new keyword
-            [\d\w_]+  # an identifier
-            (?=\s*\() # followed by (
+            \w[\w\d]*(?=\s*\()
         </Rule>
         
         <!-- Digits -->

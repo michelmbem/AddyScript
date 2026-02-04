@@ -247,7 +247,11 @@ In addition to those operators, the **date** class exposes the following members
 
 ## Strings
 
-In AddyScript, sequences of characters more commonly called _strings_ are instances of the **string** class. You can obtain a string in various ways such as using a literal string value, invoking the global **format** or **readln** functions, invoking the "toString" method of any object and so on. In fact, the **string** class is one of the more commonly used data type in AddyScript (and I think, in any scripting language). This is why it exposes a wide range of methods. Here is an example of a script that uses strings:
+In AddyScript, sequences of characters more commonly called _strings_ are instances of the **string** class.
+You can obtain a string in various ways such as using a literal string value,
+invoking the global **format** or **readln** functions, invoking the "toString" method of any object and so on.
+In fact, the **string** class is one of the more commonly used data types in AddyScript (and I think, in any scripting language).
+This is why it exposes a wide range of methods. Here is an example of a script that uses strings:
 
 ```addyscript linenums="1" title="Example"
 s = readln("Type some text: ");
