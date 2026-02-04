@@ -2,6 +2,13 @@
     .web-only {
         display: none !important;
     }
+
+    .highlighttable > th.filename {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        page-break-after: avoid;
+    }
 }
 
 /**************************/
@@ -15,14 +22,14 @@ body[data-md-color-scheme="default"] .language-addyscript.highlight .kt {
     color: maroon;
 }
 
-/* Peudo-keyword */
+/* Pseudo-keywords */
 body[data-md-color-scheme="default"] .language-addyscript.highlight .kp {
     color: teal;
 }
 
 /* Dates */
 body[data-md-color-scheme="default"] .language-addyscript.highlight .ld {
-    color: steelblue;
+    color: deepskyblue;
 }
 
 /* Punctuations */
@@ -44,22 +51,22 @@ body[data-md-color-scheme="default"] .language-addyscript.highlight .se {
 
 /* Types (dark mode) */
 body[data-md-color-scheme="slate"] .language-addyscript.highlight .kt {
-    color: chocolate;
+    color: tomato;
 }
 
-/* Peudo-keyword */
+/* Pseudo-keywords */
 body[data-md-color-scheme="slate"] .language-addyscript.highlight .kp {
-    color: mediumaquamarine;
+    color: cadetblue;
 }
 
 /* Dates */
 body[data-md-color-scheme="slate"] .language-addyscript.highlight .ld {
-    color: cornflowerblue;
+    color: lightskyblue;
 }
 
 /* Punctuations */
 body[data-md-color-scheme="slate"] .language-addyscript.highlight .p {
-    color: darkgoldenrod;
+    color: chocolate;
 }
 
 /* Keyword operators */
