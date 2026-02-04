@@ -11,7 +11,7 @@
 		<TargetFramework>net8.0-windows</TargetFramework>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+	<PropertyGroup Condition="'$(OS)' == 'Unix'">
 		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
