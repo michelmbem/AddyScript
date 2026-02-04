@@ -60,8 +60,8 @@ class AddyScriptLexer(RegexLexer):
 
         "string-single": [
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r"{[^'}]+}", String.Escape),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'\\{}]+", String),
@@ -70,8 +70,8 @@ class AddyScriptLexer(RegexLexer):
 
         "string-double": [
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{[^"}]+}', String.Escape),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"\\{}]+', String),
@@ -81,10 +81,9 @@ class AddyScriptLexer(RegexLexer):
         "verbatim-string-single": [
             (r"''", String),
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r"{[^'}]+}", String.Escape),
-            (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'{}]+", String),
             (r'.', String),
         ],
@@ -92,10 +91,9 @@ class AddyScriptLexer(RegexLexer):
         "verbatim-string-double": [
             (r'""', String),
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{[^"}]+}', String.Escape),
-            (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"{}]+', String),
             (r'.', String),
         ],
@@ -105,8 +103,8 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "interpolated-string-single": [
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{', String.Interpol, "interpolation"),
             (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'{}]+", String),
@@ -115,8 +113,8 @@ class AddyScriptLexer(RegexLexer):
 
         "interpolated-string-double": [
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{', String.Interpol, "interpolation"),
             (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"{}]+', String),
@@ -126,10 +124,9 @@ class AddyScriptLexer(RegexLexer):
         "interpolated-verbatim-string-single": [
             (r"''", String),
             (r"'", String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{', String.Interpol, "interpolation"),
-            (r"\\['\\abfnrtv0]", String.Escape),
             (r"[^'{}]+", String),
             (r'.', String),
         ],
@@ -137,10 +134,9 @@ class AddyScriptLexer(RegexLexer):
         "interpolated-verbatim-string-double": [
             (r'""', String),
             (r'"', String, "#pop"),
-            (r'{{', String.Escape),
-            (r'}}', String.Escape),
+            (r'{{', String),
+            (r'}}', String),
             (r'{', String.Interpol, "interpolation"),
-            (r'\\["\\abfnrtv0]', String.Escape),
             (r'[^"{}]+', String),
             (r'.', String),
         ],
@@ -169,10 +165,10 @@ class AddyScriptLexer(RegexLexer):
         # --------------------
         "keywords": [
             (words((
-                "let", "abstract", "as", "break", "case", "catch",
-                "class", "const", "constructor", "continue", "default",
-                "do", "else", "event", "extern", "final", "finally",
-                "for", "foreach", "function", "goto", "if", "import",
+                "abstract", "as", "break", "case", "catch", "class",
+                "const", "constructor", "continue", "default", "do",
+                "else", "event", "extern", "final", "finally", "for",
+                "foreach", "function", "goto", "if", "import", "let",
                 "operator", "private", "property", "protected", "public",
                 "record", "return", "static", "super", "switch", "this",
                 "throw", "try", "var", "when", "while", "yield",

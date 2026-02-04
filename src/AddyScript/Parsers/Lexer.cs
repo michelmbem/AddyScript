@@ -882,7 +882,7 @@ public class Lexer
             ch = Ll(1);
 
             if (ch == EOF)
-                return MakeToken(TokenID.Unknown, "@" + wrapper + strBuilder, false);
+                return MakeToken(TokenID.Unknown, $"@{wrapper}{strBuilder}", false);
 
             if (ch == wrapper)
                 if (Ll(2) == ch)
@@ -913,7 +913,7 @@ public class Lexer
 
         /*
          * Try to recognize a mutable string:
-         * Normally we should have dedicated methods for this but LiteralString and Verbatim can do the job
+         * Normally we should have dedicated methods for this, but LiteralString and Verbatim can do the job
          */
         var tmpTok = Ll(1) switch
         {
