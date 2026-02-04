@@ -24,7 +24,7 @@ public class PatternMatching(Expression expression, params MatchCase[] cases) : 
     /// The patterns to match with associated expressions.
     /// </summary>
     public MatchCase[] MatchCases => cases;
-    
+
     /// <summary>
     /// Determines whether this is a simple boolean pattern matching.
     /// </summary>

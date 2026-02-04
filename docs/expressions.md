@@ -394,7 +394,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
 * Each element of the left tuple must be a valid reference (such as a variable, a list item, an object property, or another tuple).
 * The right tuple can contain elements of type **tuple**, **list** or **set** preceded by the _spread_ operator (`..`). In this case, the contents of the collection replace the collection itself in the parent tuple. This is very convenient for assigning values to several variables at once from elements of a collection.
 * Any underscore (`_`) in the left tuple is simply ignored. This is useful when you want to extract only some values from the right tuple without having to declare dummy variables for the values you want to skip.
-    
+
     ```addyscript linenums="1" title="Example"
     l = [7, 6, 4, 2];
     (a, b, _, c) = (..l);
@@ -402,7 +402,7 @@ This allows you to set the value of multiple variables at once. So a typical gro
     println($'b = {b}');
     println($'c = {c}');
     ```
-  
+
     ```text title="Output"
     a = 7
     b = 6

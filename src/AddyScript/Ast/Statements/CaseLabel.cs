@@ -19,7 +19,7 @@ public class CaseLabel(int address, DataItem value) : Label(address)
     /// The implicit name of the default <see cref="CaseLabel"/>.
     /// </summary>
     public const string DEFAULT_LABEL_NAME = "@default";
-    
+
     /// <summary>
     /// The value that follows the <b>case</b> keyword in the script.
     /// </summary>

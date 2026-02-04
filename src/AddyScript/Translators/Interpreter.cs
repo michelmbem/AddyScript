@@ -59,7 +59,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     private LinkedList<DataItem> yieldedValues = [];
     private DataItem returnedValue;
     private Goto lastGoto;
-    
+
     #endregion
 
     #region Constructors
@@ -375,7 +375,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     public void TranslateBlockAsExpression(BlockAsExpression blkAsExpr)
     {
         TranslateBlock(blkAsExpr.Block);
-        
+
         if (yieldedValues.First == null)
             returnedValue = Void.Value;
         else
@@ -420,7 +420,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     {
         binExpr.LeftOperand.AcceptTranslator(this);
         var leftOperand = returnedValue;
-        
+
         BinaryOperator _operator = binExpr.Operator;
         if (IsShortCircuited(_operator, leftOperand)) return;
 
@@ -430,7 +430,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
             {
                 var methodName = ClassMethod.GetMethodName(_operator);
                 var method = leftOperand.Class.GetMethod(methodName);
-                
+
                 if (method != null)
                 {
                     // Handle overloaded operators
@@ -442,7 +442,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
             binExpr.RightOperand.AcceptTranslator(this);
             if (IsShortCircuiting(_operator)) return;
-            
+
             var rightOperand = returnedValue;
             returnedValue = leftOperand.ConversionNeeded(rightOperand.Class, _operator)
                           ? leftOperand.ConvertTo(rightOperand.Class).BinaryOperation(_operator, rightOperand)
@@ -898,7 +898,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         try
         {
             methodCall.Target.AcceptTranslator(this);
-            
+
             DataItem methodTarget = returnedValue;
             if (methodTarget is Void && methodCall.Optional) return;
 
@@ -1047,10 +1047,10 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
             ClassMethod method = _this.Class.SuperClass.GetMethod(pmc.FunctionName) ??
                 throw new RuntimeError(fileName, pmc, string.Format(Resources.MethodNotFound, pmc.FunctionName,
                                                                     _this.Class.SuperClass.Name));
-            
+
             if (method.Modifier == Modifier.Abstract)
                 throw new RuntimeError(fileName, pmc, string.Format(Resources.CannotInvokeAbstractMember, method.FullName));
-            
+
             CheckAccess(method, pmc);
             Invoke(method.Function, pmc.FunctionName, method.Holder, _this, pmc.Arguments, pmc.NamedArgs);
         }
@@ -1109,7 +1109,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                 // Cast 'this' to an instance of 'superClass'
                 var oldTarget = (Object)currentFrame.Context.MethodTarget;
                 var newTarget = new Object(superClass, oldTarget.AsDynamicObject);
-                
+
                 // Generate arguments from parameters
                 var parameters = ((ClassMethod)member).Function.Parameters;
                 var args = parameters.Select(p => new VariableRef(p.Name)).ToArray();
@@ -1233,7 +1233,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
             if (rootFrame.GetItem(conversion.TypeName) is not Class klass)
                 throw new RuntimeError(fileName, conversion, string.Format(Resources.UndefinedType, conversion.TypeName));
-            
+
             if (klass.ClassID is < ClassID.Boolean or > ClassID.Object)
                 throw new RuntimeError(fileName, conversion, string.Format(Resources.CannotConvertTo, conversion.TypeName));
 
@@ -1261,7 +1261,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     {
         switchBlock.Test.AcceptTranslator(this);
         int hashCode = returnedValue.GetHashCode();
-        
+
         int address = switchBlock.Cases
                                  .Where(label => label.GetHashCode() == hashCode)
                                  .Select(label => label.Address)
@@ -1435,7 +1435,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         DataItem resource = null;
         ScriptError finalException = null;
         ScriptElement finalExceptionLocation = tcf.TryBlock;
-        
+
         currentFrame.PushBlock();
 
         try
@@ -1575,11 +1575,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             mutableCopy.Original.AcceptTranslator(this);
             DataItem original = returnedValue;
-            
+
             var klass = original.Class;
             if (!klass.Inherits(Class.Record))
                 throw new RuntimeError(fileName, mutableCopy, Resources.InvalidOperandForWith);
-            
+
             var originalRef = new Literal(original);
             var args = klass.Constructor.Function.Parameters.ToDictionary(
                 p => p.Name, Expression (p) => new PropertyRef(originalRef, p.Name));
@@ -1592,7 +1592,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                     throw new ScriptError(fileName, setter, string.Format(Resources.PropertyNotFoundInClass,
                                                                           setter.Name, original.Class.Name));
             }
-            
+
             var ctorCall = new ConstructorCall(new QualifiedName(klass.Name), null, args, null);
             ctorCall.CopyLocation(mutableCopy);
             ctorCall.AcceptTranslator(this);
@@ -1732,7 +1732,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     public void AssignToTuple(TupleInitializer tupleInit, DataItem rValue)
     {
         DataItem[] rValueItems = rValue.AsArray;
-        
+
         if (rValueItems.Length != tupleInit.Items.Length)
             throw new RuntimeError(fileName, tupleInit, Resources.ListLengthMismatch);
 
@@ -2035,7 +2035,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         IFrameItem frameItem = currentFrame.GetItem(name);
         if (frameItem != null)
             throw new ScriptError(fileName, label, string.Format(Resources.NameConflict, name));
-        
+
         currentFrame.PutItem(name, label);
     }
 
@@ -2146,7 +2146,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
         return (frameItems, expandedArgList);
     }
-    
+
     /// <summary>
     /// determines if the specified name corresponds to a root frame item.
     /// </summary>
@@ -2218,7 +2218,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         }
 
         if (function.ParentFrame == null) return;
-        
+
         function.UpdateCapturedItems(frameItems);
         function.ParentFrame.SyncItems(frameItems, namesToSkip);
     }
@@ -2528,7 +2528,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     private void CheckAccess(ClassMember member, AstNode astNode)
     {
         InvocationContext ctx = currentFrame.Context;
-        
+
         bool violation = member.Scope switch
         {
             Scope.Private => ctx.MethodHolder == null || ctx.MethodHolder != member.Holder,
@@ -2591,10 +2591,10 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     {
         if (sx is RuntimeError { Thrown: not null } rx)
             return rx.Thrown;
-        
+
         var ex = new Object(Class.Exception);
         InitializeFields(ex);
-        
+
         if (sx.InnerException is { } inex)
             ex.SetProperty("__name", new String(inex.GetType().Name));
         else
@@ -2641,7 +2641,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     {
         if (typeInfoCache.TryGetValue(klass, out DataItem cached))
             return cached;
-        
+
         var typeInfo = new Object(Class.TypeInfo);
         DataItem superType = klass.SuperClass != null ? new String(klass.SuperClass.Name) : Void.Value;
         DataItem indexerInfo = klass.Indexer != null ? GetPropertyInfo(klass.Indexer) : Void.Value;
@@ -2664,7 +2664,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         typeInfo.SetProperty("__isSequential", Boolean.FromBool(klass.IsSequential));
         typeInfo.SetProperty("__isCollection", Boolean.FromBool(klass.IsCollection));
         typeInfoCache.Add(klass, typeInfo);
-        
+
         return typeInfo;
     }
 
@@ -2970,7 +2970,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     #endregion
 
     #region Miscellaneous Utility
-    
+
     /// <summary>
     /// Evaluates an expression and gets if the returned value is true.
     /// </summary>
@@ -2998,7 +2998,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     private bool IsMatch(MatchCase matchCase, Expression arg)
     {
         var (pattern, guard) = (matchCase.Pattern, matchCase.Guard);
-        
+
         try
         {
             return IsTrue(pattern.GetMatchTest(arg)) && (guard == null || IsTrue(guard));
@@ -3033,7 +3033,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                          ? int.MaxValue
                          : throw new RuntimeError(fileName, lastGoto,
                             string.Format(Resources.MissingLabel, lastGoto.LabelName));
-                
+
                 jumpCode = JumpCode.None;
                 return label.Address;
             default:
@@ -3179,16 +3179,16 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
         if (scriptPath == null) return false;
         if (importedModules.Contains(scriptPath)) return true;
-        
+
         using var reader = new StreamReader(scriptPath);
         var program = new Parser(new Lexer(reader)).Program();
         var savedState = GetState();
-        
+
         Reset(scriptPath);
         program.AcceptTranslator(this);
         RestoreState(savedState);
         importedModules.Add(scriptPath);
-        
+
         return true;
     }
 
@@ -3252,7 +3252,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                     if (member == null) return null;
 
                     CheckAccess(member, statement);
-                    
+
                     return member.IsStatic
                          ? member
                          : throw new RuntimeError(fileName, statement, string.Format(Resources.NonStaticMember, member.FullName));
@@ -3266,7 +3266,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
             {
                 var type = assembly.GetType(name.Subname(0, k).ToDottedName(true));
                 if (type == null) continue;
-                
+
                 CacheType(type);
                 return nameCache[name];
             }
@@ -3339,7 +3339,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
         indexer = null;
         if (owner == null) return;
-        
+
         indexer = (ClassProperty)owner.Class.GetMember(ClassProperty.INDEXER_NAME, MemberKind.Indexer);
         if (indexer != null) CheckAccess(indexer, itemRef);
     }

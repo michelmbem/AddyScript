@@ -27,7 +27,7 @@ public class ClassMemberSet<T> : List<T> where T : ClassMember
     }
 
     public T this[string name] => dictionary[name];
-    
+
     public bool TryGetValue(string name, out T item) => dictionary.TryGetValue(name, out item);
 
     public new void Add(T item)
@@ -36,7 +36,7 @@ public class ClassMemberSet<T> : List<T> where T : ClassMember
 
         if (dictionary.ContainsKey(item.Name))
             throw new ArgumentException($"Item '{item.Name}' already exists in the collection");
-        
+
         base.Add(item);
         dictionary.Add(item.Name, item);
     }
@@ -57,15 +57,15 @@ public class ClassMemberSet<T> : List<T> where T : ClassMember
 
     public bool Remove(string name) =>
         dictionary.TryGetValue(name, out var item) && Remove(item) && dictionary.Remove(name);
-    
+
     public new void RemoveRange(int index, int count)
     {
         for (var i = index; i < index + count; i++)
             dictionary.Remove(this[i].Name);
-        
+
         base.RemoveRange(index, count);
     }
-    
+
     public new void Clear()
     {
         base.Clear();

@@ -19,10 +19,10 @@ public readonly struct Fraction :
     public static readonly Fraction One = new (BigInteger.One);
     public static readonly Fraction Half = new (BigInteger.One, 2);
     public static readonly Fraction Third = new (BigInteger.One, 3);
-    
+
     private readonly BigInteger numerator;
     private readonly BigInteger denominator;
-    
+
     #endregion
 
     #region Constructors
@@ -30,7 +30,7 @@ public readonly struct Fraction :
     public Fraction(BigInteger num, BigInteger den)
     {
         if (den.IsZero) throw new DivideByZeroException("Denominator cannot be zero");
-        
+
         var gcd = BigInteger.GreatestCommonDivisor(num, den);
         numerator = num / gcd * den.Sign;
         denominator = BigInteger.Abs(den / gcd);
@@ -367,7 +367,7 @@ public readonly struct Fraction :
         if (exp == 0) return One;
 
         var (factor, result) = (this, One);
-        
+
         while (exp != 0)
         {
             if ((exp & 1) != 0) result *= factor;

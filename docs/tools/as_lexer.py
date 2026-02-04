@@ -140,7 +140,7 @@ class AddyScriptLexer(RegexLexer):
             (r'[^"{}]+', String),
             (r'.', String),
         ],
-        
+
         # --------------------
         # Interpolation Expression
         # --------------------

@@ -142,7 +142,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             var relation = oper == BinaryOperator.IfEmpty
                          ? ExpressionOrThrow()
                          : Required(Relation, Resources.ExpressionRequired);
-            
+
             moreRelations.Enqueue((oper, relation));
         }
 
@@ -267,7 +267,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         while (true)
         {
             SkipComments();
-            
+
             Expression operand = expr;
             Token last = token;
 
@@ -567,10 +567,10 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         {
             Token argNameToken = Match(TokenID.Identifier);
             string argName = argNameToken.ToString();
-            
+
             if (namedArgs.ContainsKey(argName))
                 throw new SyntaxError(FileName, argNameToken, Resources.DuplicatedParameter);
-            
+
             Match(TokenID.Colon);
             namedArgs.Add(argName, RequiredExpression());
 
@@ -911,7 +911,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
 
         if (!TryMatchAny(TokenID.TypeName, TokenID.Identifier))
             throw new SyntaxError(FileName, token, Resources.TypeNameExpected);
-        
+
         string typeName = token.ToString();
         Consume(1);
         Token last = Match(TokenID.RightParenthesis);
@@ -1126,7 +1126,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         var stringInt = new StringInterpolation(pattern, substitutions);
         stringInt.CopyLocation(token);
         Consume(1);
-        
+
         return stringInt;
     }
 
@@ -1178,7 +1178,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
 
             parts.Add(new NamePart(ident, paramCount));
-            
+
             if (!TryMatch(TokenID.DoubleColon)) break;
 
             Consume(1);
@@ -1304,7 +1304,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             }
 
             Pattern pattern = MatchCaseSimplePattern(ref last);
-            
+
             if (pattern != null)
             {
                 if (negate) pattern = new NegativePattern(pattern);
@@ -1444,7 +1444,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     private Pattern MatchCaseDestructuringPattern(string typeName, ref Token last)
     {
         Token first = Match(TokenID.LeftParenthesis);
-        
+
         List<string> propNames = [];
         while (TryMatch(TokenID.Identifier))
         {
@@ -1453,7 +1453,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
             if (TryMatch(TokenID.Comma))
                 Consume(1);
         }
-        
+
         last = Match(TokenID.RightParenthesis);
 
         var destPattern = new DestructuringPattern(typeName, [.. propNames]);
@@ -1472,7 +1472,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
         Token first = Match(TokenID.LeftParenthesis);
         Pattern[] subPatterns = List(MatchCasePattern, false, null);
         last = Match(TokenID.RightParenthesis);
-        
+
         Pattern pattern = subPatterns.Length switch
         {
             0 => throw new SyntaxError(FileName, last, Resources.EmptyPatternGroup),
@@ -1493,13 +1493,13 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
         Token stringToken = Match(TokenID.MutableString);
         var (pattern, substitutions) = ParseMutableString(stringToken);
-        
+
         foreach (var substitution in substitutions)
         {
             if (substitution is VariableRef) continue;
             throw new ScriptError(FileName, substitution, Resources.InvalidStringDestructuringSubstitution);
         }
-        
+
         HashSet<string> names = [];
         object[] groups = [.. substitutions.Cast<VariableRef>()
                                            .Select(varRef => varRef.Name)
@@ -1536,7 +1536,7 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
     {
         Token first = null;
         List<string> path = [];
-        
+
         while (TryMatch(TokenID.Identifier))
         {
             first ??= token;

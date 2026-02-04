@@ -26,7 +26,7 @@ internal static class ControlExtensions
         var pixelSize = new PixelSize(width, height ?? width);
         var bitmap = new RenderTargetBitmap(pixelSize, StandardDpi);
         bitmap.Render(visual);
-        
+
         return bitmap;
     }
 

@@ -18,9 +18,9 @@ public partial class FontDialog : Window
     public FontDialog()
     {
         InitializeComponent();
-        
+
         fontFamilies = [.. FontManager.Current.SystemFonts.OrderBy(f => f.Name)];
-        
+
         FilterFontList(null, false);
     }
 

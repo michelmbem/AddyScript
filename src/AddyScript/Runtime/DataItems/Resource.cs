@@ -31,7 +31,7 @@ public sealed class Resource(object handle) : DataItem
         var s = handle is IFormattable formattable
             ? formattable.ToString(format, formatProvider)
             : handle.ToString();
-        
+
         return s ?? string.Empty;
     }
 

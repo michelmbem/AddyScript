@@ -39,7 +39,7 @@ internal static class TerminalLauncher
     {
         var process = Process.Start(new ProcessStartInfo(command, args));
         if (process == null) return -1;
-        
+
         await process.WaitForExitAsync();
         return process.ExitCode;
     }

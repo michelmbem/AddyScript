@@ -159,7 +159,7 @@ public partial class NamePart(string value, int paramCount = 0)
     /// </summary>
     /// <returns>A <see cref="System.String" /></returns>
     public override string ToString() => ToString(false, false);
-    
+
     #region Operators
 
     public static bool operator ==(NamePart a, NamePart b) => Equals(a, b);
@@ -173,6 +173,6 @@ public partial class NamePart(string value, int paramCount = 0)
     public static bool operator <=(NamePart a, NamePart b) => a.CompareTo(b) <= 0;
 
     public static bool operator >=(NamePart a, NamePart b) => a.CompareTo(b) >= 0;
-    
+
     #endregion
 }

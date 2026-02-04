@@ -9,11 +9,11 @@ namespace AddyScript.Gui;
 public partial class AboutBox : Window
 {
     private const string REPO_URL = "https://github.com/michelmbem/AddyScript/";
-    
+
     public AboutBox()
     {
         InitializeComponent();
-        
+
         Title = string.Format(SR.AboutBoxTitle, AI.Title);
 
         VersionTextBlock.Text = string.Format(SR.VersionLabel, AI.Version);

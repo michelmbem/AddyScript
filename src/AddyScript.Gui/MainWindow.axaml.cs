@@ -198,7 +198,7 @@ public partial class MainWindow : Window
         {
             if (value.State != WindowState.Minimized)
                 WindowState = value.State;
-            
+
             if (WindowState == WindowState.Normal)
             {
                 Position = new(value.X, value.Y);
@@ -1068,7 +1068,7 @@ public partial class MainWindow : Window
         }
 
         if (Equals(culture, App.Options.Culture)) return;
-        
+
         await MessageBoxManager
               .GetMessageBoxStandard(SR.InfoMessageTitle, SR.LanguageChangeOnRestart, ButtonEnum.Ok, MBI.Info)
               .ShowAsync();

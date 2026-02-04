@@ -9,7 +9,7 @@ namespace AddyScript.Runtime.Utilities;
 public static class StringUtil
 {
     private static readonly UTF8Encoding Encoding = new (false, false);
-    
+
     public static string Capitalize(string value) =>
         value == null
             ? null
@@ -64,12 +64,12 @@ public static class StringUtil
 
         return new Regex(pattern, options);
     }
-    
+
     public static string ToString(Regex regex)
     {
         StringBuilder sb = new ();
         sb.Append('/').Append(regex).Append('/');
-        
+
         var options = regex.Options;
         if (options.HasFlag(RegexOptions.Singleline)) sb.Append('s');
         if (options.HasFlag(RegexOptions.Multiline)) sb.Append('m');
@@ -77,7 +77,7 @@ public static class StringUtil
         if (options.HasFlag(RegexOptions.IgnorePatternWhitespace)) sb.Append('x');
         if (options.HasFlag(RegexOptions.CultureInvariant)) sb.Append('u');
         if (options.HasFlag(RegexOptions.RightToLeft)) sb.Append('r');
-        
+
         return sb.ToString();
     }
 

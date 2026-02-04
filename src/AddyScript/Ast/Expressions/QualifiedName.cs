@@ -86,7 +86,7 @@ public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEq
         // Remove any type argument expansion from the given name
         if (dottedName.EndsWith(']'))
             dottedName = dottedName[..dottedName.IndexOf('[')];
-            
+
         return Parse(dottedName.Replace('+', '.'), ".", true);
     }
 
@@ -146,7 +146,7 @@ public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEq
         var newParts = new NamePart[length + 1];
         Array.Copy(parts, startIndex, newParts, 0, length);
         newParts[length] = part;
-            
+
         return new QualifiedName(newParts);
     }
 
@@ -266,7 +266,7 @@ public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEq
 
         for (int i = 0; i < length; ++i)
             hash = 23 * hash + this[i].GetHashCode();
-            
+
         return hash;
     }
 
@@ -305,7 +305,7 @@ public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEq
     /// </summary>
     /// <returns>A string</returns>
     public string ToFilePath() => ToString(Path.DirectorySeparatorChar.ToString(), false, false);
-    
+
     #region Operators
 
     public static bool operator ==(QualifiedName a, QualifiedName b) => Equals(a, b);
@@ -319,6 +319,6 @@ public sealed class QualifiedName : IComparable, IComparable<QualifiedName>, IEq
     public static bool operator <=(QualifiedName a, QualifiedName b) => a.CompareTo(b) <= 0;
 
     public static bool operator >=(QualifiedName a, QualifiedName b) => a.CompareTo(b) >= 0;
-    
+
     #endregion
 }

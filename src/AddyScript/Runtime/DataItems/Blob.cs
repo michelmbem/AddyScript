@@ -112,10 +112,10 @@ public sealed class Blob(byte[] buffer) : DataItem
                 var operandBuffer = operand.AsByteArray;
                 var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
                 int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
-                
+
                 for (; i < limit; ++i)
                     result[i] = (byte)(buffer[i] & operandBuffer[i]);
-                
+
                 return new Blob(result);
             }
             case BinaryOperator.Or:
@@ -123,7 +123,7 @@ public sealed class Blob(byte[] buffer) : DataItem
                 var operandBuffer = operand.AsByteArray;
                 var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
                 int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
-                
+
                 for (; i < limit; ++i)
                     result[i] = (byte)(buffer[i] | operandBuffer[i]);
 
@@ -137,7 +137,7 @@ public sealed class Blob(byte[] buffer) : DataItem
                 var operandBuffer = operand.AsByteArray;
                 var result = new byte[Math.Max(buffer.Length, operandBuffer.Length)];
                 int i = 0, limit = Math.Min(buffer.Length, operandBuffer.Length);
-                
+
                 for (; i < limit; ++i)
                     result[i] = (byte)(buffer[i] ^ operandBuffer[i]);
 

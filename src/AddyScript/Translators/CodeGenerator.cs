@@ -140,9 +140,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
         var (wasInFunctionBody, wasBlockInline) = (inFunctionBody, isBlockInline);
         inFunctionBody = isBlockInline = false;
-        
+
         var (counter, length) = (0, block.Statements.Length);
-        
+
         if (wasInFunctionBody && length > 0 &&
             block.Statements[^1] is Return { Expression: null })
             --length;
@@ -597,7 +597,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     {
         textWriter.WriteLine("try");
         tcf.TryBlock.AcceptTranslator(this);
-        
+
         if (tcf.CatchBlock != null)
         {
             textWriter.WriteLine("catch ({0})", SafeName(tcf.ExceptionName));
@@ -746,10 +746,10 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpRecord(ClassDefinition recordDef)
     {
         textWriter.Write($"record {SafeName(recordDef.ClassName)}");
-        
+
         var parameters = recordDef.Constructor?.Parameters ?? [];
         DumpParametersList(parameters);
-        
+
         var (indexer, fields, methods, events) = (recordDef.Indexer, recordDef.Fields, recordDef.Methods, recordDef.Events);
         var additionalProps = recordDef.Properties
                                        .Where(prop => prop.Name != Class.RECORD_MEMBERS_PROPERTY_NAME &&
@@ -810,7 +810,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpField(ClassFieldDecl field)
     {
         textWriter.Write(field.Scope.ToString().ToLower());
-        
+
         switch (field.Modifier)
         {
             case Modifier.Default:
@@ -822,7 +822,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                 textWriter.Write($" {field.Modifier}".ToLower());
                 break;
         }
-        
+
         textWriter.Write($" {SafeName(field.Name)}");
 
         if (field.Initializer != null)
@@ -968,7 +968,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpParametersList(ParameterDecl[] parameters)
     {
         textWriter.Write('(');
-        
+
         for (var i = 0; i < parameters.Length; ++i)
         {
             if (i > 0) textWriter.Write(", ");
@@ -1050,9 +1050,9 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
     private void DumpVariableSetter(VariableSetter variableSetter)
     {
         textWriter.Write(SafeName(variableSetter.Name));
-        
+
         if (variableSetter.Value == null) return;
-        
+
         textWriter.Write(" = ");
         variableSetter.Value.AcceptTranslator(this);
     }
@@ -1276,7 +1276,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
                                       .Replace(@">.+)", @"}")
                                       .Replace(@"\k<", @"{")
                                       .Replace(@">", @"}");
-                
+
                 textWriter.Write($"$'{regex}'");
                 break;
             }
@@ -1420,12 +1420,12 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
         for (var i = 0; i < name.Length; ++i)
         {
             if (i > 0) sb.Append("::");
-            
+
             NamePart part = name[i];
             sb.Append(SafeName(part.Value));
-            
+
             if (part.ParamCount == 0) continue;
-            
+
             sb.Append('{').Append(part.ParamCount).Append('}');
         }
 

@@ -731,7 +731,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         foreach (DataItem arg in args)
             hashCode.Add(arg);
-        
+
         return new Integer(hashCode.ToHashCode());
     }
 
@@ -878,7 +878,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::indexOf", 1);
-        
+
         var start = arguments[2].AsInt32;
         while (start < 0) start += self.Length;
 
@@ -894,7 +894,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         var arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::lastIndexOf", 1);
-        
+
         var start = arguments[2].AsInt32;
         while (start < 0) start += self.Length;
 
@@ -977,7 +977,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::ltrim", 1);
-        
+
         var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().TrimStart(trimChars));
     }
@@ -986,7 +986,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::rtrim", 1);
-        
+
         var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().TrimEnd(trimChars));
     }
@@ -995,7 +995,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     {
         DataItem arg1 = arguments[1];
         CheckArgType(arg1, Class.String, "string::trim", 1);
-        
+
         var trimChars = arg1.ToString().ToCharArray();
         return new String(arguments[0].ToString().Trim(trimChars));
     }
@@ -1007,7 +1007,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         DataItem arg2 = arguments[2];
         CheckArgType(arg2, Class.String, "string::lpad", 2);
-        
+
         var padding = arg2.ToString();
         CheckSingleChar(padding, "string::lpad", 2);
 
@@ -1182,7 +1182,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static DataItem ListInsertLogic(DataItem[] arguments)
     {
         List<DataItem> list = arguments[0].AsList;
-        
+
         int index = arguments[1].AsInt32;
         while (index < 0) index += list.Count;
 
@@ -1327,7 +1327,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
         Dictionary<DataItem, DataItem> dict = [];
         for (int i = 0; i < self.Count; ++i)
             dict.Add(self[i], other[i]);
-        
+
         return new Map(dict);
     }
 
@@ -1488,7 +1488,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
 
         var body = new Block(self.Body.Statements);
         body.CopyLocation(self.Body);
-        
+
         int paramIndex = Array.FindIndex(self.Parameters, p => p.Name == nameArg.ToString());
         Parameter[] parameters;
 
@@ -1730,7 +1730,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     /// Creates a <see cref="Duration"/> with the given number of milliseconds.
     /// </summary>
     public static readonly InnerFunction Milliseconds = new ("milliseconds", [new ("value")], MillisecondsLogic);
-    
+
     /// <summary>
     /// Sleeps for the specified number of milliseconds.
     /// </summary>
@@ -2371,7 +2371,7 @@ public class InnerFunction(string name, Parameter[] parameters, InnerFunctionLog
     private static int MonthDelta(DateTime date1, DateTime date2)
     {
         const int MONTHS_PER_YEAR = 12;
-        
+
         var yearDelta = date1.Year - date2.Year;
         var monthDelta = date1.Month - date2.Month;
         var dayDelta = date1.Day - date2.Day;

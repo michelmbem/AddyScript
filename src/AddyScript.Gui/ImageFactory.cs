@@ -24,12 +24,12 @@ internal static class ImageFactory
             Width = size,
             Height = size,
         };
-        
+
         if (color.HasValue)
             icon.Foreground = new SolidColorBrush(color.Value);
 
         icon.Pack();
-        
+
         return icon.ToBitmap(size);
     }
 }

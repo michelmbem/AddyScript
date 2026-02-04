@@ -35,7 +35,7 @@ public sealed class Set : DataItem
     public override object Clone()
     {
         var cloneSet = new HashSet<DataItem>();
-        
+
         foreach (DataItem item in hashSet)
             cloneSet.Add((DataItem) item.Clone());
 

@@ -3,7 +3,7 @@
 public class ScriptEngineTest
 {
 	delegate int SumType(int a, int b);
-		
+
 	[Fact]
 	public void GetDelegateTest()
 	{

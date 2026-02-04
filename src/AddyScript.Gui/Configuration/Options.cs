@@ -68,18 +68,18 @@ public abstract class EditorOptionsBase
 {
     [JsonConverter(typeof(FontFamilyConverter))]
     public FontFamily FontFamily { get; set; }
-    
+
     public double FontSize { get; set; }
-    
+
     public bool WordWrap { get; set; }
 }
 
 public class EditorOptions : EditorOptionsBase
 {
     public bool ShowLineNumbers { get; set; }
-    
+
     public bool ShowWhitespace { get; set; }
-    
+
     public bool HighlightCurrentLine { get; set; }
 
     public EditorOptions Clone() => new()
@@ -120,9 +120,9 @@ public record PageFormat(string Name, Size PageSize)
         new ("A3", new Size(11.69, 16.54)),
         new ("B3", new Size(13.90, 19.69)),
     ];
-    
+
     public static PageFormat Default => Known[0]; // US Letter by default
-    
+
     public override string ToString() => $"{Name} ({PageSize.Width}\" x {PageSize.Height}\")";
 }
 
@@ -134,12 +134,12 @@ public class PrintOptions
         PageMargins = new Thickness(0.4), // About 1 cm on each side by default
         Landscape = false,
     };
-    
+
     public string PrinterName { get; set; }
-    
+
     [JsonConverter(typeof(PageFormatConverter))]
     public PageFormat PageFormat { get; set; }
-    
+
     public bool Landscape { get; set; }
 
     [JsonConverter(typeof(ThicknessConverter))]
@@ -171,7 +171,7 @@ public class Options
 
     [JsonConverter(typeof(CultureInfoConverter))]
     public CultureInfo Culture { get; set; }
-    
+
     public EditorOptions Editor { get; set; }
 
     public bool UseEmulatedTerminal { get; set; }
@@ -181,7 +181,7 @@ public class Options
     public PrintOptions PrintOptions { get; set; }
 
     public List<string> SearchPaths { get; set; }
-    
+
     public List<string> References { get; set; }
 
     public Options Clone() => new()

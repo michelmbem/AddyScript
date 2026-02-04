@@ -69,7 +69,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
         set
         {
             parentFrame = value;
-            
+
             CapturedItems.Clear();
             if (parentFrame == null) return;
 
@@ -160,7 +160,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
 
         il.DeclareLocal(funType); // Function var0;
         il.DeclareLocal(typeof(Expression[])); // Expression[] var1;
-        
+
         // var0 = Function.Map[methodName];
         il.Emit(OpCodes.Ldsfld, funType.GetField("Map", flags));
         il.Emit(OpCodes.Ldstr, methodName);
@@ -240,7 +240,7 @@ public class Function(Parameter[] parameters, Block body) : IFrameItem
 
         var theDelegate = method.CreateDelegate(delegateType);
         delegateCache.Add(delegateType, theDelegate);
-        
+
         return theDelegate;
     }
 }

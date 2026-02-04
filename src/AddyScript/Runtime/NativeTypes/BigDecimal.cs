@@ -61,7 +61,7 @@ public partial struct BigDecimal :
         unscaled = tmp.unscaled;
         scale = tmp.scale;
     }
-    
+
     public BigDecimal(decimal d)
     {
         int[] bits = decimal.GetBits(d);
@@ -82,7 +82,7 @@ public partial struct BigDecimal :
         var unscaledBytes = new byte[bytes.Length - 4];
         Array.Copy(bytes, unscaledBytes, unscaledBytes.Length);
         unscaled = new BigInteger(unscaledBytes);
-        
+
         uint dword = BitConverter.ToUInt32(bytes, unscaledBytes.Length);
         if ((dword & 0x80000000) != 0)
         {
@@ -96,9 +96,9 @@ public partial struct BigDecimal :
     #endregion
 
     #region Properties
-    
+
     public readonly BigInteger Unscaled => unscaled;
-    
+
     public readonly int Scale => scale;
 
     public readonly int Sign => unscaled.Sign;
@@ -123,7 +123,7 @@ public partial struct BigDecimal :
     public readonly string ToString(string format, IFormatProvider formatProvider)
     {
         StringBuilder sb = new (BigInteger.Abs(unscaled).ToString());
-        
+
         if (scale > 0)
         {
             if (scale >= sb.Length) sb.Insert(0, "0", scale - sb.Length + 1);
@@ -308,7 +308,7 @@ public partial struct BigDecimal :
         var mid = (uint)((abs >> 32) & uint.MaxValue);
         var hi = (uint)((abs >> 64) & uint.MaxValue);
         var negate = unscaled.Sign < 0;
-        
+
         return new decimal((int)lo, (int)mid, (int)hi, negate, (byte)scale);
     }
 
@@ -620,7 +620,7 @@ public partial struct BigDecimal :
 
         return new BigDecimal(q, precision);
     }
-    
+
     /// <summary>
     /// Converts the current value to a byte array representation that encodes both the unscaled value and scale.
     /// </summary>
@@ -797,7 +797,7 @@ public partial struct BigDecimal :
 
         BigInteger n = unscaled;
         int decs = scale;
-        
+
         while (decs > 0)
         {
             var q = BigInteger.DivRem(n, BigIntegerTen, out var r);
@@ -841,7 +841,7 @@ public partial struct BigDecimal :
         // Assuming a.scale == b.scale
         var q = BigInteger.DivRem(a.unscaled, b.unscaled, out var r);
         var decs = 0;
-        
+
         while (decs < MAX_SCALE && !r.IsZero)
         {
             var q1 = BigInteger.DivRem(r * BigIntegerTen, b.unscaled, out var r1);
@@ -859,7 +859,7 @@ public partial struct BigDecimal :
         _ = BigInteger.DivRem(a.unscaled, b.unscaled, out var r);
         return new BigDecimal(r, a.scale).Deflate();
     }
-    
+
     private static BigDecimal FromRational(BigInteger numerator, BigInteger denominator,
                                            int scale, MidpointRounding rounding)
     {
@@ -888,7 +888,7 @@ public partial struct BigDecimal :
     }
 
     private readonly (BigInteger, BigInteger) ToRational() => (unscaled, BigInteger.Pow(BigIntegerTen, scale));
-    
+
     private readonly string ToScientificString()
     {
         var abs = BigInteger.Abs(unscaled);

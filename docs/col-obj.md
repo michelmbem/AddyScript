@@ -87,7 +87,7 @@ if (names contains someName)
 else
 {
     i = (int) readln('Enter a position in the list: ');
-    
+
     if (i < names.size)
     {
         names.insert(i, someName);

@@ -11,7 +11,7 @@ namespace AddyScript.Gui.Extensions;
 internal static class FontFamilyExtensions
 {
     private static readonly char[] TestChars = ['i', 'W', '.', 'm', '0', '1'];
-    
+
     /// <summary>
     /// Measures the rendered size of the specified text string when drawn with the given font family and font size.
     /// </summary>

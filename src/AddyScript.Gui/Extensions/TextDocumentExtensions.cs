@@ -93,7 +93,7 @@ internal static class TextDocumentExtensions
             case ' ':
             {
                 int spaceCount = 0;
-                
+
                 while (spaceCount < tabSize && document.GetCharAt(lineOffset + spaceCount) == ' ')
                     ++spaceCount;
 

@@ -37,7 +37,7 @@ public sealed class Complex : DataItem
 
         if (realString == null) return imaginaryString ?? "0";
         if (imaginaryString == null) return realString;
-        
+
         return value.Imaginary < 0.0
              ? $"({realString}{imaginaryString})"
              : $"({realString}+{imaginaryString})";

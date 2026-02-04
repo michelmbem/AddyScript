@@ -41,7 +41,7 @@ public partial class TerminalWindow : Window
     private void ApplyOptions(TerminalOptions options)
     {
         if (options == null) return;
-        
+
         TerminalView.Foreground = new SolidColorBrush(options.Foreground);
         TerminalView.Background = new SolidColorBrush(options.Background);
         TerminalView.FontFamily = options.FontFamily;
@@ -110,7 +110,7 @@ public partial class TerminalWindow : Window
             TextArea textArea = TerminalView.TextArea;
             TextDocument document = textArea.Document;
             Caret caret = textArea.Caret;
-            
+
             if (output.ClearScreen)
             {
                 document.Text = string.Empty;

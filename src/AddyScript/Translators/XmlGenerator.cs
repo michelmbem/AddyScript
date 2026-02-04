@@ -178,7 +178,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("LeftOperand");
         tmpElement.AppendChild(currentElement);
         assign.LeftOperand.AcceptTranslator(this);
@@ -196,7 +196,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
         terExpr.Test.AcceptTranslator(this);
@@ -219,7 +219,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("LeftOperand");
         tmpElement.AppendChild(currentElement);
         binExpr.LeftOperand.AcceptTranslator(this);
@@ -238,7 +238,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Operand");
         tmpElement.AppendChild(currentElement);
         unExpr.Operand.AcceptTranslator(this);
@@ -260,15 +260,15 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("RealPartInitializer");
         tmpElement.AppendChild(currentElement);
         cplxInit.RealPartInitializer.AcceptTranslator(this);
-        
+
         currentElement = document.CreateElement("ImaginaryPartInitializer");
         tmpElement.AppendChild(currentElement);
         cplxInit.ImaginaryPartInitializer.AcceptTranslator(this);
-        
+
         currentElement = previousElement;
     }
 
@@ -339,7 +339,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Owner");
         tmpElement.AppendChild(currentElement);
         itemRef.Owner.AcceptTranslator(this);
@@ -389,7 +389,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Owner");
         tmpElement.AppendChild(currentElement);
         propRef.Owner.AcceptTranslator(this);
@@ -424,11 +424,11 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Callee");
         tmpElement.AppendChild(currentElement);
         anCall.Callee.AcceptTranslator(this);
-        
+
         currentElement = previousElement;
 
         ProcessArguments(tmpElement, anCall);
@@ -531,7 +531,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Expression");
         tmpElement.AppendChild(currentElement);
         typeVerif.Expression.AcceptTranslator(this);
@@ -553,7 +553,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Expression");
         tmpElement.AppendChild(currentElement);
         conversion.Expression.AcceptTranslator(this);
@@ -595,7 +595,7 @@ public class XmlGenerator : ITranslator
             tmpElement.SetAttribute("DefaultCase", switchBlock.DefaultCase.ToString());
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Test");
         tmpElement.AppendChild(currentElement);
         switchBlock.Test.AcceptTranslator(this);
@@ -624,7 +624,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Initializers");
         tmpElement.AppendChild(currentElement);
         foreach (Statement initializer in forLoop.Initializers)
@@ -656,7 +656,7 @@ public class XmlGenerator : ITranslator
             tmpElement.SetAttribute("KeyName", forEach.KeyName);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
         forEach.Guard.AcceptTranslator(this);
@@ -692,7 +692,7 @@ public class XmlGenerator : ITranslator
         currentElement.AppendChild(tmpElement);
 
         XmlElement previousElement = currentElement;
-        
+
         currentElement = document.CreateElement("Guard");
         tmpElement.AppendChild(currentElement);
         doLoop.Guard.AcceptTranslator(this);
@@ -812,7 +812,7 @@ public class XmlGenerator : ITranslator
         currentElement = document.CreateElement("Expression");
         tmpElement.AppendChild(currentElement);
         patMatch.Expression.AcceptTranslator(this);
-        
+
         currentElement = previousElement;
 
         ProcessMatchCases(tmpElement, patMatch.MatchCases);
@@ -871,7 +871,7 @@ public class XmlGenerator : ITranslator
 
         if (parameter.DefaultValue != null)
             tmpElement.SetAttribute("DefaultValue", parameter.DefaultValue.ToString());
-        
+
         if (parameter.Attributes != null && parameter.Attributes.Length > 0)
             ProcessAttributes(tmpElement, parameter.Attributes);
     }
@@ -1106,11 +1106,11 @@ public class XmlGenerator : ITranslator
         ProcessPattern(tmpElement, matchCase.Pattern);
 
         XmlElement savedElement = currentElement;
-        
+
         currentElement = document.CreateElement("Expression");
         matchCase.Expression.AcceptTranslator(this);
         tmpElement.AppendChild(currentElement);
-        
+
         if (matchCase.Guard != null)
         {
             currentElement = document.CreateElement("Guard");

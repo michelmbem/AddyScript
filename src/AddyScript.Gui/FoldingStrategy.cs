@@ -151,7 +151,7 @@ public partial class FoldingStrategy
                         i = endOffset; // skip /
                         continue;
                     }
-                    
+
                     break;
                 }
                 case '\n' or '\r':

@@ -247,7 +247,7 @@ function reflect(type, otherType = null)
     println($"isTemporal: {type.isTemporal}");
     println($"isSequential: {type.isSequential}");
     println($"isCollection: {type.isCollection}");
-    
+
     if (otherType is not null)
     {
         println($"isSubclassOf({otherType.name}): {type.isSubclassOf(otherType)}");

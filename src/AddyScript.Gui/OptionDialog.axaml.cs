@@ -31,14 +31,14 @@ public record Language(CultureInfo Culture, string Name)
 {
     public Language(CultureInfo ci) :
         this(ci, $"{ci.NativeName.Capitalize()} ({ci.TwoLetterISOLanguageName})") {}
-    
+
     public override string ToString() => Name;
 }
 
 public record Printer(string Name, string DisplayName)
 {
     public Printer(string name) : this(name, name) {}
-    
+
     public override string ToString() => DisplayName;
 }
 
@@ -47,10 +47,10 @@ public record Printer(string Name, string DisplayName)
 public partial class OptionDialog : Window
 {
     #region Fields
-    
+
     private const string MARGIN_FORMAT = "0.#";
     private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
-    
+
     private readonly ObservableCollection<string> searchPaths = [];
     private readonly ObservableCollection<string> references = [];
 
@@ -61,7 +61,7 @@ public partial class OptionDialog : Window
     #endregion
 
     #region Constructor
-    
+
     public OptionDialog()
     {
         InitializeComponent();
@@ -73,7 +73,7 @@ public partial class OptionDialog : Window
         SearchPathsListBox.ItemsSource = searchPaths;
         ReferencesListBox.ItemsSource = references;
     }
-    
+
     #endregion
 
     #region Properties
@@ -147,7 +147,7 @@ public partial class OptionDialog : Window
             references.AddRange(options.References);
         }
     }
-    
+
     #endregion
 
     #region Utility methods
@@ -229,7 +229,7 @@ public partial class OptionDialog : Window
         RightMarginSpinner.Content = pageMargins.Right.ToString(MARGIN_FORMAT, CI);
         BottomMarginSpinner.Content = pageMargins.Bottom.ToString(MARGIN_FORMAT, CI);
     }
-    
+
     #endregion
 
     #region Event handlers
@@ -490,6 +490,6 @@ public partial class OptionDialog : Window
         else
             Close(false);
     }
-    
+
     #endregion
 }

@@ -20,11 +20,11 @@ class Employee : Person
         this.department = department;
         this.jobTitle = jobTitle;
     }
-    
+
     public property hireDate;
-    
+
     public property department;
-    
+
     public property jobTitle;
 }
 
@@ -120,23 +120,23 @@ class Range
    private end;
    private step;
    private current;
-   
+
    public constructor(start, end = 0, step = 1)
    {
       // Swap start and end to be in the correct order
       if (start > end) (start, end) = (end, start);
       // Ensure that step is always positive
       if (step <= 0) throw 'step has to be positive';
-      
+
       this.start = start;
       this.end = end;
       this.step = step;
    }
-   
+
    public function moveFirst() => this.current = this.start;
-   
+
    public function hasNext() => this.current < this.end;
-   
+
    public function moveNext()
    {
       var current = this.current;
@@ -170,19 +170,19 @@ class Range
    private start;
    private end;
    private step;
-   
+
    public constructor(start, end = 0, step = 1)
    {
       // Swap start and end to be in the correct order
       if (start > end) (start, end) = (end, start);
       // Ensure that step is always positive
       if (step <= 0) throw 'step has to be positive';
-      
+
       this.start = start;
       this.end = end;
       this.step = step;
    }
-   
+
    public function iterator()
    {
       for (var current = this.start; current < this.end; current += this.step)

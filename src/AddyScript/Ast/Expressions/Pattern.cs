@@ -30,7 +30,7 @@ public abstract class Pattern : ScriptElement
     /// <param name="arg">The value to match against this <see cref="Pattern"/></param>
     /// <returns>An <see cref="Expression"/> that evaluates to <b>true</b> or <b>false</b></returns>
     public abstract Expression GetMatchTest(Expression arg);
-    
+
     /// <summary>
     /// Gets the <see cref="Statement"/> that extracts data from the value of <paramref name="arg"/>
     /// if this <see cref="Pattern"/> matches it.
@@ -258,7 +258,7 @@ public class PositionalPattern(params Pattern[] items) : Pattern
     /// An inner function that checks if its argument is iterable.
     /// </summary>
     private static readonly InnerFunction IsIterable = new ("isIterable", [new ("arg")], IsIterableLogic);
-    
+
     /// <summary>
     /// The patterns to match each item of the collection.
     /// </summary>
@@ -273,7 +273,7 @@ public class PositionalPattern(params Pattern[] items) : Pattern
                                                new BinaryExpression(BinaryOperator.Equal,
                                                                     new PropertyRef(tupleAssignment, "size"),
                                                                     new Literal(new Integer(items.Length))));
-        
+
         return items.Select((item, index) => item.GetMatchTest(new ItemRef(tupleRef, new Literal(new Integer(index)))))
                     .Aggregate(initialTest, (current, next) => new BinaryExpression(BinaryOperator.AndAlso, current, next));
     }
@@ -300,13 +300,13 @@ public class PositionalPattern(params Pattern[] items) : Pattern
     {
         var iteratorMethod = klass.GetMethod("iterator");
         if (isIteratorMethod(iteratorMethod)) return true;
-        
+
         var moveFirstMethod = klass.GetMethod("moveFirst");
         var hasNextMethod = klass.GetMethod("hasNext");
         var moveNextMethod = klass.GetMethod("moveNext");
         return isIteratorMethod(moveFirstMethod) && isIteratorMethod(hasNextMethod) && isIteratorMethod(moveNextMethod);
     }
-    
+
     /// <summary>
     /// Checks whether the given method is a valid iterator method.
     /// </summary>
@@ -328,7 +328,7 @@ public class StringDestructuringPattern(Regex regex, string[] variableNames) : P
     /// An inner function that checks if its argument matches a regex and extracts variables from it.
     /// </summary>
     private static readonly InnerFunction IsMatch = new ("isMatch", [new ("arg"), new ("regex"), new ("varNames")], IsMatchLogic);
-    
+
     /// <summary>
     /// The regex pattern to match against.
     /// </summary>
@@ -343,7 +343,7 @@ public class StringDestructuringPattern(Regex regex, string[] variableNames) : P
     /// The <see cref="Object"/> extracted by the last call to <see cref="IsMatch"/>.
     /// </summary>
     private static Object LastExtracted { get; set; }
-    
+
     public override Expression GetMatchTest(Expression arg) =>
         new BinaryExpression(BinaryOperator.AndAlso,
                              new TypeVerification(arg, Class.String.Name),
@@ -351,7 +351,7 @@ public class StringDestructuringPattern(Regex regex, string[] variableNames) : P
                                                    arg,
                                                    new Literal(new Resource(regex)),
                                                    new Literal(new Resource(variableNames))));
-    
+
     public override Statement GetExtractionAction(Expression arg) =>
         new Assignment(
             new SetInitializer([.. variableNames.Select(name => new Argument(new VariableRef(name)))]),

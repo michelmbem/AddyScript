@@ -118,7 +118,7 @@ public class BinaryFormatter(Endianness endianness, Stream stream) : IDisposable
 
         if (Endianness == Endianness.BigEndian)
             SwapBytes(buffer);
-            
+
         return BitConverter.ToSingle(buffer, 0);
     }
 
@@ -129,7 +129,7 @@ public class BinaryFormatter(Endianness endianness, Stream stream) : IDisposable
 
         if (Endianness == Endianness.BigEndian)
             SwapBytes(buffer);
-            
+
         return BitConverter.ToDouble(buffer, 0);
     }
 

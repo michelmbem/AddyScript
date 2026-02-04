@@ -16,7 +16,7 @@ internal record TerminalOutput(string Text, List<ColoredSpan> Spans, bool ClearS
 internal partial class AnsiParser
 {
     private static readonly Regex AnsiRegex = GetAnsiRegex();
-    
+
     private readonly IBrush DefaultFg;
     private readonly IBrush DefaultBg;
     private IBrush currentFg;
@@ -66,7 +66,7 @@ internal partial class AnsiParser
             spans.Add(new (baseOffset + sb.Length, input.Length - logicalPos, currentFg, currentBg));
             sb.Append(input.AsSpan(logicalPos));
         }
-        
+
         return new(sb.ToString(), spans, clearScreen);
     }
 

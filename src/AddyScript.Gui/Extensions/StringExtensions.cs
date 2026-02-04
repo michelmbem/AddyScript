@@ -14,7 +14,7 @@ internal static class StringExtensions
     /// <returns>A <see cref="string"/> with the first letter uppercased</returns>
     public static string Capitalize(this string value) =>
         value.Length == 0 ? value : char.ToUpper(value[0]) + value[1..];
-    
+
     /// <summary>
     /// Escapes a string to be used as a command line argument.
     /// </summary>
@@ -55,13 +55,13 @@ internal static class StringExtensions
     public static string IndentLines(this string value, string indentation, bool skipFirstLine = false)
     {
         var lines = value.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        
+
         for (var i = 0; i < lines.Length; ++i)
         {
             if (skipFirstLine && i == 0) continue;
             lines[i] = indentation + lines[i];
         }
-        
+
         return string.Join(Environment.NewLine, lines);
     }
 

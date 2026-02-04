@@ -13,7 +13,7 @@
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWindowsForms>true</UseWindowsForms>
 	</PropertyGroup>
-	
+
 	<PropertyGroup Condition="'$(OS)' == 'Unix'">
 		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>

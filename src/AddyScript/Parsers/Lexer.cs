@@ -265,10 +265,10 @@ public class Lexer
     private Token LiteralBlob()
     {
         Consume(1); // Skip 'b' or 'B'
-        
+
         Token tmpTok = LiteralString();
         if (tmpTok.TokenID == TokenID.Unknown) return tmpTok;
-        
+
         var blob = StringUtil.String2ByteArray((string)tmpTok.Value);
         return MakeToken(TokenID.LT_Blob, blob, false);
     }
@@ -428,7 +428,7 @@ public class Lexer
             Keyword kw = Keyword.Get(word);
             return MakeToken(kw.TokenID, kw.Value, false);
         }
-        
+
         return MakeToken(TokenID.Identifier, word, false);
     }
 
@@ -808,7 +808,7 @@ public class Lexer
         CultureInfo ci = CultureInfo.InvariantCulture;
         bool loop = true;
         char ch;
-        
+
         while (loop)
         {
             ch = Ll(1);
@@ -968,7 +968,7 @@ public class Lexer
         }
 
         charIndex += count;
-        
+
         while (charIndex >= MAX_BUFFER_SIZE)
         {
             buffer.Remove(0, MAX_BUFFER_SIZE);

@@ -64,7 +64,7 @@ public sealed class Tuple(DataItem[] items) : DataItem
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        
+
         foreach (DataItem item in items)
             hashCode.Add(item);
 

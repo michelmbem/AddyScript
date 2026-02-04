@@ -18,7 +18,7 @@ public class Class : IFrameItem
     /// The name of the property that holds a tuple of all record the class members.
     /// </summary>
     public const string RECORD_MEMBERS_PROPERTY_NAME = "__members";
-    
+
     #region Predefined classes
 
     #region Primitive types
@@ -1006,7 +1006,7 @@ public class Class : IFrameItem
         var canReadBody = Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
                                                                 PropertyRef.OfSelf("reader"),
                                                                 new Literal()));
-        
+
         var canWriteBody = Block.WithReturn(new BinaryExpression(BinaryOperator.NotIdentical,
                                                                  PropertyRef.OfSelf("writer"),
                                                                  new Literal()));

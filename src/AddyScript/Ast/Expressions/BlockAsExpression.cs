@@ -19,7 +19,7 @@ public class BlockAsExpression : Expression
         Block = block;
         CopyLocation(block);
     }
-        
+
     /// <summary>
     /// The wrapped <b>block</b> statement.
     /// </summary>

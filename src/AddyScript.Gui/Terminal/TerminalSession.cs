@@ -40,7 +40,7 @@ internal class TerminalSession
             {
                 var read = await ptyConnection.ReaderStream.ReadAsync(buffer, cts.Token);
                 if (read <= 0) break;
-                
+
                 var text = Encoding.GetString(buffer, 0, read);
                 DataReceived?.Invoke(this, text);
             }
@@ -68,6 +68,6 @@ internal class TerminalSession
     }
 
     public event EventHandler<string> DataReceived;
-    
+
     public event EventHandler<int> ProcessExited;
 }

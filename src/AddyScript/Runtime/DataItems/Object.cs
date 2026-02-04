@@ -43,7 +43,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
             return RuntimeServices.Clone(this);
 
         Dictionary<string, DataItem> cloneFields = [];
-        
+
         foreach (var pair in fields)
             cloneFields.Add(pair.Key, (DataItem)pair.Value.Clone());
 
@@ -61,7 +61,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
                            let field = klass.GetField(pair.Key)
                            where field == null || field.Scope == Scope.Public
                            select pair;
-        
+
         foreach (var (name, value) in publicFields)
         {
             sb.Append($"{name} = {value.ToString(format, formatProvider)}, ");
@@ -70,7 +70,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
 
         if (stripEnd) sb.Length -= 2;
         sb.Append("}>");
-        
+
         return sb.ToString();
     }
 
@@ -107,7 +107,7 @@ public sealed class Object(Class klass, Dictionary<string, DataItem> fields) : D
     {
         if (targetType == typeof(DataItem) || targetType == typeof(object))
             return base.ConvertTo(targetType);
-        
+
         const BindingFlags flags = BindingFlags.Public | BindingFlags.Static |
                                    BindingFlags.Instance | BindingFlags.SetField |
                                    BindingFlags.SetProperty | BindingFlags.OptionalParamBinding;

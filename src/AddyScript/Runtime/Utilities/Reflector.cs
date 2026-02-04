@@ -94,7 +94,7 @@ public static class Reflector
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
         MemberInfo[] members = type.GetMember(memberName, types, flags);
-        
+
         if (members.Length > 1)
         {
             flags |= BindingFlags.DeclaredOnly;

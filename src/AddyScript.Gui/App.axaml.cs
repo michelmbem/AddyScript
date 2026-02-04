@@ -20,9 +20,9 @@ public partial class App : Application
     public static Options Options { get; set; }
 
     public static List<MainWindow> Windows { get; } = [];
-    
+
     public static MainWindow ActiveWindow { get; private set; }
-    
+
     #endregion
 
     #region Utility Static Methods
@@ -39,7 +39,7 @@ public partial class App : Application
     {
         if (Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
             return;
-        
+
         MainWindow window = new ();
         window.Activated += (_, _) => ActiveWindow = window;
         window.Opened += (_, _) =>
@@ -53,7 +53,7 @@ public partial class App : Application
             if (desktop.MainWindow == window && Windows.Count > 0)
                 desktop.MainWindow = Windows[0];
         };
-        
+
         PositionWindow(window);
         window.Open(filePath);
         window.Show();
@@ -68,7 +68,7 @@ public partial class App : Application
     private static void PositionWindow(MainWindow window)
     {
         if (Windows.Count == 0 || OperatingSystem.IsWindows()) return;
-        
+
         var screen = window.Screens.ScreenFromVisual(window);
         var workingArea = screen!.WorkingArea;
         var pos = Windows[^1].Position;
@@ -76,11 +76,11 @@ public partial class App : Application
         int winX = pos.X + 32;
         if (winX + window.Width >= workingArea.Width)
             winX = workingArea.X;
-        
+
         int winY = pos.Y + 32;
         if (winY + window.Height >= workingArea.Height)
             winY = workingArea.Y;
-        
+
         window.Position = new PixelPoint(winX, winY);
     }
 
@@ -98,10 +98,10 @@ public partial class App : Application
         var uri = new Uri("avares://asgui/Assets/Grammars/AddyScript-Mode.xshd");
         using var stream = AssetLoader.Open(uri);
         using var reader = new XmlTextReader(stream);
-        
+
         // Load the definition
         var asHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-        
+
         // Register it with the highlighting manager
         HighlightingManager.Instance.RegisterHighlighting("AddyScript", [".add", ".txt"], asHighlighting);
     }

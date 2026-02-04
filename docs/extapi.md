@@ -80,7 +80,7 @@ public static class MyExtensions
         var Exception = new Class(Class.Object, "Exception", Modifier.Default, GetExceptionConstructor(),
                                   GetExceptionIndexer(), GetExceptionFields(), GetExceptionProperties(),
                                   GetExceptionMethods(), GetExceptionEvents());
-        
+
         // Here we add Exception to the collection of predefined classes
         Class.Predefined.Add(Exception);
     }

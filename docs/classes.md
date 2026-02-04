@@ -170,14 +170,14 @@ class Person
     private _name;
     private _sex = 'Male';
     private _courtesy = 'Mr.';
-    
+
     // A property with the 'compact' syntax
     public property name
     {
         read => this._name;
         write => this._name = __value;
     }
-    
+
     // A property with the typical syntax
     public property sex
     {
@@ -195,16 +195,16 @@ class Person
             this.trigger_sex_changed(oldSex, __value);
         }
     }
-    
+
     // A read-only property encapsulating the _courtesy field
     public property courtesy => this._courtesy;
-    
+
     // A fully automatic property
     public property age;
-    
+
     // An event
     public event sex_changed(oldSex, newSex);
-    
+
     // A method
     public function summary()
     {
@@ -240,14 +240,14 @@ class PhoneBook
 {
     // Backing field for the indexer
     private _entries = {=>};
-    
+
     // Indexer definition
     public property []
     {
         read => this._entries[__key];
         write => this._entries[__key] = __value;
     }
-    
+
     // A method to display the content of the phone book
     public function toString(format = 'g')
     {
@@ -312,7 +312,7 @@ class Person
     // Fields: we don't need default values anymore as the constructor is supplying them
     private _name;
     private _courtesy;
-    
+
     // Here is the constructor, all parameters are made optional to allow the user to omit them
     public constructor(name = "", sex = "Male", age = 0)
     {
@@ -320,14 +320,14 @@ class Person
        this.sex = sex;
        this.age = age;
     }
-    
+
     // A property with the 'compact' syntax
     public property name
     {
         read => this._name;
         write => this._name = __value;
     }
-    
+
     // A semi-automatic property
     public property sex
     {
@@ -345,16 +345,16 @@ class Person
             this.trigger_sex_changed(oldSex, __value);
         }
     }
-    
+
     // A read-only property encapsulating the _courtesy field
     public property courtesy => this._courtesy;
-    
+
     // A fully automatic property
     public property age;
-    
+
     // An event
     public event sex_changed(oldSex, newSex);
-    
+
     // A method
     public function summary()
     {
@@ -389,14 +389,14 @@ When using property initializers, if the constructor has no parameters, there is
 class Point
 {
     public property x;
-    
+
     public property y;
-    
+
     public function toString(format = 'g')
     {
         return '(' + this.x + ', ' + this.y + ')';
     }
-    
+
 }
 
 pt = new Point {x = 10, y = -5};
@@ -479,7 +479,7 @@ record recordName(field1, field2, ..., fieldN)
       private final __field2;
       ...
       private final __fieldN;
-      
+
       // Generated constructor:
       public constructor (field1, field2, ..., fieldN)
       {
@@ -488,26 +488,26 @@ record recordName(field1, field2, ..., fieldN)
           ...
           this.__fieldN = fieldN;
       }
-      
+
       // Generated properties:
       public property field1 => this.__field1;
       public property field2 => this.__field2;
       ...
       public property fieldN => this.__fieldN;
-      
+
       // A protected property that returns a tuple of all declared fields:
       protected property __members => (this.__field1, this.__field2, ..., this.__fieldN);
-      
+
       // Generated methods:
       public function equals(other) => other is recordName && this.__members == other.__members;
       public function hashCode() => this.__members.hashCode();
       public function toString(format = '') => 'recordName' + this.__members.toString(format);
       public function clone() => new recordName(..this.__members);
-      
+
       // Generated operators:
       public operator ==(other) => this.equals(other);
       public operator !=(other) => !this.equals(other);
-      
+
       // Any additional members are inserted here
   }
   ```

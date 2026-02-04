@@ -64,7 +64,7 @@ public static class DataItemFactory
 
         for (int i = 0; i < tuple.Length; ++i)
             items[i] = CreateDataItem(tuple[i]);
-        
+
         return items;
     }
 }

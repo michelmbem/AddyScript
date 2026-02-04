@@ -62,7 +62,7 @@ public class Keyword(TokenID tokenID, object value = null)
         Register("try", TokenID.KW_Try);
         Register("catch", TokenID.KW_Catch);
         Register("finally", TokenID.KW_Finally);
-        
+
         Register("as", TokenID.KW_As);
         Register("typeof", TokenID.KW_TypeOf);
         Register("is", TokenID.KW_Is);

@@ -42,7 +42,7 @@ public static class MathExt
 
         // Depends on the number of significant decimal digits we want in the input (16, for instance)
         const double tolerance = 1e-16;
-        
+
         var (h1, h2, k1, k2) = (1L, 0L, 0L, 1L);
         var b = value;
 

@@ -22,7 +22,7 @@ public class ScriptEngine
     private readonly Interpreter interpreter; // The interpreter used by this instance
     private string commandPrefix = string.Empty; // Keeps the beginning of uncomplete commands
     private bool satisfied = true; // Indicates that the engine is expecting the continuation of some command or not
-    
+
     /// <summary>
     /// Initializes an instance of ScriptEngine.
     /// </summary>
@@ -63,7 +63,7 @@ public class ScriptEngine
          * Some features depend on the fact of globally having access to the currently running interpreter.
          */
         RuntimeServices.Interpreter = interpreter;
-        
+
         try
         {
             while (fullCommand.Length > 0)
@@ -131,7 +131,7 @@ public class ScriptEngine
     {
         // Important: define the currently running interpreter!
         RuntimeServices.Interpreter = interpreter;
-        
+
         var varRef = new VariableRef(functionName);
         varRef.AcceptTranslator(interpreter);
 

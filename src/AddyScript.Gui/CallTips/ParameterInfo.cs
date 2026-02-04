@@ -19,16 +19,16 @@ internal class ParameterInfo(string text, bool infinite)
     private static string ParameterText(Parameter parameter)
     {
         var textBuilder = new StringBuilder();
-        
+
         if (parameter.ByRef)
             textBuilder.Append('&');
         else if (parameter.VaList)
             textBuilder.Append("..");
-        
+
         textBuilder.Append(parameter.Name);
-        
+
         if (!parameter.CanBeEmpty) textBuilder.Append('!');
-        
+
         if (parameter.DefaultValue != null)
             switch (parameter.DefaultValue.Class.ClassID)
             {

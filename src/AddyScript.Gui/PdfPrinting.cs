@@ -151,7 +151,7 @@ public class PdfPrinting
                                        .PageSize
                                        .Rotate(options.Landscape)
                                        .Multiply(StandardDpi);
-        
+
         border = new Border
         {
             Background = editor.Background,
@@ -252,7 +252,7 @@ public class PdfPrinting
         await DrawingContextHelper.RenderAsync(page, pageView);
         document.EndPage();
     }
-    
+
 #if WINDOWS
     /// <summary>
     /// Creates a <see cref="ProcessStartInfo"/> to invoke <em>ShellExecute</em> with arguments based on the user-defined print options.
@@ -291,14 +291,14 @@ public class PdfPrinting
     private static ProcessStartInfo GetProcessStartInfo(string path, PrintOptions options)
     {
         StringBuilder sb = new ();
-        
+
         if (options != null)
         {
             if (!string.IsNullOrWhiteSpace(options.PrinterName)) sb.Append($"-d {options.PrinterName} ");
             sb.Append($"-o media={options.PageFormat.Name} -o orientation-requested=");
             sb.Append(options.Landscape ? '4' : '3').Append(' ');
         }
-        
+
         sb.Append("-o fit-to-page ").Append(path.EscapeAsCmdLineArg());
 
         return new ProcessStartInfo

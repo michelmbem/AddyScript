@@ -306,7 +306,7 @@ foreach (o in l) {
 	    (8, _, 6) => 'a triplet that starts with 8 and ends with 6',
 	    _ => 'did not match any pattern'
 	};
-	
+
 	println($'o is: {o}');
 	println($'result with o: "{res}"');
 	println();

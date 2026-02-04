@@ -58,7 +58,7 @@ public class NameTree
 
         string nodeName = name[offset].ToString();
         int index = BinarySearch(nodes, nodeName, out bool found);
-        
+
         if (!found)
         {
             object nodeValue = offset < name.Length - 1 ? null : value;

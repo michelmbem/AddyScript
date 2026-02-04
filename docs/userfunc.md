@@ -229,7 +229,7 @@ The **closure** type has a single member: the "bind" method. Its prototype is: `
 
         foreach (__index => __value in this)
             action(__value, __index);
-        
+
         return this;
     }
     ```

@@ -119,7 +119,7 @@ try (input = File::OpenRead(@"D:\Videos\TV Series\My Series\Season 1\S01E01.avi"
     try (output = File::Create(Path::Combine(Environment::GetFolderPath('DesktopDirectory'), 'MySeries-S01E01.avi')))
     {
         var block = blob::of(BLOCK_SIZE), m = 0, n;
-        
+
         while (true)
         {
             n = input.Read(block, 0, BLOCK_SIZE);

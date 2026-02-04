@@ -43,18 +43,18 @@ public class Block(params Statement[] statements) : Statement
     /// The labels declared in the block.
     /// </summary>
     public Dictionary<string, Label> Labels { get; set; } = [];
-    
+
     /// <summary>
     /// Determines whether the block is empty.
     /// </summary>
     public bool IsEmpty => Statements.Length == 0;
-    
+
     /// <summary>
     /// Determines whether the block contains a single empty return statement.
     /// </summary>
     public bool IsEmptyBody =>
         Statements.Length > 0 && Statements[0] is Return { Expression: null };
-    
+
     /// <summary>
     /// Determines whether the block contains a single return statement with an expression.
     /// </summary>

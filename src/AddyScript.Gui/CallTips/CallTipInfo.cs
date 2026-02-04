@@ -14,7 +14,7 @@ namespace AddyScript.Gui.CallTips;
 internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 {
     private int activeParameterIndex;
-    
+
     public CallTipInfo(InnerFunction innerFunction) :
         this(innerFunction.Name, [.. innerFunction.Parameters.Select(p => new ParameterInfo(p))])
     {
@@ -28,7 +28,7 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
 
         if (activeParameterIndex >= lastParameterIndex)
             return activeParameterIndex == lastParameterIndex && parameters[activeParameterIndex].Infinite;
-        
+
         ++activeParameterIndex;
         return true;
 
@@ -40,7 +40,7 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
         {
             Orientation = Orientation.Horizontal,
         };
-        
+
         panel.Children.Add(new Icon
         {
             Value = "mdi-function-variant",
@@ -48,20 +48,20 @@ internal class CallTipInfo(string functionName, List<ParameterInfo> parameters)
             Height = 16,
             Margin = new Thickness(2, 0),
         });
-        
+
         panel.Children.Add(new TextBlock
         {
             Text = functionName,
             Foreground = Brushes.DarkOrange,
             FontWeight = FontWeight.Bold,
         });
-        
+
         panel.Children.Add(new TextBlock { Text = "(" });
 
         for (var i = 0; i < parameters.Count; ++i)
         {
             if (i > 0) panel.Children.Add(new TextBlock { Text = ", " });
-            
+
             panel.Children.Add(new TextBlock
             {
                 Text = parameters[i].Text,

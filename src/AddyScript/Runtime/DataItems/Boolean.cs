@@ -12,7 +12,7 @@ public sealed class Boolean : DataItem
 {
     public const string FALSE_STRING = "false";
     public const string TRUE_STRING = "true";
-    
+
     public static readonly Boolean False = new (false);
     public static readonly Boolean True = new (true);
 

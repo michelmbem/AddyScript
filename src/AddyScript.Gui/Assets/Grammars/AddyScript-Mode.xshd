@@ -22,7 +22,7 @@
     <Color name="NumberLiteral" foreground="Firebrick" exampleText="2 - 14l + 3.1415f / 7.2d"/>
     <Color name="Modifiers" fontWeight="bold" foreground="Red" exampleText="static, final, abstract"/>
     <Color name="Visibility" fontWeight="bold" foreground="SaddleBrown" exampleText="private, protected, public"/>
-    
+
     <RuleSet name="CommentMarkerSet">
         <Keywords fontWeight="bold" foreground="Orange">
             <Word>TODO</Word>
@@ -33,7 +33,7 @@
             <Word>UNDONE</Word>
         </Keywords>
     </RuleSet>
-    
+
     <!-- This is the main ruleset. -->
     <RuleSet>
         <Span color="Preprocessor">
@@ -56,16 +56,16 @@
                 </Span>
             </RuleSet>
         </Span>
-        
+
         <Span color="Comment" ruleSet="CommentMarkerSet">
             <Begin>//</Begin>
         </Span>
-        
+
         <Span color="Comment" ruleSet="CommentMarkerSet" multiline="true">
             <Begin>/\*</Begin>
             <End>\*/</End>
         </Span>
-        
+
         <Span color="String">
             <Begin>"</Begin>
             <End>"</End>
@@ -75,7 +75,7 @@
                 <Span begin="{" end="}" color="EscapeSec"/>
             </RuleSet>
         </Span>
-        
+
         <Span color="String">
             <Begin>'</Begin>
             <End>'</End>
@@ -85,7 +85,7 @@
                 <Span begin="{" end="}" color="EscapeSec"/>
             </RuleSet>
         </Span>
-        
+
         <Span color="String" multiline="true">
             <Begin>@"</Begin>
             <End>"</End>
@@ -105,7 +105,7 @@
                 <Span begin="{" end="}" color="EscapeSec"/>
             </RuleSet>
         </Span>
-        
+
         <Span color="String">
             <Begin>\$"</Begin>
             <End>"</End>
@@ -184,7 +184,7 @@
             <Begin>`</Begin>
             <End>`</End>
         </Span>
-        
+
         <!-- don't highlight "$int" as keyword -->
         <Rule>
             \$[\w\d_]+
@@ -222,12 +222,12 @@
             <Word>while</Word>
             <Word>yield</Word>
         </Keywords>
-        
+
         <Keywords color="ThisOrSuperReference">
             <Word>super</Word>
             <Word>this</Word>
         </Keywords>
-        
+
         <Keywords color="ContextKeywords">
             <Word>__context</Word>
             <Word>__key</Word>
@@ -236,7 +236,7 @@
             <Word>read</Word>
             <Word>write</Word>
         </Keywords>
-        
+
         <Keywords color="TypeNameKeywords">
             <Word>blob</Word>
             <Word>bool</Word>
@@ -260,7 +260,7 @@
             <Word>tuple</Word>
             <Word>void</Word>
         </Keywords>
-        
+
         <Keywords color="OperatorKeywords">
             <Word>and</Word>
             <Word>as</Word>
@@ -276,20 +276,20 @@
             <Word>typeof</Word>
             <Word>with</Word>
         </Keywords>
-        
+
         <Keywords color="Modifiers">
             <Word>abstract</Word>
             <Word>extern</Word>
             <Word>final</Word>
             <Word>static</Word>
         </Keywords>
-        
+
         <Keywords color="Visibility">
             <Word>private</Word>
             <Word>protected</Word>
             <Word>public</Word>
         </Keywords>
-        
+
         <Keywords color="ValueKeywords">
             <Word>null</Word>
             <Word>false</Word>
@@ -316,7 +316,7 @@
         <Rule color="MethodCall">
             \w[\w\d]*(?=\s*\()
         </Rule>
-        
+
         <!-- Digits -->
         <Rule color="NumberLiteral">
             \b0[xX][0-9a-fA-F]+[lL]?    # hex number
@@ -325,7 +325,7 @@
             |
             \b\.([0-9](_?[0-9])*)+([Ee]?[+-]?([0-9](_?[0-9])*)+)?[iIFfDd]? # floatting-point number
         </Rule>
-        
+
         <Rule color="Punctuation">
             [?,.;:()\[\]{}+\-/%*&lt;&gt;^+~!|&amp;=]+
         </Rule>

@@ -172,7 +172,7 @@ public class ClassProperty : ClassMember
                                  new Return());
         }
     }
-    
+
     /// <summary>
     /// Gets the parameters of an accessor.
     /// </summary>

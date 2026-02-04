@@ -19,7 +19,7 @@ public class ThrowExpression : Expression
         Throw = _throw;
         CopyLocation(_throw);
     }
-        
+
     /// <summary>
     /// The wrapped <b>throw</b> statement.
     /// </summary>

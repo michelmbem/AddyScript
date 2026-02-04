@@ -196,7 +196,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         first ??= last;
 
         string className = Match(TokenID.Identifier).ToString();
-        
+
         string superClassName = null;
         if (TryMatch(TokenID.Colon))
         {
@@ -227,7 +227,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private ClassDefinition Record()
     {
         const Modifier modifier = Modifier.Final;
-        
+
         Token first = Match(TokenID.KW_Record), last;
         string className = Match(TokenID.Identifier).ToString();
         ParameterDecl[] parameters = ParameterList();
@@ -243,15 +243,15 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         }
         else
             last = Match(TokenID.SemiColon);
-        
+
         PushClass(modifier, className, null);
         var (otherCtor, indexer, additionalFields, additionalProps, methods, events) =
             IdentifiyClassMembers(modifier, additionalMembers);
         PopClass();
-        
+
         if (otherCtor != null)
             throw new ScriptError(FileName, otherCtor, Resources.RecordCannotDefineConstructor);
-        
+
         var (constructor, fields, properties) = BuildRecordClassMembers(className, parameters);
         var classDef = new ClassDefinition(className, Runtime.OOP.Class.Record.Name, modifier, constructor, indexer,
                                            [..fields, ..additionalFields], [..properties, ..additionalProps], [..methods], [..events]);
@@ -300,9 +300,9 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         ParameterDecl[] parameters = List(Parameter, true, Resources.DuplicatedParameter);
         Match(TokenID.VerticalBar);
         Match(TokenID.Arrow);
-        
+
         PushFunction(null, CurrentFunction.IsMethod, false, CurrentFunction.IsStatic);
-        
+
         Block body;
         if (TryMatch(TokenID.LeftBrace))
             body = BlockBody();
@@ -312,7 +312,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             body = Ast.Statements.Block.WithReturn(returned);
             body.CopyLocation(returned);
         }
-        
+
         PopFunction();
 
         var lambda = new InlineFunction(parameters, body);
@@ -403,7 +403,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private Block Block(bool asExpression = false)
     {
         Token first = Match(TokenID.LeftBrace);
-        
+
         CurrentFunction.PushBlock(asExpression);
         Statement[] stmts = Asterisk(StatementWithLabels);
         var labels = CurrentFunction.CurrentBlock.ConvertLabels(stmts);
@@ -491,7 +491,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
         if (cases.Count == 0 && defCase == int.MaxValue)
             throw new SyntaxError(FileName, first, Resources.CaseLabelRequired);
-        
+
         foreach (CaseLabel caseLabel in cases)
             labels.Add(caseLabel.LabelName, caseLabel);
 
@@ -511,7 +511,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     {
         Token first = Match(TokenID.KW_For);
         Match(TokenID.LeftParenthesis);
-        
+
         Statement[] initializers;
         if (TryMatch(TokenID.KW_Var))
             initializers = [VariableDecl()];
@@ -789,7 +789,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         {
             if (resource == null)
                 throw new SyntaxError(FileName, first, Resources.CatchOrFinallyBlockRequired);
-            
+
             lastBlock = tryBlock;
         }
 
@@ -1193,7 +1193,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     private Scope? AccessorScope(Scope propertyScope, Scope? otherAccessorScope)
     {
         Scope? accessorScope = null;
-        
+
         if (TryMatch(TokenID.Scope))
         {
             if (otherAccessorScope.HasValue)
@@ -1410,7 +1410,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             ..parameters.Select(p => new Assignment(PropertyRef.OfSelf(fieldName(p)), new VariableRef(p.Name))),
             new Return()
         ]);
-        
+
         var constructor = new ClassMethodDecl(className, Scope.Public, Modifier.Default, parameters, ctorBody);
 
         ClassFieldDecl[] fields = [
@@ -1419,7 +1419,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
 
         var memberReaderBody = Ast.Statements.Block.WithReturn(
             new TupleInitializer([..parameters.Select(p => new Argument(PropertyRef.OfSelf(fieldName(p))))]));
-        
+
         var memberProp = new ClassPropertyDecl(Runtime.OOP.Class.RECORD_MEMBERS_PROPERTY_NAME,
                                                Scope.Protected, Modifier.Default, PropertyAccess.None,
                                                Scope.Protected, memberReaderBody,
@@ -1432,7 +1432,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
                                                            Scope.Public, fieldReaderBody(p),
                                                            Scope.Public, null))
         ];
-        
+
         return (constructor, fields, properties);
     }
 
@@ -1598,7 +1598,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             var moreFields = List(ConstantSetter, true, Resources.DuplicatedAttributeField);
             if (fields.Count > 0 && moreFields.Any(p => p.Name == AttributeDecl.DEFAULT_FIELD_NAME))
                 throw new ScriptError(FileName, fields[0], Resources.DuplicatedAttributeValue);
-            
+
             fields.AddRange(moreFields);
             last = Match(TokenID.RightParenthesis);
         }

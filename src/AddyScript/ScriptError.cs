@@ -28,7 +28,7 @@ public class ScriptError : Exception
     {
         if (Element.Start.IsEmpty && !parent.Start.IsEmpty)
             Element.CopyLocation(parent);
-        
+
         return this;
     }
 }

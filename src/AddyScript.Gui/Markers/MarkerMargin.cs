@@ -35,7 +35,7 @@ internal class MarkerMargin : AbstractMargin
         {
             var line = vl.FirstDocumentLine.LineNumber;
             if (!markers.ContainsKey(line)) continue;
-            
+
             var rect = new Rect(0, vl.VisualTop - textView.VerticalOffset, Bounds.Width, vl.Height);
             var margin = new Thickness((Bullet.Size.Width - Bounds.Width) / 2,
                                        (Bullet.Size.Height - vl.Height) / 2);
@@ -51,15 +51,15 @@ internal class MarkerMargin : AbstractMargin
         if (textView is not { VisualLinesValid: true }) return;
 
         var pos = e.GetPosition(this);
-        
+
         foreach (var vl in textView.VisualLines)
         {
             if (!markers.TryGetValue(vl.FirstDocumentLine.LineNumber, out var tooltip))
                 continue;
-            
+
             var rect = new Rect(0,  vl.VisualTop - textView.VerticalOffset, Bounds.Width, vl.Height);
             if (!rect.Contains(pos)) continue;
-            
+
             ToolTip.SetTip(this, tooltip);
             ToolTip.SetIsOpen(this, true);
             return;
