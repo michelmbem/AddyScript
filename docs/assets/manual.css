@@ -3,7 +3,7 @@
         display: none !important;
     }
 
-    .highlighttable > th.filename {
+    .highlighttable th.filename {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
@@ -29,7 +29,7 @@ body[data-md-color-scheme="default"] .language-addyscript.highlight .kp {
 
 /* Dates */
 body[data-md-color-scheme="default"] .language-addyscript.highlight .ld {
-    color: deepskyblue;
+    color: dodgerblue;
 }
 
 /* Punctuations */
@@ -39,7 +39,7 @@ body[data-md-color-scheme="default"] .language-addyscript.highlight .p {
 
 /* Keyword operators */
 body[data-md-color-scheme="default"] .language-addyscript.highlight .ow {
-    color: darkslategray;
+    color: slategray;
 }
 
 /* String escape sequences */
@@ -71,7 +71,7 @@ body[data-md-color-scheme="slate"] .language-addyscript.highlight .p {
 
 /* Keyword operators */
 body[data-md-color-scheme="slate"] .language-addyscript.highlight .ow {
-    color: slategray;
+    color: lightslategray;
 }
 
 /* String escape sequences */
