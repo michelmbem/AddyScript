@@ -32,11 +32,7 @@ public class Lexer
     public Lexer(TextReader input)
     {
         this.input = input;
-        FileName = input switch
-        {
-            StreamReader { BaseStream: FileStream fs } => fs.Name,
-            _ => ":memory:"
-        };
+        FileName = input is StreamReader { BaseStream: FileStream fs } ? fs.Name : "stdin";
     }
 
     /// <summary>
@@ -80,14 +76,14 @@ public class Lexer
             '&' => Ampersand(),
             '|' => Verticalbar(),
             '^' => CircumflexAccent(),
-            '0' => Zero(),
             '$' => DollarSign(),
             '`' => LiteralDate(),
             '@' => VerbatimString(),
             '\'' or '"' => LiteralString(),
             'b' or 'B' when Ll(2) is '\'' or '"' => LiteralBlob(),
+            '0' when Ll(2) is 'x' or 'X' => HexNumber(),
+            >= '0' and <='9' => LiteralNumber(),
             var ch when IsLegalFirstIdChar(ch) => Identifier(),
-            var ch when char.IsDigit(ch) => LiteralNumber(),
             _ => Unknown(),
         };
     }
@@ -123,20 +119,20 @@ public class Lexer
     /// <returns>A <see cref="Token"/> representing a literal number</returns>
     private Token LiteralNumber()
     {
-        /* Tries to match the following pattern:
-         * ([0-9](_?[0-9])*)+(\.([0-9](_?[0-9])*)+)?([Ee]?[+-]?([0-9](_?[0-9])*)+)?[LlFfDd]?
-         * The sequence [0-9](_?[0-9])* is macthed by IntegralNumber.
+        /*
+         * Tries to match the following pattern:
+         * (\d[\d_]*)+(\.(\d[\d_]*)+)?([Ee][+-]?(\d[\d_]*)+)?[LlFfDdiI]?
+         * The sequence \d[\d_]* is matched by ReadDigits.
          * Whenever the sequence starts with a dot, it's prepended a literal zero.
          */
         StringBuilder numberBuilder = new ();
-        bool prependZero, isReal = false;
-        char current;
+        var isReal = false;
 
         // Integral part: (\d[\d_]*)+
-        prependZero = ReadDigits(numberBuilder);
+        var prependZero = ReadDigits(numberBuilder);
 
         // Decimal part: (\.(\d[\d_]*)+)?
-        current = Ll(1);
+        var current = Ll(1);
         if (current == '.' && Ll(2) is >= '0' and <= '9')
         {
             if (prependZero) numberBuilder.Append('0');
@@ -178,22 +174,22 @@ public class Lexer
     /// This method appends consecutive digit characters ('0'-'9') and underscores ('_') to the buffer, starting from the current position.
     /// The method advances the position for each character read. If the first character is not a digit, no characters are appended and the method returns <b>true</b>.
     /// </remarks>
-    /// <param name="buffer">The buffer to which the parsed digit characters and underscores are appended. Must not be null.</param>
+    /// <param name="builder">The buffer to which the parsed digit characters and underscores are appended. Must not be null.</param>
     /// <returns><b>true</b> if no digit was found at the current position; otherwise, <b>false</b>.</returns>
-    private bool ReadDigits(StringBuilder buffer)
+    private bool ReadDigits(StringBuilder builder)
     {
-        char c = Ll(1);
-        if (c is not (>= '0' and <= '9')) return true;
+        char ch = Ll(1);
+        if (ch is < '0' or > '9') return true;
 
-        buffer.Append(c);
+        builder.Append(ch);
         Consume(1);
-        c = Ll(1);
+        ch = Ll(1);
 
-        while (c is '_' or >= '0' and <= '9')
+        while (ch is '_' or >= '0' and <= '9')
         {
-            buffer.Append(c);
+            builder.Append(ch);
             Consume(1);
-            c = Ll(1);
+            ch = Ll(1);
         }
 
         return false;
@@ -269,7 +265,11 @@ public class Lexer
     private Token LiteralBlob()
     {
         Consume(1); // Skip 'b' or 'B'
-        var blob = StringUtil.String2ByteArray((string)LiteralString().Value);
+        
+        Token tmpTok = LiteralString();
+        if (tmpTok.TokenID == TokenID.Unknown) return tmpTok;
+        
+        var blob = StringUtil.String2ByteArray((string)tmpTok.Value);
         return MakeToken(TokenID.LT_Blob, blob, false);
     }
 
@@ -380,7 +380,7 @@ public class Lexer
 
         if (ok)
         {
-            var value = int.Parse(hexBuilder.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            var value = int.Parse(hexBuilder.ToString(), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
             Consume(max + 1);
             result = ((char)value).ToString();
         }
@@ -797,38 +797,14 @@ public class Lexer
     }
 
     /// <summary>
-    /// Gets a token representing a symbol that starts with a zero.
-    /// </summary>
-    /// <returns>A literal zero, a floating-point number or an hexadecimal number</returns>
-    private Token Zero()
-    {
-        Consume(1);
-        char ch = Ll(1);
-
-        return ch switch
-        {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Zero, true),
-            'f' or 'F' => MakeToken(TokenID.LT_Float, 0D, true),
-            'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Zero, true),
-            'i' or 'I' => MakeToken(TokenID.LT_Complex, Complex.Zero, true),
-            'x' or 'X' => HexNumber(),
-            '.' => char.IsDigit(Ll(2))
-                 ? LiteralNumber()
-                 : MakeToken(TokenID.LT_Integer, 0, false),
-            _ when char.IsDigit(ch) => LiteralNumber(),
-            _ => MakeToken(TokenID.LT_Integer, 0, false)
-        };
-    }
-
-    /// <summary>
     /// Gets a token representing an hexadecimal number.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing an hexadecimal number</returns>
     private Token HexNumber()
     {
-        Consume(1);
+        Consume(2); // Skip the initial '0x' or '0X'
 
-        StringBuilder hexNumBuilder = new ();
+        StringBuilder hexNumBuilder = new ("0");
         CultureInfo ci = CultureInfo.InvariantCulture;
         bool loop = true;
         char ch;
@@ -850,10 +826,10 @@ public class Lexer
 
         return Ll(1) switch
         {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), true),
-            _ => int.TryParse(hexNumStr, NumberStyles.HexNumber, ci, out int anInt)
-               ? MakeToken(TokenID.LT_Integer, anInt, false)
-               : MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.HexNumber, ci), false),
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.AllowHexSpecifier, ci), true),
+            _ => int.TryParse(hexNumStr, NumberStyles.AllowHexSpecifier, ci, out var n)
+               ? MakeToken(TokenID.LT_Integer, n, false)
+               : MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.AllowHexSpecifier, ci), false),
         };
     }
 
@@ -908,8 +884,7 @@ public class Lexer
     /// <returns>A <see cref="Token"/> representing a format string or a special identifier</returns>
     private Token DollarSign()
     {
-        // Skip '$'
-        Consume(1);
+        Consume(1); // Skip the initial '$'
 
         /*
          * Try to recognize a mutable string:
@@ -923,9 +898,9 @@ public class Lexer
         };
 
         if (tmpTok != null)
-            return tmpTok.TokenID == TokenID.Unknown
-                 ? tmpTok
-                 : MakeToken(TokenID.MutableString, tmpTok.ToString(), false);
+            return tmpTok.TokenID == TokenID.LT_String
+                 ? MakeToken(TokenID.MutableString, tmpTok.ToString(), false)
+                 : tmpTok;
 
         // Try to recognize a special identifier
         StringBuilder idBuilder = new ();
