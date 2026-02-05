@@ -244,7 +244,11 @@ public class ParserTest
             case "vec[4]()":
             {
                 var anoCall = Assert.IsType<AnonymousCall>(statement);
-                Assert.IsType<ItemRef>(anoCall.FunctionSource);
+                var itemRef = Assert.IsType<ItemRef>(anoCall.FunctionSource);
+                var owner = Assert.IsType<VariableRef>(itemRef.Owner);
+                var index = Assert.IsType<Literal>(itemRef.Index);
+                Assert.Equal("vec", owner.Name);
+                Assert.Equal(4, index.Value.AsInt32);
                 Assert.Empty(anoCall.Arguments);
                 Assert.Empty(anoCall.NamedArgs);
                 break;
