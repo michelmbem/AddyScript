@@ -34,11 +34,11 @@ try {
 		matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' when decimal(__value) > 0 =>
 			$'{__value} is a positive number',
 		matches @'/[+-]?\d+(\.\d+)?(e[+-]?\d+)?/i' => $'{__value} is just a number',
-		_ => throw $'{__value} is not a number'
+		_ => throw $'"{__value}" is not a number'
 	};
 	println(res);
 } catch (e) {
-	println($'\n{e.name} : {e.message}');
+	println(e.message);
 }
 
 l = [

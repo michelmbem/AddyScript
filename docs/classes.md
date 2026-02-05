@@ -273,7 +273,7 @@ Phone Book:
  - Jane Smith: 555-5678
 ```
 
-## The keyword **this**
+## The **this** keyword
 
 In the body of a method, the keyword **this** can be used to refer to the current instance of the class (the one on which the method is invoked).
 Most of the time, you will use this feature to access other members of a class from the body of one of its methods.
@@ -409,7 +409,9 @@ println(pt.toString());
 
 ## Modifiers
 
-When working with classes in AddyScript, you will always come across keywords like **private**, **protected**, **public**, **static**, **abstract**, and **final**. These are modifiers (in the broad sense of the word). The first three (**private**, **protected**, and **public**) are used to control the scope of a class member. The other three are used to manage the behavior of a class or one of its members. The table below details the meaning of each modifier depending on where it is used.
+When working with classes in AddyScript, you will always come across keywords like **private**, **protected**, **public**, **static**, **abstract**, and **final**.
+These are modifiers (in the broad sense of the word). The first three (**private**, **protected**, and **public**) are used to control the scope of a class member.
+The other three are used to manage the behavior of a class or one of its members. The table below details the meaning of each modifier depending on where it is used.
 
 |Modifier|Effect on a class|Effect on a class member|
 |:-:|-|-|

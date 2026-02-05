@@ -360,7 +360,12 @@ In addition to the above operators, the **map** class exposes the following memb
 
 ### Iteration Methods
 
-In addition to the members listed in the tables above, collection classes also have methods that can be used to iterate over their instances while performing an action, evaluating a predicate, or collecting a summary value. Such a method is generally equivalent to a loop, except that it has a more compact syntax and can appear anywhere an expression is expected, which loops cannot do. Most of these methods return the instance on which they are invoked, which allows for call chaining. The following table summarizes AddyScript iteration methods and the classes they belong to. One of them, the "times" method of the **int** and **long** types, does not belong to a collection class but has similar behavior.
+In addition to the members listed in the tables above, collection classes also have methods that can be used to iterate
+over their instances while performing an action, evaluating a predicate, or collecting a summary value.
+Such a method is generally equivalent to a loop, except that it has a more compact syntax and can appear anywhere an expression is expected,
+which loops cannot do. Most of these methods return the instance on which they are invoked, which allows for call chaining.
+The following table summarizes AddyScript iteration methods and the classes they belong to.
+One of them, the "times" method of the **int** and **long** types, does not belong to a collection class but has similar behavior.
 
 |Method|Description| Example                                                                                                                                  |
 |-|-|------------------------------------------------------------------------------------------------------------------------------------------|
@@ -382,7 +387,8 @@ In addition to the members listed in the tables above, collection classes also h
 
 **Note**:
 
-For iteration methods that are invoked on strings, blobs, tuples, or lists, the closure argument can optionally take a second parameter that will receive the value of the index of the current element on each iteration.
+For iteration methods that are invoked on strings, blobs, tuples, or lists, the closure argument can optionally take a second parameter
+that will receive the value of the index of the current element on each iteration.
 
 ```addyscript linenums="1" title="Example"
 l = ['one', 'two', 'three', 'four', 'five'];
@@ -448,15 +454,15 @@ André Dikos is aged 19
 Finally, it's worth mentioning that AddyScript can convert a map to an object and vice versa.
 In this case, if one of the map's keys isn't a valid identifier,
 the corresponding field in the output object will be accessible via a special identifier—that is,
-an identifier that starts with the dollar sign ($) or contains hexadecimal escape sequences.
+an identifier that starts with the dollar sign (`$`) or contains hexadecimal escape sequences.
 The dollar sign allows you to create identifiers that correspond to keywords or numeric values.
 Escape sequences, on the other hand, allow you to represent special characters contained within identifiers.
 **e.g.:** `$1`, `$if`, or `for\x20each` (respectively derived from `1`, `if`, and `for each`).
 
 ```addyscript linenums="1" title="Example"
-dict = { 'long' => 120, 'large' => 80, 'depth in cm' => 20 };
+dict = { 'long' => 120, '2way' => 80, 'depth in cm' => 20 };
 shape = (object) dict;
-println('Shape size: {0} x {1} x {2}', shape.$long, shape.large, shape.depth\x20in\x20cm);
+println('Shape size: {0} x {1} x {2}', shape.$long, shape.$2way, shape.depth\x20in\x20cm);
 ```
 
 ```text title="Output"
@@ -513,7 +519,7 @@ println($'{firstName} {lastName} is a {age}-year-old {title} at {company}');
 Mael Jordano is a 25-year-old Accountant at Paradise Co.
 ```
 
-If the name of a variable is preceded by the _spread_ operator (..),
+If the name of a variable is preceded by the _spread_ operator (`..`),
 it will be used to collect the remaining properties of the source object (those that were not explicitly extracted).
 
 ```addyscript linenums="1"

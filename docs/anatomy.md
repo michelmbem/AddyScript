@@ -17,7 +17,7 @@ println('Hello World!');
 
 ### Reading _n_ from the standard input and computing the sum and average of n numbers:
 
-```addyscript linenums="1" title="Sum and averrage of n numbers"
+```addyscript linenums="1" title="Sum and average of n numbers"
 n = (int)readln('How many numbers? ');
 sum = 0;
 
@@ -29,7 +29,7 @@ for (i = 0; i < n; ++i)
 }
 
 println($'The sum is {sum}');
-println($'The averrage is {sum / n}');
+println($'The average is {sum / n}');
 ```
 
 ### Declaring a function to say _"Hello"_ to each name in a list:

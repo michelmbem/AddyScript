@@ -84,7 +84,7 @@ switch (result)
        println('Bad!');
        break;
     case 5:
-       println('Averrage!');
+       println('Average!');
        break;
     case 6:
        println('Good!');
