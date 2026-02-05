@@ -1,7 +1,10 @@
-﻿using AddyScript.Ast.Expressions;
+﻿using System.Numerics;
+
+using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Parsers;
 using AddyScript.Runtime.OOP;
+using DataItems = AddyScript.Runtime.DataItems;
 
 
 namespace AddyScript.Tests;
@@ -123,9 +126,6 @@ public class ParserTest
                 Assert.Equal(QualifiedName.Parse(expression), propRef.Name);
                 break;
             }
-            default:
-                Assert.Fail($"Unexpected statement type : {statement.GetType().Name}");
-                break;
         }
     }
 
@@ -181,13 +181,13 @@ public class ParserTest
                 foreach (var entry in map.Entries)
                 {
                     var entryKey = Assert.IsType<Literal>(entry.Key);
-                    Assert.IsType<Runtime.DataItems.String>(entryKey.Value);
+                    Assert.IsType<DataItems.String>(entryKey.Value);
 
                     string keyValue = entryKey.Value.ToString();
                     Assert.True(keyValue is "one" or "two");
 
                     var entryValue = Assert.IsType<Literal>(entry.Value);
-                    var valueValue = Assert.IsType<Runtime.DataItems.Float>(entryValue.Value);
+                    var valueValue = Assert.IsType<DataItems.Float>(entryValue.Value);
 
                     switch (keyValue)
                     {
@@ -227,6 +227,7 @@ public class ParserTest
         Assert.Null(error);
 
         var statement = statements[0];
+
         switch (expression)
         {
             case "foo(bar)":
@@ -295,9 +296,190 @@ public class ParserTest
                 Assert.Equal("b", zValue.Value.ToString());
                 break;
             }
-            default:
-                Assert.Fail($"Unexpected statement type : {statement.GetType().Name}");
-                break;
         }
+    }
+
+    [Theory]
+    [InlineData("!valid")]
+    [InlineData("~0x52fl")]
+    [InlineData("--vec.size")]
+    [InlineData("++t[i]")]
+    public void PrefixUnaryExpressionTest(string expression)
+    {
+        // Arrange
+        string input = $"{expression};";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var prefix = Assert.IsType<UnaryExpression>(statements[0]);
+
+        switch (expression)
+        {
+            case "!valid":
+            {
+                Assert.Equal(UnaryOperator.Not, prefix.Operator);
+
+                var operand = Assert.IsType<VariableRef>(prefix.Operand);
+                Assert.Equal("valid", operand.Name);
+                break;
+            }
+            case "~0x52fl":
+            {
+                Assert.Equal(UnaryOperator.BitwiseNot, prefix.Operator);
+
+                var operand = Assert.IsType<Literal>(prefix.Operand);
+                var _long = Assert.IsType<DataItems.Long>(operand.Value);
+                Assert.Equal(new BigInteger(0x52f), _long.AsBigInteger);
+                break;
+            }
+            case "--vec.size":
+            {
+                Assert.Equal(UnaryOperator.PreDecrement, prefix.Operator);
+
+                var operand = Assert.IsType<PropertyRef>(prefix.Operand);
+                Assert.Equal("size", operand.PropertyName);
+
+                var owner = Assert.IsType<VariableRef>(operand.Owner);
+                Assert.Equal("vec", owner.Name);
+                break;
+            }
+            case "++t[i]":
+            {
+                Assert.Equal(UnaryOperator.PreIncrement, prefix.Operator);
+
+                var operand = Assert.IsType<ItemRef>(prefix.Operand);
+                var owner = Assert.IsType<VariableRef>(operand.Owner);
+                Assert.Equal("t", owner.Name);
+
+                var index = Assert.IsType<VariableRef>(operand.Index);
+                Assert.Equal("i", index.Name);
+                break;
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData("action!")]
+    [InlineData("buffer.length--")]
+    [InlineData("elem[n]++")]
+    public void PostfixUnaryExpressionTest(string expression)
+    {
+        // Arrange
+        string input = $"{expression};";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var postfix = Assert.IsType<UnaryExpression>(statements[0]);
+
+        switch (expression)
+        {
+            case "action!":
+            {
+                Assert.Equal(UnaryOperator.NotEmpty, postfix.Operator);
+
+                var operand = Assert.IsType<VariableRef>(postfix.Operand);
+                Assert.Equal("action", operand.Name);
+                break;
+            }
+            case "buffer.length--":
+            {
+                Assert.Equal(UnaryOperator.PostDecrement, postfix.Operator);
+
+                var operand = Assert.IsType<PropertyRef>(postfix.Operand);
+                Assert.Equal("length", operand.PropertyName);
+
+                var owner = Assert.IsType<VariableRef>(operand.Owner);
+                Assert.Equal("buffer", owner.Name);
+                break;
+            }
+            case "elem[n]++":
+            {
+                Assert.Equal(UnaryOperator.PostIncrement, postfix.Operator);
+
+                var operand = Assert.IsType<ItemRef>(postfix.Operand);
+                var owner = Assert.IsType<VariableRef>(operand.Owner);
+                Assert.Equal("elem", owner.Name);
+
+                var index = Assert.IsType<VariableRef>(operand.Index);
+                Assert.Equal("n", index.Name);
+                break;
+            }
+        }
+    }
+
+    [Fact]
+    public void ArithmeticExpressionTest()
+    {
+        // Arrange
+        string input = "2*x**3 + 5/y - rand();";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        /*
+         * Expectation:
+         * 
+         * statements[0] = binary
+         * bynary = term1 - term2
+         * term1 = term1_1 + term1_2
+         * term1_1 = factor1 * factor2
+         * factor1 = literal { type: int, value: 2 }
+         * factor2 = expo1 ** expo2
+         * expo1 = variable_ref { name: x }
+         * expo2 = literal { type: int, value: 3 }
+         * term1_2 = factor3 / factor4
+         * factor3 = literal { type: int, value: 5 }
+         * factor4 = variable_ref { name: y }
+         * term2 = function_call { name: rand, positional_args: [], named_args: [] }
+         */
+
+        var binary = Assert.IsType<BinaryExpression>(statements[0]);
+        Assert.Equal(BinaryOperator.Minus, binary.Operator);
+
+        var term1 = Assert.IsType<BinaryExpression>(binary.LeftOperand);
+        Assert.Equal(BinaryOperator.Plus, term1.Operator);
+
+        var term1_1 = Assert.IsType<BinaryExpression>(term1.LeftOperand);
+        Assert.Equal(BinaryOperator.Times, term1_1.Operator);
+
+        var factor1 = Assert.IsType<Literal>(term1_1.LeftOperand);
+        Assert.Equal(2, factor1.Value.AsInt32);
+
+        var factor2 = Assert.IsType<BinaryExpression>(term1_1.RightOperand);
+        Assert.Equal(BinaryOperator.Power, factor2.Operator);
+
+        var expo1 = Assert.IsType<VariableRef>(factor2.LeftOperand);
+        Assert.Equal("x", expo1.Name);
+
+        var expo2 = Assert.IsType<Literal>(factor2.RightOperand);
+        Assert.Equal(3, expo2.Value.AsInt32);
+
+        var term1_2 = Assert.IsType<BinaryExpression>(term1.RightOperand);
+        Assert.Equal(BinaryOperator.Divide, term1_2.Operator);
+
+        var factor3 = Assert.IsType<Literal>(term1_2.LeftOperand);
+        Assert.Equal(5, factor3.Value.AsInt32);
+
+        var factor4 = Assert.IsType<VariableRef>(term1_2.RightOperand);
+        Assert.Equal("y", factor4.Name);
+
+        var term2 = Assert.IsType<FunctionCall>(binary.RightOperand);
+        Assert.Equal("rand", term2.FunctionName);
+        Assert.Empty(term2.Arguments);
+        Assert.Empty(term2.NamedArgs);
     }
 }
