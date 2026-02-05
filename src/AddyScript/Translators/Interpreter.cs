@@ -874,10 +874,10 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     {
         try
         {
-            anCall.Callee.AcceptTranslator(this);
+            anCall.Called.AcceptTranslator(this);
 
             DataItem target = returnedValue;
-            if (target is not Closure) throw new RuntimeError(fileName, anCall.Callee, Resources.CalleeIsNotClosure);
+            if (target is not Closure) throw new RuntimeError(fileName, anCall.Called, Resources.CalleeIsNotClosure);
 
             Function function = target.AsFunction;
             InvocationContext ctx = (function.ParentFrame ?? currentFrame).Context;

@@ -244,7 +244,7 @@ public class ParserTest
             case "vec[4]()":
             {
                 var anoCall = Assert.IsType<AnonymousCall>(statement);
-                Assert.IsType<ItemRef>(anoCall.Callee);
+                Assert.IsType<ItemRef>(anoCall.Called);
                 Assert.Empty(anoCall.Arguments);
                 Assert.Empty(anoCall.NamedArgs);
                 break;

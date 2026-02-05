@@ -427,7 +427,7 @@ public class XmlGenerator : ITranslator
 
         currentElement = document.CreateElement("Callee");
         tmpElement.AppendChild(currentElement);
-        anCall.Callee.AcceptTranslator(this);
+        anCall.Called.AcceptTranslator(this);
 
         currentElement = previousElement;
 

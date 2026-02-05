@@ -341,7 +341,7 @@ public class CodeGenerator(TextWriter textWriter) : ITranslator
 
     public void TranslateAnonymousCall(AnonymousCall anCall)
     {
-        MayBeParenthesize(anCall.Callee);
+        MayBeParenthesize(anCall.Called);
         DumpArgumentList(anCall.Arguments, anCall.NamedArgs);
     }
 
