@@ -206,59 +206,60 @@ public abstract class BasicParser
     /// Executes some parsing method and verifies that the returned value is non-null.
     /// </summary>
     /// <typeparam name="T">The type of element to recognize</typeparam>
-    /// <param name="recognizer">The recognition method</param>
+    /// <param name="syntaxRule">A reference to the parsing method</param>
     /// <param name="errorMessage">
-    /// The message of the exception thrown whenever <paramref name="recognizer"/> returns null
+    /// The message of the exception thrown whenever <paramref name="syntaxRule"/> returns null
     /// </param>
     /// <returns>A non-null instance of the desired type</returns>
-    protected T Required<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement =>
-        recognizer() ?? throw new SyntaxError(FileName, token, errorMessage);
+    protected T Required<T>(Func<T> syntaxRule, string errorMessage) where T : ScriptElement =>
+        syntaxRule() ?? throw new SyntaxError(FileName, token, errorMessage);
 
     /// <summary>
-    /// Recognizes a sequence of non-terminal symbols of the same type.
+    /// Applies the asterisk operator to a parsing method.<br/>
+    /// Recognizes a sequence of non-terminal symbols of the same type, zero or more times.
     /// </summary>
     /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
-    /// <param name="recognizer">The method used to recognize each symbol</param>
+    /// <param name="syntaxRule">A reference to the parsing method used to recognize each symbol</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] Asterisk<T>(Recognizer<T> recognizer) where T : ScriptElement
+    protected T[] Asterisk<T>(Func<T> syntaxRule) where T : ScriptElement
     {
         List<T> elements = [];
-        T element = recognizer();
+        T element = syntaxRule();
 
         while (element != null)
         {
             elements.Add(element);
-            element = recognizer();
+            element = syntaxRule();
         }
 
         return [.. elements];
     }
 
     /// <summary>
+    /// Applies the plus rule to a parsing method.<br/>
     /// Recognizes a non-empty sequence of non-terminal symbols of the same type.
     /// </summary>
     /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
-    /// <param name="recognizer">The method used to recognize each symbol</param>
-    /// <param name="errorMessage">The message of the exception thrown if the list is empty</param>
+    /// <param name="syntaxRule">A reference to the parsing method used to recognize each symbol</param>
+    /// <param name="errorMessage">The message of the exception thrown if the sequence is empty</param>
     /// <returns>A non-empty array of instances of the desired type</returns>
-    protected T[] Plus<T>(Recognizer<T> recognizer, string errorMessage) where T : ScriptElement
+    protected T[] Plus<T>(Func<T> syntaxRule, string errorMessage) where T : ScriptElement
     {
-        var elements = Asterisk(recognizer);
+        var elements = Asterisk(syntaxRule);
         return elements.Length > 0 ? elements : throw new SyntaxError(FileName, token, errorMessage);
     }
 
     /// <summary>
-    /// Recognizes a comma separated list of non-terminal symbols of the same type.
+    /// Recognizes a comma-separated list of non-terminal symbols of the same type.
     /// </summary>
     /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
-    /// <param name="recognizer">The method used to recognize each symbol</param>
+    /// <param name="syntaxRule">A reference to the parsing method used to recognize each symbol</param>
     /// <param name="checkUnicity">Tells if each symbol must be unique</param>
     /// <param name="errorMessage">The message of the exception thrown if a symbol is duplicated in the list</param>
     /// <returns>An array of instances of the desired type</returns>
-    protected T[] List<T>(Recognizer<T> recognizer, bool checkUnicity, string errorMessage)
-        where T : ScriptElement
+    protected T[] List<T>(Func<T> syntaxRule, bool checkUnicity, string errorMessage) where T : ScriptElement
     {
-        T element = recognizer();
+        T element = syntaxRule();
         if (element == null) return [];
 
         List<T> elements = [element];
@@ -267,7 +268,7 @@ public abstract class BasicParser
         {
             Consume(1);
 
-            element = Required(recognizer, Resources.AbnormalListTermination);
+            element = Required(syntaxRule, Resources.AbnormalListTermination);
             if (checkUnicity && elements.Contains(element))
                 throw new ScriptError(FileName, element, errorMessage);
 
@@ -326,13 +327,6 @@ public abstract class BasicParser
     #endregion
 
     #region Nested types
-
-    /// <summary>
-    /// A common prototype for non-terminal symbols recognition methods.
-    /// </summary>
-    /// <typeparam name="T">The returned symbol's type</typeparam>
-    /// <returns>An instance of the desired type</returns>
-    protected delegate T Recognizer<out T>() where T : ScriptElement;
 
     #region ParseTimeClass
 

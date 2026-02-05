@@ -804,6 +804,7 @@ public class Lexer
     {
         Consume(2); // Skip the initial '0x' or '0X'
 
+        // The leading zero prevents BigInteger from interpreting the number as negative
         StringBuilder hexNumBuilder = new ("0");
         CultureInfo ci = CultureInfo.InvariantCulture;
         bool loop = true;
@@ -886,10 +887,6 @@ public class Lexer
     {
         Consume(1); // Skip the initial '$'
 
-        /*
-         * Try to recognize a mutable string:
-         * Normally we should have dedicated methods for this, but LiteralString and Verbatim can do the job
-         */
         var tmpTok = Ll(1) switch
         {
             '\'' or '"' => LiteralString(),
