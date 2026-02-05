@@ -215,7 +215,7 @@ public abstract class BasicParser
         syntaxRule() ?? throw new SyntaxError(FileName, token, errorMessage);
 
     /// <summary>
-    /// Applies the asterisk operator to a parsing method.<br/>
+    /// Applies the <em>asterisk operator</em> to a parsing method.<br/>
     /// Recognizes a sequence of non-terminal symbols of the same type, zero or more times.
     /// </summary>
     /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
@@ -236,7 +236,7 @@ public abstract class BasicParser
     }
 
     /// <summary>
-    /// Applies the plus rule to a parsing method.<br/>
+    /// Applies the <em>plus operator</em> to a parsing method.<br/>
     /// Recognizes a non-empty sequence of non-terminal symbols of the same type.
     /// </summary>
     /// <typeparam name="T">The type of non-terminal symbols to recognize</typeparam>
