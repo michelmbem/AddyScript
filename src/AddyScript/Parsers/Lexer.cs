@@ -114,6 +114,44 @@ public class Lexer
     }
 
     /// <summary>
+    /// Gets a token representing an hexadecimal number.
+    /// </summary>
+    /// <returns>A <see cref="Token"/> representing an hexadecimal number</returns>
+    private Token HexNumber()
+    {
+        Consume(2); // Skip the initial '0x' or '0X'
+
+        // The leading zero prevents BigInteger from interpreting the number as negative
+        StringBuilder hexNumBuilder = new("0");
+        bool loop = true;
+        char ch;
+
+        while (loop)
+        {
+            ch = Ll(1);
+
+            if (IsHexDigit(ch))
+            {
+                hexNumBuilder.Append(ch);
+                Consume(1);
+            }
+            else
+                loop = false;
+        }
+
+        string hexNumStr = hexNumBuilder.ToString();
+        NumberStyles hex = NumberStyles.AllowHexSpecifier;
+        CultureInfo ci = CultureInfo.InvariantCulture;
+
+        return Ll(1) switch
+        {
+            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, hex, ci), true),
+            _ when int.TryParse(hexNumStr, hex, ci, out var n) => MakeToken(TokenID.LT_Integer, n, false),
+            _ => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, hex, ci), false),
+        };
+    }
+
+    /// <summary>
     /// Gets a token representing a literal number.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a literal number</returns>
@@ -210,24 +248,15 @@ public class Lexer
     {
         CultureInfo ci = CultureInfo.InvariantCulture;
 
-        if (isReal)
-            return Ll(1) switch
-            {
-                'f' or 'F' => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), true),
-                'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
-                'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
-                _ => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), false),
-            };
-
         return Ll(1) switch
         {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), true),
             'f' or 'F' => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), true),
-            'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
             'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
-            _ => int.TryParse(numberStr, ci, out var n)
-               ? MakeToken(TokenID.LT_Integer, n, false)
-               : MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), false),
+            'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
+            'l' or 'L' when !isReal => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), true),
+            _ when isReal => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), false),
+            _ when int.TryParse(numberStr, ci, out var n) => MakeToken(TokenID.LT_Integer, n, false),
+            _ => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), false),
         };
     }
 
@@ -237,7 +266,7 @@ public class Lexer
     /// <returns>A literal date value</returns>
     private Token LiteralDate()
     {
-        Consume(1);
+        Consume(1); // Skip the initial backtick (`)
 
         StringBuilder dateBuilder = new ();
         char ch = Ll(1);
@@ -259,6 +288,51 @@ public class Lexer
     }
 
     /// <summary>
+    /// Recognizes a verbatim string (one that starts with '@' and can span on multiple lines).
+    /// </summary>
+    /// <returns>A <see cref="Token"/> representing a literal string</returns>
+    private Token VerbatimString()
+    {
+        // Skip the initial '@' sign
+        Consume(1);
+
+        char wrapper = Ll(1);
+        if (wrapper is not ('\'' or '"'))
+            return MakeToken(TokenID.Unknown, "@", false);
+
+        // Skip the wrapper
+        Consume(1);
+
+        StringBuilder strBuilder = new();
+        bool loop = true;
+        char ch;
+
+        while (loop)
+        {
+            ch = Ll(1);
+
+            if (ch == EOF)
+                return MakeToken(TokenID.Unknown, $"@{wrapper}{strBuilder}", false);
+
+            if (ch == wrapper)
+                if (Ll(2) == ch)
+                {
+                    strBuilder.Append(ch);
+                    Consume(2);
+                }
+                else
+                    loop = false;
+            else
+            {
+                strBuilder.Append(ch);
+                Consume(1);
+            }
+        }
+
+        return MakeToken(TokenID.LT_String, strBuilder.ToString(), true);
+    }
+
+    /// <summary>
     /// Gets a token representing a literal blob.
     /// </summary>
     /// <returns>A <see cref="Token"/> representing a literal blob</returns>
@@ -266,10 +340,10 @@ public class Lexer
     {
         Consume(1); // Skip 'b' or 'B'
 
-        Token tmpTok = LiteralString();
-        if (tmpTok.TokenID == TokenID.Unknown) return tmpTok;
+        Token literalString = LiteralString();
+        if (literalString.TokenID == TokenID.Unknown) return literalString;
 
-        var blob = StringUtil.String2ByteArray((string)tmpTok.Value);
+        var blob = StringUtil.String2ByteArray((string)literalString.Value);
         return MakeToken(TokenID.LT_Blob, blob, false);
     }
 
@@ -386,7 +460,7 @@ public class Lexer
         }
         else
         {
-            result = "\\" + Ll(1);
+            result = @"\" + Ll(1);
             Consume(1);
         }
 
@@ -430,6 +504,67 @@ public class Lexer
         }
 
         return MakeToken(TokenID.Identifier, word, false);
+    }
+
+    /// <summary>
+    /// Gets a token representing a symbol that starts with the $ symbol.
+    /// </summary>
+    /// <returns>A <see cref="Token"/> representing a format string or a special identifier</returns>
+    private Token DollarSign()
+    {
+        Consume(1); // Skip the initial '$'
+
+        return Ll(1) switch
+        {
+            '\'' or '"' => MutableString(LiteralString()),
+            '@' => MutableString(VerbatimString()),
+            _ => SpecialIdentifier(),
+        };
+    }
+
+    /// <summary>
+    /// Converts a string literal token to a mutable string token if applicable.
+    /// </summary>
+    /// <param name="literalString">The token representing a string literal to be evaluated. Must not be null.</param>
+    /// <returns>A token representing a mutable string if the input is a string literal; otherwise, returns the original token.</returns>
+    private Token MutableString(Token literalString) => literalString.TokenID == TokenID.LT_String
+        ? MakeToken(TokenID.MutableString, literalString.Value, false)
+        : literalString;
+
+    /// <summary>
+    /// Parses a special identifier from the current input position and returns a corresponding token.
+    /// </summary>
+    /// <remarks>
+    /// A special identifier may include legal identifier characters and escape sequences.
+    /// If no valid identifier is found at the current position, the returned token will indicate an unknown identifier.
+    /// </remarks>
+    /// <returns>
+    /// A <see cref="Token"/> representing the parsed identifier if one is found;
+    /// otherwise, a token indicating an unknown identifier.
+    /// </returns>
+    private Token SpecialIdentifier()
+    {
+        StringBuilder idBuilder = new();
+        bool loop = true;
+
+        while (loop)
+        {
+            char ch = Ll(1);
+
+            if (IsLegalIdChar(ch))
+            {
+                idBuilder.Append(ch);
+                Consume(1);
+            }
+            else if (ch == '\\')
+                idBuilder.Append(EscapeSequence());
+            else
+                loop = false;
+        }
+
+        return idBuilder.Length > 0
+             ? MakeToken(TokenID.Identifier, idBuilder.ToString(), false)
+             : MakeToken(TokenID.Unknown, "$", false);
     }
 
     /// <summary>
@@ -794,133 +929,6 @@ public class Lexer
             '=' => MakeToken(TokenID.CircumflexEqual, null, true),
             _ => MakeToken(TokenID.Circumflex, null, false),
         };
-    }
-
-    /// <summary>
-    /// Gets a token representing an hexadecimal number.
-    /// </summary>
-    /// <returns>A <see cref="Token"/> representing an hexadecimal number</returns>
-    private Token HexNumber()
-    {
-        Consume(2); // Skip the initial '0x' or '0X'
-
-        // The leading zero prevents BigInteger from interpreting the number as negative
-        StringBuilder hexNumBuilder = new ("0");
-        CultureInfo ci = CultureInfo.InvariantCulture;
-        bool loop = true;
-        char ch;
-
-        while (loop)
-        {
-            ch = Ll(1);
-
-            if (IsHexDigit(ch))
-            {
-                hexNumBuilder.Append(ch);
-                Consume(1);
-            }
-            else
-                loop = false;
-        }
-
-        string hexNumStr = hexNumBuilder.ToString();
-
-        return Ll(1) switch
-        {
-            'l' or 'L' => MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.AllowHexSpecifier, ci), true),
-            _ => int.TryParse(hexNumStr, NumberStyles.AllowHexSpecifier, ci, out var n)
-               ? MakeToken(TokenID.LT_Integer, n, false)
-               : MakeToken(TokenID.LT_Long, BigInteger.Parse(hexNumStr, NumberStyles.AllowHexSpecifier, ci), false),
-        };
-    }
-
-    /// <summary>
-    /// Recognizes a verbatim string (one that starts with '@' and can span on multiple lines).
-    /// </summary>
-    /// <returns>A <see cref="Token"/> representing a literal string</returns>
-    private Token VerbatimString()
-    {
-        // Skip the initial '@' sign
-        Consume(1);
-
-        char wrapper = Ll(1);
-        if (wrapper is not ('\'' or '"'))
-            return MakeToken(TokenID.Unknown, "@", false);
-
-        // Skip the wrapper
-        Consume(1);
-
-        StringBuilder strBuilder = new ();
-        bool loop = true;
-        char ch;
-
-        while (loop)
-        {
-            ch = Ll(1);
-
-            if (ch == EOF)
-                return MakeToken(TokenID.Unknown, $"@{wrapper}{strBuilder}", false);
-
-            if (ch == wrapper)
-                if (Ll(2) == ch)
-                {
-                    strBuilder.Append(ch);
-                    Consume(2);
-                }
-                else
-                    loop = false;
-            else
-            {
-                strBuilder.Append(ch);
-                Consume(1);
-            }
-        }
-
-        return MakeToken(TokenID.LT_String, strBuilder.ToString(), true);
-    }
-
-    /// <summary>
-    /// Gets a token representing a symbol that starts with the $ symbol.
-    /// </summary>
-    /// <returns>A <see cref="Token"/> representing a format string or a special identifier</returns>
-    private Token DollarSign()
-    {
-        Consume(1); // Skip the initial '$'
-
-        var tmpTok = Ll(1) switch
-        {
-            '\'' or '"' => LiteralString(),
-            '@' => VerbatimString(),
-            _ => null
-        };
-
-        if (tmpTok != null)
-            return tmpTok.TokenID == TokenID.LT_String
-                 ? MakeToken(TokenID.MutableString, tmpTok.ToString(), false)
-                 : tmpTok;
-
-        // Try to recognize a special identifier
-        StringBuilder idBuilder = new ();
-        bool loop = true;
-
-        while (loop)
-        {
-            char ch = Ll(1);
-
-            if (IsLegalIdChar(ch))
-            {
-                idBuilder.Append(ch);
-                Consume(1);
-            }
-            else if (ch == '\\')
-                idBuilder.Append(EscapeSequence());
-            else
-                loop = false;
-        }
-
-        return idBuilder.Length > 0
-             ? MakeToken(TokenID.Identifier, idBuilder.ToString(), false)
-             : MakeToken(TokenID.Unknown, "$", false);
     }
 
     /// <summary>
