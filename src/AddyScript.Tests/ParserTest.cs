@@ -57,9 +57,8 @@ public class ParserTest
         Assert.Single(statements);
         Assert.Null(error);
 
-        var statement = statements[0];
-        Assert.IsType<Literal>(statement);
-        Assert.Equal(classId, ((Literal)statement).Value.Class.ClassID);
+        var literal = Assert.IsType<Literal>(statements[0]);
+        Assert.Equal(classId, literal.Value.Class.ClassID);
     }
 
     [Theory]
@@ -147,10 +146,10 @@ public class ParserTest
         Assert.Single(statements);
         Assert.Null(error);
 
-        var statement = Assert.IsType<Assignment>(statements[0]);
-        Assert.Equal(BinaryOperator.None, statement.Operator);
+        var assignment = Assert.IsType<Assignment>(statements[0]);
+        Assert.Equal(BinaryOperator.None, assignment.Operator);
 
-        switch (statement.RightOperand)
+        switch (assignment.RightOperand)
         {
             case TupleInitializer tuple:
                 Assert.Equal(5, tuple.Items.Length);
@@ -205,7 +204,7 @@ public class ParserTest
                 }
                 break;
             default:
-                Assert.Fail($"Unexpected statement type : {statement.GetType().Name}");
+                Assert.Fail($"Unexpected statement type : {assignment.GetType().Name}");
                 break;
         }
     }
