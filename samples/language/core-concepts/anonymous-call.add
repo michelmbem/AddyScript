@@ -5,7 +5,7 @@
 * an inline function/lambda expression defined and invoked in-place.
 **************************************************************************************************/
 
-// fn returns a closure
+// f returns a closure
 function f(n)
 {
 	return |a, b| => (a + b)/n;
