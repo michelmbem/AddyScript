@@ -30,14 +30,14 @@ else
 	}
 	
 	(sum, squares, minimum, maximum) = stats(t);
-	averrage = sum / n;
-	stdDev = sqrt(squares / n - averrage ** 2);
+	average = sum / n;
+	stdDev = sqrt(squares / n - average ** 2);
 	
 	println($"you entered: {t}");
 	println($"the sum of items is: {sum}");
 	println($"the minimum is: {minimum}");
 	println($"the maximum is: {maximum}");
-	println($"the averrage is: {averrage}");
+	println($"the average is: {average}");
 	println($"the standard deviation is: {stdDev}");
 }
 
