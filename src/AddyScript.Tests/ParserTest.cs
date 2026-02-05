@@ -164,7 +164,7 @@ public class ParserTest
                 for (int i = 0; i < list.Items.Length; ++i)
                 {
                     var listItem = Assert.IsType<Literal>(list.Items[i].Value);
-                    Assert.Equal(((char)('a' + i)).ToString(), listItem.Value.ToString());
+                    Assert.Equal('a'.Plus(i), listItem.Value.ToString());
                 }
                 break;
             case SetInitializer set:
@@ -173,7 +173,7 @@ public class ParserTest
                 for (int i = 0; i < set.Items.Length; ++i)
                 {
                     var setItem = Assert.IsType<VariableRef>(set.Items[i].Value);
-                    Assert.Equal(((char)('w' + i)).ToString(), setItem.Name);
+                    Assert.Equal('w'.Plus(i), setItem.Name);
                 }
                 break;
             case MapInitializer map:
@@ -283,7 +283,7 @@ public class ParserTest
                     Assert.False(staticCall.Arguments[i].Spread);
 
                     var arg = Assert.IsType<VariableRef>(staticCall.Arguments[i].Value);
-                    Assert.Equal(((char)('w' + i)).ToString(), arg.Name);
+                    Assert.Equal('w'.Plus(i), arg.Name);
                 }
 
                 Assert.True(staticCall.NamedArgs.ContainsKey("y"));
