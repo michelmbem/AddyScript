@@ -351,9 +351,9 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                     var (positionalArgs, namedArgs) = FunctionArguments();
                     var last = Match(TokenID.RightParenthesis);
 
-                    Expression called = expr;
-                    expr = new AnonymousCall(called, positionalArgs, namedArgs);
-                    expr.SetLocation(called.Start, last.End);
+                    Expression source = expr;
+                    expr = new AnonymousCall(source, positionalArgs, namedArgs);
+                    expr.SetLocation(source.Start, last.End);
                     break;
                 }
                 case TokenID.KW_Switch:

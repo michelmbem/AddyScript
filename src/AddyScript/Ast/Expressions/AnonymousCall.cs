@@ -13,24 +13,24 @@ namespace AddyScript.Ast.Expressions;
 /// <remarks>
 /// Initializes a new instance of AnonymousCall.
 /// </remarks>
-/// <param name="called">The expression that produces the function being called</param>
+/// <param name="source">The expression that produces the function being called</param>
 /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
 /// <param name="namedArgs">The collection of named arguments passed to the function</param>
-public class AnonymousCall(Expression called, Argument[] positionalArgs, Dictionary<string, Expression> namedArgs)
+public class AnonymousCall(Expression source, Argument[] positionalArgs, Dictionary<string, Expression> namedArgs)
     : FunctionCall($"__anonymous_{Environment.TickCount}", positionalArgs, namedArgs)
 {
     /// <summary>
     /// Initializes a new instance of AnonymousCall.
     /// </summary>
-    /// <param name="called">The expression that produces the function being called</param>
+    /// <param name="source">The expression that produces the function being called</param>
     /// <param name="positionalArgs">The list of positional arguments passed to the function</param>
-    public AnonymousCall(Expression called, params Expression[] positionalArgs)
-        : this(called, ToArguments(positionalArgs), null) { }
+    public AnonymousCall(Expression source, params Expression[] positionalArgs)
+        : this(source, ToArguments(positionalArgs), null) { }
 
     /// <summary>
     /// Represents the expression that produces the function being called.
     /// </summary>
-    public Expression Called => called;
+    public Expression FunctionSource => source;
 
     /// <summary>
     /// Translates this node.
