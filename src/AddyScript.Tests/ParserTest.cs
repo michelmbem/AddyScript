@@ -89,34 +89,28 @@ public class ParserTest
         switch (expression)
         {
             case "delta":
-            {
-                var varRef = Assert.IsType<VariableRef>(statement);
-                Assert.Equal(expression, varRef.Name);
+                Assert.Equal(expression, Assert.IsType<VariableRef>(statement).Name);
                 break;
-            }
             case "vec[4]":
             {
                 var itemRef = Assert.IsType<ItemRef>(statement);
-                var owner = Assert.IsType<VariableRef>(itemRef.Owner);
                 var index = Assert.IsType<Literal>(itemRef.Index);
-                Assert.Equal("vec", owner.Name);
-                Assert.Equal(4, index.Value.AsInt32);
+                Assert.Equal("vec", Assert.IsType<VariableRef>(itemRef.Owner).Name);
+                Assert.Equal(4, Assert.IsType<DataItems.Integer>(index.Value).AsInt32);
                 break;
             }
             case "dict['name']":
             {
                 var itemRef = Assert.IsType<ItemRef>(statement);
-                var owner = Assert.IsType<VariableRef>(itemRef.Owner);
                 var index = Assert.IsType<Literal>(itemRef.Index);
-                Assert.Equal("dict", owner.Name);
-                Assert.Equal("name", index.Value.ToString());
+                Assert.Equal("dict", Assert.IsType<VariableRef>(itemRef.Owner).Name);
+                Assert.Equal("name", Assert.IsType<DataItems.String>(index.Value).ToString());
                 break;
             }
             case "obj.prop":
             {
                 var propRef = Assert.IsType<PropertyRef>(statement);
-                var owner = Assert.IsType<VariableRef>(propRef.Owner);
-                Assert.Equal("obj", owner.Name);
+                Assert.Equal("obj", Assert.IsType<VariableRef>(propRef.Owner).Name);
                 Assert.Equal("prop", propRef.PropertyName);
                 break;
             }
@@ -156,7 +150,7 @@ public class ParserTest
                 for (int i = 0; i < tuple.Items.Length; ++i)
                 {
                     var tupleItem = Assert.IsType<Literal>(tuple.Items[i].Value);
-                    Assert.Equal(i + 1, tupleItem.Value.AsInt32);
+                    Assert.Equal(i + 1, Assert.IsType<DataItems.Integer>(tupleItem.Value).AsInt32);
                 }
                 break;
             case ListInitializer list:
@@ -164,7 +158,7 @@ public class ParserTest
                 for (int i = 0; i < list.Items.Length; ++i)
                 {
                     var listItem = Assert.IsType<Literal>(list.Items[i].Value);
-                    Assert.Equal('a'.Plus(i), listItem.Value.ToString());
+                    Assert.Equal('a'.Plus(i), Assert.IsType<DataItems.String>(listItem.Value).ToString());
                 }
                 break;
             case SetInitializer set:
@@ -235,40 +229,39 @@ public class ParserTest
                 var fnCall = Assert.IsType<FunctionCall>(statement);
                 Assert.Equal("foo", fnCall.FunctionName);
                 Assert.Empty(fnCall.NamedArgs);
-                Assert.Single(fnCall.Arguments);
-                Assert.False(fnCall.Arguments[0].Spread);
-
-                var arg0 = Assert.IsType<VariableRef>(fnCall.Arguments[0].Value);
-                Assert.Equal("bar", arg0.Name);
+                
+                var arg = Assert.Single(fnCall.Arguments);
+                Assert.Equal("bar", Assert.IsType<VariableRef>(arg.Value).Name);
+                Assert.False(arg.Spread);
                 break;
             }
             case "vec[4]()":
             {
                 var anoCall = Assert.IsType<AnonymousCall>(statement);
-                var itemRef = Assert.IsType<ItemRef>(anoCall.FunctionSource);
-                var owner = Assert.IsType<VariableRef>(itemRef.Owner);
-                var index = Assert.IsType<Literal>(itemRef.Index);
-                Assert.Equal("vec", owner.Name);
-                Assert.Equal(4, index.Value.AsInt32);
                 Assert.Empty(anoCall.Arguments);
                 Assert.Empty(anoCall.NamedArgs);
+                
+                var itemRef = Assert.IsType<ItemRef>(anoCall.FunctionSource);
+                Assert.Equal("vec", Assert.IsType<VariableRef>(itemRef.Owner).Name);
+                
+                var index = Assert.IsType<Literal>(itemRef.Index);
+                Assert.Equal(4, Assert.IsType<DataItems.Integer>(index.Value).AsInt32);
                 break;
             }
             case "obj.meth(1, 2)":
             {
                 var methCall = Assert.IsType<MethodCall>(statement);
-                var target = Assert.IsType<VariableRef>(methCall.Target);
-                Assert.Equal("obj", target.Name);
+                Assert.Equal("obj", Assert.IsType<VariableRef>(methCall.Target).Name);
                 Assert.Equal("meth", methCall.FunctionName);
-                Assert.Empty(methCall.NamedArgs);
                 Assert.Equal(2, methCall.Arguments.Length);
+                Assert.Empty(methCall.NamedArgs);
 
                 for (int i = 0; i < methCall.Arguments.Length; ++i)
                 {
                     Assert.False(methCall.Arguments[i].Spread);
 
                     var arg = Assert.IsType<Literal>(methCall.Arguments[i].Value);
-                    Assert.Equal(i + 1, arg.Value.AsInt32);
+                    Assert.Equal(i + 1, Assert.IsType<DataItems.Integer>(arg.Value).AsInt32);
                 }
                 break;
             }
@@ -278,6 +271,8 @@ public class ParserTest
                 Assert.Equal(new QualifiedName("a", "b", "c"), staticCall.Name);
                 Assert.Equal(2, staticCall.Arguments.Length);
                 Assert.Equal(2, staticCall.NamedArgs.Count);
+                Assert.True(staticCall.NamedArgs.ContainsKey("y"));
+                Assert.True(staticCall.NamedArgs.ContainsKey("z"));
 
                 for (int i = 0; i < staticCall.Arguments.Length; ++i)
                 {
@@ -286,17 +281,41 @@ public class ParserTest
                     var arg = Assert.IsType<VariableRef>(staticCall.Arguments[i].Value);
                     Assert.Equal('w'.Plus(i), arg.Name);
                 }
-
-                Assert.True(staticCall.NamedArgs.ContainsKey("y"));
+                
                 var yValue = Assert.IsType<Literal>(staticCall.NamedArgs["y"]);
-                Assert.Equal("a", yValue.Value.ToString());
+                Assert.Equal("a", Assert.IsType<DataItems.String>(yValue.Value).ToString());
 
-                Assert.True(staticCall.NamedArgs.ContainsKey("z"));
                 var zValue = Assert.IsType<Literal>(staticCall.NamedArgs["z"]);
-                Assert.Equal("b", zValue.Value.ToString());
+                Assert.Equal("b", Assert.IsType<DataItems.String>(zValue.Value).ToString());
                 break;
             }
         }
+    }
+    
+    [Fact]
+    public void FunctionCallWithSpreadArgTest()
+    {
+        // Arrange
+        string input = "foo(bar, ..baz);";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var call = Assert.IsType<FunctionCall>(statements[0]);
+        Assert.Equal("foo", call.FunctionName);
+        Assert.Equal(2, call.Arguments.Length);
+        
+        var arg1 = call.Arguments[0];
+        Assert.Equal("bar", Assert.IsType<VariableRef>(arg1.Value).Name);
+        Assert.False(arg1.Spread);
+        
+        var arg2 = call.Arguments[1];
+        Assert.Equal("baz", Assert.IsType<VariableRef>(arg2.Value).Name);
+        Assert.True(arg2.Spread);
     }
 
     [Theory]
@@ -321,13 +340,9 @@ public class ParserTest
         switch (expression)
         {
             case "!valid":
-            {
                 Assert.Equal(UnaryOperator.Not, prefix.Operator);
-
-                var operand = Assert.IsType<VariableRef>(prefix.Operand);
-                Assert.Equal("valid", operand.Name);
+                Assert.Equal("valid", Assert.IsType<VariableRef>(prefix.Operand).Name);
                 break;
-            }
             case "~0x52fl":
             {
                 Assert.Equal(UnaryOperator.BitwiseNot, prefix.Operator);
@@ -342,10 +357,8 @@ public class ParserTest
                 Assert.Equal(UnaryOperator.PreDecrement, prefix.Operator);
 
                 var operand = Assert.IsType<PropertyRef>(prefix.Operand);
+                Assert.Equal("vec", Assert.IsType<VariableRef>(operand.Owner).Name);
                 Assert.Equal("size", operand.PropertyName);
-
-                var owner = Assert.IsType<VariableRef>(operand.Owner);
-                Assert.Equal("vec", owner.Name);
                 break;
             }
             case "++t[i]":
@@ -353,11 +366,8 @@ public class ParserTest
                 Assert.Equal(UnaryOperator.PreIncrement, prefix.Operator);
 
                 var operand = Assert.IsType<ItemRef>(prefix.Operand);
-                var owner = Assert.IsType<VariableRef>(operand.Owner);
-                Assert.Equal("t", owner.Name);
-
-                var index = Assert.IsType<VariableRef>(operand.Index);
-                Assert.Equal("i", index.Name);
+                Assert.Equal("t", Assert.IsType<VariableRef>(operand.Owner).Name);
+                Assert.Equal("i", Assert.IsType<VariableRef>(operand.Index).Name);
                 break;
             }
         }
@@ -384,22 +394,16 @@ public class ParserTest
         switch (expression)
         {
             case "action!":
-            {
                 Assert.Equal(UnaryOperator.NotEmpty, postfix.Operator);
-
-                var operand = Assert.IsType<VariableRef>(postfix.Operand);
-                Assert.Equal("action", operand.Name);
+                Assert.Equal("action", Assert.IsType<VariableRef>(postfix.Operand).Name);
                 break;
-            }
             case "buffer.length--":
             {
                 Assert.Equal(UnaryOperator.PostDecrement, postfix.Operator);
 
                 var operand = Assert.IsType<PropertyRef>(postfix.Operand);
+                Assert.Equal("buffer", Assert.IsType<VariableRef>(operand.Owner).Name);
                 Assert.Equal("length", operand.PropertyName);
-
-                var owner = Assert.IsType<VariableRef>(operand.Owner);
-                Assert.Equal("buffer", owner.Name);
                 break;
             }
             case "elem[n]++":
@@ -407,11 +411,8 @@ public class ParserTest
                 Assert.Equal(UnaryOperator.PostIncrement, postfix.Operator);
 
                 var operand = Assert.IsType<ItemRef>(postfix.Operand);
-                var owner = Assert.IsType<VariableRef>(operand.Owner);
-                Assert.Equal("elem", owner.Name);
-
-                var index = Assert.IsType<VariableRef>(operand.Index);
-                Assert.Equal("n", index.Name);
+                Assert.Equal("elem", Assert.IsType<VariableRef>(operand.Owner).Name);
+                Assert.Equal("n", Assert.IsType<VariableRef>(operand.Index).Name);
                 break;
             }
         }
@@ -434,7 +435,7 @@ public class ParserTest
          * Expectation:
          * 
          * statements[0] = binary
-         * bynary = term1 - term2
+         * binary = term1 - term2
          * term1 = term1_1 + term1_2
          * term1_1 = factor1 * factor2
          * factor1 = literal { type: int, value: 2 }
@@ -457,7 +458,7 @@ public class ParserTest
         Assert.Equal(BinaryOperator.Times, term1_1.Operator);
 
         var factor1 = Assert.IsType<Literal>(term1_1.LeftOperand);
-        Assert.Equal(2, factor1.Value.AsInt32);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(factor1.Value).AsInt32);
 
         var factor2 = Assert.IsType<BinaryExpression>(term1_1.RightOperand);
         Assert.Equal(BinaryOperator.Power, factor2.Operator);
@@ -466,13 +467,13 @@ public class ParserTest
         Assert.Equal("x", expo1.Name);
 
         var expo2 = Assert.IsType<Literal>(factor2.RightOperand);
-        Assert.Equal(3, expo2.Value.AsInt32);
+        Assert.Equal(3, Assert.IsType<DataItems.Integer>(expo2.Value).AsInt32);
 
         var term1_2 = Assert.IsType<BinaryExpression>(term1.RightOperand);
         Assert.Equal(BinaryOperator.Divide, term1_2.Operator);
 
         var factor3 = Assert.IsType<Literal>(term1_2.LeftOperand);
-        Assert.Equal(5, factor3.Value.AsInt32);
+        Assert.Equal(5, Assert.IsType<DataItems.Integer>(factor3.Value).AsInt32);
 
         var factor4 = Assert.IsType<VariableRef>(term1_2.RightOperand);
         Assert.Equal("y", factor4.Name);
@@ -481,5 +482,327 @@ public class ParserTest
         Assert.Equal("rand", term2.FunctionName);
         Assert.Empty(term2.Arguments);
         Assert.Empty(term2.NamedArgs);
+    }
+
+    [Fact]
+    public void LogicalExpressionTest()
+    {
+        // Arrange
+        string input = "sin(x) > 0.5 && cos(y) <= 0.2 || randint(10) >= 5;";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        /*
+         * Expectation:
+         *
+         * statements[0] = condition
+         * condition = relation1 || relation2
+         * relation1 = relation1_1 && relation1_2
+         * relation1_1 = term1 > term2
+         * term1 = function_call { name: 'sin', positional_args: [variable_ref { name: 'x' }], named_args: [] }
+         * term2 = literal { type: float, value: 0.5 }
+         * relation1_2 = term3 <= term4
+         * term3 = function_call { name: 'cos', positional_args: [variable_ref { name: 'y' }], named_args: [] }
+         * term4 = literal { type: float, value: 0.2 }
+         * relation2 = term5 >= term6
+         * term5 = function_call { name: 'randint', positional_args: [literal { type: int, value: 10 }], named_args: [] }
+         * term6 = literal { type: int, value: 5 }
+         */
+
+        var condition = Assert.IsType<BinaryExpression>(statements[0]);
+        Assert.Equal(BinaryOperator.OrElse, condition.Operator);
+        
+        var relation1 = Assert.IsType<BinaryExpression>(condition.LeftOperand);
+        Assert.Equal(BinaryOperator.AndAlso, relation1.Operator);
+        
+        var relation1_1 = Assert.IsType<BinaryExpression>(relation1.LeftOperand);
+        Assert.Equal(BinaryOperator.GreaterThan, relation1_1.Operator);
+        
+        var term1 = Assert.IsType<FunctionCall>(relation1_1.LeftOperand);
+        Assert.Equal("sin", term1.FunctionName);
+        Assert.Empty(term1.NamedArgs);
+        
+        var arg1 = Assert.Single(term1.Arguments);
+        Assert.Equal("x", Assert.IsType<VariableRef>(arg1.Value).Name);
+        Assert.False(arg1.Spread);
+        
+        var term2 = Assert.IsType<Literal>(relation1_1.RightOperand);
+        Assert.Equal(0.5, Assert.IsType<DataItems.Float>(term2.Value).AsDouble);
+        
+        var relation1_2 = Assert.IsType<BinaryExpression>(relation1.RightOperand);
+        Assert.Equal(BinaryOperator.LessThanOrEqual, relation1_2.Operator);
+        
+        var term3 = Assert.IsType<FunctionCall>(relation1_2.LeftOperand);
+        Assert.Equal("cos", term3.FunctionName);
+        Assert.Empty(term3.NamedArgs);
+        
+        var arg2 = Assert.Single(term3.Arguments);
+        Assert.Equal("y", Assert.IsType<VariableRef>(arg2.Value).Name);
+        Assert.False(arg2.Spread);
+        
+        var term4 = Assert.IsType<Literal>(relation1_2.RightOperand);
+        Assert.Equal(0.2, Assert.IsType<DataItems.Float>(term4.Value).AsDouble);
+        
+        var relation2 = Assert.IsType<BinaryExpression>(condition.RightOperand);
+        Assert.Equal(BinaryOperator.GreaterThanOrEqual, relation2.Operator);
+        
+        var term5 = Assert.IsType<FunctionCall>(relation2.LeftOperand);
+        Assert.Equal("randint", term5.FunctionName);
+        Assert.Empty(term5.NamedArgs);
+        
+        var arg3 = Assert.Single(term5.Arguments);
+        Assert.Equal(10, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(arg3.Value).Value).AsInt32);
+        Assert.False(arg3.Spread);
+        
+        var term6 = Assert.IsType<Literal>(relation2.RightOperand);
+        Assert.Equal(5, Assert.IsType<DataItems.Integer>(term6.Value).AsInt32);
+    }
+
+    [Fact]
+    public void TernaryExpressionTest()
+    {
+        // Arrange
+        string input = "doc.approved ? 'Approved' : doc.rejected ? 'Rejected' : 'Unknown';";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var ternary = Assert.IsType<TernaryExpression>(statements[0]);
+        var test = Assert.IsType<PropertyRef>(ternary.Test);
+        Assert.Equal("doc", Assert.IsType<VariableRef>(test.Owner).Name);
+        Assert.Equal("approved", test.PropertyName);
+        
+        var truePart = Assert.IsType<Literal>(ternary.TruePart);
+        Assert.Equal("Approved", Assert.IsType<DataItems.String>(truePart.Value).ToString());
+        
+        var falsePart = Assert.IsType<TernaryExpression>(ternary.FalsePart);
+        var test2 = Assert.IsType<PropertyRef>(falsePart.Test);
+        Assert.Equal("doc", Assert.IsType<VariableRef>(test2.Owner).Name);
+        Assert.Equal("rejected", test2.PropertyName);
+        
+        var truePart2 = Assert.IsType<Literal>(falsePart.TruePart);
+        Assert.Equal("Rejected", Assert.IsType<DataItems.String>(truePart2.Value).ToString());
+        
+        var falsePart2 = Assert.IsType<Literal>(falsePart.FalsePart);
+        Assert.Equal("Unknown", Assert.IsType<DataItems.String>(falsePart2.Value).ToString());
+    }
+    
+    [Fact]
+    public void AssignmentTest()
+    {
+        // Arrange
+        string input = "a = b += c[-1] *= d ?? 2;";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var assignment1 = Assert.IsType<Assignment>(statements[0]);
+        Assert.Equal(BinaryOperator.None, assignment1.Operator);
+        Assert.Equal("a", Assert.IsType<VariableRef>(assignment1.LeftOperand).Name);
+        
+        var assignment2 = Assert.IsType<Assignment>(assignment1.RightOperand);
+        Assert.Equal(BinaryOperator.Plus, assignment2.Operator);
+        Assert.Equal("b", Assert.IsType<VariableRef>(assignment2.LeftOperand).Name);
+        
+        var assignment3 = Assert.IsType<Assignment>(assignment2.RightOperand);
+        Assert.Equal(BinaryOperator.Times, assignment3.Operator);
+        
+        var itemRef = Assert.IsType<ItemRef>(assignment3.LeftOperand);
+        Assert.Equal("c", Assert.IsType<VariableRef>(itemRef.Owner).Name);
+        
+        var index = Assert.IsType<UnaryExpression>(itemRef.Index);
+        Assert.Equal(UnaryOperator.Minus, index.Operator);
+        Assert.Equal(1, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(index.Operand).Value).AsInt32);
+        
+        var assignee = Assert.IsType<BinaryExpression>(assignment3.RightOperand);
+        Assert.Equal(BinaryOperator.IfEmpty, assignee.Operator);
+        Assert.Equal("d", Assert.IsType<VariableRef>(assignee.LeftOperand).Name);
+        
+        var defaultVal = Assert.IsType<Literal>(assignee.RightOperand);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(defaultVal.Value).AsInt32);
+    }
+
+    [Fact]
+    public void ConstantDeclarationTest()
+    {
+        // Arrange
+        string input = "const PI = 3.14, MAX = 2;";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var constDecl = Assert.IsType<ConstantDecl>(statements[0]);
+        Assert.Equal(2, constDecl.Setters.Length);
+        
+        var setter1 = constDecl.Setters[0];
+        Assert.Equal("PI", setter1.Name);
+        Assert.Equal(3.14, Assert.IsType<DataItems.Float>(Assert.IsType<Literal>(setter1.Value).Value).AsDouble);
+        
+        var setter2 = constDecl.Setters[1];
+        Assert.Equal("MAX", setter2.Name);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(setter2.Value).Value).AsInt32);
+    }
+
+    [Fact]
+    public void VariableDeclarationTest()
+    {
+        // Arrange
+        string input = "var name = 'Bob', age = 25, job;";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var varDecl = Assert.IsType<VariableDecl>(statements[0]);
+        Assert.Equal(3, varDecl.Setters.Length);
+        
+        var setter1 = varDecl.Setters[0];
+        Assert.Equal("name", setter1.Name);
+        Assert.Equal("Bob", Assert.IsType<DataItems.String>(Assert.IsType<Literal>(setter1.Value).Value).ToString());
+        
+        var setter2 = varDecl.Setters[1];
+        Assert.Equal("age", setter2.Name);
+        Assert.Equal(25, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(setter2.Value).Value).AsInt32);
+        
+        var setter3 = varDecl.Setters[2];
+        Assert.Equal("job", setter3.Name);
+        Assert.Null(setter3.Value);
+    }
+    
+    [Fact]
+    public void FunctionDeclarationTest()
+    {
+        // Arrange
+        string input = "function foo(a, b) => a + b;";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var funcDecl = Assert.IsType<FunctionDecl>(statements[0]);
+        Assert.Equal("foo", funcDecl.Name);
+        Assert.Equal(2, funcDecl.Parameters.Length);
+        
+        var param1 = funcDecl.Parameters[0];
+        Assert.Equal("a", param1.Name);
+        Assert.False(param1.ByRef);
+        Assert.False(param1.VaList);
+        Assert.True(param1.CanBeEmpty);
+        Assert.Null(param1.DefaultValue);
+        
+        var param2 = funcDecl.Parameters[1];
+        Assert.Equal("b", param2.Name);
+        Assert.False(param2.ByRef);
+        Assert.False(param2.VaList);
+        Assert.True(param2.CanBeEmpty);
+        Assert.Null(param2.DefaultValue);
+        
+        var ret = Assert.IsType<Return>(Assert.Single(funcDecl.Body.Statements));
+        var expr = Assert.IsType<BinaryExpression>(ret.Expression);
+        Assert.Equal(BinaryOperator.Plus, expr.Operator);
+        Assert.Equal("a", Assert.IsType<VariableRef>(expr.LeftOperand).Name);
+        Assert.Equal("b", Assert.IsType<VariableRef>(expr.RightOperand).Name);
+    }
+
+    [Fact]
+    public void FunctionDeclarationTest2()
+    {
+        // Arrange
+        string input = """
+                       function bar(&res, x!, y = 0L, ..more)
+                       {
+                           res = x + y + sum(..more);
+                           return res >= 0;
+                       }
+                       """;
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var funcDecl = Assert.IsType<FunctionDecl>(statements[0]);
+        Assert.Equal("bar", funcDecl.Name);
+        Assert.Equal(4, funcDecl.Parameters.Length);
+        Assert.Equal(3, funcDecl.Body.Statements.Length); // There is an appended return statement
+        Assert.Null(Assert.IsType<Return>(funcDecl.Body.Statements[2]).Expression);
+        
+        var param1 = funcDecl.Parameters[0];
+        Assert.Equal("res", param1.Name);
+        Assert.True(param1.ByRef);
+        Assert.False(param1.VaList);
+        Assert.True(param1.CanBeEmpty);
+        Assert.Null(param1.DefaultValue);
+        
+        var param2 = funcDecl.Parameters[1];
+        Assert.Equal("x", param2.Name);
+        Assert.False(param2.ByRef);
+        Assert.False(param2.VaList);
+        Assert.False(param2.CanBeEmpty);
+        Assert.Null(param2.DefaultValue);
+        
+        var param3 = funcDecl.Parameters[2];
+        Assert.Equal("y", param3.Name);
+        Assert.False(param3.ByRef);
+        Assert.False(param3.VaList);
+        Assert.True(param3.CanBeEmpty);
+        Assert.Equal(BigInteger.Zero, Assert.IsType<DataItems.Long>(param3.DefaultValue).AsBigInteger);
+        
+        var param4 = funcDecl.Parameters[3];
+        Assert.Equal("more", param4.Name);
+        Assert.False(param4.ByRef);
+        Assert.True(param4.VaList);
+        Assert.True(param4.CanBeEmpty);
+        Assert.Null(param4.DefaultValue);
+        
+        var assign = Assert.IsType<Assignment>(funcDecl.Body.Statements[0]);
+        Assert.Equal("res", Assert.IsType<VariableRef>(assign.LeftOperand).Name);
+        Assert.Equal(BinaryOperator.None, assign.Operator);
+        
+        var assignee = Assert.IsType<BinaryExpression>(assign.RightOperand);
+        Assert.Equal(BinaryOperator.Plus, assignee.Operator);
+        
+        var left = Assert.IsType<BinaryExpression>(assignee.LeftOperand);
+        Assert.Equal(BinaryOperator.Plus, left.Operator);
+        Assert.Equal("x", Assert.IsType<VariableRef>(left.LeftOperand).Name);
+        Assert.Equal("y", Assert.IsType<VariableRef>(left.RightOperand).Name);
+        
+        var right = Assert.IsType<FunctionCall>(assignee.RightOperand);
+        Assert.Equal("sum", right.FunctionName);
+        
+        var arg = Assert.Single(right.Arguments);
+        Assert.Equal("more", Assert.IsType<VariableRef>(arg.Value).Name);
+        Assert.True(arg.Spread);
+        
+        var ret = Assert.IsType<Return>(funcDecl.Body.Statements[1]);
+        var returned = Assert.IsType<BinaryExpression>(ret.Expression);
+        Assert.Equal(BinaryOperator.GreaterThanOrEqual, returned.Operator);
+        Assert.Equal("res", Assert.IsType<VariableRef>(returned.LeftOperand).Name);
+        Assert.Equal(0, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(returned.RightOperand).Value).AsInt32);
     }
 }

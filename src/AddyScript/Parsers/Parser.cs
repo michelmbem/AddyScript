@@ -357,7 +357,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Token last = Match(TokenID.SemiColon);
 
         var constDecl = new ConstantDecl(setters);
-        constDecl.SetLocation(first.Start, last.Start);
+        constDecl.SetLocation(first.Start, last.End);
         return constDecl;
     }
 
@@ -372,7 +372,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Token last = Match(TokenID.SemiColon);
 
         var varDecl = new VariableDecl([..setters]);
-        varDecl.SetLocation(first.Start, last.Start);
+        varDecl.SetLocation(first.Start, last.End);
         return varDecl;
     }
 
