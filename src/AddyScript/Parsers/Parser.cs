@@ -601,7 +601,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Match(TokenID.KW_While);
         Match(TokenID.LeftParenthesis);
         var guard = RequiredExpression();
-        Token last = Match(TokenID.RightParenthesis);
+        Match(TokenID.RightParenthesis);
+        Token last = Match(TokenID.SemiColon);
 
         var doLoop = new DoLoop(guard, body);
         doLoop.SetLocation(first.Start, last.End);

@@ -1,9 +1,13 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Parsers;
 using AddyScript.Runtime.OOP;
+
+using Newtonsoft.Json.Linq;
+
 using DataItems = AddyScript.Runtime.DataItems;
 
 
@@ -1070,11 +1074,11 @@ public class ParserTest
         Assert.Equal(ForEachLoop.DEFAULT_KEY_NAME, forEach.KeyName);
         Assert.Equal("item", forEach.ValueName);
         Assert.Equal("collection", Assert.IsType<VariableRef>(forEach.Guard).Name);
-        
+
         var bodyCall = Assert.IsType<FunctionCall>(forEach.Action);
         Assert.Equal("process", bodyCall.FunctionName);
         Assert.Empty(bodyCall.NamedArgs);
-        
+
         var arg = Assert.Single(bodyCall.Arguments);
         Assert.Equal("item", Assert.IsType<VariableRef>(arg.Value).Name);
         Assert.False(arg.Spread);
@@ -1111,5 +1115,361 @@ public class ParserTest
         Assert.Equal(2, strInterp.Substitions.Length);
         Assert.Equal("key", Assert.IsType<VariableRef>(strInterp.Substitions[0]).Name);
         Assert.Equal("value", Assert.IsType<VariableRef>(strInterp.Substitions[1]).Name);
+    }
+
+    [Fact]
+    public void WhileLoopTest()
+    {
+        // Arrange
+        string input = "while (hasNext()) process(next());";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var whileLoop = Assert.IsType<WhileLoop>(statements[0]);
+
+        var guard = Assert.IsType<FunctionCall>(whileLoop.Guard);
+        Assert.Equal("hasNext", guard.FunctionName);
+        Assert.Empty(guard.Arguments);
+        Assert.Empty(guard.NamedArgs);
+
+        var bodyCall = Assert.IsType<FunctionCall>(whileLoop.Action);
+        Assert.Equal("process", bodyCall.FunctionName);
+        Assert.Empty(bodyCall.NamedArgs);
+
+        var arg = Assert.Single(bodyCall.Arguments);
+        Assert.False(arg.Spread);
+
+        var nextCall = Assert.IsType<FunctionCall>(arg.Value);
+        Assert.Equal("next", nextCall.FunctionName);
+        Assert.Empty(nextCall.Arguments);
+        Assert.Empty(nextCall.NamedArgs);
+    }
+
+    [Fact]
+    public void DoWhileLoopTest()
+    {
+        // Arrange
+        string input = "do { step(); } while (canContinue());";
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var doLoop = Assert.IsType<DoLoop>(statements[0]);
+
+        var guard = Assert.IsType<FunctionCall>(doLoop.Guard);
+        Assert.Equal("canContinue", guard.FunctionName);
+        Assert.Empty(guard.Arguments);
+        Assert.Empty(guard.NamedArgs);
+
+        var body = Assert.IsType<Block>(doLoop.Action);
+        var bodyCall = Assert.IsType<FunctionCall>(Assert.Single(body.Statements));
+        Assert.Equal("step", bodyCall.FunctionName);
+        Assert.Empty(bodyCall.Arguments);
+        Assert.Empty(bodyCall.NamedArgs);
+    }
+
+    [Fact]
+    public void PatternMatchingTest()
+    {
+        // Arrange
+        string input = """
+            randint(-10, 20) switch
+            {
+                < 0 => println('Negative'),
+                0 => println('Zero'),
+                1 or 2 or 3 => println('Small'),
+                >= 4 and <= 5 => println('Medium'),
+                not 10 => println('Large'),
+                10 => println('Perfect'),
+                _ => println('Other')
+            };
+            """;
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var patMatch = Assert.IsType<PatternMatching>(statements[0]);
+        Assert.Equal(7, patMatch.MatchCases.Length);
+        Assert.IsType<AlwaysTruePattern>(patMatch.MatchCases[6].Pattern);
+
+        var testCall = Assert.IsType<FunctionCall>(patMatch.Expression);
+        Assert.Equal("randint", testCall.FunctionName);
+        Assert.Equal(2, testCall.Arguments.Length);
+        Assert.Empty(testCall.NamedArgs);
+
+        var arg1 = Assert.IsType<UnaryExpression>(testCall.Arguments[0].Value);
+        Assert.Equal(UnaryOperator.Minus, arg1.Operator);
+        Assert.Equal(10, Assert.IsType<DataItems.Integer>(
+            Assert.IsType<Literal>(arg1.Operand).Value).AsInt32);
+
+        var arg2 = Assert.IsType<Literal>(testCall.Arguments[1].Value);
+        Assert.Equal(20, Assert.IsType<DataItems.Integer>(arg2.Value).AsInt32);
+
+        var case1 = Assert.IsType<RelationalPattern>(patMatch.MatchCases[0].Pattern);
+        Assert.Equal(BinaryOperator.LessThan, case1.Operator);
+        Assert.Equal(0, Assert.IsType<DataItems.Integer>(case1.Value).AsInt32);
+
+        var caseCall1 = Assert.IsType<FunctionCall>(patMatch.MatchCases[0].Expression);
+        Assert.Equal("println", caseCall1.FunctionName);
+        Assert.Empty(caseCall1.NamedArgs);
+
+        var caseArg1 = Assert.Single(caseCall1.Arguments);
+        Assert.Equal("Negative", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg1.Value).Value).ToString());
+
+        var case2 = Assert.IsType<RelationalPattern>(patMatch.MatchCases[1].Pattern);
+        Assert.Equal(BinaryOperator.Equal, case2.Operator);
+        Assert.Equal(0, Assert.IsType<DataItems.Integer>(case2.Value).AsInt32);
+
+        var caseCall2 = Assert.IsType<FunctionCall>(patMatch.MatchCases[1].Expression);
+        Assert.Equal("println", caseCall2.FunctionName);
+        Assert.Empty(caseCall2.NamedArgs);
+
+        var caseArg2 = Assert.Single(caseCall2.Arguments);
+        Assert.Equal("Zero", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg2.Value).Value).ToString());
+
+        var case3 = Assert.IsType<LogicalPattern>(patMatch.MatchCases[2].Pattern);
+        Assert.False(case3.Inclusive);
+
+        var case3_left = Assert.IsType<LogicalPattern>(case3.Left);
+        Assert.False(case3_left.Inclusive);
+
+        var case3_left_left = Assert.IsType<RelationalPattern>(case3_left.Left);
+        Assert.Equal(BinaryOperator.Equal, case3_left_left.Operator);
+        Assert.Equal(1, Assert.IsType<DataItems.Integer>(case3_left_left.Value).AsInt32);
+
+        var case3_left_right = Assert.IsType<RelationalPattern>(case3_left.Right);
+        Assert.Equal(BinaryOperator.Equal, case3_left_right.Operator);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(case3_left_right.Value).AsInt32);
+
+        var case3_right = Assert.IsType<RelationalPattern>(case3.Right);
+        Assert.Equal(BinaryOperator.Equal, case3_right.Operator);
+        Assert.Equal(3, Assert.IsType<DataItems.Integer>(case3_right.Value).AsInt32);
+
+        var caseCall3 = Assert.IsType<FunctionCall>(patMatch.MatchCases[2].Expression);
+        Assert.Equal("println", caseCall3.FunctionName);
+        Assert.Empty(caseCall3.NamedArgs);
+
+        var caseArg3 = Assert.Single(caseCall3.Arguments);
+        Assert.Equal("Small", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg3.Value).Value).ToString());
+
+        var case4 = Assert.IsType<LogicalPattern>(patMatch.MatchCases[3].Pattern);
+        Assert.True(case4.Inclusive);
+
+        var case4_left = Assert.IsType<RelationalPattern>(case4.Left);
+        Assert.Equal(BinaryOperator.GreaterThanOrEqual, case4_left.Operator);
+        Assert.Equal(4, Assert.IsType<DataItems.Integer>(case4_left.Value).AsInt32);
+
+        var case4_right = Assert.IsType<RelationalPattern>(case4.Right);
+        Assert.Equal(BinaryOperator.LessThanOrEqual, case4_right.Operator);
+        Assert.Equal(5, Assert.IsType<DataItems.Integer>(case4_right.Value).AsInt32);
+
+        var caseCall4 = Assert.IsType<FunctionCall>(patMatch.MatchCases[3].Expression);
+        Assert.Equal("println", caseCall4.FunctionName);
+        Assert.Empty(caseCall4.NamedArgs);
+
+        var caseArg4 = Assert.Single(caseCall4.Arguments);
+        Assert.Equal("Medium", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg4.Value).Value).ToString());
+
+        var case5 = Assert.IsType<NegativePattern>(patMatch.MatchCases[4].Pattern);
+        var case5_child = Assert.IsType<RelationalPattern>(case5.Child);
+        Assert.Equal(BinaryOperator.Equal, case5_child.Operator);
+        Assert.Equal(10, Assert.IsType<DataItems.Integer>(case5_child.Value).AsInt32);
+
+        var caseCall5 = Assert.IsType<FunctionCall>(patMatch.MatchCases[4].Expression);
+        Assert.Equal("println", caseCall5.FunctionName);
+        Assert.Empty(caseCall5.NamedArgs);
+
+        var caseArg5 = Assert.Single(caseCall5.Arguments);
+        Assert.Equal("Large", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg5.Value).Value).ToString());
+
+        var case6 = Assert.IsType<RelationalPattern>(patMatch.MatchCases[5].Pattern);
+        Assert.Equal(BinaryOperator.Equal, case6.Operator);
+        Assert.Equal(10, Assert.IsType<DataItems.Integer>(case6.Value).AsInt32);
+
+        var caseCall6 = Assert.IsType<FunctionCall>(patMatch.MatchCases[5].Expression);
+        Assert.Equal("println", caseCall6.FunctionName);
+        Assert.Empty(caseCall6.NamedArgs);
+
+        var caseArg6 = Assert.Single(caseCall6.Arguments);
+        Assert.Equal("Perfect", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg6.Value).Value).ToString());
+
+        var caseCall7 = Assert.IsType<FunctionCall>(patMatch.MatchCases[6].Expression);
+        Assert.Equal("println", caseCall7.FunctionName);
+        Assert.Empty(caseCall7.NamedArgs);
+
+        var caseArg7 = Assert.Single(caseCall7.Arguments);
+        Assert.Equal("Other", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseArg7.Value).Value).ToString());
+
+        foreach (var matchCase in patMatch.MatchCases)
+        {
+            Assert.Null(matchCase.Guard);
+        }
+    }
+
+    [Fact]
+    public void PatternMatchingTest2()
+    {
+        // Arrange
+        string input = """
+            data switch
+            {
+                null => 'No value',
+                CustomerData => $'Customer Data, name: {data.name}, phone: {data.phone}',
+                OrderData { orderDate: >= `2025-07-01` } => 'Recent order',
+                EmployeeData(jobTitle, department) => $'Employee: {jobTitle} at {department}',
+                { shipping.$date.year: 2026  } => 'Shipping in 2026',
+                (date, decimal) => $'Invoice date: {__value[0]:d}, amount: {__value[1]:c}',
+                _ when data is not string => throw 'Unsupported data',
+                _ => {
+                    println('Require more processing');
+                    yield data;
+                }
+            };
+            """;
+
+        // Act
+        var (statements, error) = Parse(input);
+
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+
+        var patMatch = Assert.IsType<PatternMatching>(statements[0]);
+        Assert.Equal("data", Assert.IsType<VariableRef>(patMatch.Expression).Name);
+        Assert.Equal(8, patMatch.MatchCases.Length);
+        Assert.IsType<AlwaysTruePattern>(patMatch.MatchCases[6].Pattern);
+        Assert.IsType<AlwaysTruePattern>(patMatch.MatchCases[7].Pattern);
+
+        var case1 = Assert.IsType<RelationalPattern>(patMatch.MatchCases[0].Pattern);
+        Assert.Equal(BinaryOperator.Identical, case1.Operator);
+        Assert.Equal(DataItems.Void.Value, case1.Value);
+
+        var caseExpr1 = Assert.IsType<Literal>(patMatch.MatchCases[0].Expression);
+        Assert.Equal("No value", Assert.IsType<DataItems.String>(caseExpr1.Value).ToString());
+
+        var case2 = Assert.IsType<TypePattern>(patMatch.MatchCases[1].Pattern);
+        Assert.Equal("CustomerData", case2.TypeName);
+
+        var caseExpr2 = Assert.IsType<StringInterpolation>(patMatch.MatchCases[1].Expression);
+        Assert.Equal("Customer Data, name: {0}, phone: {1}", caseExpr2.Pattern);
+        Assert.Equal(2, caseExpr2.Substitions.Length);
+
+        var sub1 = Assert.IsType<PropertyRef>(caseExpr2.Substitions[0]);
+        Assert.Equal("data", Assert.IsType<VariableRef>(sub1.Owner).Name);
+        Assert.Equal("name", sub1.PropertyName);
+
+        var sub2 = Assert.IsType<PropertyRef>(caseExpr2.Substitions[1]);
+        Assert.Equal("data", Assert.IsType<VariableRef>(sub2.Owner).Name);
+        Assert.Equal("phone", sub2.PropertyName);
+
+        var case3 = Assert.IsType<ObjectPattern>(patMatch.MatchCases[2].Pattern);
+        Assert.Equal("OrderData", case3.TypeName);
+
+        var propMatcher = Assert.Single(case3.PropertyMatchers);
+        Assert.Equal("orderDate", Assert.Single(propMatcher.Path));
+
+        var propPattern1 = Assert.IsType<RelationalPattern>(propMatcher.Pattern);
+        Assert.Equal(BinaryOperator.GreaterThanOrEqual, propPattern1.Operator);
+        Assert.Equal(DateTime.Parse("2025-07-01", CultureInfo.InvariantCulture),
+            Assert.IsType<DataItems.Date>(propPattern1.Value).AsDateTime);
+
+        var caseExpr3 = Assert.IsType<Literal>(patMatch.MatchCases[2].Expression);
+        Assert.Equal("Recent order", Assert.IsType<DataItems.String>(caseExpr3.Value).ToString());
+
+        var case4 = Assert.IsType<DestructuringPattern>(patMatch.MatchCases[3].Pattern);
+        Assert.Equal("EmployeeData", case4.TypeName);
+        Assert.Equal(2, case4.PropertyNames.Length);
+        Assert.Equal("jobTitle", case4.PropertyNames[0]);
+        Assert.Equal("department", case4.PropertyNames[1]);
+
+        var caseExpr4 = Assert.IsType<StringInterpolation>(patMatch.MatchCases[3].Expression);
+        Assert.Equal("Employee: {0} at {1}", caseExpr4.Pattern);
+        Assert.Equal(2, caseExpr4.Substitions.Length);
+        Assert.Equal("jobTitle", Assert.IsType<VariableRef>(caseExpr4.Substitions[0]).Name);
+        Assert.Equal("department", Assert.IsType<VariableRef>(caseExpr4.Substitions[1]).Name);
+
+        var case5 = Assert.IsType<ObjectPattern>(patMatch.MatchCases[4].Pattern);
+        Assert.Null(case5.TypeName);
+
+        var shippingMatcher = Assert.Single(case5.PropertyMatchers);
+        Assert.Equal(3, shippingMatcher.Path.Length);
+        Assert.Equal("shipping", shippingMatcher.Path[0]);
+        Assert.Equal("date", shippingMatcher.Path[1]);
+        Assert.Equal("year", shippingMatcher.Path[2]);
+
+        var propPattern2 = Assert.IsType<RelationalPattern>(shippingMatcher.Pattern);
+        Assert.Equal(BinaryOperator.Equal, propPattern2.Operator);
+        Assert.Equal(2026, Assert.IsType<DataItems.Integer>(propPattern2.Value).AsInt32);
+
+        var caseExpr5 = Assert.IsType<Literal>(patMatch.MatchCases[4].Expression);
+        Assert.Equal("Shipping in 2026", Assert.IsType<DataItems.String>(caseExpr5.Value).ToString());
+
+        var case6 = Assert.IsType<PositionalPattern>(patMatch.MatchCases[5].Pattern);
+        Assert.Equal(2, case6.Items.Length);
+        Assert.Equal("date", Assert.IsType<TypePattern>(case6.Items[0]).TypeName);
+        Assert.Equal("decimal", Assert.IsType<TypePattern>(case6.Items[1]).TypeName);
+
+        var caseExpr6 = Assert.IsType<StringInterpolation>(patMatch.MatchCases[5].Expression);
+        Assert.Equal("Invoice date: {0:d}, amount: {1:c}", caseExpr6.Pattern);
+        Assert.Equal(2, caseExpr6.Substitions.Length);
+
+        var sub6_1 = Assert.IsType<ItemRef>(caseExpr6.Substitions[0]);
+        Assert.Equal("__value", Assert.IsType<VariableRef>(sub6_1.Owner).Name);
+        Assert.Equal(0, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(sub6_1.Index).Value).AsInt32);
+
+        var sub6_2 = Assert.IsType<ItemRef>(caseExpr6.Substitions[1]);
+        Assert.Equal("__value", Assert.IsType<VariableRef>(sub6_2.Owner).Name);
+        Assert.Equal(1, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(sub6_2.Index).Value).AsInt32);
+
+        var guard7 = Assert.IsType<PatternMatching>(patMatch.MatchCases[6].Guard);
+        Assert.Equal("data", Assert.IsType<VariableRef>(guard7.Expression).Name);
+        Assert.True(guard7.IsSimple);
+
+        var typeCheck7 = Assert.IsType<TypePattern>(Assert.IsType<NegativePattern>(guard7.MatchCases[0].Pattern).Child);
+        Assert.Equal("string", typeCheck7.TypeName);
+
+        var caseExpr7 = Assert.IsType<ThrowExpression>(patMatch.MatchCases[6].Expression);
+        Assert.Equal("Unsupported data", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(caseExpr7.Throw.Expression).Value).ToString());
+
+        var caseExpr8 = Assert.IsType<BlockAsExpression>(patMatch.MatchCases[7].Expression);
+        Assert.Equal(2, caseExpr8.Block.Statements.Length);
+
+        var printCall = Assert.IsType<FunctionCall>(caseExpr8.Block.Statements[0]);
+        Assert.Equal("println", printCall.FunctionName);
+        Assert.Empty(printCall.NamedArgs);
+        
+        var printArg = Assert.Single(printCall.Arguments);
+        Assert.Equal("Require more processing", Assert.IsType<DataItems.String>(
+            Assert.IsType<Literal>(printArg.Value).Value).ToString());
+
+        var yieldStmt = Assert.IsType<Yield>(caseExpr8.Block.Statements[1]);
+        Assert.Equal("data", Assert.IsType<VariableRef>(yieldStmt.Expression).Name);
+
+        for (var i = 0; i < patMatch.MatchCases.Length; i++)
+        {
+            if (i == 6) continue; // the 7th case has a guard
+            Assert.Null(patMatch.MatchCases[i].Guard);
+        }
     }
 }
