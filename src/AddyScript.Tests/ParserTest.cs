@@ -440,12 +440,12 @@ public class ParserTest
          * term1_1 = factor1 * factor2
          * factor1 = literal { type: int, value: 2 }
          * factor2 = expo1 ** expo2
-         * expo1 = variable_ref { name: x }
+         * expo1 = variable_ref { name: 'x' }
          * expo2 = literal { type: int, value: 3 }
          * term1_2 = factor3 / factor4
          * factor3 = literal { type: int, value: 5 }
-         * factor4 = variable_ref { name: y }
-         * term2 = function_call { name: rand, positional_args: [], named_args: [] }
+         * factor4 = variable_ref { name: 'y' }
+         * term2 = function_call { name: 'rand', positional_args: [], named_args: [] }
          */
 
         var binary = Assert.IsType<BinaryExpression>(statements[0]);
