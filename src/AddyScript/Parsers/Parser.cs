@@ -725,7 +725,7 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
         Token last = Match(TokenID.SemiColon);
 
         var _return = new Return(expr);
-        _return.SetLocation(first.Start, last.Start);
+        _return.SetLocation(first.Start, last.End);
         return _return;
     }
 

@@ -805,4 +805,71 @@ public class ParserTest
         Assert.Equal("res", Assert.IsType<VariableRef>(returned.LeftOperand).Name);
         Assert.Equal(0, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(returned.RightOperand).Value).AsInt32);
     }
+
+    [Fact]
+    public static void ExternalFunctionDeclarationTest()
+    {
+        // Arrange
+        string input = "extern function routine(handle, struct);";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var funcDecl = Assert.IsType<ExternalFunctionDecl>(statements[0]);
+        Assert.Equal("routine", funcDecl.Name);
+        Assert.Equal(2, funcDecl.Parameters.Length);
+        
+        var param1 = funcDecl.Parameters[0];
+        Assert.Equal("handle", param1.Name);
+        Assert.False(param1.ByRef);
+        Assert.False(param1.VaList);
+        Assert.True(param1.CanBeEmpty);
+        Assert.Null(param1.DefaultValue);
+        
+        var param2 = funcDecl.Parameters[1];
+        Assert.Equal("struct", param2.Name);
+        Assert.False(param2.ByRef);
+        Assert.False(param2.VaList);
+        Assert.True(param2.CanBeEmpty);
+        Assert.Null(param2.DefaultValue);
+    }
+    
+    [Fact]
+    public void IfElseTest()
+    {
+        // Arrange
+        string input = "if (x >= 0) println('Positive'); else println('Negative');";
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var ifElse = Assert.IsType<IfElse>(statements[0]);
+        
+        var guard = Assert.IsType<BinaryExpression>(ifElse.Guard);
+        Assert.Equal(BinaryOperator.GreaterThanOrEqual, guard.Operator);
+        Assert.Equal("x", Assert.IsType<VariableRef>(guard.LeftOperand).Name);
+        Assert.Equal(0, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(guard.RightOperand).Value).AsInt32);
+        
+        var action = Assert.IsType<FunctionCall>(ifElse.Action);
+        Assert.Equal("println", action.FunctionName);
+        
+        var arg1 = Assert.Single(action.Arguments);
+        Assert.Equal("Positive", Assert.IsType<DataItems.String>(Assert.IsType<Literal>(arg1.Value).Value).ToString());
+        Assert.False(arg1.Spread);
+        
+        var altAction = Assert.IsType<FunctionCall>(ifElse.AlternativeAction);
+        Assert.Equal("println", altAction.FunctionName);
+        
+        var arg2 = Assert.Single(altAction.Arguments);
+        Assert.Equal("Negative", Assert.IsType<DataItems.String>(Assert.IsType<Literal>(arg2.Value).Value).ToString());
+        Assert.False(arg2.Spread);
+    }
 }
