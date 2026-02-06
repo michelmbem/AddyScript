@@ -6,8 +6,6 @@ using AddyScript.Ast.Statements;
 using AddyScript.Parsers;
 using AddyScript.Runtime.OOP;
 
-using Newtonsoft.Json.Linq;
-
 using DataItems = AddyScript.Runtime.DataItems;
 
 
