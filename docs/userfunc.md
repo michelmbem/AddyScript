@@ -139,7 +139,7 @@ println('add(..l[2..], ..s)' + res);
 A parameter can be passed to a function by value, by reference, or as a variable-length list of values.
 By default, parameters are passed by value.
 To indicate that a parameter is passed by reference, simply prefix it with the ampersand sign (`&`).
-Similarly, prefixing a parameter with the double-dot sign (`..`) keyword indicates that it represents a variable-length list of values.
+Similarly, prefixing a parameter with the double-dot sign (`..`) indicates that it represents a variable-length list of values.
 Note that a variable-length list of values must always be the last in a parameter list.
 Thus, a function cannot have multiple variable-length lists of values in its header.
 
