@@ -5,7 +5,6 @@ using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
 using AddyScript.Parsers;
 using AddyScript.Runtime.OOP;
-
 using DataItems = AddyScript.Runtime.DataItems;
 
 
@@ -130,6 +129,7 @@ public class ParserTest
     [InlineData("['a', 'b', 'c']")]
     [InlineData("{w, x, ..y, z}")]
     [InlineData("{'one' => 1f, 'two' => 2f}")]
+    [InlineData("new {value, parent, left = null, right = null}")]
     public void InitializerTest(string expression)
     {
         // Arrange
@@ -198,6 +198,17 @@ public class ParserTest
                             break;
                     }
                 }
+                break;
+            case ObjectInitializer _object:
+                Assert.Equal(4, _object.PropertySetters.Length);
+                Assert.Equal("value", _object.PropertySetters[0].Name);
+                Assert.Equal("value", Assert.IsType<VariableRef>(_object.PropertySetters[0].Value).Name);
+                Assert.Equal("parent", _object.PropertySetters[1].Name);
+                Assert.Equal("parent", Assert.IsType<VariableRef>(_object.PropertySetters[1].Value).Name);
+                Assert.Equal("left", _object.PropertySetters[2].Name);
+                Assert.IsType<DataItems.Void>(Assert.IsType<Literal>(_object.PropertySetters[2].Value).Value);
+                Assert.Equal("right", _object.PropertySetters[3].Name);
+                Assert.IsType<DataItems.Void>(Assert.IsType<Literal>(_object.PropertySetters[3].Value).Value);
                 break;
             default:
                 Assert.Fail($"Unexpected statement type : {assignment.GetType().Name}");
@@ -930,21 +941,21 @@ public class ParserTest
         Assert.Single(statements);
         Assert.Null(error);
 
-        var switchStmt = Assert.IsType<SwitchBlock>(statements[0]);
-        Assert.Equal("score", Assert.IsType<VariableRef>(switchStmt.Test).Name);
-        Assert.Equal(2, switchStmt.Cases.Length);
-        Assert.Equal(0, switchStmt.Cases[0].Address);
-        Assert.Equal(1, Assert.IsType<DataItems.Integer>(switchStmt.Cases[0].Value).AsInt32);
-        Assert.Equal(2, switchStmt.Cases[1].Address);
-        Assert.Equal(2, Assert.IsType<DataItems.Integer>(switchStmt.Cases[1].Value).AsInt32);
-        Assert.Equal(4, switchStmt.DefaultCase);
-        Assert.Equal(5, switchStmt.Statements.Length);
+        var switchBlk = Assert.IsType<SwitchBlock>(statements[0]);
+        Assert.Equal("score", Assert.IsType<VariableRef>(switchBlk.Test).Name);
+        Assert.Equal(2, switchBlk.Cases.Length);
+        Assert.Equal(0, switchBlk.Cases[0].Address);
+        Assert.Equal(1, Assert.IsType<DataItems.Integer>(switchBlk.Cases[0].Value).AsInt32);
+        Assert.Equal(2, switchBlk.Cases[1].Address);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(switchBlk.Cases[1].Value).AsInt32);
+        Assert.Equal(4, switchBlk.DefaultCase);
+        Assert.Equal(5, switchBlk.Statements.Length);
 
-        for (int i = 0; i < switchStmt.Statements.Length; i++)
+        for (int i = 0; i < switchBlk.Statements.Length; i++)
         {
             if (i % 2 == 0) // case 1, case 2 and default case
             {
-                var printCall = Assert.IsType<FunctionCall>(switchStmt.Statements[i]);
+                var printCall = Assert.IsType<FunctionCall>(switchBlk.Statements[i]);
                 Assert.Equal("println", printCall.FunctionName);
                 Assert.Empty(printCall.NamedArgs);
 
@@ -955,7 +966,7 @@ public class ParserTest
             }
             else // break statements
             {
-                Assert.IsType<Break>(switchStmt.Statements[i]);
+                Assert.IsType<Break>(switchBlk.Statements[i]);
             }
         }
     }
@@ -1030,14 +1041,14 @@ public class ParserTest
         Assert.Equal("k", Assert.IsType<VariableRef>(guard.LeftOperand).Name);
         Assert.Equal("n", Assert.IsType<VariableRef>(guard.RightOperand).Name);
 
-        var incrementer1 = Assert.IsType<UnaryExpression>(forLoop.Incrementers[0]);
-        Assert.Equal(UnaryOperator.PreIncrement, incrementer1.Operator);
-        Assert.Equal("k", Assert.IsType<VariableRef>(incrementer1.Operand).Name);
+        var incr1 = Assert.IsType<UnaryExpression>(forLoop.Incrementers[0]);
+        Assert.Equal(UnaryOperator.PreIncrement, incr1.Operator);
+        Assert.Equal("k", Assert.IsType<VariableRef>(incr1.Operand).Name);
 
-        var incrementer2 = Assert.IsType<Assignment>(forLoop.Incrementers[1]);
-        Assert.Equal("l", Assert.IsType<VariableRef>(incrementer2.LeftOperand).Name);
-        Assert.Equal(BinaryOperator.Times, incrementer2.Operator);
-        Assert.Equal(2, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(incrementer2.RightOperand).Value).AsInt32);
+        var incr2 = Assert.IsType<Assignment>(forLoop.Incrementers[1]);
+        Assert.Equal("l", Assert.IsType<VariableRef>(incr2.LeftOperand).Name);
+        Assert.Equal(BinaryOperator.Times, incr2.Operator);
+        Assert.Equal(2, Assert.IsType<DataItems.Integer>(Assert.IsType<Literal>(incr2.RightOperand).Value).AsInt32);
 
         var methodCall = Assert.IsType<MethodCall>(forLoop.Action);
         Assert.Equal("vec", Assert.IsType<VariableRef>(methodCall.Target).Name);
@@ -1149,7 +1160,7 @@ public class ParserTest
     }
 
     [Fact]
-    public void DoWhileLoopTest()
+    public void DoLoopTest()
     {
         // Arrange
         string input = "do { step(); } while (canContinue());";
@@ -1469,5 +1480,124 @@ public class ParserTest
             if (i == 6) continue; // the 7th case has a guard
             Assert.Null(patMatch.MatchCases[i].Guard);
         }
+    }
+
+    [Fact]
+    public void ClassDefinitionTest()
+    {
+        // Arrange
+        string input = """
+                       class Single
+                       {
+                           private _element;
+                           
+                           public constructor (element)
+                           {
+                               this.element = element;
+                           }
+                           
+                           public property element
+                           {
+                              read { return this._element; }
+                              write { this._element = __value; }
+                           }
+                           
+                           public function toString()
+                           {
+                               return "Single(" + this.element + ")";
+                           }
+                       }
+                       """;
+        
+        // Act
+        var (statements, error) = Parse(input);
+        
+        // Assert
+        Assert.Single(statements);
+        Assert.Null(error);
+        
+        var classDef = Assert.IsType<ClassDefinition>(statements[0]);
+        Assert.Equal("Single", classDef.ClassName);
+        Assert.Equal(Modifier.Default, classDef.Modifier);
+        Assert.Null(classDef.SuperClassName);
+        Assert.Null(classDef.Indexer);
+        Assert.Empty(classDef.Events);
+        Assert.Null(classDef.Attributes);
+
+        var constructor = Assert.IsType<ClassMethodDecl>(classDef.Constructor);
+        Assert.Equal(classDef.ClassName, constructor.Name);
+        Assert.Equal(Scope.Public, constructor.Scope);
+        Assert.Equal(Modifier.Default, constructor.Modifier);
+        Assert.Null(constructor.Attributes);
+        
+        var ctorParam = Assert.Single(constructor.Parameters);
+        Assert.Equal("element", ctorParam.Name);
+        Assert.False(ctorParam.ByRef);
+        Assert.False(ctorParam.VaList);
+        Assert.True(ctorParam.CanBeEmpty);
+        Assert.Null(ctorParam.DefaultValue);
+        Assert.Null(ctorParam.Attributes);
+        Assert.Equal(2, constructor.Body.Statements.Length);
+        Assert.IsType<Return>(constructor.Body.Statements[1]);
+        
+        var ctorBodyAssign = Assert.IsType<Assignment>(constructor.Body.Statements[0]);
+        Assert.Equal(BinaryOperator.None, ctorBodyAssign.Operator);
+        Assert.Equal("element", Assert.IsType<VariableRef>(ctorBodyAssign.RightOperand).Name);
+        
+        var lValue = Assert.IsType<PropertyRef>(ctorBodyAssign.LeftOperand);
+        Assert.Equal("element", lValue.PropertyName);
+        Assert.IsType<SelfReference>(lValue.Owner);
+        
+        var elementField = Assert.Single(classDef.Fields);
+        Assert.Equal("_element", elementField.Name);
+        Assert.Equal(Scope.Private, elementField.Scope);
+        Assert.Equal(Modifier.Default, elementField.Modifier);
+        Assert.Null(elementField.Initializer);
+        Assert.Null(elementField.Attributes);
+
+        var elementProp = Assert.Single(classDef.Properties);
+        Assert.Equal("element", elementProp.Name);
+        Assert.Equal(Scope.Public, elementProp.Scope);
+        Assert.Equal(Modifier.Default, elementProp.Modifier);
+        Assert.True(elementProp.CanRead);
+        Assert.True(elementProp.CanWrite);
+        Assert.Equal(elementProp.Scope, elementProp.ReaderScope);
+        Assert.Equal(elementProp.Scope, elementProp.WriterScope);
+        Assert.Null(elementProp.Attributes);
+        
+        var readerStmt = Assert.IsType<Return>(elementProp.ReaderBody.Statements[0]);
+        var returned = Assert.IsType<PropertyRef>(readerStmt.Expression);
+        Assert.Equal(elementField.Name, returned.PropertyName);
+        Assert.IsType<SelfReference>(returned.Owner);
+        
+        var writerStmt = Assert.IsType<Assignment>(elementProp.WriterBody.Statements[0]);
+        Assert.Equal(BinaryOperator.None, writerStmt.Operator);
+        Assert.Equal("__value", Assert.IsType<VariableRef>(writerStmt.RightOperand).Name);
+        
+        var lValue2 = Assert.IsType<PropertyRef>(writerStmt.LeftOperand);
+        Assert.Equal(elementField.Name, lValue2.PropertyName);
+        Assert.IsType<SelfReference>(lValue2.Owner);
+        
+        var toStringMethod = Assert.Single(classDef.Methods);
+        Assert.Equal("toString", toStringMethod.Name);
+        Assert.Equal(Scope.Public, toStringMethod.Scope);
+        Assert.Equal(Modifier.Default, toStringMethod.Modifier);
+        Assert.Empty(toStringMethod.Parameters);
+        Assert.Equal(2, toStringMethod.Body.Statements.Length);
+        Assert.IsType<Return>(toStringMethod.Body.Statements[1]);
+        Assert.Null(toStringMethod.Attributes);
+        
+        var toStringBodyReturn = Assert.IsType<Return>(toStringMethod.Body.Statements[0]);
+        var returned2 = Assert.IsType<BinaryExpression>(toStringBodyReturn.Expression);
+        Assert.Equal(BinaryOperator.Plus, returned2.Operator);
+        Assert.Equal(")", Assert.IsType<DataItems.String>(Assert.IsType<Literal>(returned2.RightOperand).Value).ToString());
+        
+        var leftTerm = Assert.IsType<BinaryExpression>(returned2.LeftOperand);
+        Assert.Equal(BinaryOperator.Plus, leftTerm.Operator);
+        Assert.Equal("Single(", Assert.IsType<DataItems.String>(Assert.IsType<Literal>(leftTerm.LeftOperand).Value).ToString());
+        
+        var middleTerm = Assert.IsType<PropertyRef>(leftTerm.RightOperand);
+        Assert.Equal(elementProp.Name, middleTerm.PropertyName);
+        Assert.IsType<SelfReference>(middleTerm.Owner);
     }
 }
