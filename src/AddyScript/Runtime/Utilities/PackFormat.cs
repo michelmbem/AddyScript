@@ -221,13 +221,13 @@ public class PackFormat(Endianness endianness, IEnumerable<PackFormatItem> items
                         ++j;
                     while (j < s.Length && char.IsDigit(s[j]));
                     if (j >= s.Length)
-                        throw new ArgumentException(Resources.PackInvalidFormat);
+                        throw new FormatException(Resources.PackInvalidFormat);
                     count = int.Parse(s[i..j]);
                     i = j;
                     break;
                 }
                 default:
-                    throw new ArgumentException(Resources.PackInvalidFormat);
+                    throw new FormatException(Resources.PackInvalidFormat);
             }
         }
 
