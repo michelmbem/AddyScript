@@ -1,5 +1,6 @@
 ﻿using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
+using Tuple = AddyScript.Runtime.DataItems.Tuple;
 
 
 namespace AddyScript.Tests;
@@ -11,9 +12,15 @@ public class TupleTest
     [Fact]
     public void TupleSerializationTest()
     {
-        var t1 = DataItemFactory.CreateDataItem((10, 0.5));
-        var t2 = DataItemFactory.CreateDataItem(new Tuple<int, double>(8, -.33));
+        // Arrange
+        var value1 = (10, 0.5);
+        var value2 = new Tuple<int, double>(8, -.33);
+        
+        // Act
+        var t1 = DataItemFactory.CreateDataItem(value1);
+        var t2 = DataItemFactory.CreateDataItem(value2);
 
+        // Assert
         Assert.Equal(Class.Tuple, t1.Class);
         Assert.Equal(new Integer(10), t1.AsArray[0]);
         Assert.Equal(new Float(0.5), t1.AsArray[1]);
@@ -26,11 +33,18 @@ public class TupleTest
     [Fact]
     public void TupleDeserializationTest()
     {
-        var t = DataItemFactory.CreateDataItem((-7, 3.1f));
+        // Arrange
+        const int first = -7;
+        const float second = 3.1f;
+        
+        var t = new Tuple([new Integer(first), new Float(second)]);
+        
+        // Act
         var v1 = t.ConvertTo(typeof((int, float)));
         var v2 = t.ConvertTo(typeof(Tuple<int, float>));
 
-        Assert.Equal((-7, 3.1f), v1);
-        Assert.Equal(new Tuple<int, float>(-7, 3.1f), v2);
+        // Assert
+        Assert.Equal((first, second), v1);
+        Assert.Equal(new Tuple<int, float>(first, second), v2);
     }
 }

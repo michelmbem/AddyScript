@@ -9,7 +9,13 @@ public class PackFormatTest
     [Fact]
     public void ParseTest()
     {
-        var format = PackFormat.Parse("<hI12s");
+        // Arrange
+        string input = "<hI12s";
+        
+        // Act
+        var format = PackFormat.Parse(input);
+        
+        // Assert
         Assert.Equal(Endianness.LittleEndian, format.Endianness);
         Assert.Equal(3, format.Items.Count);
         Assert.Equal(3, format.Length);
