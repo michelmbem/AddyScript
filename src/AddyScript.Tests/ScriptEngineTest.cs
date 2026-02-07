@@ -1,37 +1,46 @@
 ﻿namespace AddyScript.Tests;
 
+
 public class ScriptEngineTest
 {
 	delegate int SumType(int a, int b);
-
-	[Fact]
-	public void GetDelegateTest()
+	
+	private readonly ScriptEngine engine;
+	
+	public ScriptEngineTest()
 	{
-		// Arrange
-		var ctx = new ScriptContext();
-		var engine = new ScriptEngine(ctx);
+		engine = new ScriptEngine();
 		engine.Execute("function sum(a, b) {return a + b;}");
-
-		// Act
-		var sum = engine.GetDelegate<SumType>("sum");
-		var x = sum(7, -3);
-
-		// Assert
-		Assert.Equal(4, x);
 	}
 
-	[Fact]
-	public void InvokeTest()
+	[Theory]
+	[InlineData(7, -3, 4)]
+	[InlineData(10, 5, 15)]
+	[InlineData(0, 0, 0)]
+	public void GetDelegateTest(int a, int b, int res)
 	{
 		// Arrange
-		var ctx = new ScriptContext();
-		var engine = new ScriptEngine(ctx);
-		engine.Execute("function sum(a, b) {return a + b;}");
-
+		var sum = engine.GetDelegate<SumType>("sum");
+		
 		// Act
-		var x = engine.Invoke("sum", 10, 5).AsInt32;
+		var x = sum(a, b);
 
 		// Assert
-		Assert.Equal(15, x);
+		Assert.Equal(res, x);
+	}
+
+	[Theory]
+	[InlineData(7, -3, 4)]
+	[InlineData(10, 5, 15)]
+	[InlineData(0, 0, 0)]
+	public void InvokeTest(int a, int b, int res)
+	{
+		// Arrange
+		
+		// Act
+		var x = engine.Invoke("sum", a, b);
+
+		// Assert
+		Assert.Equal(res, x.AsInt32);
 	}
 }
