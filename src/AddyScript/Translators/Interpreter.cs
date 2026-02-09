@@ -54,8 +54,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     private Stack<MethodFrame> frames = new ();
     private MethodFrame rootFrame, currentFrame;
     private string fileName = string.Empty;
-    private MissingReferenceAction misRefAct = MissingReferenceAction.Fail;
-    private JumpCode jumpCode = JumpCode.None;
+    private MissingReferenceAction onMissingRef = MissingReferenceAction.Fail;
+    private JumpCode jump = JumpCode.None;
     private LinkedList<DataItem> yieldedValues = [];
     private DataItem returnedValue;
     private Goto lastGoto;
@@ -118,7 +118,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         }
         finally
         {
-            jumpCode = JumpCode.None;
+            jump = JumpCode.None;
             fileName = prevFileName;
         }
     }
@@ -650,15 +650,15 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
         switch (frameItem)
         {
-            case null when misRefAct == MissingReferenceAction.Create:
+            case null when onMissingRef == MissingReferenceAction.Create:
                 returnedValue = Undefined.Value;
                 currentFrame.PutItem(varRef.Name, returnedValue);
                 break;
-            case null when misRefAct == MissingReferenceAction.Fail:
+            case null when onMissingRef == MissingReferenceAction.Fail:
                 throw new RuntimeError(fileName, varRef, string.Format(Resources.UndefinedVariable, varRef.Name));
             case null: // do nothing when misRefAction is Ignore
                 break;
-            case Undefined when misRefAct == MissingReferenceAction.Fail:
+            case Undefined when onMissingRef == MissingReferenceAction.Fail:
                 throw new RuntimeError(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
             case DataItem variable: // handles Undefined when misRefAct is not Fail
                 returnedValue = variable;
@@ -701,7 +701,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                     return;
             }
 
-            if (itemValue == null && misRefAct != MissingReferenceAction.Ignore)
+            if (itemValue == null && onMissingRef != MissingReferenceAction.Ignore)
                 throw new RuntimeError(fileName, itemRef, string.Format(Resources.IndexNotFound, index));
 
             returnedValue = itemValue;
@@ -779,7 +779,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
             }
 
-            if (propValue == null && misRefAct != MissingReferenceAction.Ignore)
+            if (propValue == null && onMissingRef != MissingReferenceAction.Ignore)
                 throw new RuntimeError(fileName, propertyRef, string.Format(Resources.PropertyNotFoundInObject,
                                                                             propertyRef.PropertyName));
 
@@ -1187,14 +1187,14 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
     public void TranslateTypeVerification(TypeVerification typeVerif)
     {
-        MissingReferenceAction prevAction = misRefAct;
+        MissingReferenceAction prevAction = onMissingRef;
 
         try
         {
             if (rootFrame.GetItem(typeVerif.TypeName) is not Class klass)
                 throw new RuntimeError(fileName, typeVerif, string.Format(Resources.UndefinedType, typeVerif.TypeName));
 
-            misRefAct = MissingReferenceAction.Ignore;
+            onMissingRef = MissingReferenceAction.Ignore;
             typeVerif.Expression.AcceptTranslator(this);
             DataItem retVal = returnedValue;
             returnedValue = Boolean.FromBool((retVal == null && klass == Class.Void) || retVal.InstanceOf(klass));
@@ -1209,7 +1209,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         }
         finally
         {
-            misRefAct = prevAction;
+            onMissingRef = prevAction;
         }
     }
 
@@ -1299,13 +1299,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             forLoop.Action.AcceptTranslator(this);
 
-            switch (jumpCode)
+            switch (jump)
             {
                 case JumpCode.Continue:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     break;
                 case JumpCode.Break:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     goto EXIT;
                 case JumpCode.Goto or JumpCode.Return:
                     goto EXIT;
@@ -1330,13 +1330,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
             forEach.Action.AcceptTranslator(this);
 
-            switch (jumpCode)
+            switch (jump)
             {
                 case JumpCode.Continue:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     break;
                 case JumpCode.Break:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     goto EXIT;
                 case JumpCode.Goto or JumpCode.Return:
                     goto EXIT;
@@ -1353,13 +1353,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             whileLoop.Action.AcceptTranslator(this);
 
-            switch (jumpCode)
+            switch (jump)
             {
                 case JumpCode.Continue:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     break;
                 case JumpCode.Break:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     return;
                 case JumpCode.Goto or JumpCode.Return:
                     return;
@@ -1373,13 +1373,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             doLoop.Action.AcceptTranslator(this);
 
-            switch (jumpCode)
+            switch (jump)
             {
                 case JumpCode.Continue:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     break;
                 case JumpCode.Break:
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     return;
                 case JumpCode.Goto or JumpCode.Return:
                     return;
@@ -1389,18 +1389,18 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
 
     public void TranslateContinue(Continue _continue)
     {
-        jumpCode = JumpCode.Continue;
+        jump = JumpCode.Continue;
     }
 
     public void TranslateBreak(Break _break)
     {
-        jumpCode = JumpCode.Break;
+        jump = JumpCode.Break;
     }
 
     public void TranslateGoto(Goto _goto)
     {
         lastGoto = _goto;
-        jumpCode = JumpCode.Goto;
+        jump = JumpCode.Goto;
     }
 
     public void TranslateYield(Yield yield)
@@ -1416,7 +1416,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         else
             _return.Expression.AcceptTranslator(this);
 
-        jumpCode = JumpCode.Return;
+        jump = JumpCode.Return;
     }
 
     public void TranslateThrow(Throw _throw)
@@ -1468,13 +1468,13 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             if (tcf.FinallyBlock != null)
             {
-                var (prevRetValue, prevJumpCode, prevGoto) = (returnedValue, jumpCode, lastGoto);
+                var (prevRetValue, prevJumpCode, prevGoto) = (returnedValue, jumpCode: jump, lastGoto);
 
                 try
                 {
-                    jumpCode = JumpCode.None;
+                    jump = JumpCode.None;
                     tcf.FinallyBlock.AcceptTranslator(this);
-                    if (jumpCode == JumpCode.Goto)
+                    if (jump == JumpCode.Goto)
                         finalException = new RuntimeError(fileName, lastGoto, Resources.CannotJumpOutOfFinallyBlock);
                 }
                 catch (ScriptError ex3)
@@ -1485,7 +1485,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                 finally
                 {
                     // Any return or jump within the finally block is ignored
-                    (returnedValue, jumpCode, lastGoto) = (prevRetValue, prevJumpCode, prevGoto);
+                    (returnedValue, jump, lastGoto) = (prevRetValue, prevJumpCode, prevGoto);
                 }
             }
 
@@ -2242,7 +2242,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         {
             function.Body.AcceptTranslator(this);
 
-            if (jumpCode == JumpCode.Goto)
+            if (jump == JumpCode.Goto)
                 throw new RuntimeError(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
         }
         finally
@@ -2253,7 +2253,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
             CopyBackFrameItems(function, expandedArgList, frameItems);
             returnedValue = result;
 
-            jumpCode = JumpCode.None;
+            jump = JumpCode.None;
         }
     }
 
@@ -3020,15 +3020,15 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     /// <exception cref="RuntimeError">The code is trying to jump out of a program</exception>
     private int NextAddress(int address, Dictionary<string, Label> labels, bool canJumpOut, bool handleBreak)
     {
-        switch (jumpCode)
+        switch (jump)
         {
             case JumpCode.None:
                 return address + 1;
             case JumpCode.Break:
-                if (handleBreak) jumpCode = JumpCode.None;
+                if (handleBreak) jump = JumpCode.None;
                 return int.MaxValue;
             case JumpCode.Goto when labels.TryGetValue(lastGoto.LabelName, out var label):
-                jumpCode = JumpCode.None;
+                jump = JumpCode.None;
                 return label.Address;
             case JumpCode.Goto when !canJumpOut:
                 throw new RuntimeError(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
@@ -3118,7 +3118,7 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     /// </summary>
     /// <returns>An <see cref="InterpreterState"/></returns>
     private InterpreterState GetState()
-        => new (frames, rootFrame, fileName, misRefAct, jumpCode, yieldedValues, lastGoto);
+        => new (frames, rootFrame, fileName, onMissingRef, jump, yieldedValues, lastGoto);
 
     /// <summary>
     /// Restores a the interpreter to an initially captured state.
@@ -3132,8 +3132,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
         rootFrame = savedState.rootFrame;
         currentFrame = frames.Peek();
         fileName = savedState.fileName;
-        misRefAct = savedState.misRefAct;
-        jumpCode = savedState.jumpCode;
+        onMissingRef = savedState.misRefAct;
+        jump = savedState.jumpCode;
         yieldedValues = savedState.yieldedValues;
         lastGoto = savedState.lastGoto;
     }
@@ -3144,8 +3144,8 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
     /// <param name="fileName">The value to set to the fieldName field</param>
     private void Reset(string fileName)
     {
-        jumpCode = JumpCode.None;
-        misRefAct = MissingReferenceAction.Fail;
+        jump = JumpCode.None;
+        onMissingRef = MissingReferenceAction.Fail;
         lastGoto = null;
         yieldedValues.Clear();
         frames.Clear();
