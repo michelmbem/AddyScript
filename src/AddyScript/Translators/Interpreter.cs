@@ -3027,15 +3027,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
             case JumpCode.Break:
                 if (handleBreak) jumpCode = JumpCode.None;
                 return int.MaxValue;
-            case JumpCode.Goto:
-                if (!labels.TryGetValue(lastGoto.LabelName, out var label))
-                    return canJumpOut
-                         ? int.MaxValue
-                         : throw new RuntimeError(fileName, lastGoto,
-                            string.Format(Resources.MissingLabel, lastGoto.LabelName));
-
+            case JumpCode.Goto when labels.TryGetValue(lastGoto.LabelName, out var label):
                 jumpCode = JumpCode.None;
                 return label.Address;
+            case JumpCode.Goto when !canJumpOut:
+                throw new RuntimeError(fileName, lastGoto, string.Format(Resources.MissingLabel, lastGoto.LabelName));
             default:
                 return int.MaxValue;
         }
