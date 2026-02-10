@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.OOP;

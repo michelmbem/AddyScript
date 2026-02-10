@@ -20,6 +20,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="System.Numerics.Complex" Alias="SysComplex" />
+		<Using Include="AddyScript.Runtime.DataItems.Void" Alias="Void" />
+		<Using Include="AddyScript.Runtime.DataItems.Boolean" Alias="Boolean" />
+		<Using Include="AddyScript.Runtime.DataItems.Integer" Alias="Integer" />
+		<Using Include="AddyScript.Runtime.DataItems.Long" Alias="Long" />
+		<Using Include="AddyScript.Runtime.DataItems.Float" Alias="Float" />
+		<Using Include="AddyScript.Runtime.DataItems.Decimal" Alias="Decimal" />
+		<Using Include="AddyScript.Runtime.DataItems.Rational" Alias="Rational" />
+		<Using Include="AddyScript.Runtime.DataItems.Complex" Alias="Complex" />
+		<Using Include="AddyScript.Runtime.DataItems.Date" Alias="Date" />
+		<Using Include="AddyScript.Runtime.DataItems.Duration" Alias="Duration" />
+		<Using Include="AddyScript.Runtime.DataItems.String" Alias="String" />
+		<Using Include="AddyScript.Runtime.DataItems.Blob" Alias="Blob" />
+		<Using Include="AddyScript.Runtime.DataItems.Tuple" Alias="Tuple" />
+		<Using Include="AddyScript.Runtime.DataItems.List" Alias="List" />
+		<Using Include="AddyScript.Runtime.DataItems.Set" Alias="Set" />
+		<Using Include="AddyScript.Runtime.DataItems.Queue" Alias="Queue" />
+		<Using Include="AddyScript.Runtime.DataItems.Stack" Alias="Stack" />
+		<Using Include="AddyScript.Runtime.DataItems.Map" Alias="Map" />
+		<Using Include="AddyScript.Runtime.DataItems.Object" Alias="Object" />
+		<Using Include="AddyScript.Runtime.DataItems.Resource" Alias="Resource" />
+		<Using Include="AddyScript.Runtime.DataItems.Closure" Alias="Closure" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>

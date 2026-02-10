@@ -7,8 +7,6 @@ using AddyScript.Ast.Statements;
 using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
-using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using String = AddyScript.Runtime.DataItems.String;
 
 
 namespace AddyScript.Parsers;

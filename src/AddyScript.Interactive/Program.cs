@@ -9,10 +9,12 @@ namespace AddyScript.Interactive;
 
 internal static class Program
 {
-    private const string WELCOME_MESSAGE_FORMAT = "{0} Interactive Shell, version {1} by {2}.\r\n" +
-                                                  "GitHub: https://github.com/michelmbem/AddyScript.\r\n" +
-                                                  "Wiki: https://michelmbem.github.io/AddyScript.\r\n" +
-                                                  "Use the exit() function to quit.";
+    private const string WELCOME_MESSAGE_FORMAT = """
+                                                  {0} Interactive Shell, version {1} by {2}.
+                                                  GitHub: https://github.com/michelmbem/AddyScript.
+                                                  Wiki: https://michelmbem.github.io/AddyScript.
+                                                  Use the exit() function to quit.
+                                                  """;
     private const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
     private const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
     private const string MAIN_PROMPT = ">>> ";
@@ -171,7 +173,7 @@ internal static class Program
     private static void ShowError(Exception ex)
     {
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($"{ex.GetType().FullName} : {ex.Message}");
+        Console.WriteLine($@"{ex.GetType().FullName} : {ex.Message}");
         Console.ResetColor();
     }
 

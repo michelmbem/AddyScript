@@ -1,5 +1,4 @@
 using System;
-using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.OOP;

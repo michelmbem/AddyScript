@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Translators;

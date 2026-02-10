@@ -5,7 +5,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
-using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -13,12 +12,6 @@ using AddyScript.Properties;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.NativeTypes;
 using AddyScript.Runtime.Utilities;
-using Blob = AddyScript.Runtime.DataItems.Blob;
-using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using Complex = AddyScript.Runtime.DataItems.Complex;
-using Decimal = AddyScript.Runtime.DataItems.Decimal;
-using String = AddyScript.Runtime.DataItems.String;
-using Void = AddyScript.Runtime.DataItems.Void;
 
 
 namespace AddyScript.Parsers;

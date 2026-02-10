@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using SysComplex = System.Numerics.Complex;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Runtime.NativeTypes;

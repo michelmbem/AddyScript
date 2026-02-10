@@ -3,7 +3,6 @@ using System.Reflection;
 
 using AddyScript.Ast;
 using AddyScript.Runtime.DataItems;
-using String = AddyScript.Runtime.DataItems.String;
 
 
 namespace AddyScript.Runtime;

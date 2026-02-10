@@ -17,13 +17,7 @@ using AddyScript.Runtime.Frames;
 using AddyScript.Runtime.OOP;
 using AddyScript.Runtime.Utilities;
 using AddyScript.Translators.Utility;
-using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using Complex = AddyScript.Runtime.DataItems.Complex;
 using Label = AddyScript.Ast.Statements.Label;
-using Object = AddyScript.Runtime.DataItems.Object;
-using String = AddyScript.Runtime.DataItems.String;
-using Tuple = AddyScript.Runtime.DataItems.Tuple;
-using Void = AddyScript.Runtime.DataItems.Void;
 
 
 namespace AddyScript.Translators;
@@ -656,11 +650,11 @@ public class Interpreter : ITranslator, IAssignmentProcessor, IIntrospectionHelp
                 break;
             case null when onMissingRef == MissingReferenceAction.Fail:
                 throw new RuntimeError(fileName, varRef, string.Format(Resources.UndefinedVariable, varRef.Name));
-            case null: // do nothing when misRefAction is Ignore
+            case null: // do nothing when onMissingRef is Ignore
                 break;
             case Undefined when onMissingRef == MissingReferenceAction.Fail:
                 throw new RuntimeError(fileName, varRef, string.Format(Resources.UninitializedVariable, varRef.Name));
-            case DataItem variable: // handles Undefined when misRefAct is not Fail
+            case DataItem variable: // handles Undefined when onMissingRef is not Fail
                 returnedValue = variable;
                 break;
             case Constant constant:

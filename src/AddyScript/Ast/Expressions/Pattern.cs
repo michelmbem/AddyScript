@@ -9,11 +9,6 @@ using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 using AddyScript.Runtime.OOP;
 
-using Boolean = AddyScript.Runtime.DataItems.Boolean;
-using Object = AddyScript.Runtime.DataItems.Object;
-using String = AddyScript.Runtime.DataItems.String;
-using Void = AddyScript.Runtime.DataItems.Void;
-
 
 namespace AddyScript.Ast.Expressions;
 
