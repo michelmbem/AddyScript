@@ -34,8 +34,6 @@ println($'ed = {ed}');
 
 println();
 
-println();
-
 println($'john == jane: {john == jane}');
 println($'john == doe: {john == doe}');
 println($'john == laura: {john == laura}');

@@ -58,6 +58,13 @@ public class AlwaysTruePattern : Pattern
 public class RelationalPattern(BinaryOperator _operator, DataItem value) : Pattern
 {
     /// <summary>
+    /// Initializes a new instance of <see cref="RelationalPattern"/>
+    /// with the <see cref="BinaryOperator.Equal"/> operator and the given value.
+    /// </summary>
+    /// <param name="value">The value to compare against</param>
+    public RelationalPattern(DataItem value) : this(BinaryOperator.Equal, value) { }
+    
+    /// <summary>
     /// The relational operator to use for the comparison.
     /// </summary>
     public BinaryOperator Operator => _operator;
@@ -159,8 +166,17 @@ public class ObjectPattern(string typeName, PropertyMatcher[] propertyMatchers) 
 }
 
 
+/// <summary>
+/// A subclass of <see cref="Pattern"/> that checks if the value to match is of a particular type
+/// and extracts the values of the given properties.
+/// </summary>
+/// <param name="typeName">The name of the type to match against</param>
+/// <param name="propertyNames">The names of the properties to extract</param>
 public class DestructuringPattern(string typeName, string[] propertyNames) : TypePattern(typeName)
 {
+    /// <summary>
+    /// The names of the properties to extract.
+    /// </summary>
     public string[] PropertyNames => propertyNames;
 
     public override Expression GetMatchTest(Expression arg) =>

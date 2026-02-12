@@ -1356,15 +1356,15 @@ public class ExpressionParser(Lexer lexer) : BasicParser(lexer)
                 break;
             case TokenID.LT_Boolean or TokenID.LT_Integer or TokenID.LT_Long or TokenID.LT_Float or
                  TokenID.LT_Decimal or TokenID.LT_Date or TokenID.LT_String:
-                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(false, ref last));
+                pattern = new RelationalPattern(MatchCasePatternLiteralValue(false, ref last));
                 break;
             case TokenID.Plus when LookAhead(t => t.IsNumeric, out var pos):
                 Consume(pos - 1);
-                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(false, ref last));
+                pattern = new RelationalPattern(MatchCasePatternLiteralValue(false, ref last));
                 break;
             case TokenID.Minus when LookAhead(t => t.IsNumeric, out var pos):
                 Consume(pos - 1);
-                pattern = new RelationalPattern(BinaryOperator.Equal, MatchCasePatternLiteralValue(true, ref last));
+                pattern = new RelationalPattern(MatchCasePatternLiteralValue(true, ref last));
                 break;
             case TokenID.LessThan or TokenID.GreaterThan or TokenID.LessThanEqual or TokenID.GreaterThanEqual:
             {

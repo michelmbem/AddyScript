@@ -2,8 +2,8 @@ namespace AddyScript;
 
 
 /// <summary>
-/// The base class of all script elements :<br/>
-/// tokens, statements, expressions, parameters and class's members.
+/// The base class of all language symbols:<br/>
+/// tokens, statements, expressions, labels, patterns, parameters, and class members.
 /// </summary>
 public class ScriptElement
 {
