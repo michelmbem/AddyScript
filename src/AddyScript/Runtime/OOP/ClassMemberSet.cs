@@ -13,13 +13,9 @@ public class ClassMemberSet<T> : List<T> where T : ClassMember
 {
     private readonly Dictionary<string, T> dictionary = [];
 
-    public ClassMemberSet()
-    {
-    }
+    public ClassMemberSet() { }
 
-    public ClassMemberSet(int capacity) : base(capacity)
-    {
-    }
+    public ClassMemberSet(int capacity) : base(capacity) { }
 
     public ClassMemberSet(IEnumerable<T> items)
     {
