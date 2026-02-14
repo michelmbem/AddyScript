@@ -179,7 +179,7 @@
                       i:MenuItem.Icon="fa-scissors"
                       Click="ToolbarCutButtonClick" />
             <MenuItem Name="CopyMenuItem"
-                      Header="{x:Static p:Resources.New}"
+                      Header="{x:Static p:Resources.Copy}"
                       i:MenuItem.Icon="fa-copy"
                       Click="ToolbarCopyButtonClick" />
             <MenuItem Name="PasteMenuItem"
