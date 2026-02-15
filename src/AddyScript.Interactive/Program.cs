@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using AddyScript.Properties;
 using AddyScript.Runtime;
 using AddyScript.Runtime.DataItems;
 using String = AddyScript.Runtime.DataItems.String;
@@ -11,8 +12,8 @@ internal static class Program
 {
     private const string WELCOME_MESSAGE_FORMAT = """
                                                   {0} Interactive Shell, version {1} by {2}.
-                                                  GitHub: https://github.com/michelmbem/AddyScript.
-                                                  Wiki: https://michelmbem.github.io/AddyScript.
+                                                  GitHub: {3}.
+                                                  Wiki: {4}.
                                                   Use the exit() function to quit.
                                                   """;
     private const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
@@ -129,7 +130,8 @@ internal static class Program
     private static void ShowWelcome()
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(WELCOME_MESSAGE_FORMAT, AssemblyInfo.Title, AssemblyInfo.Version, AssemblyInfo.Company);
+        Console.WriteLine(WELCOME_MESSAGE_FORMAT, AssemblyInfo.Title, AssemblyInfo.Version,
+                          AssemblyInfo.Company, AssemblyInfo.GitHubRepoUrl, AssemblyInfo.WikiUrl);
         Console.ResetColor();
     }
 

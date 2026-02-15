@@ -10,6 +10,7 @@ using AddyScript.Gui.Configuration;
 using AddyScript.Gui.Extensions;
 using AddyScript.Gui.Markers;
 using AddyScript.Gui.Terminal;
+using AddyScript.Properties;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -43,8 +44,6 @@ public enum CompletionStage
 public partial class MainWindow : Window
 {
     #region Fields
-
-    private const string WIKI_LINK = "https://michelmbem.github.io/AddyScript/";
 
     private static readonly string WorkDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -1080,7 +1079,7 @@ public partial class MainWindow : Window
 
     private void ToolbarHelpButtonClick(object sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(WIKI_LINK) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(AssemblyInfo.WikiUrl) { UseShellExecute = true });
     }
 
     private async void ToolbarHelpAboutMenuItemClick(object sender, RoutedEventArgs e)

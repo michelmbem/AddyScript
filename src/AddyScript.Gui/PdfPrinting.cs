@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AddyScript.Gui.Configuration;
 using AddyScript.Gui.Extensions;
+using AddyScript.Properties;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;

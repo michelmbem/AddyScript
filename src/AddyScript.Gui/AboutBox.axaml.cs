@@ -1,15 +1,13 @@
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using AI = AddyScript.Gui.AssemblyInfo;
+using AI = AddyScript.Properties.AssemblyInfo;
 using SR = AddyScript.Gui.Properties.Resources;
 
 namespace AddyScript.Gui;
 
 public partial class AboutBox : Window
 {
-    private const string REPO_URL = "https://github.com/michelmbem/AddyScript/";
-
     public AboutBox()
     {
         InitializeComponent();
@@ -23,7 +21,7 @@ public partial class AboutBox : Window
 
     private void HyperlinkButtonClick(object sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(REPO_URL) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(AI.GitHubRepoUrl) { UseShellExecute = true });
     }
 
     private void OkButtonClick(object sender, RoutedEventArgs e)
