@@ -58,6 +58,7 @@ public partial class MainWindow : Window
     private TextMarkerService textMarkerService;
     private CompletionWindow completionWindow;
     private OverloadInsightWindow insightWindow;
+    private SearchPanel searchPanel;
     private DispatcherTimer idleTimer;
     private DispatcherTimer dwellTimer;
     private TextViewPosition? hoverPosition;
@@ -640,9 +641,12 @@ public partial class MainWindow : Window
     /// <param name="replaceMode">true to open the search panel in replace mode; otherwise, false to open it in search-only mode.</param>
     private void OpenSearchPanel(bool replaceMode)
     {
-        Editor.SearchPanel?.Uninstall();
+        if (searchPanel == null)
+        {
+            Editor.SearchPanel.Uninstall();
+            searchPanel = SearchPanel.Install(Editor);
+        }
 
-        var searchPanel = SearchPanel.Install(Editor);
         var selection = Editor.TextArea.Selection;
         searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
         searchPanel.IsReplaceMode = replaceMode;
