@@ -31,4 +31,8 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\AddyScript\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+	</ItemGroup>
+
 </Project>
