@@ -19,7 +19,7 @@ public static class ConfigurationManager
         AssemblyInfo.Title,
         "config.json");
 
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions JsonOptions = new ()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.KebabCaseLower,
@@ -28,7 +28,7 @@ public static class ConfigurationManager
 
     public static Options LoadOptions()
     {
-        ApplicationSettings appSettings = LoadAllSettings();
+        var appSettings = LoadAllSettings();
         return appSettings.Options ?? Options.Default;
     }
 
@@ -37,7 +37,7 @@ public static class ConfigurationManager
 
     public static WindowSettings LoadWindowSettings(string path)
     {
-        ApplicationSettings appSettings = LoadAllSettings();
+        var appSettings = LoadAllSettings();
         appSettings.Windows.TryGetValue(path, out var window);
         return window;
     }
