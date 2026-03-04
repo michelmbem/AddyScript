@@ -161,12 +161,8 @@ public class Options
     public static readonly Options Default = new ()
     {
         UseEmulatedTerminal = true,
-        SearchPaths = [
-            Path.GetFullPath(@"../../../samples/library")
-        ],
-        References = [
-            "Microsoft.Data.SqlClient"
-        ],
+        SearchPaths = [ Path.GetFullPath(@"../../../samples/library") ],
+        References = [],
     };
 
     [JsonConverter(typeof(CultureInfoConverter))]
