@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Xml;
 using AddyScript.Gui.Configuration;
+using AddyScript.Properties;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -218,4 +219,10 @@ public partial class App : Application
     }
 
     #endregion
+
+    private async void OnAboutClick(object sender, EventArgs e)
+    {
+        var aboutBox = new AboutBox();
+        await aboutBox.ShowDialog<bool>(ActiveWindow);
+    }
 }
