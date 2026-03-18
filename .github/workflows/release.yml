@@ -136,7 +136,7 @@ jobs:
 
       - name: Package Samples
         if: matrix.runtime == 'linux-x64'
-        run: zip ${{ env.APP_NAME }}-samples-${{ steps.version.outputs.VERSION }}.zip samples
+        run: zip -r ${{ env.APP_NAME }}-samples-${{ steps.version.outputs.VERSION }}.zip samples
 
       # -------------------------
       # UPLOAD ARTIFACTS
