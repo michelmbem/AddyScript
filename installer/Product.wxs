@@ -6,7 +6,7 @@
       Language="1033"
       Version="$(var.Version)"
       Manufacturer="Addy"
-      UpgradeCode="f7f6f392-dbcb-4ecd-b6f3-92dbcbdecde7">
+      UpgradeCode="D5DEFE7B-E1F2-4519-B72F-A73CA312BB14">
 
     <Package
         InstallerVersion="500"

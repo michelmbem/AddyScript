@@ -134,6 +134,10 @@ jobs:
           cd publish/${{ matrix.runtime }}
           tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
 
+      - name: Package Samples
+        if: matrix.runtime == 'linux-x64'
+        run: zip ${{ env.APP_NAME }}-samples-${{ steps.version.outputs.VERSION }}.zip samples
+
       # -------------------------
       # UPLOAD ARTIFACTS
       # -------------------------
@@ -146,6 +150,7 @@ jobs:
             *.msi
             *.dmg
             *.tar.gz
+            *.zip
 
   release:
     needs: build
@@ -160,6 +165,7 @@ jobs:
           find . -name "*.msi" -exec mv {} release/ \;
           find . -name "*.dmg" -exec mv {} release/ \;
           find . -name "*.tar.gz" -exec mv {} release/ \;
+          find . -name "*.zip" -exec mv {} release/ \;
 
       - uses: softprops/action-gh-release@v2
         with:
