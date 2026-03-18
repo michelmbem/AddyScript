@@ -56,7 +56,7 @@
       <ListBox.ItemTemplate>
         <DataTemplate>
           <TextBlock FontFamily="{Binding}"
-                     Text="{Binding}"
+                     Text="{Binding Name}"
                      FontSize="24"
                      DoubleTapped="FontListItemDoubleTapped" />
         </DataTemplate>

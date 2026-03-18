@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AddyScript.Gui.Extensions;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -19,8 +20,16 @@ public partial class FontDialog : Window
     {
         InitializeComponent();
 
-        fontFamilies = [.. FontManager.Current.SystemFonts.OrderBy(f => f.Name)];
+        var appFonts = Application.Current?.Resources
+            .Where(entry => entry.Value is FontFamily)
+            .Select(entry => (FontFamily)entry.Value) ?? [];
 
+        fontFamilies = [..
+            FontManager.Current.SystemFonts
+                .Concat(appFonts)
+                .DistinctBy(f => f.Name)
+                .OrderBy(f => f.Name)];
+        
         FilterFontList(null, false);
     }
 
