@@ -80,4 +80,8 @@
             <DependentUpon>Resources.resx</DependentUpon>
         </EmbeddedResource>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\Fonts\" />
+    </ItemGroup>
 </Project>

@@ -225,7 +225,7 @@ public class Lexer
 
         while (ch is '_' or >= '0' and <= '9')
         {
-            builder.Append(ch);
+            if (ch != '_') builder.Append(ch);
             Consume(1);
             ch = Ll(1);
         }
@@ -252,7 +252,7 @@ public class Lexer
         {
             'f' or 'F' => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), true),
             'd' or 'D' => MakeToken(TokenID.LT_Decimal, BigDecimal.Parse(numberStr), true),
-            'i' or 'I' => MakeToken(TokenID.LT_Complex, new Complex(0, double.Parse(numberStr, ci)), true),
+            'i' or 'I' => MakeToken(TokenID.LT_Complex, new SysComplex(0, double.Parse(numberStr, ci)), true),
             'l' or 'L' when !isReal => MakeToken(TokenID.LT_Long, BigInteger.Parse(numberStr, ci), true),
             _ when isReal => MakeToken(TokenID.LT_Float, double.Parse(numberStr, ci), false),
             _ when int.TryParse(numberStr, ci, out var n) => MakeToken(TokenID.LT_Integer, n, false),

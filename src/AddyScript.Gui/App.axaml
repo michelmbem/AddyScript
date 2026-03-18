@@ -20,6 +20,7 @@
     </Application.Styles>
 
     <Application.Resources>
+        <!-- Colors -->
         <SolidColorBrush x:Key="WindowForeground" Color="Black" />
         <SolidColorBrush x:Key="WindowBackground" Color="DarkOrange" />
         <SolidColorBrush x:Key="ToolbarButtonForeground" Color="White" />
@@ -34,9 +35,12 @@
         <SolidColorBrush x:Key="TerminalForeground" Color="#E7E7E7" />
         <SolidColorBrush x:Key="TerminalBackground" Color="#171717" />
         <SolidColorBrush x:Key="PopupBackground" Color="#DDEEEEEE" />
-        <FontFamily x:Key="EditorFontFamily">Monospace</FontFamily>
-        <FontFamily x:Key="TerminalFontFamily">Monospace</FontFamily>
-        <x:Double x:Key="EditorFontSize">15</x:Double>
-        <x:Double x:Key="TerminalFontSize">15</x:Double>
+        
+        <!-- Fonts -->
+        <FontFamily x:Key="JetBrainsMono">avares://asgui/Assets/Fonts/JetBrainsMono#JetBrains Mono</FontFamily>
+        <StaticResource x:Key="EditorFontFamily" ResourceKey="JetBrainsMono" />
+        <StaticResource x:Key="TerminalFontFamily" ResourceKey="JetBrainsMono" />
+        <x:Double x:Key="EditorFontSize">14</x:Double>
+        <x:Double x:Key="TerminalFontSize">14</x:Double>
     </Application.Resources>
 </Application>
