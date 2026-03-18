@@ -96,7 +96,7 @@ jobs:
               <string>AddyScript</string>
             
               <key>CFBundleExecutable</key>
-              <string>${{ env.APP_NAME }}</string>
+              <string>asgui</string>
             
               <key>CFBundleIdentifier</key>
               <string>org.addy.addyscript</string>
