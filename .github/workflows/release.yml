@@ -1,0 +1,167 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_VERSION: 8.0.x
+  GUI_PROJECT_PATH: src/AddyScript.Gui/AddyScript.Gui.csproj
+  SHELL_PROJECT_PATH: src/AddyScript.Interactive/AddyScript.Interactive.csproj
+  APP_NAME: addyscript
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+          - os: windows-latest
+            runtime: win-arm64
+          - os: ubuntu-latest
+            runtime: linux-x64
+          - os: ubuntu-latest
+            runtime: linux-arm64
+          - os: macos-latest
+            runtime: osx-x64
+          - os: macos-latest
+            runtime: osx-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Publish Gui
+        run: dotnet publish ${{ env.GUI_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+
+      - name: Publish Shell
+        run: dotnet publish ${{ env.SHELL_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+
+      # -------------------------
+      # WINDOWS MSI
+      # -------------------------
+
+      - name: Install WiX
+        if: startsWith(matrix.runtime, 'win')
+        run: choco install wixtoolset -y
+        
+      - name: Harvest publish directory
+        if: startsWith(matrix.runtime, 'win')
+        shell: pwsh
+        run: heat dir "publish\${{ matrix.runtime }}" -cg PublishedFiles -dr INSTALLFOLDER -var var.PublishDir -gg -srd -sfrag -sreg -out installer\Files.wxs
+
+      - name: Build MSI
+        if: startsWith(matrix.runtime, 'win')
+        shell: pwsh
+        run: |
+          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=publish\${{ matrix.runtime }}" "-dVersion=${{ steps.version.outputs.VERSION }}"
+          light Product.wixobj Files.wixobj -ext WixUIExtension -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
+
+      # -------------------------
+      # MACOS APP + DMG
+      # -------------------------
+
+      - name: Create macOS bundle
+        if: startsWith(matrix.runtime, 'osx')
+        run: |
+          APP="${{ env.APP_NAME }}.app"
+
+          mkdir -p $APP/Contents/MacOS
+          mkdir -p $APP/Contents/Resources
+
+          cp -R publish/${{ matrix.runtime }}/* $APP/Contents/MacOS/
+          cp src/AddyScript.Gui/Assets/Images/Icons/AddyScript.icns $APP/Contents/Resources/
+
+          cat > $APP/Contents/Info.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+            <dict>
+              <key>CFBundleName</key>
+              <string>AddyScript</string>
+            
+              <key>CFBundleExecutable</key>
+              <string>${{ env.APP_NAME }}</string>
+            
+              <key>CFBundleIdentifier</key>
+              <string>org.addy.addyscript</string>
+            
+              <key>CFBundleVersion</key>
+              <string>${{ steps.version.outputs.VERSION }}</string>
+            
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+            
+              <key>CFBundleIconFile</key>
+              <string>AddyScript</string>
+            </dict>
+          </plist>
+          EOF
+
+      - name: Create DMG
+        if: startsWith(matrix.runtime, 'osx')
+        run: |
+          hdiutil create \
+            -fs HFS+ \
+            -srcfolder ${{ env.APP_NAME }}.app \
+            -volname AddyScript \
+            -format UDZO \
+            -ov \
+            ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.dmg
+
+      # -------------------------
+      # LINUX TAR
+      # -------------------------
+
+      - name: Package Linux
+        if: startsWith(matrix.runtime, 'linux')
+        run: |
+          cd publish/${{ matrix.runtime }}
+          tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
+
+      # -------------------------
+      # UPLOAD ARTIFACTS
+      # -------------------------
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.runtime }}
+          path: |
+            *.msi
+            *.dmg
+            *.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: Collect artifacts
+        run: |
+          mkdir release
+          find . -name "*.msi" -exec mv {} release/ \;
+          find . -name "*.dmg" -exec mv {} release/ \;
+          find . -name "*.tar.gz" -exec mv {} release/ \;
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release/*
