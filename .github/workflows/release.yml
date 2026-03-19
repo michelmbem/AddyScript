@@ -79,7 +79,7 @@ jobs:
       - name: Create macOS bundle
         if: startsWith(matrix.runtime, 'osx')
         run: |
-          APP="${{ env.APP_NAME }}.app"
+          APP="AddyScript.app"
 
           mkdir -p $APP/Contents/MacOS
           mkdir -p $APP/Contents/Resources

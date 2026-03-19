@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using AddyScript.Gui.Autocomplete;
 using AddyScript.Gui.CallTips;
@@ -986,11 +988,14 @@ public partial class MainWindow : Window
             document.UncommentLine(Editor.TextArea.Caret.Line);
     }
 
+    [RequiresAssemblyFiles("Calls System.Reflection.Assembly.Location")]
     private async void ToolbarRunButtonClick(object sender, RoutedEventArgs e)
     {
         /****************************************************************************
          * Parsing and running the script is delegated to asis.
          * *************************************************************************/
+
+        var asis = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location!), "asis");
 
         var scriptPath = Path.Combine(WorkDir, Path.ChangeExtension(Path.GetRandomFileName(), ".add"));
         Directory.CreateDirectory(WorkDir);
@@ -1006,7 +1011,7 @@ public partial class MainWindow : Window
             argsList.Add(culture.Name);
         }
 
-        foreach (var directory in App.Options.SearchPaths)
+        foreach (var directory in App.Options!.SearchPaths)
         {
             argsList.Add("-d");
             argsList.Add(directory);
@@ -1025,7 +1030,7 @@ public partial class MainWindow : Window
             int exitCode = await TerminalLauncher.LaunchTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusItem.Text}]",
-                "./asis",
+                asis,
                 [.. argsList]);
 
             if (exitCode == 0 || !File.Exists(logPath)) return;
