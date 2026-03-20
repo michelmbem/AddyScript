@@ -432,4 +432,7 @@
   <data name="XmlFileFilter" xml:space="preserve">
     <value>Linguagem de marcação extensível</value>
   </data>
+  <data name="CouldNotLocateAsis" xml:space="preserve">
+    <value>Não foi possível localizar o executável 'asis'.</value>
+  </data>
 </root>

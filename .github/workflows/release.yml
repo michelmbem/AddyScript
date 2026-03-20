@@ -47,10 +47,10 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       - name: Publish Gui
-        run: dotnet publish ${{ env.GUI_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+        run: dotnet publish ${{ env.GUI_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}/asgui
 
       - name: Publish Shell
-        run: dotnet publish ${{ env.SHELL_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+        run: dotnet publish ${{ env.SHELL_PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}/asis
 
       # -------------------------
       # WINDOWS MSI
@@ -59,17 +59,22 @@ jobs:
       - name: Install WiX
         if: startsWith(matrix.runtime, 'win')
         run: choco install wixtoolset -y
+
+      - name: Prepare Windows distribution
+        if: startsWith(matrix.runtime, 'win')
+        shell: pwsh
+        run: Copy-Item -Path "publish\${{ matrix.runtime }}\asis\*" -Destination "publish\${{ matrix.runtime }}\asgui" -Recurse -Force
         
       - name: Harvest publish directory
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
-        run: heat dir "publish\${{ matrix.runtime }}" -cg PublishedFiles -dr INSTALLFOLDER -var var.PublishDir -gg -srd -sfrag -sreg -out installer\Files.wxs
+        run: heat dir "publish\${{ matrix.runtime }}\asgui" -cg PublishedFiles -dr INSTALLFOLDER -var var.PublishDir -gg -srd -sfrag -sreg -out installer\Files.wxs
 
       - name: Build MSI
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=publish\${{ matrix.runtime }}" "-dVersion=${{ steps.version.outputs.VERSION }}"
+          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=publish\${{ matrix.runtime }}\asgui" "-dVersion=${{ steps.version.outputs.VERSION }}"
           light Product.wixobj Files.wixobj -ext WixUIExtension -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
 
       # -------------------------
@@ -82,10 +87,14 @@ jobs:
           APP="AddyScript.app"
 
           mkdir -p $APP/Contents/MacOS
+          mkdir -p $APP/Contents/Helpers
           mkdir -p $APP/Contents/Resources
 
-          cp -R publish/${{ matrix.runtime }}/* $APP/Contents/MacOS/
+          cp -R publish/${{ matrix.runtime }}/asgui/* $APP/Contents/MacOS/
+          cp -R publish/${{ matrix.runtime }}/asis/* $APP/Contents/Helpers/
           cp src/AddyScript.Gui/Assets/Images/Icons/AddyScript.icns $APP/Contents/Resources/
+          chmod +x $APP/Contents/MacOS/asgui
+          chmod +x $APP/Contents/Helpers/asis
 
           cat > $APP/Contents/Info.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -131,7 +140,8 @@ jobs:
       - name: Package Linux
         if: startsWith(matrix.runtime, 'linux')
         run: |
-          cd publish/${{ matrix.runtime }}
+          cp -R publish/${{ matrix.runtime }}/asis/* publish/${{ matrix.runtime }}/asgui/
+          cd publish/${{ matrix.runtime }}/asgui
           tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
 
       - name: Package Samples

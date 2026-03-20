@@ -450,4 +450,7 @@
   <data name="XmlFileFilter" xml:space="preserve">
     <value>eXtensible Markup Language</value>
   </data>
+  <data name="CouldNotLocateAsis" xml:space="preserve">
+    <value>Could not locate the 'asis' executable</value>
+  </data>
 </root>

@@ -40,7 +40,7 @@ From left to right, the toolbar buttons play the following role:
 
 ### General editor tips:
 
-1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. Therefore, the executables of both programs must always be in the same directory.
+1. **asgui** does not execute scripts by itself. It delegates this task to **asis**. On Windows and Linux, the executables of both programs must remain in the same directory. On macOS, the application bundle must keep the bundled **asis** helper in its expected location.
 2. To have time to read the output printed by your script, always add a call to the _readln()_ function at the end of it. Of course this is not necessary for scripts that have a graphical interface.
 3. The shortcut to execute a script is **[F5]**. In fact, many commands use the same shortcut as in VS:
     1. **[Ctrl+N]** to create a new script

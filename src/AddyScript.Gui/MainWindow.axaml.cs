@@ -655,6 +655,30 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// Resolves the file path to the "asis" executable by searching through predefined candidate directories.
+    /// </summary>
+    /// <remarks>
+    /// This method searches for the "asis" executable in multiple locations relative to the application's base directory
+    /// and the assembly's location. The search stops at the first valid file path found.
+    /// </remarks>
+    /// <returns>
+    /// The fully qualified file path to the "asis" executable if it is found in one of the candidate locations.
+    /// </returns>
+    /// <exception cref="FileNotFoundException">
+    /// Thrown if the "asis" executable is not found in any of the predefined candidate locations.
+    /// </exception>
+    private static string ResolveAsisPath()
+    {
+        HashSet<string> candidates = [
+            Path.Combine(AppContext.BaseDirectory, "asis"),
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Helpers", "asis")),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location!) ?? AppContext.BaseDirectory, "asis"),
+        ];
+
+        return candidates.FirstOrDefault(File.Exists) ?? throw new FileNotFoundException(SR.CouldNotLocateAsis);
+    }
+
+    /// <summary>
     /// Reports an error by marking the specified range in the script and displaying an error message to the user.
     /// </summary>
     /// <param name="errorMessage">The error message to display for the marked script range. Cannot be null.</param>
@@ -995,8 +1019,6 @@ public partial class MainWindow : Window
          * Parsing and running the script is delegated to asis.
          * *************************************************************************/
 
-        var asis = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location!), "asis");
-
         var scriptPath = Path.Combine(WorkDir, Path.ChangeExtension(Path.GetRandomFileName(), ".add"));
         Directory.CreateDirectory(WorkDir);
         await File.WriteAllTextAsync(scriptPath, Editor.Text);
@@ -1030,7 +1052,7 @@ public partial class MainWindow : Window
             int exitCode = await TerminalLauncher.LaunchTerminal(
                 this,
                 $"{AssemblyInfo.Title} Terminal [{FileNameStatusItem.Text}]",
-                asis,
+                ResolveAsisPath(),
                 [.. argsList]);
 
             if (exitCode == 0 || !File.Exists(logPath)) return;

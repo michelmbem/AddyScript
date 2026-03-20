@@ -417,4 +417,7 @@
   <data name="ReferencesDescription" xml:space="preserve">
     <value>Sélectionnez les assemblys .NET pouvant être référencés depuis un script. Vous pouvez indiquer leur nom ou leur chemin d'accès.</value>
   </data>
+  <data name="CouldNotLocateAsis" xml:space="preserve">
+    <value>Impossible de localiser le fichier exécutable de « asis ».</value>
+  </data>
 </root>
