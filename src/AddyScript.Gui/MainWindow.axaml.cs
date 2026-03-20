@@ -669,10 +669,12 @@ public partial class MainWindow : Window
     /// </exception>
     private static string ResolveAsisPath()
     {
+        var asisExeName = OperatingSystem.IsWindows() ? "asis.exe" : "asis";
+
         HashSet<string> candidates = [
-            Path.Combine(AppContext.BaseDirectory, "asis"),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Helpers", "asis")),
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location!) ?? AppContext.BaseDirectory, "asis"),
+            Path.Combine(AppContext.BaseDirectory, asisExeName),
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Helpers", asisExeName)),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location!) ?? AppContext.BaseDirectory, asisExeName),
         ];
 
         return candidates.FirstOrDefault(File.Exists) ?? throw new FileNotFoundException(SR.CouldNotLocateAsis);
