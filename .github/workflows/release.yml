@@ -142,7 +142,7 @@ jobs:
         run: |
           cp -R publish/${{ matrix.runtime }}/asis/* publish/${{ matrix.runtime }}/asgui/
           cd publish/${{ matrix.runtime }}/asgui
-          tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
+          tar -czf ../../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
 
       - name: Package Samples
         if: matrix.runtime == 'linux-x64'
