@@ -249,7 +249,7 @@ if (__name === 'main')
 	}
 
 	function mssql_test() {
-		const CONNECTION_STRING = 'Data Source=localhost;Initial Catalog=Northwind;User Id=sa;Password=$qlDb@min;Encrypt=True;Trust Server Certificate=True';
+		const CONNECTION_STRING = 'Data Source=localhost;Initial Catalog=Northwind;User Id=sa;Password=secret;Encrypt=True;Trust Server Certificate=True';
 		
 		println('Testing MS SQL Server with connection string: ' + CONNECTION_STRING);
 		println();
@@ -298,7 +298,7 @@ if (__name === 'main')
 	}
 
 	function oracle_test() {
-		const CONNECTION_STRING = 'Data Source=localhost:1521/free;User Id=hr;Password=hrpwd';
+		const CONNECTION_STRING = 'Data Source=localhost;User Id=hr;Password=secret';
 		
 		println('Testing Oracle with connection string: ' + CONNECTION_STRING);
 		println();
@@ -351,7 +351,7 @@ if (__name === 'main')
 	}
 
 	function mysql_test() {
-		const CONNECTION_STRING = 'Server=localhost;User=root;Password=sqladm;Database=sakila'; // The 'Database' or 'Initial Catalog' setting is mandatory with MySQL
+		const CONNECTION_STRING = 'Server=localhost;User=root;Password=secret;Database=sakila';
 		
 		println('Testing MySQL with connection string: ' + CONNECTION_STRING);
 		println();
@@ -400,7 +400,7 @@ if (__name === 'main')
 	}
 
 	function postgres_test() {
-		const CONNECTION_STRING = 'Server=localhost;User=postgres;Password=sqladm;Database=pagila'; // pagila is a port of MySQL's sakila to PostgreSQL
+		const CONNECTION_STRING = 'Server=localhost;User=postgres;Password=secret;Database=pagila';
 		
 		println('Testing PostgreSQL with connection string: ' + CONNECTION_STRING);
 		println();
@@ -451,7 +451,7 @@ if (__name === 'main')
 	}
 
 	function sqlite_test() {
-		const CONNECTION_STRING = 'Data Source=:memory:;User Id=sa';
+		const CONNECTION_STRING = 'Data Source=:memory:';
 		
 		println('Testing SQLite with connection string: ' + CONNECTION_STRING);
 		println();
