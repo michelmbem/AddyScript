@@ -23,6 +23,13 @@ internal static class StringExtensions
     public static string EscapeAsCmdLineArg(this string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 
     /// <summary>
+    /// Escapes a string to be safely used in AppleScript commands.
+    /// </summary>
+    /// <param name="value">The string to escape.</param>
+    /// <returns>A new string where special characters are escaped for AppleScript compatibility.</returns>
+    public static string EscapeForAppleScript(this string value) => value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+    /// <summary>
     /// Shorten a string by replacing any exceding part by an ellipsis mark (...).
     /// </summary>
     /// <param name="value">The string that should be made shorter</param>

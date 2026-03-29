@@ -20,8 +20,8 @@ static class DBOConfig
 			connectionType = 'Oracle.ManagedDataAccess.Client.OracleConnection'
 		},
 		'mysql' => new {
-			assemblyName = 'MySql.Data',
-			connectionType = 'MySql.Data.MySqlClient.MySqlConnection'
+			assemblyName = 'MySqlConnector',
+			connectionType = 'MySqlConnector.MySqlConnection'
 		},
 		'pgsql' => new {
 			assemblyName = 'Npgsql',
