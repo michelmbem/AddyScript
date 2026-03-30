@@ -5,7 +5,7 @@ Keep in mind that AddyScript is constantly evolving. Its syntax can change from 
 If you downloaded an earlier version and started your work from there,
 you can ignore the changes made in later versions and continue your work as you began.
 
-Here is a quick summary of the most significant changes made to the scripting engine over the versions:
+Here is a quick summary of the most significant changes made to the project over the versions:
 
 ## Version 0.7
 
@@ -97,7 +97,16 @@ Here is a quick summary of the most significant changes made to the scripting en
 
 ## Version 1.1.0.0
 
-* Improved native terminal invocation in the macOS version of the GUI app.
+* Improved native terminal invocation in the macOS version of the GUI app using `osascript`.
+* Fixed `asis` path resolution in the Windows version of the GUI app.
+* Optimized `asis` executable lookup and improved macOS packaging by registering `asis` as a helper inside the application bundle.
+* Added localized GUI error messages for cases where the `asis` executable cannot be found.
+
+## Current development
+
+* Refined constructor handling so derived classes implicitly invoke the superclass constructor when no explicit call is provided.
+* Adjusted the handling of the **final** modifier in the parser and runtime class model.
+* Continued refining macOS application bundle creation in the release workflow, including bundle layout and Finder integration.
 
 <div markdown class="web-only">
 
