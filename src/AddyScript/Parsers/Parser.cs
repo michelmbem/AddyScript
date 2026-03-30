@@ -955,8 +955,8 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
     {
         Token first = Match(TokenID.KW_Constructor);
         ParameterDecl[] parameters = ParameterList();
-
-        ParentConstructorCall superCall = null;
+        ParentConstructorCall superCall;
+        
         if (TryMatch(TokenID.Colon))
         {
             Consume(1);
@@ -969,12 +969,18 @@ public class Parser(Lexer lexer) : ExpressionParser(lexer)
             superCall = new ParentConstructorCall(positionalArgs, namedArgs);
             superCall.SetLocation(superStart.Start, superEnd.End);
         }
+        else
+        {
+            // If the parent class constructor is not explicitly called, call it implicitly without arguments.
+            // The parent class should then have a public default constructor.
+            superCall = new ParentConstructorCall();
+            superCall.CopyLocation(first);
+        }
 
         PushFunction(CurrentClass.Name, true, true, false);
         Block body = BlockBody();
         PopFunction();
-
-        if (superCall != null) body.Insert(0, superCall);
+        body.Insert(0, superCall);
 
         var constructor = new ClassMethodDecl(CurrentClass.Name, scope, Modifier.Default, parameters, body);
         constructor.SetLocation(first.Start, body.End);

@@ -27,7 +27,6 @@ abstract class A
 class B : A
 {
 	public constructor(separator = ', ', prefix = '[', suffix = ']')
-		: super()
 	{
 		this.separator = separator;
 		this.prefix = prefix;

@@ -585,7 +585,8 @@ public class Class : IFrameItem
     /// <param name="name">The name of this class</param>
     /// <param name="modifier">Determines the way this class supports inheritance</param>
     private Class(ClassID classID, string name, Modifier modifier) :
-        this(classID, name, modifier, null, CreateDefaultConstructor(name, Scope.Private),
+        this(classID, name, modifier, null,
+             CreateDefaultConstructor(name, modifier == Modifier.Final ? Scope.Private : Scope.Protected),
          null, null, null, null, null) { }
 
     /// <summary>
@@ -707,9 +708,14 @@ public class Class : IFrameItem
     /// </summary>
     /// <param name="className">The name of the owning class</param>
     /// <param name="scope">The scope of the constructor</param>
+    /// <param name="invokeSuper">Determines whether the constructor should invoke the superclass constructor</param>
     /// <returns>A <see cref="ClassMethod"/></returns>
-    private static ClassMethod CreateDefaultConstructor(string className, Scope scope) =>
-        new (className, scope, Modifier.Default, Function.Empty);
+    private static ClassMethod CreateDefaultConstructor(string className, Scope scope, bool invokeSuper = false)
+    {
+        var constructor = new ClassMethod(className, scope, Modifier.Default, Function.Empty);
+        if (invokeSuper) constructor.Function.Body.Insert(0, new ParentConstructorCall());
+        return constructor;
+    }
 
     /// <summary>
     /// Generates the body of the <i>TypeInfo::__read_superType</i> and  <i>MemberInfo::__read_definer</i> methods.
@@ -1293,7 +1299,7 @@ public class Class : IFrameItem
     /// <param name="constructor">The provided constructor</param>
     public void RegisterConstructor(ClassMethod constructor)
     {
-        Constructor = constructor ?? CreateDefaultConstructor(Name, Scope.Public);
+        Constructor = constructor ?? CreateDefaultConstructor(Name, Scope.Public, SuperClass != null);
         Constructor.Holder = this;
     }
 
