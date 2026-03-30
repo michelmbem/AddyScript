@@ -84,12 +84,13 @@ jobs:
       - name: Create macOS bundle
         if: startsWith(matrix.runtime, 'osx')
         run: |
-          APP="AddyScript.app"
+          APP="AddyScript/AddyScript.app"
 
           mkdir -p $APP/Contents/MacOS
           mkdir -p $APP/Contents/Helpers
           mkdir -p $APP/Contents/Resources
-
+          
+          ln -s /Applications AddyScript/Applications
           cp -R publish/${{ matrix.runtime }}/asgui/* $APP/Contents/MacOS/
           cp -R publish/${{ matrix.runtime }}/asis/* $APP/Contents/Helpers/
           cp src/AddyScript.Gui/Assets/Images/Icons/AddyScript.icns $APP/Contents/Resources/
@@ -121,13 +122,15 @@ jobs:
             </dict>
           </plist>
           EOF
+          
+          xattr -cr $APP
 
       - name: Create DMG
         if: startsWith(matrix.runtime, 'osx')
         run: |
           hdiutil create \
             -fs HFS+ \
-            -srcfolder ${{ env.APP_NAME }}.app \
+            -srcfolder AddyScript \
             -volname AddyScript \
             -format UDZO \
             -ov \
