@@ -587,7 +587,7 @@ public class Class : IFrameItem
     private Class(ClassID classID, string name, Modifier modifier) :
         this(classID, name, modifier, null,
              CreateDefaultConstructor(name, modifier == Modifier.Final ? Scope.Private : Scope.Protected),
-         null, null, null, null, null) { }
+             null, null, null, null, null) { }
 
     /// <summary>
     /// Initializes a new instance of Class.
