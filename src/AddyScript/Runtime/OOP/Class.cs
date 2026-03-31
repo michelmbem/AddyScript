@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using AddyScript.Ast.Expressions;
 using AddyScript.Ast.Statements;
@@ -1119,29 +1120,25 @@ public class Class : IFrameItem
     /// <returns>A collection of <see cref="ClassMember"/>s</returns>
     public ClassMemberSet<ClassMember> GetDeclaredMembers(MemberKind kind = MemberKind.All)
     {
-        var memberSet = new ClassMemberSet<ClassMember>();
+        ClassMemberSet<ClassMember> memberSet = [];
 
-        if ((kind & MemberKind.Constructor) != MemberKind.None)
+        if (kind.HasFlag(MemberKind.Constructor))
             memberSet.Add(Constructor);
 
-        if (!((kind & MemberKind.Indexer) == MemberKind.None || Indexer == null))
+        if (kind.HasFlag(MemberKind.Indexer) && Indexer != null)
             memberSet.Add(Indexer);
 
-        if ((kind & MemberKind.Field) != MemberKind.None)
-            foreach (ClassField field in Fields)
-                memberSet.Add(field);
+        if (kind.HasFlag(MemberKind.Field))
+            memberSet.AddRange(Fields);
 
-        if ((kind & MemberKind.Property) != MemberKind.None)
-            foreach (ClassProperty property in Properties)
-                memberSet.Add(property);
+        if (kind.HasFlag(MemberKind.Property))
+            memberSet.AddRange(Properties);
 
-        if ((kind & MemberKind.Method) != MemberKind.None)
-            foreach (ClassMethod method in Methods)
-                memberSet.Add(method);
+        if (kind.HasFlag(MemberKind.Method))
+            memberSet.AddRange(Methods);
 
-        if ((kind & MemberKind.Event) != MemberKind.None)
-            foreach (ClassEvent method in Events)
-                memberSet.Add(method);
+        if (kind.HasFlag(MemberKind.Event))
+            memberSet.AddRange(Events);
 
         return memberSet;
     }
@@ -1153,8 +1150,9 @@ public class Class : IFrameItem
     /// <returns>A collection of <see cref="ClassMember"/>s</returns>
     public ClassMemberSet<ClassMember> GetMembers(MemberKind kind = MemberKind.All)
     {
-        var memberSet = new ClassMemberSet<ClassMember>();
-        if ((kind & MemberKind.Constructor) != MemberKind.None)
+        ClassMemberSet<ClassMember> memberSet = [];
+
+        if (kind.HasFlag(MemberKind.Constructor))
             memberSet.Add(Constructor);
 
         MemberKind noCtor = kind & ~MemberKind.Constructor;
@@ -1163,10 +1161,7 @@ public class Class : IFrameItem
         while (klass != null)
         {
             var members = klass.GetDeclaredMembers(noCtor);
-
-            foreach (ClassMember member in members)
-                if (!memberSet.Contains(member.Name))
-                    memberSet.Add(member);
+            memberSet.AddRange(members.Where(member => !memberSet.Contains(member.Name)));
 
             klass = klass.SuperClass;
         }
@@ -1182,23 +1177,23 @@ public class Class : IFrameItem
     /// <returns>A <see cref="ClassMember"/></returns>
     public ClassMember GetDeclaredMember(string memberName, MemberKind kind = MemberKind.All)
     {
-        if ((kind & MemberKind.Constructor) != MemberKind.None && memberName == Name)
+        if (kind.HasFlag(MemberKind.Constructor) && memberName == Name)
             return Constructor;
 
-        if ((kind & MemberKind.Indexer) != MemberKind.None && memberName == ClassProperty.INDEXER_NAME)
+        if (kind.HasFlag(MemberKind.Indexer) && memberName == ClassProperty.INDEXER_NAME)
             return Indexer;
 
-        if ((kind & MemberKind.Field) != MemberKind.None && Fields.Contains(memberName))
-            return Fields[memberName];
+        if (kind.HasFlag(MemberKind.Field) && Fields.TryGetValue(memberName, out var field))
+            return field;
 
-        if ((kind & MemberKind.Property) != MemberKind.None && Properties.Contains(memberName))
-            return Properties[memberName];
+        if (kind.HasFlag(MemberKind.Property) && Properties.TryGetValue(memberName, out var property))
+            return property;
 
-        if ((kind & MemberKind.Method) != MemberKind.None && Methods.Contains(memberName))
-            return Methods[memberName];
+        if (kind.HasFlag(MemberKind.Method) && Methods.TryGetValue(memberName, out var method))
+            return method;
 
-        if ((kind & MemberKind.Event) != MemberKind.None && Events.Contains(memberName))
-            return Events[memberName];
+        if (kind.HasFlag(MemberKind.Event) && Events.TryGetValue(memberName, out var _event))
+            return _event;
 
         return null;
     }
@@ -1227,7 +1222,7 @@ public class Class : IFrameItem
     {
         Class klass = this;
 
-        while (!(klass == null || klass.Fields.Contains(fieldName)))
+        while (klass?.Fields.Contains(fieldName) == false)
             klass = klass.SuperClass;
 
         return klass?.Fields[fieldName];
@@ -1242,7 +1237,7 @@ public class Class : IFrameItem
     {
         Class klass = this;
 
-        while (!(klass == null || klass.Properties.Contains(propertyName)))
+        while (klass?.Properties.Contains(propertyName) == false)
             klass = klass.SuperClass;
 
         return klass?.Properties[propertyName];
@@ -1257,7 +1252,7 @@ public class Class : IFrameItem
     {
         Class klass = this;
 
-        while (!(klass == null || klass.Methods.Contains(methodName)))
+        while (klass?.Methods.Contains(methodName) == false)
             klass = klass.SuperClass;
 
         return klass?.Methods[methodName];
@@ -1272,7 +1267,7 @@ public class Class : IFrameItem
     {
         Class klass = this;
 
-        while (!(klass == null || klass.Events.Contains(eventName)))
+        while (klass?.Events.Contains(eventName) == false)
             klass = klass.SuperClass;
 
         return klass?.Events[eventName];
