@@ -1299,7 +1299,20 @@ public class Class : IFrameItem
     /// <param name="constructor">The provided constructor</param>
     public void RegisterConstructor(ClassMethod constructor)
     {
-        Constructor = constructor ?? CreateDefaultConstructor(Name, Scope.Public, SuperClass != null);
+        if (constructor != null)
+            Constructor = constructor;
+        else
+        {
+            var ctorScope = Modifier switch
+            {
+                Modifier.Abstract => Scope.Protected,
+                Modifier.Static => Scope.Private,
+                _ => Scope.Public
+            };
+
+            Constructor = CreateDefaultConstructor(Name, ctorScope, SuperClass != null);
+        }
+
         Constructor.Holder = this;
     }
 
