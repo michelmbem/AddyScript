@@ -11,11 +11,11 @@ namespace AddyScript.Interactive;
 internal static class Program
 {
     private const string WELCOME_MESSAGE_FORMAT = """
-                                                  {0} Interactive Shell, version {1} by {2}.
-                                                  GitHub: {3}.
-                                                  Wiki: {4}.
-                                                  Use the exit() function to quit.
-                                                  """;
+        {0} Interactive Shell, version {1} by {2}.
+        GitHub: {3}.
+        Wiki: {4}.
+        Use the exit() function to quit.
+        """;
     private const string SUCCESS_MESSAGE_FORMAT = "res: {0}";
     private const string ERROR_MESSAGE_FORMAT = "{0}: \"{1}\" in {2} at line {3}, column {4}";
     private const string MAIN_PROMPT = ">>> ";
